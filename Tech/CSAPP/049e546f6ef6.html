@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>程序：从源码到终止（ICS期末报告） | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="概述本报告将从源代码开始，追溯一个简单程序从编译到运行结束的全过程。系统环境是 WSL2 Ubuntu 20.04.5 LTS，编译使用 gcc 和 glibc 版本为 gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0 以及 GLIBC 2.31-0ubuntu9.9。使用的程序代码如下： 12345678#include &lt;stdio.h&gt;#incl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程序：从源码到终止（ICS期末报告）">
+<meta property="og:url" content="https://cameudis.github.io/Tech/CSAPP/049e546f6ef6.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="概述本报告将从源代码开始，追溯一个简单程序从编译到运行结束的全过程。系统环境是 WSL2 Ubuntu 20.04.5 LTS，编译使用 gcc 和 glibc 版本为 gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0 以及 GLIBC 2.31-0ubuntu9.9。使用的程序代码如下： 12345678#include &lt;stdio.h&gt;#incl">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2023-01-12T11:45:14.000Z">
+<meta property="article:modified_time" content="2023-01-15T08:08:01.128Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="CSAPP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://cameudis.github.io/Tech/CSAPP/049e546f6ef6.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '程序：从源码到终止（ICS期末报告）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-15 16:08:01'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">58</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">程序：从源码到终止（ICS期末报告）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-12T11:45:14.000Z" title="Created 2023-01-12 19:45:14">2023-01-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-15T08:08:01.128Z" title="Updated 2023-01-15 16:08:01">2023-01-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/CSAPP/">CSAPP</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/CSAPP/049e546f6ef6.html" data-flag-title="程序：从源码到终止（ICS期末报告）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/CSAPP/049e546f6ef6.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/CSAPP/049e546f6ef6.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本报告将从源代码开始，追溯一个简单程序从编译到运行结束的全过程。<br>系统环境是 WSL2 Ubuntu 20.04.5 LTS，编译使用 gcc 和 glibc 版本为 <code>gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0</code> 以及 <code>GLIBC 2.31-0ubuntu9.9</code>。<br>使用的程序代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">char</span> *s = (<span class="type">char</span>*)<span class="built_in">malloc</span>(<span class="number">16</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%15s&quot;</span> , s);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;Hello %s\n&quot;</span> , s);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-编译和链接"><a href="#1-编译和链接" class="headerlink" title="1 编译和链接"></a>1 编译和链接</h2><p>我们平时使用的”编译器”gcc，其全称是 GNU Compiler Collection，是一套组合程序，即教材中的 compiler driver。<br>gcc将程序编译为完整程序的过程可以分为如下几步：</p>
+<ol>
+<li>预编译：C 预编译器 cpp 会处理源代码中的宏以及引用，并简化代码（删除所有注释，调整缩进）</li>
+<li>编译：C 编译器 cc1 会将 C 代码翻译成汇编代码文本</li>
+<li>汇编：汇编器 as 将根据汇编代码文本生成一个二进制的可重定位目标文件</li>
+<li>链接：链接器 ld （注意加载器是 <code>ld.so</code>）把多个可重定位目标文件以及需要的系统目标文件进行链接，生成二进制可执行文件</li>
+</ol>
+<p>在实际操作中，我们可以一步一步完成上述的整个过程。<br>预编译： <code>cpp ./prog.c prog.i</code><br>编译： <code>/usr/lib/gcc/x86_64-linux-gnu/9/cc1 ./prog.i -o prog.s</code><br>汇编： <code>as ./prog.s -o prog.o</code><br>链接： <code>gcc ./prog.o -o prog</code><br>最后一步还是不得不使用了 gcc，这是因为直接使用 ld 或者其封装 collect2 需要我们自己指定链接用的库，如果直接使用会报如下错误（找不到某些符号在哪）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ ld ./prog.o -o prog</span><br><span class="line">ld: warning: cannot find entry symbol _start; defaulting to 0000000000401000</span><br><span class="line">ld: ./prog.o: <span class="keyword">in</span> <span class="keyword">function</span> `main<span class="string">&#x27;:</span></span><br><span class="line"><span class="string">prog.i:(.text+0xe): undefined reference to `malloc&#x27;</span></span><br><span class="line">ld: prog.i:(.text+0x2a): undefined reference to `__isoc99_scanf<span class="string">&#x27;</span></span><br><span class="line"><span class="string">ld: prog.i:(.text+0x42): undefined reference to `printf&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>在使用 gcc 进行编译时，可以通过参数 <code>-v, --verbose</code> 来显示编译过程的信息。得到的信息过于复杂，但是我们也可以从中发现一部分 ld 报错的原因，在 gcc 调用 collect2 的时候，参数多得吓死人，但从中我们可以看到几个教材中出现过的熟悉的身影，这里按顺序列举一下—— <code>Scrt1.o</code>、<code>crti.o</code>、<code>crtbeginS.o</code>、一大堆 -L 用来指定库、<code>crtendS.o</code>、<code>crtn.o</code> 。<br>报错中说找不到符号_start，是因为没有链接 <code>Scrt1.o</code> 。报错中说找不到某些库函数，是因为没有用 -L 告诉链接器有哪些库。由于库的目录比较多，涉及到繁琐的细节，因此这里就不深究了。</p>
+<p>我们可以检查一下每一步得到的中间文件（附件里都有），来探究一下到底每一步干了什么。</p>
+<h3 id="1-1-预编译"><a href="#1-1-预编译" class="headerlink" title="1.1 预编译"></a>1.1 预编译</h3><p>预编译之后得到一个极大无比的文本文件，与源文件相比，多出来的部分主要是两个 <code>#include</code> 被展开，其中包含了一大堆的函数声明。即使程序没用到这些函数，但这些函数在头文件里存在，就会被拿过来放到 <code>.i</code> 文件中。</p>
+<h3 id="1-2-编译"><a href="#1-2-编译" class="headerlink" title="1.2 编译"></a>1.2 编译</h3><p>令人感到神奇的是，编译之后得到的汇编代码文本文件，居然只有短短的 41 行。其中有汇编代码，也有诸如 <code>.section</code> <code>.string</code> 的指令。<br>我们可以看到程序用到的两个常量字符串 <code>&quot;%15s&quot;</code> 和 <code>&quot;Hello %s\n&quot;</code> 位于 <code>.rodata</code> section，而 <code>main</code> 这个全局标号位于 <code>.text</code> 节（代码节）。</p>
+<h3 id="1-3-汇编"><a href="#1-3-汇编" class="headerlink" title="1.3 汇编"></a>1.3 汇编</h3><p>这一步能够生成目标文件，由于是二进制文件所以体积一下子变大了。<br>作为一个 ELF 文件，目标文件具有严格的规范，因此汇编器除了翻译 <code>prog.s</code> 中的指令以外，还添加了许多内容来满足 ELF 的格式。我们可以借助 <code>objdump</code> 和 <code>readelf</code> 来看看里面有哪些东西。</p>
+<p>首先看文件头（elf header），使用指令 <code>readelf -h ./prog.o</code> ，其中包含了文件的魔数、架构、大端还是小端、section headers 的位置、还有各种 flag 信息。</p>
+<p>在 section header table 中，存储了目标文件各个 section 的名字、大小、相对于文件起始处的偏移（即位置）等信息，这里结合教材观察几个重要的section。</p>
+<ul>
+<li><code>.text</code> 节紧跟在文件头之后，有 0x48 个字节，可以用 <code>objdump -d</code> 反汇编程序所有可执行代码；</li>
+<li><code>.rel.text</code> 节记录了需要重定位的代码地址；</li>
+<li><code>.data</code> 节和 <code>.bss</code> 节分别存储已初始化和未初始化的全局变量，这里大小都为 0；</li>
+<li><code>.rodata</code> 节存储只读的常量，大小为 0xf，恰好是两个常量字符串大小相加，十分合理；</li>
+<li><code>.symtab</code> 节记录了函数和全局变量的信息 (<code>readelf -s</code>)，比如 <code>main</code> 和用到的库函数（UND）；</li>
+<li><code>.strtab</code> 节记录了符号表中符号的名称 （<code>readelf -p .strtab</code>），比如 “main” 和 “malloc”。</li>
+</ul>
+<h3 id="1-4-链接"><a href="#1-4-链接" class="headerlink" title="1.4 链接"></a>1.4 链接</h3><p>链接过后的 目标文件成为了可执行文件，体积一下子从 1.7K 变成了 17K。</p>
+<p>首先是多了一个端头部表，或者称为 PHT（Program Header Table），用来指示加载器如何加载各个 segment 到不同的页中（包括各个 segment 的物理和虚拟地址、物理和虚拟大小等信息）。<br>其次是多了许多的代码，重要的如 <code>_start</code>，处理动态链接的 <code>.plt</code> segment，<code>_init</code> 和 <code>_fini</code>。<br>此外还添加了许多数据结构，重要的如记录库函数真实地址的 GOT 表，记录动态链接所需信息的 <code>.dynamic</code> 节，本报告后续会提到这些数据结构。</p>
+<h2 id="2-命令行执行"><a href="#2-命令行执行" class="headerlink" title="2 命令行执行"></a>2 命令行执行</h2><p>终于到了激动人心的执行时刻。这一部分将会探索从命令行执行指令 <code>./prog</code>，按下回车键，一直到程序开始执行 <code>_start</code> 中的第一条指令前，计算机都完成了哪些工作。</p>
+<p>首先，shell 程序会对指令进行解析，把字符串拆分成一个字符数组，这里就是单纯的一个 <code>[&quot;./prog&quot;, NULL]</code>。<br>在 shell 确认这不是一个内置的指令后，它会 <code>fork</code>（系统调用）出一个子进程，内核为新的子进程创建其数据结构、分配一个新的 PID 、并复制一个 <code>mm_struct</code> 然后把里面的页都标记成 private copy-on-write，从抽象上讲已经为新进程复制了所有的空间。</p>
+<p>由于我们没有用 <code>&#39;&amp;&#39;</code> 指定后台运行，因此 shell 主进程会调用 <code>waitpid</code> 系统调用来等待子进程运行结束。<br>而对于子进程，通过 <code>strace</code> 工具可以明确看到，接下来它会调用 <code>execve(&quot;./prog&quot;, [&quot;./prog&quot;], 0x7ffea1185a30) = 0</code>，来让自己”变成”我们运行的程序，或者说 <code>.prog</code> 替换了 shell 的子进程的程序。其中，<code>0x7ffea1185a30</code> 是环境变量数组的地址, shell 会直接让子进程继承自己的环境变量。</p>
+<hr>
+<p>结合 <code>execve</code> 的 man page 和教材，<code>execve</code>（即内核）会负责完成程序的加载：删除原有用户空间的地址映射，然后重新映射新程序的代码段、数据段、栈的区域。如果程序是动态链接 ELF 的话，内核还会调用 PT_INTERP segment 中记录的动态加载器。使用 glibc 编译的话就是 <code>ld.so</code>。<br>由于是内核处理，因此 <code>strace</code> 不会记录这些过程。<br>可以用 <code>ldd</code> 工具查看+查找一个 ELF 需要的动态链接库和动态加载器。我们看到程序要求的加载器为 <code>/lib64/ld-linux-x86-64.so.2</code>。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ldd ./prog</span><br><span class="line">        linux-vdso.so.1 (0x00007ffc4b5b4000)</span><br><span class="line">        libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f1b9400b000)</span><br><span class="line">        /lib64/ld-linux-x86-64.so.2 (0x00007f1b9420e000)</span><br></pre></td></tr></table></figure>
+
+<p>另外，由于<strong>按需加载</strong>原则，实际上这里并没有将程序真的从硬盘中取到内存中，而只是在页表中添加了其映射关系。</p>
+<p>我们借助 <code>strace</code> 工具以及进程的 <code>/proc/[PID]/maps</code> 来分析这个过程。<br>首先子进程会调用 <code>execve</code>，在执行完 <code>execve</code> 后出现了一大堆系统调用，是加载器 <code>ld.so</code> 加载共享链接库的过程。（通过共享库的加载地址和 <code>strace</code> 打印的 <code>mmap</code> 返回地址对照即可发现）另外，加载器 <code>ld.so</code> 本身的加载由 <code>execve</code> （也就是内核）完成，因为我们在 <code>execve</code> 之后并不能看到加载加载器的系统调用。<br>在动态加载器操作完之后，共享库映射关系都已经确定（或者说已经 allocated 了），此时才会真正开始从程序的入口处执行程序。为了证实这一点，我们可以通过 gdb 下断点断在 <code>_start</code> 处，然后查看此时程序的虚拟地址空间映射（这里使用了 gdb 插件 pwndbg 提供的 <code>vmmap</code> 指令），可以看到这时共享库确实已经被加载完毕了。</p>
+<p>之后，终于进入程序运行流，开始运行程序。</p>
+<h2 id="3-启动-main-函数"><a href="#3-启动-main-函数" class="headerlink" title="3 启动 main 函数"></a>3 启动 main 函数</h2><p>本部分我们来简单探索一下从 <code>_start</code> 到 <code>main</code> 的过程。由于这部分教材中并没有详细讲解，因此本报告中也不深挖这部分的细节。</p>
+<p>简而言之，<code>_start</code> 调用 <code>__libc_start_main</code>，顾名思义是位于共享库 libc 中的一个用来启动 main 函数的函数，其实同时也负责在 main 函数返回后处理程序后事。<br>然后 <code>__libc_start_main</code> 会调用 <code>main</code> 函数，进入程序员编写的代码部分。</p>
+<p>我们可以通过 gdb 来观察这个过程，只需要从 <code>_start</code> 一步一步执行即可。逃课的方法就是把断点下在 main，然后使用 <code>backtrace</code> 查看这时的函数调用关系：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; backtrace</span><br><span class="line">#0  0x000055555555515d in main ()</span><br><span class="line">#1  0x00007ffff7df0083 in __libc_start_main (main=0x555555555159 &lt;main&gt;, argc=1, argv=0x7fffffffe008, init=&lt;optimized out&gt;, fini=&lt;optimized out&gt;, rtld_fini=&lt;optimized out&gt;, stack_end=0x7fffffffdff8) at ../csu/libc-start.c:308</span><br><span class="line">#2  0x000055555555509e in _start ()</span><br></pre></td></tr></table></figure>
+
+<p>更具体一些的话，<code>__libc_start_main()</code> 会调用程序静态链接的 <code>__libc_csu_init()</code> 函数，这个函数又会调用位于 <code>.init</code> 段中的 <code>_init_proc()</code> 和位于 <code>.init_array</code> 中的函数。（这是一个函数指针数组）<br>此外，<code>__libc_start_main()</code> 还会调用 <code>_cxa_atexit()</code>，这个函数可以让库函数 <code>exit()</code> 在退出程序前执行指定的函数，这里是让 <code>exit()</code> 执行 <code>__libc_csu_fini()</code> 函数。<br>在进行完上述步骤后，它才会调用 main 函数，真是十分复杂的初始化过程。报告写得如此详细，是因为我接触过一道通过修改与 <code>.init_array</code> 类似的 <code>.fini_array</code> 中函数指针的地址来完成攻击的 CTF 题目（pwnable. tw-3x17）（这两个全局变量竟然是 RW 的）。<br>本部分参考了 <a target="_blank" rel="noopener" href="https://blog.csdn.net/gary_ygl/article/details/8506007">linux编程之main()函数启动过程</a>。</p>
+<h2 id="4-运行-main-函数"><a href="#4-运行-main-函数" class="headerlink" title="4 运行 main 函数"></a>4 运行 main 函数</h2><p>进入 main 函数的执行！main 函数作为一个用到了局部变量的用户态函数，会在用户栈中有属于自己的栈帧，因此在函数的开头和末尾都有用于开辟、退出栈帧的代码。</p>
+<p>在我们的程序中，main 调用了三个库函数—— <code>malloc()</code>, <code>scanf()</code> 以及 <code>printf()</code>。在调用它们之前，main 函数会将参数放到 rdi 和 rsi 等寄存器中（在汇编指令中可能会放到 edi 等寄存器中，由于高 32 位会自动清零，这么做可以缩短代码长度），这是 64 位 Linux 的规约。在 32 位 Linux 下就不会这么传参，而是将参数按顺序放在栈上（第一个参数在地址最低处，以此类推），然后再调用函数（因此返回地址上面就是其参数）。</p>
+<p>之后本章将会分为三个小节——动态链接、动态内存分配和 I&#x2F;O。</p>
+<h3 id="4-1-动态链接"><a href="#4-1-动态链接" class="headerlink" title="4.1 动态链接"></a>4.1 动态链接</h3><p>动态链接库 <code>libc.so.6</code> 在被加载到内存时，由于 Linux 系统默认开启的 ASLR 保护，它会被加载到一个随机的位置，不过仍然满足基础的 4KB 的页对齐（也就是其基址最低 12 比特一定是 0）。程序需要调用的库函数，其实际位置（指位于进程虚拟内存空间的地址）在加载器 ld 用 <code>mmap</code> 把共享库映射到进程的虚拟内存空间之前是未知的，因此在程序开始运行后我们需要处理动态链接的”重定位”。<br>之所以这里重定位打了个引号，是因为动态链接的符号，其重定位机制和静态链接大有不同。静态链接的重定位就是直接修改代码中的地址，但动态链接不是这么处理的。<br>理由之一是进程的代码段权限是 RX，也就是不可写的，要是可写的话会产生严重的安全隐患。但对于这个理由我可以提出疑惑：如果让 ld 在程序的 <code>_start</code> 开始执行之前，就由 ld 做好全部代码的重定位，然后再用 mprotect 系统调用修改代码段权限为不可写，不是一样安全吗？<br>但是问题来了，这样对大量引用库函数的程序非常不友好：在程序还未开始时，ld 会花较大的时间开销来进行重定位工作，这时的重定位可不像编译软件时一样慢点也就慢点了，而是会实实在在地增加程序运行的启动时间。<br>因此，类似于按需调页的机制，动态链接也使用了延迟绑定（Lazy Binding）的机制，只在用到库函数的时候才去处理它的重定位。显然，上述修改代码段的地址引用的重定位方法无法做到安全的延迟绑定，因此有了 PLT 和 GOT 表机制。</p>
+<p>简而言之，GOT（Global Offset Table）存符号地址，PLT 存负责调用 GOT 的代码。<br>回到我们的 prog，当它调用库函数时，它实际调用的是 PLT 中的代码，可以用 <code>objdump</code> 看到：<br><code>call   1040 &lt;malloc@plt&gt;</code><br><code>call   1050 &lt;__isoc99_scanf@plt&gt;</code><br><code>call   1030 &lt;printf@plt&gt;</code></p>
+<p>以 <code>malloc</code> 为例说明延迟绑定机制，注意到我的环境下编译得到的 PLT 和 GOT 机制与教材中有差异，但本质不变。<br>当 <code>prog</code> 第一次调用 <code>malloc</code> 时，GOT 中还没有其实际位置，而是保存着 PLT 中某处的代码地址。所以第一次调用 <code>malloc</code> 的大致流程如下，我们使用 <code>gdb</code> 追踪一下这个流程 ：</p>
+<ol>
+<li><p>调用 <code>malloc</code> 对应 PLT 条目代码，并跳转到 GOT 当前记载的地址 <code>0x0000555555555040</code> ：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   0x555555555080 &lt;malloc@plt&gt;                  endbr64 </span><br><span class="line"> ► 0x555555555084 &lt;malloc@plt+4&gt;                bnd jmp qword ptr [rip + 0x2f95]</span><br><span class="line"></span><br><span class="line">pwndbg&gt; x/gx $rip+0x2f95+0x7        # 加的0x7是该指令本身长度</span><br><span class="line">0x555555558020 &lt;malloc@got.plt&gt;:        0x0000555555555040</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>虽然 <code>0x0000555555555040</code> 不像书中一样是 <code>malloc@plt</code> 的第二条指令，但其工作和书中相同：将 <code>malloc</code> 对应编号压栈并调用 PLT[0]：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">► 0x555555555040                                   endbr64 </span><br><span class="line">  0x555555555044                                   push   1</span><br><span class="line">  0x555555555049                                   bnd jmp 0x555555555020</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>PLT[0]将 GOT[1]压栈并调用 GOT[2]，也就是负责处理动态链接的 <code>ld.so</code> 中的库函数 <code>_dl_runtime_resolve_xsavec ()</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">  0x555555555020  push   qword ptr [rip + 0x2fe2]  &lt;_GLOBAL_OFFSET_TABLE_+8&gt;</span><br><span class="line">► 0x555555555026  bnd jmp qword ptr [rip + 0x2fe3] &lt;_dl_runtime_resolve_xsavec&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>动态链接器将 GOT[“malloc”]覆写成其实际地址，并直接调用之。此详细过程严重超纲因此不在本报告研究范围内。在从 <code>malloc</code> 返回之后，我们用 pwndbg 的命令 <code>got</code> 查看当前 GOT 表，可以看到只有 <code>malloc</code> 地址被填好了，还没用到的 <code>printf</code> 和 <code>scanf</code> 都指向 PLT 某处：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; got</span><br><span class="line">GOT protection: Partial RELRO | GOT functions: 3</span><br><span class="line">[0x555555558018] printf@GLIBC_2.2.5 -&gt; 0x555555555030 ◂— endbr64 </span><br><span class="line">[0x555555558020] malloc@GLIBC_2.2.5 -&gt; 0x7ffff7e660e0 (malloc) ◂— endbr64 </span><br><span class="line">[0x555555558028] __isoc99_scanf@GLIBC_2.7 -&gt; 0x555555555050 ◂— endbr64</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>另外，值得一提的是 Linux 的 RELRO 保护机制。<br>开启了 Full RELRO 保护的 binary 会在 main 开始运行前就将所有的 GOT 表项填充完毕，程序执行时 GOT 表权限不可写，从而防止攻击者覆写 GOT 来劫持程序控制流。<br>不知为何，我的环境下使用 <code>gcc ./prog.c -o prog</code> 编译出的可执行文件默认开启了 Full RELRO 而非采用延迟绑定的 Partial RELRO，因此为了开启延迟绑定，需要添加编译选项 <code>-z lazy</code>。上面的分析就是我开启了延迟绑定之后重新编译后完成的。</p>
+<h3 id="4-2-动态内存分配"><a href="#4-2-动态内存分配" class="headerlink" title="4.2 动态内存分配"></a>4.2 动态内存分配</h3><p>动态内存分配的过程其实可以拆分成多层，我们关注三层：</p>
+<ul>
+<li>用户程序 prog，调用 <code>malloc</code> 函数</li>
+<li>库函数 <code>malloc</code> ，负责调用系统调用 <code>brk</code> 和 <code>mmap</code></li>
+<li>系统调用 <code>brk</code> 和 <code>mmap</code> （内核代码）负责处理虚拟页分配的工作<br>本节重点关注中间那层—— <code>malloc</code> 可以看作一个对 <code>brk</code> 和 <code>mmap</code> 的封装，在内核给的大块空间的基础上，根据用户需求切割成一个个小的 chunk 给用户使用，为了增加 locality 而编写了一套十分复杂的已释放区块复用&amp;回收的机制。</li>
+</ul>
+<p>由于我们的 prog 没有多线程，因此他的堆是通过 <code>brk</code> 来分配的。我们通过 <code>strace</code> 输出和 <code>gdb</code> 来尝试观察。在 <code>gdb</code> 中使用指令 <code>catch syscall brk</code> 可以捕捉 <code>brk</code> 系统调用，我们第一次捕捉到是在运行 <code>ld.so</code> 中的代码时，对应 <code>strace</code> 开头捕捉到的一次。第二次就是运行 <code>malloc</code><br>时了，所以 <code>malloc</code> 实际调用了两次 <code>brk</code> ：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brk(NULL)                               = 0x563917de6000</span><br><span class="line">brk(0x563917e07000)                     = 0x563917e07000</span><br></pre></td></tr></table></figure>
+<p>第一次调用是为了获取当前堆顶指针的位置（虽然这时候堆还不存在），第二次获取是为了设置堆顶指针的值，也就是给堆申请了空间，简单计算得出申请大小为 <code>0x21000</code>，也就是 33 个页（132KB）。</p>
+<p>在得到这么大一片空间后，<code>malloc</code> 会从其中分出一小部分来给用户。我们使用 <code>pwndbg</code> 来查看从 <code>malloc</code> 返回后堆的区块情况：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x555555559000</span><br><span class="line">Size: 0x291</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x555555559290</span><br><span class="line">Size: 0x21</span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: 0x5555555592b0</span><br><span class="line">Size: 0x20d51</span><br></pre></td></tr></table></figure>
+<ul>
+<li>地址最低处的 0x290 大小的区块和一种释放区块缓存机制 Tcache 有关，这里不细究。</li>
+<li>中间的那个区块就是用户程序申请得到的空间，0x21 中那个 1 是一个 flag，表示前一个区块正在使用中（PREV_INUSE bit），0x20 而不是 0x10 是因为这个 chunk 的前 0x10 字节用来存储一些 metadata（具体来说是 prev_size 和 size 字段），后面的 0x10 是真正给用户使用的空间。因此，<code>malloc</code> 的返回地址也不是这里显示的 chunk 地址，而是加了 0x10 后的地址。</li>
+<li>最后一个是特殊的 Top chunk，<code>malloc</code> 用这个超大的 chunk 来指代没被分配给用户的空间</li>
+</ul>
+<p>我们在调用 <code>scanf</code> 并输入 <code>&quot;aaaabbbbccccdddd&quot;</code> 后再来看看这个 chunk 的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/4gx 0x555555559290</span><br><span class="line">0x555555559290: 0x0000000000000000      0x0000000000000021</span><br><span class="line">0x5555555592a0: 0x6262626261616161      0x0064646463636363</span><br></pre></td></tr></table></figure>
+<p>这就证实了上面介绍的 chunk 的结构。我们调用 <code>scanf</code> 时限制读取 15 大小，因此这里用户可用的 0x10 个字节最后正好用来存放 NULL Byte，没有出现溢出。由于小端法，这个地址最高位的 <code>&#39;\x00&#39;</code> 被理解为一个八字节整形的最高位。</p>
+<h3 id="4-3-I-x2F-O"><a href="#4-3-I-x2F-O" class="headerlink" title="4.3 I&#x2F;O"></a>4.3 I&#x2F;O</h3><p>IO 相关库函数和 <code>malloc</code> 一样，是封装了系统调用 <code>read</code> 和 <code>write</code> 并提供更复杂接口功能的函数。<code>scanf</code> 和 <code>printf</code> 会使用从 shell 那里继承下来的文件描述符 <code>stdin</code> 和 <code>stdout</code> 来读取和输出。<br>IO 相关库函数会有自己的 buffer，而非直接进行输入输出。在调用了 <code>scanf</code> 后，我们再在 <code>pwndbg</code> 里使用 <code>heap</code> 指令，就可以发现 <code>scanf</code> 调用 <code>malloc</code> 分配了一块大小为 0x411（申请大小为 0x400）的空间，这就是输入的 buffer；在 printf 结束后同样可以看到一块输出的 buffer。（我们甚至还可以检查一下 Buffer 里的内容，但报告已经满 8 页就不看了）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x5555555592b0</span><br><span class="line">Size: 0x411</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x5555555596c0</span><br><span class="line">Size: 0x411</span><br><span class="line">Top chunk | PREV_INUSE</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-程序退出"><a href="#5-程序退出" class="headerlink" title="5 程序退出"></a>5 程序退出</h2><p>当 main 函数返回后，程序回到 <code>__libc_start_main</code>，然后调用了库函数 <code>exit</code>。库函数 <code>exit</code> 会调用系统调用 <code>exit</code>。内核具体干了什么超出了 ICS 的教学范围，这里我们就快进到进程已终止。<br>如果不被父进程回收的话，那么这个程序会一直保持僵尸状态；不过我们运气很好，shell 主进程还一直 <code>waitpid</code> 着呢。于是 shell 把它的子进程回收了，在命令行上打印出一个 prompt，然后继续等待用户输入下一个指令。至此，程序运行完成！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://cameudis.github.io">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://cameudis.github.io/Tech/CSAPP/049e546f6ef6.html">https://cameudis.github.io/Tech/CSAPP/049e546f6ef6.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CSAPP/">CSAPP</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/Daily/%E5%91%A8%E8%AE%B0/e394f4617e35.html" title="OSS#0x16"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">OSS#0x16</div></div></a></div><div class="next-post pull-right"><a href="/Tech/Pwn/fcbf94ce9a6a.html" title="babyheap_0ctf_2017 note"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">babyheap_0ctf_2017 note</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/Tech/CSAPP/10e1fe259481.html" title="CSAPP:Lab2 BombLab"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-31</div><div class="title">CSAPP:Lab2 BombLab</div></div></a></div><div><a href="/Tech/CSAPP/1135ac38337b.html" title="C&#x2F;C++汇编笔记#0"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-02</div><div class="title">C&#x2F;C++汇编笔记#0</div></div></a></div><div><a href="/Tech/CSAPP/16e6efac1dd3.html" title="C&#x2F;C++汇编笔记#1"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-04</div><div class="title">C&#x2F;C++汇编笔记#1</div></div></a></div><div><a href="/Tech/CSAPP/1b2c81a4ea2a.html" title="ICS:Lab1 DataLab"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-10-08</div><div class="title">ICS:Lab1 DataLab</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">58</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/cameudis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">大家都要学习、学习、再学习。应该学会毛泽东同志所提倡的“挤”和“钻”的精神，先挤出时间来学习，然后再钻研进去。没有一股自觉地挤劲和钻劲，是学不好的。——江泽民：《讲学习，讲政治，讲正气》</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5"><span class="toc-text">1 编译和链接</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-%E9%A2%84%E7%BC%96%E8%AF%91"><span class="toc-text">1.1 预编译</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E7%BC%96%E8%AF%91"><span class="toc-text">1.2 编译</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E6%B1%87%E7%BC%96"><span class="toc-text">1.3 汇编</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-%E9%93%BE%E6%8E%A5"><span class="toc-text">1.4 链接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%89%A7%E8%A1%8C"><span class="toc-text">2 命令行执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%90%AF%E5%8A%A8-main-%E5%87%BD%E6%95%B0"><span class="toc-text">3 启动 main 函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E8%BF%90%E8%A1%8C-main-%E5%87%BD%E6%95%B0"><span class="toc-text">4 运行 main 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5"><span class="toc-text">4.1 动态链接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="toc-text">4.2 动态内存分配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-I-x2F-O"><span class="toc-text">4.3 I&#x2F;O</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%A8%8B%E5%BA%8F%E9%80%80%E5%87%BA"><span class="toc-text">5 程序退出</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/e394f4617e35.html" title="OSS#0x16">OSS#0x16</a><time datetime="2023-01-15T08:14:39.000Z" title="Created 2023-01-15 16:14:39">2023-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/CSAPP/049e546f6ef6.html" title="程序：从源码到终止（ICS期末报告）">程序：从源码到终止（ICS期末报告）</a><time datetime="2023-01-12T11:45:14.000Z" title="Created 2023-01-12 19:45:14">2023-01-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/Pwn/fcbf94ce9a6a.html" title="babyheap_0ctf_2017 note">babyheap_0ctf_2017 note</a><time datetime="2023-01-11T02:06:09.000Z" title="Created 2023-01-11 10:06:09">2023-01-11</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/eda1a360bf9c.html" title="OSS#0x15">OSS#0x15</a><time datetime="2023-01-10T15:46:47.000Z" title="Created 2023-01-10 23:46:47">2023-01-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/23bb80ac2fa2.html" title="一星七#0x14">一星七#0x14</a><time datetime="2022-12-19T12:26:39.000Z" title="Created 2022-12-19 20:26:39">2022-12-19</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
