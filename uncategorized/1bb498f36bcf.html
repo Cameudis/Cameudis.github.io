@@ -1,0 +1,196 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>OSS#0x17 | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="快乐寒假第二周~ 我寒假安排不是以周为单位来安排的，而是以chunk为单位安排的，每个chunk4到5天左右，时间长度和任务目标都取决于我的心情。这种安排方式不至于太细，有自由度，也不会像以前那种看板上全是任务一样令人焦虑，目前看来是很适合大端假期的任务安排模式。 这几天还是和之前一样，继续看CTFwiki，继续做ICSPA。PA目前做到2.3，已经实现了RV32I和RV32M的指令，也实现了一部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OSS#0x17">
+<meta property="og:url" content="https://cameudis.github.io/uncategorized/1bb498f36bcf.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="快乐寒假第二周~ 我寒假安排不是以周为单位来安排的，而是以chunk为单位安排的，每个chunk4到5天左右，时间长度和任务目标都取决于我的心情。这种安排方式不至于太细，有自由度，也不会像以前那种看板上全是任务一样令人焦虑，目前看来是很适合大端假期的任务安排模式。 这几天还是和之前一样，继续看CTFwiki，继续做ICSPA。PA目前做到2.3，已经实现了RV32I和RV32M的指令，也实现了一部">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2023-01-23T12:24:26.000Z">
+<meta property="article:modified_time" content="2023-01-23T13:24:45.185Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://cameudis.github.io/uncategorized/1bb498f36bcf.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'OSS#0x17',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-01-23 21:24:45'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">OSS#0x17</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-23T12:24:26.000Z" title="Created 2023-01-23 20:24:26">2023-01-23</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-01-23T13:24:45.185Z" title="Updated 2023-01-23 21:24:45">2023-01-23</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/uncategorized/1bb498f36bcf.html" data-flag-title="OSS#0x17"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/uncategorized/1bb498f36bcf.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/uncategorized/1bb498f36bcf.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>快乐寒假第二周~</p>
+<p>我寒假安排不是以周为单位来安排的，而是以chunk为单位安排的，每个chunk4到5天左右，时间长度和任务目标都取决于我的心情。这种安排方式不至于太细，有自由度，也不会像以前那种看板上全是任务一样令人焦虑，目前看来是很适合大端假期的任务安排模式。</p>
+<p>这几天还是和之前一样，继续看CTFwiki，继续做ICSPA。PA目前做到2.3，已经实现了RV32I和RV32M的指令，也实现了一部分klib中的函数。<br>最主要头疼的还是Makefile，这相当于一门新语言了，还有各种“库”函数（什么info，basename，notdir……），真的是RTFM、STFW读得很痛苦（而且私以为官方手册不太好查，跟我一起写Makefile有的东西又查不到）。今天看了一整天才把流程大致弄清楚，细节还没去深究。</p>
+<p>但是跳出琐碎的实现细节来看，<strong>PA，或者说计算机系统，真的是非常有趣、复杂、合理、抽象、富有魅力的一套系统</strong>。<br>大一的时候看过<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1EW411u7th">Crash Course Computer Science系列</a>，基本了解了整个计算机系统是如何运行的。每次Carrie Anne说这是“Another level of abstraction”，就会出现一个小动画，用来强调<strong>抽象</strong>。当时我已经对计算机由一层层的抽象组成有了初步的印象，但是我其实对这些层次是什么，有什么用，并没有很具体的认识。<br>南大的PA作为他们拔尖班“计算机系统基础”这门课的Project Assignment，确实教的是计算机系统的基础，能让已经学习过《CSAPP》的我对计算机有一个更具体的认识，能够更好理解各个抽象层之间的关系了。</p>
+<p>之前我写的所有程序都运行于标准库之上，因此标准库已经成为了想当然的一个存在。我在之前写ICS课程报告时知道了其实 _start 也是从某个目标文件里链接出来的，但我其实分不清这到底是谁的机制，是OS的？是内核的？是编译器的？是标准库的？<br>现在做PA，痛苦地RTFSC时看到了一个_start的汇编实现，我才终于略懂这玩意是啥：<br><strong>运行时环境</strong>规定了可执行文件的格式、加载方式，也规定了如何寻找程序的起始点。比如Linux会通过查询ELF头来寻找Entry Point，而nemu则会把程序加载到0x80000000处，并默认起始点就在此处（但是nemu不是运行时环境，这点我之后还得琢磨琢磨）。然后由链接器来遵循这些约定，安排程序各个段在可执行文件中的位置。在pa中，框架代码里有一个 <code>linker.ld</code> 文件，就是用来给链接器指示这些约定的。下面是讲义对这个链接脚本的说明：</p>
+<blockquote>
+<p>首先是.text节, 其中又以abstract-machine&#x2F;am&#x2F;src&#x2F;$ISA&#x2F;nemu&#x2F;start.S中自定义的entry节开始, 然后接下来是其它目标文件的.text节. 这样, 可执行程序起始处总是放置start.S的代码, 而不是其它代码, 保证客户程序总能从start.S开始正确执行. 链接脚本也定义了其它节(包括.rodata, .data, .bss)的链接顺序, 还定义了一些关于位置信息的符号, 包括每个节的末尾, 栈顶位置, 堆区的起始和末尾.</p>
+</blockquote>
+<p>至此，我才终于理解一个C程序到底是怎么来的！比如，main只是标准库的约定而已，在自己的标准库（运行时环境）中，我可以用_start直接启动main，也可以调用一个handler启动main，我也可以根本不启动main。甚至，我可以不用标准库，只要在链接脚本里写明入口点等信息，就可以直接从我的main函数开始执行！在看到了类似标准库的实现后，我终于理解了<strong>如果没有标准库（运行时环境）</strong>这层抽象，世界原来是什么样子的；但同样我也立马就感受到了运行时环境的强大之处 —— 复杂的功能居然能仅仅写几行C语言就编译出来了？</p>
+<blockquote>
+<p>先驱已经创造了图灵机. 但区区几个数字电路模块搭成的如此简单的机器, 又能做些什么呢? 先驱说, 一切无限的可能, 都蕴含于其中.</p>
+</blockquote>
+<p>在简单的状态机之上，复杂而神秘的软件世界正在向我们揭开她的面纱。下周我将继续肝肝肝！<br>（不过PA之后的工作当然不只有强化运行时环境，还需要给模拟的计算机硬件添加各种新功能呢hhh）</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://cameudis.github.io">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://cameudis.github.io/uncategorized/1bb498f36bcf.html">https://cameudis.github.io/uncategorized/1bb498f36bcf.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/uncategorized/c372e83f29fd.html" title="【ZCTF 2016】note2"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">【ZCTF 2016】note2</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/cameudis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">大家都要学习、学习、再学习。应该学会毛泽东同志所提倡的“挤”和“钻”的精神，先挤出时间来学习，然后再钻研进去。没有一股自觉地挤劲和钻劲，是学不好的。——江泽民：《讲学习，讲政治，讲正气》</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/uncategorized/1bb498f36bcf.html" title="OSS#0x17">OSS#0x17</a><time datetime="2023-01-23T12:24:26.000Z" title="Created 2023-01-23 20:24:26">2023-01-23</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/uncategorized/c372e83f29fd.html" title="【ZCTF 2016】note2">【ZCTF 2016】note2</a><time datetime="2023-01-16T07:59:08.000Z" title="Created 2023-01-16 15:59:08">2023-01-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/e394f4617e35.html" title="OSS#0x16">OSS#0x16</a><time datetime="2023-01-15T08:14:39.000Z" title="Created 2023-01-15 16:14:39">2023-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/CSAPP/049e546f6ef6.html" title="程序：从源码到终止（ICS期末报告）">程序：从源码到终止（ICS期末报告）</a><time datetime="2023-01-12T11:45:14.000Z" title="Created 2023-01-12 19:45:14">2023-01-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/Pwn/315b637e69b6.html" title="【0CTF 2017】babyheap note">【0CTF 2017】babyheap note</a><time datetime="2023-01-11T02:06:09.000Z" title="Created 2023-01-11 10:06:09">2023-01-11</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
