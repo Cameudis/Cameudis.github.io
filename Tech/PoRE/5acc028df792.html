@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>PoRE#0x0 | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="为了在学校的高强度课程《逆向工程原理 Principles of Reverse Engineer》存活下来，站主决定开启一个系列笔记，并同步到博客上。目标是将课程以及实验的要点以人话讲清楚，整理一些便于查询的cheatsheet，并尝试拓展学习一些有趣的内容，以便同学和自己参考。（如果有同学看的话(´_ゝ&#96;)） 本期作为第0期，主要记录课程的基础设施使用方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PoRE#0x0">
+<meta property="og:url" content="https://cameudis.github.io/Tech/PoRE/5acc028df792.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="为了在学校的高强度课程《逆向工程原理 Principles of Reverse Engineer》存活下来，站主决定开启一个系列笔记，并同步到博客上。目标是将课程以及实验的要点以人话讲清楚，整理一些便于查询的cheatsheet，并尝试拓展学习一些有趣的内容，以便同学和自己参考。（如果有同学看的话(´_ゝ&#96;)） 本期作为第0期，主要记录课程的基础设施使用方法。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2023-03-03T08:43:28.000Z">
+<meta property="article:modified_time" content="2023-03-03T11:44:47.968Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="PoRE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://cameudis.github.io/Tech/PoRE/5acc028df792.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PoRE#0x0',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-03-03 19:44:47'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">68</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">PoRE#0x0</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-03T08:43:28.000Z" title="Created 2023-03-03 16:43:28">2023-03-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-03-03T11:44:47.968Z" title="Updated 2023-03-03 19:44:47">2023-03-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/PoRE/">PoRE</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/PoRE/5acc028df792.html" data-flag-title="PoRE#0x0"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/PoRE/5acc028df792.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/PoRE/5acc028df792.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>为了在学校的高强度课程《逆向工程原理 Principles of Reverse Engineer》存活下来，站主决定开启一个系列笔记，并同步到博客上。<br>目标是将课程以及实验的要点以人话讲清楚，整理一些便于查询的cheatsheet，并尝试拓展学习一些有趣的内容，以便同学和自己参考。（如果有同学看的话(´_ゝ&#96;)）</p>
+<p>本期作为第0期，主要记录课程的基础设施使用方法。</p>
+<span id="more"></span>
+
+<h2 id="在-PoRE-中使用-git"><a href="#在-PoRE-中使用-git" class="headerlink" title="在 PoRE 中使用 git"></a>在 PoRE 中使用 git</h2><p>本课程所有的 slides 获取、作业获取以及作业提交都通过 GIT 完成。<br>GIT 作为一个分布式的版本控制软件，自然有强大的文件同步功能，能在客户端和服务器之间同步文件。</p>
+<p>完整的 GIT 系统是经典的客户端-服务端架构，服务器上存储了 GIT 仓库。<br>我们经常使用的 github，提供了 GIT 仓库的托管服务。而在PoRE课程中，我们使用的是课程搭建的 GIT 服务器。<br>在课程 GIT 服务器上，有如下一些仓库（repository，简称repo）：</p>
+<ul>
+<li>release：LAB 的分发版本</li>
+<li>pore_2130xxx0xxx：每个人的个人仓库，主要用于提交</li>
+<li>slides：存放课程的 slides</li>
+</ul>
+<p>在 PoRE 中使用 git 的完整流程如下：</p>
+<ol>
+<li>和TA注册公钥，服务器会允许你使用私钥来登录服务器的 gitpore 账号</li>
+<li>使用 <code>git clone</code> 下载自己的个人仓库（目前是空的）</li>
+<li>使用 <code>gir remote add</code> 将 release 仓库添加至远程仓库列表中，并命名为 release<br>（以下步骤为每次 Lab 的流程）</li>
+<li>使用 <code>git pull release master</code> 来让本地文件与 release 仓库的 master 分支同步（下载最新作业分发）</li>
+<li>完成Lab，多使用 <code>git commit</code> 和 <code>git push origin master</code> 来在本地、远程存档。其中 origin 是指我们位于服务器的个人仓库。</li>
+<li>在最后的提交时，使用 <code>git tag &#39;submit&#39;</code> 来标记当前 commit 为最终版本。</li>
+</ol>
+<p>此外，未来常用的操作还有：<br>0. 一键add：<code>git add &lt;path_of_root_dir&gt;</code></p>
+<ol>
+<li>撤回本地 commit，并且不还原文件：<code>git reset --soft HEAD^</code></li>
+<li>撤回远程 commit，并且不还原文件：上一步基础上将本地强行同步至远程仓库 <code>git push origin master --force</code></li>
+<li>删除本地 tag：<code>git tag -d &lt;tagname&gt;</code></li>
+<li>删除远程 tag：上一步基础上 <code>git push origin :refs/tags/&lt;tagname&gt;</code></li>
+</ol>
+<h3 id="指定-git-使用的-SSH-密钥"><a href="#指定-git-使用的-SSH-密钥" class="headerlink" title="指定 git 使用的 SSH 密钥"></a>指定 git 使用的 SSH 密钥</h3><p>如果需要在多个设备上使用同一对密钥，或者设备迁移之后要迁移密钥，或者想要同时使用多个密钥，可以通过如下的方式为不同的主机设置不同的密钥（这其实不是 git 的配置，而是 ssh 的配置）：</p>
+<p>进入 <code>~/.ssh/</code>，如果没有 config 文件的话就创建一个 config 文件（文件名为 config）。<br>config 的规则是从上至下读取条目，若找到匹配的Host就使用配置，找不到就默认。具体规则详见 <a target="_blank" rel="noopener" href="https://linux.die.net/man/5/ssh_config">man page</a>。<br>config 的条目格式如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host &lt;NickName&gt;</span><br><span class="line">    HostName &lt;HostName/IP_addr&gt;</span><br><span class="line">    User &lt;User_name&gt;</span><br><span class="line">    IdentityFile &lt;Path_to_Private_Key&gt;</span><br></pre></td></tr></table></figure>
+
+<p>具体来说，本课程的远程 git 服务器可以这样设置：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host PoRE</span><br><span class="line">    HostName 106.15.186.69</span><br><span class="line">    User gitpore</span><br><span class="line">    IdentityFile &lt;Path_to_Private_Key&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在设置完毕之后，再从服务器 clone repo 时，就可以从原先冗长的：<br><code>git clone gitpore@106.15.186.69:slides.git</code></p>
+<p>简写为：<br><code>git clone PoRE:slides.git</code></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://cameudis.github.io">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://cameudis.github.io/Tech/PoRE/5acc028df792.html">https://cameudis.github.io/Tech/PoRE/5acc028df792.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/PoRE/">PoRE</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/Daily/%E5%91%A8%E8%AE%B0/e6ec106e0e7d.html" title="OSS#0x1C"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">OSS#0x1C</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">68</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/cameudis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">大家都要学习、学习、再学习。应该学会毛泽东同志所提倡的“挤”和“钻”的精神，先挤出时间来学习，然后再钻研进去。没有一股自觉地挤劲和钻劲，是学不好的。——江泽民：《讲学习，讲政治，讲正气》</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8-PoRE-%E4%B8%AD%E4%BD%BF%E7%94%A8-git"><span class="toc-text">在 PoRE 中使用 git</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A-git-%E4%BD%BF%E7%94%A8%E7%9A%84-SSH-%E5%AF%86%E9%92%A5"><span class="toc-text">指定 git 使用的 SSH 密钥</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/PoRE/5acc028df792.html" title="PoRE#0x0">PoRE#0x0</a><time datetime="2023-03-03T08:43:28.000Z" title="Created 2023-03-03 16:43:28">2023-03-03</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/e6ec106e0e7d.html" title="OSS#0x1C">OSS#0x1C</a><time datetime="2023-02-27T07:41:31.000Z" title="Created 2023-02-27 15:41:31">2023-02-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/ab9616de1425.html" title="OSS#0x1B">OSS#0x1B</a><time datetime="2023-02-20T08:41:31.000Z" title="Created 2023-02-20 16:41:31">2023-02-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/46c0b4d6f111.html" title="No_title">No_title</a><time datetime="2023-02-18T13:12:37.000Z" title="Created 2023-02-18 21:12:37">2023-02-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/5851385fd8a7.html" title="OSS#0x1A">OSS#0x1A</a><time datetime="2023-02-15T14:39:39.000Z" title="Created 2023-02-15 22:39:39">2023-02-15</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
