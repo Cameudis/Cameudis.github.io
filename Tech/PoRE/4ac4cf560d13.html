@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>PoRE#0x1 | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Android APP Reverse PartI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PoRE#0x1">
+<meta property="og:url" content="https://cameudis.github.io/Tech/PoRE/4ac4cf560d13.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="Android APP Reverse PartI">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg">
+<meta property="article:published_time" content="2023-03-08T10:08:00.000Z">
+<meta property="article:modified_time" content="2023-03-08T10:14:07.407Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="PoRE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://cameudis.github.io/Tech/PoRE/4ac4cf560d13.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'PoRE#0x1',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-03-08 18:14:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">73</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">20</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">PoRE#0x1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-08T10:08:00.000Z" title="Created 2023-03-08 18:08:00">2023-03-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-03-08T10:14:07.407Z" title="Updated 2023-03-08 18:14:07">2023-03-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/PoRE/">PoRE</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/PoRE/4ac4cf560d13.html" data-flag-title="PoRE#0x1"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/PoRE/4ac4cf560d13.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/PoRE/4ac4cf560d13.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>Android APP Reverse PartI</p>
+<span id="more"></span>
+
+<p>上周老师带我们速通了 Android 的 APK 结构、架构以及 Android 系统本身的架构，本人课上走了一会神就再也跟不上了，课后一边 STFW 一边过了一遍 PPT，现在再用这篇笔记过一遍。（可能存在一些错误，希望看到能顺手和俺说下）</p>
+<p>本篇笔记分为三个部分，App、System 以及 SDK。</p>
+<h2 id="1-Android-App"><a href="#1-Android-App" class="headerlink" title="1 Android App"></a>1 Android App</h2><p>安卓 APP 具有三种形态：</p>
+<ol>
+<li>source code</li>
+<li>APK（安装包）</li>
+<li>App（安装好的软件）<br>其中，APK 几乎等价于 App，例如安卓 QQ 就可以直接导出一个软件 APK（虽然有几率出现问题）。课程讲述逆向工程，直接用 APK 的视角来讲述一个安卓软件；但我们这里也可以采取另一种视角 —— 先来看看 source code 阶段的安卓 App 是什么样的。</li>
+</ol>
+<h3 id="1-1-source-code"><a href="#1-1-source-code" class="headerlink" title="1.1 source code"></a>1.1 source code</h3><p>在 source code 阶段，App 由 <code>.java</code> 源代码、<code>.xml</code> 数据文件以及别的一些多媒体资源组成。上述的三种文件，大致通过下面的结构被组织起来：</p>
+<ul>
+<li>manifests 文件夹：存放 <code>AndroidManifest.xml</code></li>
+<li>java 文件夹：存放 Java 代码</li>
+<li>res 文件夹：存放资源文件，如布局相关 xml、多媒体文件<br>下面按照上述顺序，介绍他们的用途。</li>
+</ul>
+<h4 id="1-1-1-manifest"><a href="#1-1-1-manifest" class="headerlink" title="1.1.1 manifest"></a>1.1.1 manifest</h4><p>这一文件在 source code 阶段和 APK 阶段都十分重要。它的作用是全局配置文件，包含了系统运行安卓程序所需要的信息，如 name, version, access rights, referenced library files 等。</p>
+<p>它最显著的作用就是对于<strong>组件（component)</strong> 的基础信息<strong>声明</strong>。<br>不像平常写的 C、C++软件，Android APP 并不是由函数组成的，也不完全由自己调度其运行顺序（C 程序的函数调用就只是简单的返回地址压栈、修改 rip 而已）。<strong>Android APP 由组件组成</strong>，并由安卓系统负责调度组件的运行，也就是组件间的调用全部由系统提供的接口来完成。<br>类比来看，组件就是搭建成 APP 所用的积木，安卓 APP 的开发就是搭积木，挺有趣的hhh。</p>
+<p>详细信息：<a target="_blank" rel="noopener" href="https://developer.android.com/guide/topics/manifest/manifest-intro?hl=zh-cn">应用清单概览  |  Android 开发者  |  Android Developers</a></p>
+<h4 id="1-1-2-java-code-Component"><a href="#1-1-2-java-code-Component" class="headerlink" title="1.1.2 java code (Component)"></a>1.1.2 java code (Component)</h4><p>组件有四种类型：<br>-Activity<br>-Service<br>-Broadcast receiver<br>-Content provider<br>它们各自负责了不同的工作。写代码时，通过继承对应组件的类来创建一个组件，比如：<br><code>public class MyClass1 extends BroadcastReceiver</code><br>就可以创建一个 Broadcast receiver 组件。（当然，还需要在 <code>AndroidManifest.xml</code> 文件中声明其基本信息）</p>
+<h5 id="Activity"><a href="#Activity" class="headerlink" title="Activity"></a>Activity</h5><p>Activity 是 APP 与用户交互的窗口，也就是 UI 界面。下图是 Activity 的<strong>生命周期</strong>，开发者通过 <strong>@Override（覆盖）</strong> Activity 父类的对应名称方法来指示 Activity 组件在这个时候应该干什么。（其他组件也有对应的生命周期）<br>比如我们想让 Activity 被启动时创建一个界面，就自己写一个 <code>onCreate()</code> 方法，并在其中加入对应代码。系统在创建这个 Activity 时，会调用其 <code>onCreate()</code> 方法，也就是调用我们写的界面创建代码。</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9kZXZlbG9wZXIuYW5kcm9pZC5nb29nbGUuY24vZ3VpZGUvY29tcG9uZW50cy9pbWFnZXMvYWN0aXZpdHlfbGlmZWN5Y2xlLnBuZw?x-oss-process=image/format,png" alt="Activity Life Cycle"></p>
+<h5 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h5><p>Service 是不在前台运行、不提供界面，在后台工作的组件。我们说 APP 在后台运行，可能就是运行着一些 Service 组件。至于 Service 具体干什么，可以有非常多种。比如在后台接受网络消息、播放音乐等等。</p>
+<p>服务可以被启动为两种形态：<strong>启动服务（start service)</strong> 和 <strong>绑定服务（bind service）</strong><br>启动服务比较独立，自己跑完就结束了；但绑定服务不同。当一个服务被作为绑定服务启动时，它就像一个为另一个进程提供 API 的服务一样。</p>
+<p><img src="https://anjaekwang.github.io/assets/images/AndroidComponent/6.png" alt="Service Life Cycle"></p>
+<h5 id="Broadcast-receiver"><a href="#Broadcast-receiver" class="headerlink" title="Broadcast receiver"></a>Broadcast receiver</h5><p>Broadcast 机制允许应用向外界（所有安装的 APP，甚至是当前不在运行的 APP）广播信息，而该组件就是用来接受这些广播的。安卓系统本身就会发送大量的 broadcast 来指示系统事件的发生。（之后会提到，Intent 类型可以指示广播的内容）</p>
+<p>receiver 即可以像别的组件一样在 <code>AndroidManifest.xml</code> 中声明来创建（静态创建），也可以用代码来在应用运行时创建（动态创建），后者需要记得用完了后注销创建的receiver。</p>
+<h5 id="Content-provider"><a href="#Content-provider" class="headerlink" title="Content provider"></a>Content provider</h5><p>这个组件用来统一管理一个 APP 所拥有的应用数据，包括文件系统中的、SQLlite 中的、网络上的数据等等。然后提供了一个获取这些数据的接口（毕竟叫做 provider）。</p>
+<h4 id="1-1-3-res"><a href="#1-1-3-res" class="headerlink" title="1.1.3 res"></a>1.1.3 res</h4><p>APK 拥有的数据分为静态的 res 和需要使用 AssetManager 来访问的。<br>res 中的资源文件会被映射到 <code>R.java</code> 文件中，可以用 <code>R.id.[resname]</code> 直接引用对应的资源。如 <code>R.id.button1</code> <code>R.id.textView</code> 等</p>
+<h3 id="1-2-APK"><a href="#1-2-APK" class="headerlink" title="1.2 APK"></a>1.2 APK</h3><p>在课程中，我们会使用 Android Studio 来将项目生成一个 APK 安装包。APK 中的代码都编译了字节码，丢失了代码风格等东西（从而导致逆向成为一门痛苦而具有挑战性的工作）。</p>
+<p>APK 大致包含如下一些文件、文件夹：</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">AndroidManifest.xml</td>
+<td align="left">Compiled global configuration file</td>
+</tr>
+<tr>
+<td align="left">classes.dex</td>
+<td align="left">Compiled and packaged source code</td>
+</tr>
+<tr>
+<td align="left">lib</td>
+<td align="left">Store Binary shared library</td>
+</tr>
+<tr>
+<td align="left">META-INF</td>
+<td align="left">Store the metadata</td>
+</tr>
+<tr>
+<td align="left">assets</td>
+<td align="left">Store the resource file, will not be compiled</td>
+</tr>
+<tr>
+<td align="left">res</td>
+<td align="left">Store the resource file</td>
+</tr>
+<tr>
+<td align="left">resource.arsc</td>
+<td align="left">Compiled and packaged files of res&#x2F;values</td>
+</tr>
+</tbody></table>
+<h2 id="2-Android-System"><a href="#2-Android-System" class="headerlink" title="2 Android System"></a>2 Android System</h2><p>&#x2F;&#x2F; TODO</p>
+<h2 id="3-Android-SDK"><a href="#3-Android-SDK" class="headerlink" title="3 Android SDK"></a>3 Android SDK</h2><p>&#x2F;&#x2F; TODO</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://cameudis.github.io">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://cameudis.github.io/Tech/PoRE/4ac4cf560d13.html">https://cameudis.github.io/Tech/PoRE/4ac4cf560d13.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/PoRE/">PoRE</a></div><div class="post_share"><div class="social-share" data-image="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/Tech/Pwn/33ac9256da88.html" title="【*CTF 2018】babystack"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">【*CTF 2018】babystack</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">73</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">20</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/cameudis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">大家都要学习、学习、再学习。应该学会毛泽东同志所提倡的“挤”和“钻”的精神，先挤出时间来学习，然后再钻研进去。没有一股自觉地挤劲和钻劲，是学不好的。——江泽民：《讲学习，讲政治，讲正气》</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Android-App"><span class="toc-text">1 Android App</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-source-code"><span class="toc-text">1.1 source code</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-manifest"><span class="toc-text">1.1.1 manifest</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-java-code-Component"><span class="toc-text">1.1.2 java code (Component)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Activity"><span class="toc-text">Activity</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Service"><span class="toc-text">Service</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Broadcast-receiver"><span class="toc-text">Broadcast receiver</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Content-provider"><span class="toc-text">Content provider</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-3-res"><span class="toc-text">1.1.3 res</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-APK"><span class="toc-text">1.2 APK</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Android-System"><span class="toc-text">2 Android System</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Android-SDK"><span class="toc-text">3 Android SDK</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/PoRE/4ac4cf560d13.html" title="PoRE#0x1">PoRE#0x1</a><time datetime="2023-03-08T10:08:00.000Z" title="Created 2023-03-08 18:08:00">2023-03-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/Pwn/33ac9256da88.html" title="【*CTF 2018】babystack">【*CTF 2018】babystack</a><time datetime="2023-03-08T02:25:50.000Z" title="Created 2023-03-08 10:25:50">2023-03-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/Pwn/80789099dd23.html" title="【NJCTF 2017】messager">【NJCTF 2017】messager</a><time datetime="2023-03-07T14:24:20.000Z" title="Created 2023-03-07 22:24:20">2023-03-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Tech/Network/57e49cd58f92.html" title="自顶向下笔记#Ch1">自顶向下笔记#Ch1</a><time datetime="2023-03-06T09:18:58.000Z" title="Created 2023-03-06 17:18:58">2023-03-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/Daily/%E5%91%A8%E8%AE%B0/7835f559fe37.html" title="OSS#0x1D">OSS#0x1D</a><time datetime="2023-03-05T09:32:04.000Z" title="Created 2023-03-05 17:32:04">2023-03-05</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="true"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
