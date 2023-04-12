@@ -1346,8 +1346,8 @@ canvas:not(#ribbon-canvas),
   --tab-botton-bg: #f0f0f0;
   --tab-botton-color: #1f2d3d;
   --tab-button-hover-bg: #dcdcdc;
-  --tab-button-active-bg: #fff;
-  --card-bg: #fff;
+  --tab-button-active-bg: #ffd;
+  --card-bg: #ffd;
   --sidebar-bg: #f6f8fa;
   --btn-hover-color: #ff7242;
   --btn-color: #fff;
@@ -1400,7 +1400,7 @@ input::placeholder {
   z-index: -999;
   width: 100%;
   height: 100%;
-  background: url(https://i.imgtg.com/2023/04/11/8zPqM.jpg);
+  background: url(https://i.imgtg.com/2023/04/12/8ixtD.jpg);
   background-attachment: local;
   background-position: center;
   background-size: cover;
