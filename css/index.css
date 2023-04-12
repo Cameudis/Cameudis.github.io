@@ -1346,8 +1346,8 @@ canvas:not(#ribbon-canvas),
   --tab-botton-bg: #f0f0f0;
   --tab-botton-color: #1f2d3d;
   --tab-button-hover-bg: #dcdcdc;
-  --tab-button-active-bg: #ffd;
-  --card-bg: #ffd;
+  --tab-button-active-bg: rgba(255,255,255,0.902);
+  --card-bg: rgba(255,255,255,0.902);
   --sidebar-bg: #f6f8fa;
   --btn-hover-color: #ff7242;
   --btn-color: #fff;
@@ -2464,6 +2464,11 @@ h1.page-title + .tag-cloud-list {
   overflow: hidden;
   margin-top: 20px;
   padding: 20px 24px;
+}
+@media screen and (max-width: 768px) {
+  #aside-content .card-widget:not(#card-toc) {
+    display: none;
+  }
 }
 #aside-content .card-info .author-info__name {
   font-weight: 500;
