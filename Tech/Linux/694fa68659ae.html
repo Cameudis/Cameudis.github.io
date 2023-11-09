@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>【Linux#0x00】Linux权限模型 | Cameudis's Blog</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Linux系列开篇！本期介绍Linux中的权限模型，从 ls -l 的解释一路科普到内核漏洞的利用（什么！）  由于 Linux 设计时是一个多用户系统，可能有很多人共用一个 Linux 系统，因此 Linux 中存在用户和用户组的概念，每个用户或者用户组都有一个自己的 id，每个用户可以属于多个用户组。有了用户之间的区分，就可以为文件设置权限，限制不应该访问的用户的访问，于是就有了权限系统。 用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Linux#0x00】Linux权限模型">
+<meta property="og:url" content="https://www.cameudis.com/Tech/Linux/694fa68659ae.html">
+<meta property="og:site_name" content="Cameudis&#39;s Blog">
+<meta property="og:description" content="Linux系列开篇！本期介绍Linux中的权限模型，从 ls -l 的解释一路科普到内核漏洞的利用（什么！）  由于 Linux 设计时是一个多用户系统，可能有很多人共用一个 Linux 系统，因此 Linux 中存在用户和用户组的概念，每个用户或者用户组都有一个自己的 id，每个用户可以属于多个用户组。有了用户之间的区分，就可以为文件设置权限，限制不应该访问的用户的访问，于是就有了权限系统。 用">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png">
+<meta property="article:published_time" content="2023-11-09T15:36:16.000Z">
+<meta property="article:modified_time" content="2023-11-09T15:47:50.320Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/Tech/Linux/694fa68659ae.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  }
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【Linux#0x00】Linux权限模型',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-11-09 23:47:50'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = url => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      link.onload = () => resolve()
+      link.onerror = () => reject()
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">59</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【Linux#0x00】Linux权限模型</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-11-09T15:36:16.000Z" title="Created 2023-11-09 23:36:16">2023-11-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-11-09T15:47:50.320Z" title="Updated 2023-11-09 23:47:50">2023-11-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/Linux/694fa68659ae.html" data-flag-title="【Linux#0x00】Linux权限模型"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/Linux/694fa68659ae.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/Linux/694fa68659ae.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>Linux系列开篇！<br>本期介绍Linux中的权限模型，从 <code>ls -l</code> 的解释一路科普到内核漏洞的利用（什么！）</p>
+<hr>
+<p>由于 Linux 设计时是一个多用户系统，可能有很多人共用一个 Linux 系统，因此 Linux 中存在<strong>用户</strong>和<strong>用户组</strong>的概念，每个用户或者用户组都有一个自己的 id，每个用户可以属于多个用户组。<br>有了用户之间的区分，就可以为文件设置权限，限制不应该访问的用户的访问，于是就有了权限系统。</p>
+<p>用户和用户组这两个抽象的概念，其实主要体现在两个地方：</p>
+<ul>
+<li>进程系统：每个进程都有自己所属的用户和用户组</li>
+<li>文件系统：每个文件都有自己所属的用户和用户组，以及相应的读写权限设置</li>
+</ul>
+<p>可以使用 <code>getuid()</code> 系列系统调用获取当前进程的用户 id，在 shell 里可以直接输入 <code>id</code> 查看当前 shell 进程的用户和用户组 id。（这里先不提及 id 的区别，后面再进行讲解）</p>
+<h2 id="文件系统中的权限模型"><a href="#文件系统中的权限模型" class="headerlink" title="文件系统中的权限模型"></a>文件系统中的权限模型</h2><p>使用命令 <code>ls -l</code> 可以查看文件的详细信息，比如：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ll</span><br><span class="line">drwxr-xr-x  4 cameudis cameudis   4096 Mar 24  2023 .cargo/</span><br><span class="line">drwx------  2 cameudis cameudis   4096 Nov  2 10:43 .ssh/</span><br><span class="line">-rw-r--r--  1 cameudis cameudis   4957 Oct 31 18:41 .bashrc</span><br><span class="line">-rw-r--r--  1 cameudis cameudis    619 Oct 31 10:11 memo.txt</span><br></pre></td></tr></table></figure>
+
+<p>我们以第一条为例：</p>
+<table>
+<thead>
+<tr>
+<th>文件类型</th>
+<th>权限信息</th>
+<th>连结数</th>
+<th>拥有者</th>
+<th>用户组</th>
+<th>文件大小</th>
+<th>修改日期</th>
+<th>文件名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>d</code></td>
+<td><code>rwxr-xr-x</code></td>
+<td><code>4</code></td>
+<td><code>cameudis</code></td>
+<td><code>cameudis</code></td>
+<td><code>4096</code></td>
+<td><code>Mar 24  2023</code></td>
+<td><code>.cargo/</code></td>
+</tr>
+</tbody></table>
+<p>第一个字段文件类型包括以下这些（从这里也可以看到万物皆文件的思想）：</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>文件类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-</td>
+<td>普通文件</td>
+</tr>
+<tr>
+<td>d</td>
+<td>目录</td>
+</tr>
+<tr>
+<td>|</td>
+<td>符号链接</td>
+</tr>
+<tr>
+<td>p</td>
+<td>named pipe</td>
+</tr>
+<tr>
+<td>c</td>
+<td>字符设备</td>
+</tr>
+<tr>
+<td>b</td>
+<td>块设备</td>
+</tr>
+<tr>
+<td>s</td>
+<td>socket 文件</td>
+</tr>
+</tbody></table>
+<p>我们可以看到，每个文件都会有一个所属的用户、一个所属的用户组。相应地，一个文件的权限设置会有三档：<strong>对于所属用户的权限</strong>、<strong>对于所属用户组中用户的权限</strong>、<strong>对于其他用户的权限</strong>。在一些权限设置工具 <code>chmod</code> 中，这三者分别简称为 <code>U</code> <code>G</code> <code>O</code>，即 User、Group、Others。</p>
+<p>在 <code>ls -h</code> 看到的信息中，我们看到的 <code>rwxr--r--</code> 字符串，其实就类似一个 bit vector。前三个字符表示对于所属用户的权限，中间三个表示所属用户组中用户的权限，最后三个字符表示对于其他用户的权限。</p>
+<p>比如，<code>.cargo</code> 目录归 cameudis 所有，那么 cameudis 作为拥有者，其权限是 <code>rwx</code>（Read、Write、eXecute）；而另一个用户 Jern，若他不属于 cameudis 用户组，那么他的权限是 <code>r--</code>（Read only）。</p>
+<blockquote>
+<p>你可能会好奇，为什么 Linux 下各种目录大小都显示为 4096：这是硬盘中用来存储目录 metadata 信息的大小，这些 metadata 有：<br>如果你需要计算目录大小，可以使用 <code>du</code> 指令，比如 <code>du -sh /tmp</code>。</p>
+</blockquote>
+<h3 id="修改文件权限"><a href="#修改文件权限" class="headerlink" title="修改文件权限"></a>修改文件权限</h3><p>一句废话就是：如果想要修改文件的权限，你必须拥有文件的权限。<br>在命令行中，我们最常使用的修改权限工具是 <code>chmod</code>。</p>
+<p>在 <code>chmod</code> 中，最简单的用法就是：<code>chmod &lt;+/-&gt;&lt;r/w/x&gt; &lt;filename&gt;</code>，这样会给用户、组和其他人通通加上或减去某个权限，比如：<code>chmod +x a.out</code> 就能让所有人都获取执行该文件的权限。</p>
+<p>在此基础上，还可以特别指定某一群体：<code>chmod [ugoa...]&lt;+/-&gt;&lt;r/w/x&gt; &lt;filename&gt;</code>。比如 <code>chmod u+x a.out</code> 就可以只给拥有者执行该文件的权限。</p>
+<p>不过，根据笔者观察，大家最常用的用法是直接使用数字指定。我们知道每个文件有三组权限，所以可以用三个 3 比特的值来分别表示一个文件的三组权限。在这个 3 比特的值中，约定最高位表示 r，中间一位表示 w，最后一位表示 x。所以，<code>111</code> 就对应 <code>rwx</code>，<code>010</code> 就对应 <code>-w-</code>。</p>
+<p>然后，我们再将其写为 8 进制，<code>111</code> 就会变成 <code>7</code>（如果你硬要说是更大的进制也可以），这样我们就可以用一个阿拉伯数字表示一组权限。</p>
+<p>再将其推广一下之后，就可以用三个数字表达三组权限，我们列出一些经常用到的权限作为例子：</p>
+<table>
+<thead>
+<tr>
+<th>权限编码</th>
+<th>权限说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>755</td>
+<td>rwxr-xr-x</td>
+</tr>
+<tr>
+<td>600</td>
+<td>rw——-</td>
+</tr>
+<tr>
+<td>644</td>
+<td>rw-r–r–</td>
+</tr>
+<tr>
+<td>777</td>
+<td>rwxrwxrwx</td>
+</tr>
+</tbody></table>
+<p>chmod 使用这种语法来让我们快速指定权限：<code>chmod 755 ./a.out</code> </p>
+<blockquote>
+<p><strong>冷知识：</strong><br>在著名动漫《新世纪福音战士新剧场版》中，明日香操纵 EVA 二号机进入野兽模式时，使用的指令是 “Code 777”，这说明 EVA 二号机运行的是 Linux 操作系统⊂彡☆))∀`)<br><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311082023947.png" alt="chmod 777"></p>
+</blockquote>
+<h2 id="进程系统中的权限模型"><a href="#进程系统中的权限模型" class="headerlink" title="进程系统中的权限模型"></a>进程系统中的权限模型</h2><p>每个进程都会有 UID 和 GID，且相关数据会继承给子进程（当然满足条件就可以修改自己的 UID 和 GID，只要符合一些要求，可以到对应系统调用的 man page 中查看具体要求）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> getuid.c</span><br><span class="line">int <span class="function"><span class="title">main</span></span>() &#123; <span class="built_in">printf</span>(<span class="string">&quot;UID: %d\n&quot;</span>, getuid()); &#125;</span><br><span class="line">$ gcc -w -o getuid ./getuid.c</span><br><span class="line">$ <span class="built_in">id</span></span><br><span class="line">uid=1000(cameudis) gid=1000(cameudis) <span class="built_in">groups</span>=1000(cameudis),4(adm),20(dialout),24(cdrom),25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),117(netdev),1001(docker)</span><br><span class="line">$ ./getuid</span><br><span class="line">UID: 1000</span><br></pre></td></tr></table></figure>
+
+<p>一个进程并不是只有一个 UID（用户 ID）和一个 GID（用户组 ID），而是根据不同用途有多个。</p>
+<p>在操作系统为进程准备的结构体中，一个进程包含如下几种 ID：</p>
+<ul>
+<li><strong>Effective（eUID、eGID）</strong>：大多数权限检查都使用这两个 ID。</li>
+<li><strong>Real（UID、GID）</strong>：真正的 ID，可能与 eUID、eGID 不同，用作信号检查等。</li>
+<li><strong>Saved</strong>：用于切换的 UID&#x2F;GID，在临时降权的时候用到。</li>
+</ul>
+<p>eUID 和 eGID 最为常用，进程是否能够打开文件等权限检查都使用 eUID 和 eGID，因此 <code>id</code> 指令默认显示的也是 eUID 和 eGID。（不过可以用 <code>-r</code> 参数指定显示 real UID&#x2F;GID）。</p>
+<h3 id="SUID-amp-SGID"><a href="#SUID-amp-SGID" class="headerlink" title="SUID &amp; SGID"></a>SUID &amp; SGID</h3><p>之所以需要区分 effective ID 和 read ID，是因为在某些场景中，需要区分这两个 ID。我们设想这样一个场景（纯虚构，细节问题不要在意）：</p>
+<blockquote>
+<p>Jern 安装了一个 Web 服务器软件（假设服务器软件的所有者和用户组都是 Jern），想要让运维 Cameudis 也能够执行该软件，因此他就把软件文件的权限设置为 <code>r-x</code>。<br>Cameudis 开心地启动！了 Web 服务器，但是访问网站时发现无法正常访问网页。</p>
+<p>原来由 Cameudis 执行的 Web 服务器进程，其 eUID 和 eGID 都是 Cameudis 的，因此这个进程没办法访问 Jern 放在目录中的 html 网页文件！</p>
+</blockquote>
+<p>为了解决场景中的这一问题，一个方法就是再给 Cameudis 目录中所有的文件的权限。但这种方法的缺陷在于，万一程序还需要访问未知位置的一些目录，我们可能不能一直及时地给 Cameudis 权限。<br>另一个方法就是将 Cameudis 加入 Jern 所在的用户组。这种方法挺好的，不过需要具体情况具体分析下加入之后有没有潜在危害。</p>
+<p>此外，还有一种 Linux 提供的方法，这种机制允许用户在文件中加入 <code>SUID</code>、<code>SGID</code> 权限位（就和 RWX 一样），如下所示：</p>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311092333758.png"></p>
+<ul>
+<li><code>SUID</code> (Set-UID)：当前文件被执行时，以文件拥有者 UID 作为 eUID 而不是父进程的 eUID。</li>
+<li><code>SGID</code> (Set-GID)：当前文件被执行时，以文件拥有组 GID 作为 eGID 而不是父进程的 eGID。</li>
+</ul>
+<blockquote>
+<p>这里说当前文件被执行，显然默认了文件是可执行文件。不可执行文件被设置这两个位是可行的但并没有意义。</p>
+</blockquote>
+<p>因此，Jern 可以给 Web 服务器的程序文件加上 <code>SUID</code> bit，这样 Cameudis 执行 Web 服务器时，服务器进程会以 Jern 的 <code>eUID</code> 运行，从而就能够访问所有 Jern 本人可以访问的文件。</p>
+<p>一个具体的例子就是 <code>sudo</code> 程序，我们可以这样查看其权限信息：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> sudo       <span class="comment"># which 让shell查找某个程序的具体位置</span></span><br><span class="line">/usr/bin/sudo</span><br><span class="line">$ ll /usr/bin/sudo</span><br><span class="line">-rwsr-xr-x 1 root root 166056 Apr  4  2023 /usr/bin/sudo*</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，sudo 的 <code>U</code> 权限是 <code>rws</code>，这里的 s 就表示 <code>SUID</code>。我们在执行 sudo 时，会以 root 用户的 <code>eUID</code> 执行，从而能够访问高权限的资源。</p>
+<blockquote>
+<p>使用 chmod 给文件加 SUID 和 SGID 的方法：<br><code>chmod u+s &lt;file&gt;</code><br><code>chmod g+s &lt;file&gt;</code></p>
+</blockquote>
+<h3 id="Sticky-bit"><a href="#Sticky-bit" class="headerlink" title="Sticky bit"></a>Sticky bit</h3><p>Sticky bit 主要用于目录，对于标记为 Sticky 的目录中的文件，只有<strong>文件的所有者与目录的所有者</strong>才能重命名或删除文件，其他行为则照常。</p>
+<p>通常来说，我们用 Sticky bit 来保护一些共享的文件夹，这里的共享是指多个用户都会在这个文件夹中处理文件。比如，<code>/tmp</code> 文件夹就常常被置为 <code>Sticky</code>，来防止普通用户删除或者移动其他用户的文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ll /</span><br><span class="line">drwxrwxrwt  74 root root   36864 Nov  6 14:09 tmp/</span><br></pre></td></tr></table></figure>
+
+<p>至于给非目录的普通文件置 Sticky bit，各类 Unix 系统的对待方式都不一样，比如 Linux 就是直接忽略置 Sticky 的文件。</p>
+<blockquote>
+<p>使用 chmod 给文件加 Sticky 的方法：<br><code>chmod o+t &lt;file&gt;</code></p>
+</blockquote>
+<h2 id="特殊的存在-root"><a href="#特殊的存在-root" class="headerlink" title="特殊的存在 root"></a>特殊的存在 root</h2><p>以上说的各种权限限制，<strong>都对 root 用户无效</strong>。作为 Linux 系统中的真神，root 用户和用户组都拥有特殊的 ID 0。通常为了使用 root 的力量，我们会借用 <code>sudo</code> 这个 <code>SUID</code>  程序。</p>
+<p><img src="https://imgs.xkcd.com/comics/sandwich.png"></p>
+<p>root 用户可以：</p>
+<ul>
+<li>打开任何文件，包括 <code>/proc</code> 中一些高权限的文件如 <code>kallsym</code>。</li>
+<li>执行任何程序</li>
+<li>切换到任何其他用户</li>
+<li>调试任何程序</li>
+<li>关机、重启</li>
+<li>加载设备驱动等内核模块</li>
+<li>……</li>
+</ul>
+<p>简单来说，<strong>root 用户可以控制整个系统</strong>。</p>
+<p>由于 root 的力量过于强大，所以任何一个略有安全意识的人，在平时都不会以 root 用户的身份执行指令，除非必要。相关反例实在太多了，几乎每个默认 root 用户登录的人都会因此出现一些问题。（笑死）</p>
+<p>既然 root 的力量如此强大，那么可想而知，如果黑客拿到了我们机器的 root 权限，那会是多么可怕的一场<strong>安全灾难</strong>。因此，接下来我们学习如何作为黑客拿到 root 权限。</p>
+<h2 id="权限提升（提权）"><a href="#权限提升（提权）" class="headerlink" title="权限提升（提权）"></a>权限提升（提权）</h2><p>提权，一般就是指黑客将他们权限从普通用户提高到 root 的一类攻击，通常的提权流程是这样的：</p>
+<ol>
+<li>在系统上初步站稳脚跟，比如通过有漏洞的程序拿到一个 shell（pwn！）</li>
+<li>找到一个可以利用的高权限服务</li>
+<li>利用那个高权限服务，借助它拿到权限</li>
+</ol>
+<p>什么是可以利用的高权限服务呢？</p>
+<ol>
+<li><code>SUID</code> 程序就是一种高权限的服务，如果它存在漏洞的话，我们就可以通过利用漏洞来达成提权，比如 <code>sudo</code> 就有过非常多的 CVE，可以攻击 <code>sudo</code> 的漏洞来拿到 root 权限。</li>
+<li>有一些不必要有 <code>SUID</code> 的程序，如果能够以 root 权限运行的话，会带来令人意想不到的安全风险。</li>
+<li>操作系统内核显然是最高权限运行的服务了，如果内核存在漏洞，同样可以帮助我们达成提权。这就是传说中的<strong>内核漏洞利用</strong>。</li>
+</ol>
+<p>前者比较容易理解，就是普通的用户态程序利用而已，因此本文中我们主要介绍后两者。</p>
+<h3 id="SUID-提权"><a href="#SUID-提权" class="headerlink" title="SUID 提权"></a>SUID 提权</h3><p>如果你发现 <code>mv</code> 程序是 <code>SUID</code> 的，你可以做到哪些事情？<br>看起来我们只能移动一些文件，但实际上，每个常见 Linux 程序的功能都可能非常强大。比如就算是简单的 <code>mv</code> 指令，也可以做到彻底的提权。</p>
+<p><code>mv</code> 的提权方法，可以参考<a target="_blank" rel="noopener" href="https://medium.com/workindia-in/the-dark-side-of-mv-command-3419c1bd619">The Dark Side of <code>mv</code> Command. mv, short for MOVE has been one of the… | by Nikhil Jagtap | WorkIndia.in | Medium</a></p>
+<p>更多 binary 的提权方法，可以见 <a target="_blank" rel="noopener" href="https://gtfobins.github.io/">GTFOBins</a>。</p>
+<p>强烈推荐读者去 <a target="_blank" rel="noopener" href="https://pwn.college/fundamentals/program-misuse">pwn.college</a> 实地打几道题来试试看。</p>
+<blockquote>
+<p>如果 &#x2F;bin&#x2F;sh 作为一个 SUID 程序运行，即 eUID 和 rUID 不同，那么它会主动降权限，将 eUID 设置成 rUID。这就是一种应对 SUID 提权的非常简单的缓解措施。<br>遇到这种情况，只要加上 <code>-p</code> 参数即可。</p>
+</blockquote>
+<h3 id="内核漏洞"><a href="#内核漏洞" class="headerlink" title="内核漏洞"></a>内核漏洞</h3><p>我们知道，操作系统不过就是一个用户程序与资源的管理器而已，它同样也是一个由程序员写成的程序，操作系统也会有漏洞。</p>
+<p>我们平常说的操作系统，通常包括了许多东西，比如桌面系统。不过，这里我们要关注的是一个操作系统真正重要的东西——<strong>内核</strong>（<strong>kernel</strong>，台湾称为<strong>核心</strong>）。</p>
+<p>内核是一个运行在更高级别的程序，我们刚刚提到的各种机制，包括文件系统、进程系统，这些系统的实现统统位于内核之中。比如我们刚刚提到了 <code>eUID</code>、Real <code>UID</code>，这些东西统统都是内核中为每个进程准备的结构体中的一个字段。</p>
+<p>如果读者学过 OS，那么就会知道用户态程序和内核交互的最常见的方法就是通过<strong>系统调用</strong>。因此，如果系统调用涉及的某段代码中存在漏洞，我们就能<strong>从用户程序攻击内核</strong>。（这就是为什么内核 pwn 的 exp 都是一个 C 程序，自己编写软件来攻击内核显然是最方便的）</p>
+<p>提权是攻击内核最常见的目的之一。如果我们控制了内核，比如劫持了控制流，我们就可以去调用内核中存在的函数，将当前进程的权限提高至 root。</p>
+<p>具体来说，我们一般会控制内核执行 <code>commit_creds(prepare_kernel_cred(0))</code>，其中 <code>prepare_kernel_cred(0)</code> 会创建一个各个字段都是 0 的 cred 结构体，然后 <code>commit_creds()</code> 可以将当前进程的 cred 替换为参数。我们前面知道 root 拥有特殊的 id —— 0，因此调用完这两个函数后，就可以将进程权限切换为 <code>root</code>。<br>此后进程就可以想干啥就干啥了，比如起一个 root shell。</p>
+<p>当然，这里只是一个小科普，内核漏洞笔者还没有入门，希望读者里能有未来挖掘或利用内核漏洞的大能|∀`)</p>
+<hr>
+<p>参考资料：pwn.college</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://www.cameudis.com">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://www.cameudis.com/Tech/Linux/694fa68659ae.html">https://www.cameudis.com/Tech/Linux/694fa68659ae.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post_share"><div class="social-share" data-image="https://i.imgtg.com/2023/04/11/8z0Vl.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">【Pwn#0x14】pwnable.tw BabyStack writeup</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">59</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E6%9D%83%E9%99%90%E6%A8%A1%E5%9E%8B"><span class="toc-text">文件系统中的权限模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90"><span class="toc-text">修改文件权限</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E6%9D%83%E9%99%90%E6%A8%A1%E5%9E%8B"><span class="toc-text">进程系统中的权限模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SUID-amp-SGID"><span class="toc-text">SUID &amp; SGID</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sticky-bit"><span class="toc-text">Sticky bit</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84%E5%AD%98%E5%9C%A8-root"><span class="toc-text">特殊的存在 root</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%83%E9%99%90%E6%8F%90%E5%8D%87%EF%BC%88%E6%8F%90%E6%9D%83%EF%BC%89"><span class="toc-text">权限提升（提权）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SUID-%E6%8F%90%E6%9D%83"><span class="toc-text">SUID 提权</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%BC%8F%E6%B4%9E"><span class="toc-text">内核漏洞</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/Linux/694fa68659ae.html" title="【Linux#0x00】Linux权限模型"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Linux#0x00】Linux权限模型"/></a><div class="content"><a class="title" href="/Tech/Linux/694fa68659ae.html" title="【Linux#0x00】Linux权限模型">【Linux#0x00】Linux权限模型</a><time datetime="2023-11-09T15:36:16.000Z" title="Created 2023-11-09 23:36:16">2023-11-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】pwnable.tw BabyStack writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup">【Pwn#0x14】pwnable.tw BabyStack writeup</a><time datetime="2023-10-23T11:51:17.000Z" title="Created 2023-10-23 19:51:17">2023-10-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/224d2c00b9a1.html" title="【Pwn#0x13】pwnable.tw Starbound writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x13】pwnable.tw Starbound writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/224d2c00b9a1.html" title="【Pwn#0x13】pwnable.tw Starbound writeup">【Pwn#0x13】pwnable.tw Starbound writeup</a><time datetime="2023-10-13T06:59:14.000Z" title="Created 2023-10-13 14:59:14">2023-10-13</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey: '6VqGye1352LX381YQDTOaiXs',
+      avatar: 'retro',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: true
+    }, [{"placeholder":"El Psy Congroo"}]))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
