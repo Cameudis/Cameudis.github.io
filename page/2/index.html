@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>Cameudis's Blog - Exp10re the W0r1d</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Cameudis's Blog - Exp10re the W0r1d</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
 <meta property="og:title" content="Cameudis&#39;s Blog">
 <meta property="og:url" content="https://www.cameudis.com/page/2/index.html">
 <meta property="og:site_name" content="Cameudis&#39;s Blog">
@@ -7,25 +7,25 @@
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.cameudis.com/images/ava1.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/page/2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+<meta name="twitter:image" content="https://www.cameudis.com/images/ava1.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/page/2/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
   root: '/',
   algolia: undefined,
   localSearch: undefined,
   translate: undefined,
   noticeOutdate: undefined,
-  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
   copy: {
-    success: 'Copy successfully',
-    error: 'Copy error',
-    noSupport: 'The browser does not support'
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
   },
   relativeDate: {
     homepage: false,
     post: false
   },
   runtime: '',
-  date_suffix: {
-    just: 'Just',
+  dateSuffix: {
+    just: 'Just now',
     min: 'minutes ago',
     hour: 'hours ago',
     day: 'days ago',
@@ -34,11 +34,9 @@
   copyright: undefined,
   lightbox: 'fancybox',
   Snackbar: undefined,
-  source: {
-    justifiedGallery: {
-      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
-      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
-    }
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
   },
   isPhotoFigcaption: true,
   islazyload: false,
@@ -46,86 +44,86 @@
   percent: {
     toc: true,
     rightside: false,
-  }
+  },
+  autoDarkmode: false
 }</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
   title: 'Cameudis\'s Blog',
   isPost: false,
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2024-01-06 01:37:18'
-}</script><noscript><style type="text/css">
-  #nav {
-    opacity: 1
-  }
-  .justified-gallery img {
-    opacity: 1
-  }
-
-  #recent-posts time,
-  #post-meta time {
-    display: inline !important
-  }
-</style></noscript><script>(win=>{
-    win.saveToLocal = {
-      set: function setWithExpiry(key, value, ttl) {
-        if (ttl === 0) return
-        const now = new Date()
-        const expiryDay = ttl * 86400000
-        const item = {
-          value: value,
-          expiry: now.getTime() + expiryDay,
+  postUpdate: '2024-01-11 16:31:27'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
         }
-        localStorage.setItem(key, JSON.stringify(item))
-      },
-
-      get: function getWithExpiry(key) {
-        const itemStr = localStorage.getItem(key)
-
-        if (!itemStr) {
-          return undefined
-        }
-        const item = JSON.parse(itemStr)
-        const now = new Date()
-
-        if (now.getTime() > item.expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return item.value
       }
-    }
-  
-    win.getScript = url => new Promise((resolve, reject) => {
-      const script = document.createElement('script')
-      script.src = url
-      script.async = true
-      script.onerror = reject
-      script.onload = script.onreadystatechange = function() {
-        const loadState = this.readyState
-        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-        script.onload = script.onreadystatechange = null
-        resolve()
-      }
-      document.head.appendChild(script)
-    })
-  
-    win.getCSS = url => new Promise((resolve, reject) => {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = url
-      link.onload = () => resolve()
-      link.onerror = () => reject()
-      document.head.appendChild(link)
-    })
-  
-      win.activateDarkMode = function () {
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
         document.documentElement.setAttribute('data-theme', 'dark')
         if (document.querySelector('meta[name="theme-color"]') !== null) {
           document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
         }
       }
-      win.activateLightMode = function () {
+      win.activateLightMode = () => {
         document.documentElement.setAttribute('data-theme', 'light')
         if (document.querySelector('meta[name="theme-color"]') !== null) {
           document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
@@ -133,9 +131,9 @@
       }
       const t = saveToLocal.get('theme')
     
-          if (t === 'dark') activateDarkMode()
-          else if (t === 'light') activateLightMode()
-        
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
       const asideStatus = saveToLocal.get('aside-status')
       if (asideStatus !== undefined) {
         if (asideStatus === 'hide') {
@@ -145,13 +143,13 @@
         }
       }
     
-    const detectApple = () => {
-      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-        document.documentElement.classList.add('apple')
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
       }
-    }
-    detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/9b71e71b216d.html" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain">【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-05-03T23:55:01.000Z" title="Created 2023-05-04 07:55:01">2023-05-04</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:21:25.544Z" title="Updated 2023-10-30 23:21:25">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/9b71e71b216d.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/9b71e71b216d.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/9b71e71b216d.html" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain">【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-05-03T23:55:01.000Z" title="Created 2023-05-04 07:55:01">2023-05-04</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/9b71e71b216d.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/9b71e71b216d.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。
 比赛时和前辈两人看这题看了几个小时，找gadget找了很久也没做出来。比赛结束后发现了两个版本的做法，分别是官方的和Chovid99师傅的的。官方的做法比较一般，并且和我们比赛时的思路完全一致（只是我们傻了没发现那个关键gadget），因此本文主要分析官方的做法。
 
 
@@ -170,7 +168,7 @@ Frida功能强大，且使用非常便捷、快速。比如在Android平台，Xp
 本笔记收集了一些安卓使用Frida的资源。
 推荐食用方法是：
 
-安装：如果你是PoRE学生，可以直接用助教给的方法，在虚拟机进行安装配置 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/f6c454d44380.html" title="【Pwn#0x10】pwnable.tw Re-alloc writeup">【Pwn#0x10】pwnable.tw Re-alloc writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-13T15:03:41.000Z" title="Created 2023-04-13 23:03:41">2023-04-13</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:20:59.884Z" title="Updated 2023-10-30 23:20:59">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/f6c454d44380.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/f6c454d44380.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">相关：realloc、tcache2.29
+安装：如果你是PoRE学生，可以直接用助教给的方法，在虚拟机进行安装配置 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/f6c454d44380.html" title="【Pwn#0x10】pwnable.tw Re-alloc writeup">【Pwn#0x10】pwnable.tw Re-alloc writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-13T15:03:41.000Z" title="Created 2023-04-13 23:03:41">2023-04-13</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/f6c454d44380.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/f6c454d44380.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">相关：realloc、tcache2.29
 借用了很多巧合，实在是特别“幸运”的一个利用。自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。
 漏洞分析保护情况：
 123456Arch:     amd64-64-littleRELRO:    Partial RELROStack:    Canary foundNX:       NX enabledPIE:      No PIE (0x3fe000)FORTIFY:  Enabled
@@ -183,7 +181,7 @@ free：将选中栏使用 realloc(ptr, 0) 进行释放，并将指针置零。
 
 主要的漏洞在于realloc的使用上，可以通过RTFM（在线m ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/PoRE/d5088fb7cb3c.html" title="【PoRE#0x03】Burp Extension">【PoRE#0x03】Burp Extension</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-11T13:58:41.000Z" title="Created 2023-04-11 21:58:41">2023-04-11</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:06:54.174Z" title="Updated 2023-10-30 23:06:54">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/PoRE/">PoRE</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/PoRE/d5088fb7cb3c.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/PoRE/d5088fb7cb3c.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">官方教程：Creating Burp extensions - PortSwiggerMontoya官方文档：MontoyaApiMontoya官方示例：PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite
 Burp Suite过去插件开发使用的是Extender API，不过最近推出了一套新的API（今年1月刚刚发布），叫做Montoya API。新的API增加了Burp Suite插件开发的简便性，但是似乎并不完善，还有一些接口没有实现的样子。
-对于Lab4中的任务，也就是自动处理HTTP包的插件，可以参考这个例子：burp-extensions-montoya-api-examples&#x2F;proxyhandler&#x2F;src&#x2F;main&#x2F;java&#x2F;example&#x2F;proxyhandler at main · PortSwigger&#x2F;burp-extensions- ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/141743759f16.html" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling">【Pwn#0x0F】UTCTF 2023 Bing Chilling</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-04T05:19:34.000Z" title="Created 2023-04-04 13:19:34">2023-04-04</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:17:12.524Z" title="Updated 2023-10-30 23:17:12">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/141743759f16.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/141743759f16.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">Loongarch ROP比赛时发现了这是LoongArch的ROP，然后不太会找gadget就放弃了。赛后看大佬的writeup，发现只要找到一个关键的来自_dl_runtime_resolve的gadget，就可以万事大吉了。复现参考：CTFtime.org &#x2F; UTCTF 2023 &#x2F; Bing Chilling &#x2F; Writeup
+对于Lab4中的任务，也就是自动处理HTTP包的插件，可以参考这个例子：burp-extensions-montoya-api-examples&#x2F;proxyhandler&#x2F;src&#x2F;main&#x2F;java&#x2F;example&#x2F;proxyhandler at main · PortSwigger&#x2F;burp-extensions- ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/141743759f16.html" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling">【Pwn#0x0F】UTCTF 2023 Bing Chilling</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-04T05:19:34.000Z" title="Created 2023-04-04 13:19:34">2023-04-04</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/141743759f16.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/141743759f16.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">Loongarch ROP比赛时发现了这是LoongArch的ROP，然后不太会找gadget就放弃了。赛后看大佬的writeup，发现只要找到一个关键的来自_dl_runtime_resolve的gadget，就可以万事大吉了。复现参考：CTFtime.org &#x2F; UTCTF 2023 &#x2F; Bing Chilling &#x2F; Writeup
 
 环境准备我们都知道 Linux 下的可执行文件是 ELF 格式，但 ELF 也分架构，比如这个 binary 就并不是 amd64 架构的，而是 Loongarch 龙架构。
 12$ file hellohello: ELF 64-bit LSB executable, *unknown arch 0x102* version 1 (SYSV), statically linked, for GNU/Linux 5.19.0, with debug_info, not stripped
@@ -195,13 +193,13 @@ Burp Suite过去插件开发使用的是Extender API，不过最近推出了一�
 接下来介绍 Java 中创建线程的方法、UI 线程、以及线程间交互的方法（包括复杂的 Asynchronous Messaging 与简化后的 AsyncTask）。
 4.1.1 Java Multi-threading参考：Java 多线程编程 | 菜鸟教程 (runoob.com)
 &#x2F;&#x2F; TODO
-4.1.2 Android UI Thread所有与 UI 相关的操作都在 UI 线程中进行，换句话说，想要进行 UI 操作，就必须通 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/a45521a4b6a2.html" title="【Pwn#0x0E】UTCTF 2023 Printfail writeup">【Pwn#0x0E】UTCTF 2023 Printfail writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-12T13:28:13.000Z" title="Created 2023-03-12 21:28:13">2023-03-12</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:16:50.614Z" title="Updated 2023-10-30 23:16:50">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/a45521a4b6a2.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/a45521a4b6a2.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">非栈上的格式化字符串利用。
+4.1.2 Android UI Thread所有与 UI 相关的操作都在 UI 线程中进行，换句话说，想要进行 UI 操作，就必须通 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/a45521a4b6a2.html" title="【Pwn#0x0E】UTCTF 2023 Printfail writeup">【Pwn#0x0E】UTCTF 2023 Printfail writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-12T13:28:13.000Z" title="Created 2023-03-12 21:28:13">2023-03-12</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/a45521a4b6a2.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/a45521a4b6a2.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">非栈上的格式化字符串利用。
 
 
 非栈上的格式化字符串利用方法参考文章：非栈上格式化字符串漏洞利用技巧-安全客
 想用格式化字符串来覆写任意位置的数据时，通常是把指针附在字符串的末尾，然后用 %k$n 来引用这个指针。但是如果程序不在栈上读取字符串，就没有办法指向自定义的指针了。
 当然，方法依然存在，就是利用栈上已有的指针。在 64 位环境下，如果栈上存在一个指另一个指另一个的三级链结构（也就是两个指向栈的指针），就仍旧可以构造出任意的指针，如下图所示：
-123456789101112131415161718┌────────────────┐│                │├────────────────┤│First PTR       │├──────────────┬─┤│              │ ││              │ │├────────────┬─▼─┤│Second PTR  │   │├────────────┴─┬─┤│              │ ││  ┌───┬───┬───┤ ││  │   │   │   │ │├──▼─┬─▼─┬─ ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/b40f5afe3eeb.html" title="【Pwn#0x0D】HackIM CTF 2023 spygame writeup">【Pwn#0x0D】HackIM CTF 2023 spygame writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-10T11:59:14.000Z" title="Created 2023-03-10 19:59:14">2023-03-10</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:16:35.904Z" title="Updated 2023-10-30 23:16:35">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/b40f5afe3eeb.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/b40f5afe3eeb.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">我们CTF萌新小分队已经达到了4人之多(&#96;ヮ´)，这次排名41&#x2F;433，感觉很好~这道题有十个队做出来，很高兴我也弄出来了，还顺便大致学会了docker配本地环境，挺感动的~~
+123456789101112131415161718┌────────────────┐│                │├────────────────┤│First PTR       │├──────────────┬─┤│              │ ││              │ │├────────────┬─▼─┤│Second PTR  │   │├────────────┴─┬─┤│              │ ││  ┌───┬───┬───┤ ││  │   │   │   │ │├──▼─┬─▼─┬─ ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/b40f5afe3eeb.html" title="【Pwn#0x0D】HackIM CTF 2023 spygame writeup">【Pwn#0x0D】HackIM CTF 2023 spygame writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-10T11:59:14.000Z" title="Created 2023-03-10 19:59:14">2023-03-10</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/b40f5afe3eeb.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/b40f5afe3eeb.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">我们CTF萌新小分队已经达到了4人之多(&#96;ヮ´)，这次排名41&#x2F;433，感觉很好~这道题有十个队做出来，很高兴我也弄出来了，还顺便大致学会了docker配本地环境，挺感动的~~
 漏洞：随机数未设种子、数组下标溢出
 
 程序逻辑程序给了 N 个代码源文件以及DockerFile。主要逻辑是用 C code 写的，但是封装成了一个 Python 可以调用的模块，名为 spy，相关信息参考python文档 Extending Python with C or C++ — Python 3.11.2 documentation。
@@ -230,13 +228,13 @@ manifests 文件夹：存放 AndroidManifest.xml
 java 文件夹： ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#content-inner">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#content-inner">6</a><a class="extend next" rel="next" href="/page/3/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup">【Pwn#0x14】HITCTF2023 xv6-Trusted writeup</a><time datetime="2023-11-28T17:58:33.000Z" title="Created 2023-11-29 01:58:33">2023-11-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Linux/def2b48d2855.html" title="【Linux#0x01】Linux权限模型"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Linux#0x01】Linux权限模型"/></a><div class="content"><a class="title" href="/Tech/Linux/def2b48d2855.html" title="【Linux#0x01】Linux权限模型">【Linux#0x01】Linux权限模型</a><time datetime="2023-11-09T15:36:16.000Z" title="Created 2023-11-09 23:36:16">2023-11-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】pwnable.tw BabyStack writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup">【Pwn#0x14】pwnable.tw BabyStack writeup</a><time datetime="2023-10-23T11:51:17.000Z" title="Created 2023-10-23 19:51:17">2023-10-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
             <i class="fas fa-folder-open"></i>
             <span>Categories</span>
-            <a class="card-more-btn" href="/categories/" title="More">
+            <a class="card-more-btn" href="/categories/" title="View More">
     <i class="fas fa-angle-right"></i></a>
             </div>
             <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Daily/"><span class="card-category-list-name">Daily</span><span class="card-category-list-count">11</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Daily/%E6%9D%82%E8%B0%88/"><span class="card-category-list-name">杂谈</span><span class="card-category-list-count">5</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/"><span class="card-category-list-name">Tech</span><span class="card-category-list-count">49</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Algorithm/"><span class="card-category-list-name">Algorithm</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Blog/"><span class="card-category-list-name">Blog</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/CSAPP/"><span class="card-category-list-name">CSAPP</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/EE/"><span class="card-category-list-name">EE</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">2</span></a></li></ul></li>
-            </ul></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span><a class="card-more-btn" href="/archives/" title="More">
-    <i class="fas fa-angle-right"></i></a></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">November 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/10/"><span class="card-archive-list-date">October 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/09/"><span class="card-archive-list-date">September 2023</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/06/"><span class="card-archive-list-date">June 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/05/"><span class="card-archive-list-date">May 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/04/"><span class="card-archive-list-date">April 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/03/"><span class="card-archive-list-date">March 2023</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/02/"><span class="card-archive-list-date">February 2023</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-01-05T17:37:18.283Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+            </ul></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span><a class="card-more-btn" href="/archives/" title="View More">
+    <i class="fas fa-angle-right"></i></a></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">November 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/10/"><span class="card-archive-list-date">October 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/09/"><span class="card-archive-list-date">September 2023</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/06/"><span class="card-archive-list-date">June 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/05/"><span class="card-archive-list-date">May 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/04/"><span class="card-archive-list-date">April 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/03/"><span class="card-archive-list-date">March 2023</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/02/"><span class="card-archive-list-date">February 2023</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-01-11T08:31:27.437Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
   function loadValine () {
     function initValine () {
       let initData = {

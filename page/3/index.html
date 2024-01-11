@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><title>Cameudis's Blog - Exp10re the W0r1d</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Cameudis's Blog - Exp10re the W0r1d</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
 <meta property="og:title" content="Cameudis&#39;s Blog">
 <meta property="og:url" content="https://www.cameudis.com/page/3/index.html">
 <meta property="og:site_name" content="Cameudis&#39;s Blog">
@@ -7,25 +7,25 @@
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.cameudis.com/images/ava1.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/page/3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+<meta name="twitter:image" content="https://www.cameudis.com/images/ava1.jpg"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/page/3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
   root: '/',
   algolia: undefined,
   localSearch: undefined,
   translate: undefined,
   noticeOutdate: undefined,
-  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
   copy: {
-    success: 'Copy successfully',
-    error: 'Copy error',
-    noSupport: 'The browser does not support'
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
   },
   relativeDate: {
     homepage: false,
     post: false
   },
   runtime: '',
-  date_suffix: {
-    just: 'Just',
+  dateSuffix: {
+    just: 'Just now',
     min: 'minutes ago',
     hour: 'hours ago',
     day: 'days ago',
@@ -34,11 +34,9 @@
   copyright: undefined,
   lightbox: 'fancybox',
   Snackbar: undefined,
-  source: {
-    justifiedGallery: {
-      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
-      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
-    }
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
   },
   isPhotoFigcaption: true,
   islazyload: false,
@@ -46,86 +44,86 @@
   percent: {
     toc: true,
     rightside: false,
-  }
+  },
+  autoDarkmode: false
 }</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
   title: 'Cameudis\'s Blog',
   isPost: false,
   isHome: true,
   isHighlightShrink: false,
   isToc: false,
-  postUpdate: '2024-01-06 01:37:18'
-}</script><noscript><style type="text/css">
-  #nav {
-    opacity: 1
-  }
-  .justified-gallery img {
-    opacity: 1
-  }
-
-  #recent-posts time,
-  #post-meta time {
-    display: inline !important
-  }
-</style></noscript><script>(win=>{
-    win.saveToLocal = {
-      set: function setWithExpiry(key, value, ttl) {
-        if (ttl === 0) return
-        const now = new Date()
-        const expiryDay = ttl * 86400000
-        const item = {
-          value: value,
-          expiry: now.getTime() + expiryDay,
+  postUpdate: '2024-01-11 16:31:27'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
         }
-        localStorage.setItem(key, JSON.stringify(item))
-      },
-
-      get: function getWithExpiry(key) {
-        const itemStr = localStorage.getItem(key)
-
-        if (!itemStr) {
-          return undefined
-        }
-        const item = JSON.parse(itemStr)
-        const now = new Date()
-
-        if (now.getTime() > item.expiry) {
-          localStorage.removeItem(key)
-          return undefined
-        }
-        return item.value
       }
-    }
-  
-    win.getScript = url => new Promise((resolve, reject) => {
-      const script = document.createElement('script')
-      script.src = url
-      script.async = true
-      script.onerror = reject
-      script.onload = script.onreadystatechange = function() {
-        const loadState = this.readyState
-        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-        script.onload = script.onreadystatechange = null
-        resolve()
-      }
-      document.head.appendChild(script)
-    })
-  
-    win.getCSS = url => new Promise((resolve, reject) => {
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = url
-      link.onload = () => resolve()
-      link.onerror = () => reject()
-      document.head.appendChild(link)
-    })
-  
-      win.activateDarkMode = function () {
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
         document.documentElement.setAttribute('data-theme', 'dark')
         if (document.querySelector('meta[name="theme-color"]') !== null) {
           document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
         }
       }
-      win.activateLightMode = function () {
+      win.activateLightMode = () => {
         document.documentElement.setAttribute('data-theme', 'light')
         if (document.querySelector('meta[name="theme-color"]') !== null) {
           document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
@@ -133,9 +131,9 @@
       }
       const t = saveToLocal.get('theme')
     
-          if (t === 'dark') activateDarkMode()
-          else if (t === 'light') activateLightMode()
-        
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
       const asideStatus = saveToLocal.get('aside-status')
       if (asideStatus !== undefined) {
         if (asideStatus === 'hide') {
@@ -145,13 +143,13 @@
         }
       }
     
-    const detectApple = () => {
-      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-        document.documentElement.classList.add('apple')
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
       }
-    }
-    detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/33ac9256da88.html" title="【Pwn#0x0C】*CTF 2018 babystack">【Pwn#0x0C】*CTF 2018 babystack</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-08T02:25:50.000Z" title="Created 2023-03-08 10:25:50">2023-03-08</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:16:10.324Z" title="Updated 2023-10-30 23:16:10">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/33ac9256da88.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/33ac9256da88.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">攻击GLIBC的TLS结构体，覆写Canary。快速学习了一下Pthread，大致知道了多线程的用法。
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Blog"><span class="site-name">Cameudis's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/33ac9256da88.html" title="【Pwn#0x0C】*CTF 2018 babystack">【Pwn#0x0C】*CTF 2018 babystack</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-08T02:25:50.000Z" title="Created 2023-03-08 10:25:50">2023-03-08</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/33ac9256da88.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/33ac9256da88.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">攻击GLIBC的TLS结构体，覆写Canary。快速学习了一下Pthread，大致知道了多线程的用法。
 
 
 starctf2018&#x2F;pwn-babystack at master · sixstars&#x2F;starctf2018 (github.com)
@@ -159,7 +157,7 @@ GLIBC 不仅把 Canary 放在 TLS（Thread Local Storage）中，还把 TLS 放�
 
 漏洞分析程序逻辑很简单，就是开一个线程，然后这个线程里存在一个超大的栈溢出。
 程序会用寄存器 fs 来存储 TLS 的位置，而 canary 就在 fs+0x28 的地方，如下结构体定义所示：
-12345678910111213typedef struct  &#123;    void *tcb;        /* Pointer to the TCB.  Not necessarily the                 thread descriptor used by libpthread.  */    dtv_t  ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/80789099dd23.html" title="【Pwn#0x0B】NJCTF 2017 messager">【Pwn#0x0B】NJCTF 2017 messager</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-07T14:24:20.000Z" title="Created 2023-03-07 22:24:20">2023-03-07</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:15:42.414Z" title="Updated 2023-10-30 23:15:42">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/80789099dd23.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/80789099dd23.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">省流：Canary爆破，顺便复习了一下Linux socket API，还知道了IDA View下右键数值常量可以查找对应的枚举名（前提是要指知道枚举名的开头）（比如AF_INET、SOCK_STREAM等）。
+12345678910111213typedef struct  &#123;    void *tcb;        /* Pointer to the TCB.  Not necessarily the                 thread descriptor used by libpthread.  */    dtv_t  ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/80789099dd23.html" title="【Pwn#0x0B】NJCTF 2017 messager">【Pwn#0x0B】NJCTF 2017 messager</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-03-07T14:24:20.000Z" title="Created 2023-03-07 22:24:20">2023-03-07</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/80789099dd23.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/80789099dd23.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">省流：Canary爆破，顺便复习了一下Linux socket API，还知道了IDA View下右键数值常量可以查找对应的枚举名（前提是要指知道枚举名的开头）（比如AF_INET、SOCK_STREAM等）。
 
 
 程序逆向一开始程序创建了一个监听套接字，逆向得到逻辑大致如下：
@@ -177,7 +175,7 @@ GLIBC 不仅把 Canary 放在 TLS（Thread Local Storage）中，还把 TLS 放�
 
 release：LAB 的分发版本
 pore_2130xxx0xxx：每个人的个人仓库，主要用于提交
-slides：存放课程的 slid ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/7e0b30214381.html" title="【Pwn#0x0A】pwnable.tw tcache_tear writeup">【Pwn#0x0A】pwnable.tw tcache_tear writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-02-01T07:16:30.000Z" title="Created 2023-02-01 15:16:30">2023-02-01</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:15:20.984Z" title="Updated 2023-10-30 23:15:20">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/7e0b30214381.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/7e0b30214381.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">完全自己做出来的一个堆题，算是入门堆利用了吧哈哈。
+slides：存放课程的 slid ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/7e0b30214381.html" title="【Pwn#0x0A】pwnable.tw tcache_tear writeup">【Pwn#0x0A】pwnable.tw tcache_tear writeup</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-02-01T07:16:30.000Z" title="Created 2023-02-01 15:16:30">2023-02-01</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/7e0b30214381.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/7e0b30214381.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">完全自己做出来的一个堆题，算是入门堆利用了吧哈哈。
 程序分析GLIBC 2.27 64bits，关闭了 PIE。菜单题，提供了 alloc、free、info、exit 四个功能。
 
 通过 alloc，用户可以自由申请小于 0xff（不含 chunk header）大小的区块并向其中填入 size-0x16 个任意字符（奇怪的限制）。整个程序只有一个放指针的槽位，是一个全局符号，记为gptr。
@@ -186,7 +184,7 @@ slides：存放课程的 slid ...</div></div></div><div class="recent-post-item"
 通过 exit，用户可以退出程序。
 
 程序没有什么自带的后门函数，orw 的三个函数都不齐。
-思路结合分析可以看出，必须要泄露 libc 基址才能搞事情。所以需要在 2.27 的版本下，想办法绕过 tcache 让 chunk 进入 unsorted bin 来获取 li ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/c372e83f29fd.html" title="【Pwn#0x09】ZCTF 2016 note2">【Pwn#0x09】ZCTF 2016 note2</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-16T07:59:08.000Z" title="Created 2023-01-16 15:59:08">2023-01-16</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:18:47.034Z" title="Updated 2023-10-30 23:18:47">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/c372e83f29fd.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/c372e83f29fd.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">正在学习Unlink - CTF wiki，参考上面的方法自己打了一遍，其实是感觉上面的方法有些不必要的步骤，因此自己做的时候简化了一下……
+思路结合分析可以看出，必须要泄露 libc 基址才能搞事情。所以需要在 2.27 的版本下，想办法绕过 tcache 让 chunk 进入 unsorted bin 来获取 li ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/c372e83f29fd.html" title="【Pwn#0x09】ZCTF 2016 note2">【Pwn#0x09】ZCTF 2016 note2</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-16T07:59:08.000Z" title="Created 2023-01-16 15:59:08">2023-01-16</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/c372e83f29fd.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/c372e83f29fd.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">正在学习Unlink - CTF wiki，参考上面的方法自己打了一遍，其实是感觉上面的方法有些不必要的步骤，因此自己做的时候简化了一下……
 题目分析ubuntu16 64bit 菜单题Partial RELRO，no PIE –&gt; 可以覆写 GOT 进行攻击
 提供了四个功能：
 
@@ -203,7 +201,7 @@ slides：存放课程的 slid ...</div></div></div><div class="recent-post-item"
 
 1 编译和链接我们平时使用的”编译器”gcc，其全称是 GNU Compiler Collection，是一套组合程序，即教材中的 compiler driver。gcc将程序编译为完整程序的过程可以分为如下几步：
 
-预编译：C 预编译器 cpp 会处理源代码中的宏以及引用，并简化代码（删除所有注释，调 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/315b637e69b6.html" title="【Pwn#0x08】0CTF 2017 babyheap">【Pwn#0x08】0CTF 2017 babyheap</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-11T02:06:09.000Z" title="Created 2023-01-11 10:06:09">2023-01-11</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:14:32.714Z" title="Updated 2023-10-30 23:14:32">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/315b637e69b6.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/315b637e69b6.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">放寒假了，于是我把ptmalloc2机制又重新学习了一遍，开始做点简单的堆利用题了！本题一半抄一半自己摸，也算是基本搞懂了，这里放一个笔记。
+预编译：C 预编译器 cpp 会处理源代码中的宏以及引用，并简化代码（删除所有注释，调 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/315b637e69b6.html" title="【Pwn#0x08】0CTF 2017 babyheap">【Pwn#0x08】0CTF 2017 babyheap</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-01-11T02:06:09.000Z" title="Created 2023-01-11 10:06:09">2023-01-11</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.605Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/315b637e69b6.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/315b637e69b6.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">放寒假了，于是我把ptmalloc2机制又重新学习了一遍，开始做点简单的堆利用题了！本题一半抄一半自己摸，也算是基本搞懂了，这里放一个笔记。
 基础信息：ubuntu16（glibc2.23），菜单题，64 位，保护全开。提供 alloc、 free、dump、fill 功能，同时允许分配 16 个区块。
 漏洞：fill 功能可以向区块写入任意长度信息，也就是堆溢出。
 由于保护全开，于是 pwn 的目标便是：
@@ -215,7 +213,7 @@ slides：存放课程的 slid ...</div></div></div><div class="recent-post-item"
 我们需要泄露这个指针，就需要想办法构造 UAF 或者 ove ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Daily/%E6%9D%82%E8%B0%88/803421a18fc9.html" title="【杂谈#0x04】">【杂谈#0x04】</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-12-09T10:46:46.000Z" title="Created 2022-12-09 18:46:46">2022-12-09</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:05:27.664Z" title="Updated 2023-10-30 23:05:27">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Daily/">Daily</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Daily/%E6%9D%82%E8%B0%88/">杂谈</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Daily/%E6%9D%82%E8%B0%88/803421a18fc9.html#post-comment"><span class="valine-comment-count" data-xid="/Daily/%E6%9D%82%E8%B0%88/803421a18fc9.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">最近发生了很多事情，但我也总结不出什么道理，所以就写个杂谈来分享下我看到的事情和我的感受吧。
 第一是疫情防控的急速转变。从乌鲁木齐市的大火开始，网上就有一股强大的反抗当前防疫政策的力量出现了。那段时间是我朋友圈里，不存在的文章占比最高的一段时间。甚至不仅仅是网上，在现实中也有许多人开始抗议，以举白纸的方式。这很显然是多个因素推动造成的，其中不乏境外势力的推动。但是不论因素是什么，民众中已经形成一股怨气了。可想而知，不论多么小心，未来一定会有类似乌鲁木齐大火一样的惨剧发生，这是中国作为一个大国所无法避免的，这里的大说的是规模、人口、差异之大。而网络的存在又消除了信息的传播限制，使得全国都能获取到事件的相关信息，使这股怨气仿佛滚雪球一般越传越大。因此在这种情况下，选择放开是十分合理的措施，并且一定要放开到让老百姓意识到明显不同的程度。所以现在大的真的来了：
 pafd。出校刷卡。线上。提前。推迟。后续安排问卷。活动取消。离校。抢票。见证历史。一时间所有的东西都转了起来。
-第二是不可抗力带来的迷茫。在这周三四五，我每天都遭受了一次课业上的打击。周三错过了一学期只点名一次的毛概点名；周四在集合与 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/508d7fe62c17.html" title="【Pwn#0x07】THUCTF 2022 babystack_level3">【Pwn#0x07】THUCTF 2022 babystack_level3</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-11-15T06:11:48.000Z" title="Created 2022-11-15 14:11:48">2022-11-15</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-10-30T15:22:55.644Z" title="Updated 2023-10-30 23:22:55">2023-10-30</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/508d7fe62c17.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/508d7fe62c17.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">比赛链接：THUCTF2022（报名了比赛的账号现在（2022&#x2F;11&#x2F;15）还可以下载附件和开启实例）
+第二是不可抗力带来的迷茫。在这周三四五，我每天都遭受了一次课业上的打击。周三错过了一学期只点名一次的毛概点名；周四在集合与 ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/Tech/Pwn/508d7fe62c17.html" title="【Pwn#0x07】THUCTF 2022 babystack_level3">【Pwn#0x07】THUCTF 2022 babystack_level3</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-11-15T06:11:48.000Z" title="Created 2022-11-15 14:11:48">2022-11-15</time><span class="article-meta-separator">|</span><i class="fas fa-history"></i><span class="article-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.605Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-inbox"></i><a class="article-meta__categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right article-meta-link"></i><a class="article-meta__categories" href="/categories/Tech/Pwn/">Pwn</a></span><span class="article-meta"><span class="article-meta-separator">|</span><i class="fas fa-comments"></i><a href="/Tech/Pwn/508d7fe62c17.html#post-comment"><span class="valine-comment-count" data-xid="/Tech/Pwn/508d7fe62c17.html"><i class="fa-solid fa-spinner fa-spin"></i></span></a><span class="article-meta-label"> comments</span></span></div><div class="content">比赛链接：THUCTF2022（报名了比赛的账号现在（2022&#x2F;11&#x2F;15）还可以下载附件和开启实例）
 学习了一下ret2dlresolve的基础。在NO RELRO的时候，程序的.dynamic节被存储在RW的地址空间，而其中的一个指针strtab指向的是动态链接的符号表。我们可以把这个符号表提取出来，修改一下，存在一个别的地方，然后把.dynamic里面的指针修改到那个地方。然后程序就会使用我们的假字符串表来进行动态符号解析！
 题目分析
 
@@ -226,13 +224,13 @@ pafd。出校刷卡。线上。提前。推迟。后续安排问卷。活动取�
 rop chain是构造一个假的dynstr表（比如把read改成system），然后把.dynamic那里的指针改成假的dynstr，并且跳转 ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/2/#content-inner"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#content-inner">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/#content-inner">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#content-inner">6</a><a class="extend next" rel="next" href="/page/4/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">14</div></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x14】HITCTF2023 xv6-Trusted writeup">【Pwn#0x14】HITCTF2023 xv6-Trusted writeup</a><time datetime="2023-11-28T17:58:33.000Z" title="Created 2023-11-29 01:58:33">2023-11-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Linux/def2b48d2855.html" title="【Linux#0x01】Linux权限模型"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Linux#0x01】Linux权限模型"/></a><div class="content"><a class="title" href="/Tech/Linux/def2b48d2855.html" title="【Linux#0x01】Linux权限模型">【Linux#0x01】Linux权限模型</a><time datetime="2023-11-09T15:36:16.000Z" title="Created 2023-11-09 23:36:16">2023-11-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】pwnable.tw BabyStack writeup"/></a><div class="content"><a class="title" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup">【Pwn#0x14】pwnable.tw BabyStack writeup</a><time datetime="2023-10-23T11:51:17.000Z" title="Created 2023-10-23 19:51:17">2023-10-23</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline">
             <i class="fas fa-folder-open"></i>
             <span>Categories</span>
-            <a class="card-more-btn" href="/categories/" title="More">
+            <a class="card-more-btn" href="/categories/" title="View More">
     <i class="fas fa-angle-right"></i></a>
             </div>
             <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Daily/"><span class="card-category-list-name">Daily</span><span class="card-category-list-count">11</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Daily/%E6%9D%82%E8%B0%88/"><span class="card-category-list-name">杂谈</span><span class="card-category-list-count">5</span></a></li></ul></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/"><span class="card-category-list-name">Tech</span><span class="card-category-list-count">49</span></a><ul class="card-category-list child"><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Algorithm/"><span class="card-category-list-name">Algorithm</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Blog/"><span class="card-category-list-name">Blog</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/CSAPP/"><span class="card-category-list-name">CSAPP</span><span class="card-category-list-count">3</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/EE/"><span class="card-category-list-name">EE</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Tech/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">2</span></a></li></ul></li>
-            </ul></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span><a class="card-more-btn" href="/archives/" title="More">
-    <i class="fas fa-angle-right"></i></a></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">November 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/10/"><span class="card-archive-list-date">October 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/09/"><span class="card-archive-list-date">September 2023</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/06/"><span class="card-archive-list-date">June 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/05/"><span class="card-archive-list-date">May 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/04/"><span class="card-archive-list-date">April 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/03/"><span class="card-archive-list-date">March 2023</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/02/"><span class="card-archive-list-date">February 2023</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-01-05T17:37:18.283Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+            </ul></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span><a class="card-more-btn" href="/archives/" title="View More">
+    <i class="fas fa-angle-right"></i></a></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/11/"><span class="card-archive-list-date">November 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/10/"><span class="card-archive-list-date">October 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/09/"><span class="card-archive-list-date">September 2023</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/06/"><span class="card-archive-list-date">June 2023</span><span class="card-archive-list-count">4</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/05/"><span class="card-archive-list-date">May 2023</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/04/"><span class="card-archive-list-date">April 2023</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/03/"><span class="card-archive-list-date">March 2023</span><span class="card-archive-list-count">8</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2023/02/"><span class="card-archive-list-date">February 2023</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-01-11T08:31:27.437Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
   function loadValine () {
     function initValine () {
       let initData = {
