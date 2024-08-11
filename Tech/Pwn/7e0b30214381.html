@@ -23,7 +23,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Pwn#0x0A】pwnable.tw tcache_tear writeup">
 <meta property="og:url" content="https://www.cameudis.com/Tech/Pwn/7e0b30214381.html">
-<meta property="og:site_name" content="Cameudis&#39;s Homepage">
+<meta property="og:site_name" content="Cameudis&#39; Blog">
 <meta property="og:description" content="完全自己做出来的一个堆题，算是入门堆利用了吧哈哈。 程序分析GLIBC 2.27 64bits，关闭了 PIE。菜单题，提供了 alloc、free、info、exit 四个功能。  通过 alloc，用户可以自由申请小于 0xff（不含 chunk header）大小的区块并向其中填入 size-0x16 个任意字符（奇怪的限制）。整个程序只有一个放指针的槽位，是一个全局符号，记为gptr。 通">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-02-01T07:16:30.000Z">
@@ -45,7 +45,7 @@
   };
 </script>
 
-  <title>【Pwn#0x0A】pwnable.tw tcache_tear writeup | Cameudis's Homepage</title>
+  <title>【Pwn#0x0A】pwnable.tw tcache_tear writeup | Cameudis' Blog</title>
   
 
 
@@ -96,10 +96,10 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Cameudis's Homepage</h1>
+      <h1 class="site-title">Cameudis' Blog</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+      <p class="site-subtitle" itemprop="description">Binary Hack, Computer System, Music, and whatever</p>
   </div>
 
   <div class="site-nav-right">
@@ -180,7 +180,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis's Homepage">
+      <meta itemprop="name" content="Cameudis' Blog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">

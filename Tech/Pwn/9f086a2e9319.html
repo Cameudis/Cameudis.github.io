@@ -23,7 +23,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Pwn#0x14】pwnable.tw BabyStack writeup">
 <meta property="og:url" content="https://www.cameudis.com/Tech/Pwn/9f086a2e9319.html">
-<meta property="og:site_name" content="Cameudis&#39;s Homepage">
+<meta property="og:site_name" content="Cameudis&#39; Blog">
 <meta property="og:description" content="本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……  漏洞分析本题主要有两个漏洞，一个是检查密码时，根据用户的输入的大小（strlen）作为 strncmp 的参数进行比较，然而这样会导致用户输入 NULL Byte 就通过检查，同时还允许了一字节一字节爆破得到正确的密码；甚至泄露密码后面的别的数据——在本题中就是程序基址。另一个是一个没有检查大小的 strcpy。 漏洞利用">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/Snipaste_2023-10-23_20-43-43.jpg">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>【Pwn#0x14】pwnable.tw BabyStack writeup | Cameudis's Homepage</title>
+  <title>【Pwn#0x14】pwnable.tw BabyStack writeup | Cameudis' Blog</title>
   
 
 
@@ -98,10 +98,10 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Cameudis's Homepage</h1>
+      <h1 class="site-title">Cameudis' Blog</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+      <p class="site-subtitle" itemprop="description">Binary Hack, Computer System, Music, and whatever</p>
   </div>
 
   <div class="site-nav-right">
@@ -182,7 +182,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis's Homepage">
+      <meta itemprop="name" content="Cameudis' Blog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">

@@ -23,7 +23,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain">
 <meta property="og:url" content="https://www.cameudis.com/Tech/Pwn/9b71e71b216d.html">
-<meta property="og:site_name" content="Cameudis&#39;s Homepage">
+<meta property="og:site_name" content="Cameudis&#39; Blog">
 <meta property="og:description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://i.imgtg.com/2023/05/04/Ck43t.png">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain | Cameudis's Homepage</title>
+  <title>【Pwn#0x11】TAMUctf 2023 Pwnme - linked ROP chain | Cameudis' Blog</title>
   
 
 
@@ -98,10 +98,10 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Cameudis's Homepage</h1>
+      <h1 class="site-title">Cameudis' Blog</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
-      <p class="site-subtitle" itemprop="description">Exp10re the W0r1d</p>
+      <p class="site-subtitle" itemprop="description">Binary Hack, Computer System, Music, and whatever</p>
   </div>
 
   <div class="site-nav-right">
@@ -182,7 +182,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis's Homepage">
+      <meta itemprop="name" content="Cameudis' Blog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
