@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.cameudis.com/Daily/%E6%9D%82%E8%B0%88/22e3ce1da9dc.html</loc>
+    
+    <lastmod>2024-09-07</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://www.cameudis.com/link/index.html</loc>
     
     <lastmod>2024-09-04</lastmod>
@@ -643,7 +652,7 @@
 
   <url>
     <loc>https://www.cameudis.com/</loc>
-    <lastmod>2024-09-04</lastmod>
+    <lastmod>2024-09-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>

@@ -166,6 +166,106 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Algorithm/c1314f859a6c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis' Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Tech/Algorithm/c1314f859a6c.html" class="post-title-link" itemprop="url">【Algorithm#0x00】数据结构-逆波兰表示法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-07-30 16:51:43" itemprop="dateCreated datePublished" datetime="2022-07-30T16:51:43+08:00">2022-07-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-01-11 16:34:02" itemprop="dateModified" datetime="2024-01-11T16:34:02+08:00">2024-01-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/Algorithm/" itemprop="url" rel="index"><span itemprop="name">Algorithm</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/Algorithm/c1314f859a6c.html" class="post-meta-item leancloud_visitors" data-flag-title="【Algorithm#0x00】数据结构-逆波兰表示法" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/Algorithm/c1314f859a6c.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Algorithm/c1314f859a6c.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="四则运算表达式求值-逆波兰表示法"><a href="#四则运算表达式求值-逆波兰表示法" class="headerlink" title="四则运算表达式求值 - 逆波兰表示法"></a>四则运算表达式求值 - 逆波兰表示法</h2><p>逆波兰表示法是栈结构的典型应用。<br>在逆波兰表示法中，无论是“把中缀表达式转化成后缀表达式”，还是“计算后缀表达式”，都需要用栈作为工具。<br>所以我写了一个简单的表达式转换程序试了下……（仅支持个位数加减法）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stack&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cctype&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回符号优先级，若非运算符则返回0</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">short</span> <span class="title">prior</span><span class="params">(<span class="type">char</span> c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (c)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;*&#x27;</span>:</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;/&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;+&#x27;</span>:</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&#x27;-&#x27;</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将中缀表达式a转化为后缀表达式，并存储在c中</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">convert_expression</span><span class="params">(string&amp; a, string&amp; c)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    stack&lt;<span class="type">char</span>&gt; b;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; a.<span class="built_in">length</span>(); ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 数字直接输出</span></span><br><span class="line">        <span class="keyword">if</span> ((<span class="string">&#x27;0&#x27;</span>&lt;=a[i] &amp;&amp; a[i]&lt;=<span class="string">&#x27;9&#x27;</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            c.<span class="built_in">push_back</span>(a[i]);</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 左括号直接压栈</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a[i] == <span class="string">&#x27;(&#x27;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            b.<span class="built_in">push</span>(a[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 右扩号则循环输出直到左括号</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a[i]==<span class="string">&#x27;)&#x27;</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">while</span> (b.<span class="built_in">top</span>() != <span class="string">&#x27;(&#x27;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                c.<span class="built_in">push_back</span>(b.<span class="built_in">top</span>());</span><br><span class="line">                b.<span class="built_in">pop</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            b.<span class="built_in">pop</span>();</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 处理符号优先级</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">prior</span>(a[i]))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 当前符号优先级 &lt;= 栈顶符号优先级：栈顶符号出栈</span></span><br><span class="line">            <span class="keyword">while</span> (!b.<span class="built_in">empty</span>() &amp;&amp; <span class="built_in">prior</span>(a[i]) &lt;= <span class="built_in">prior</span>(b.<span class="built_in">top</span>()))</span><br><span class="line">            &#123;</span><br><span class="line">                c.<span class="built_in">push_back</span>(b.<span class="built_in">top</span>());</span><br><span class="line">                b.<span class="built_in">pop</span>();</span><br><span class="line">            &#125;</span><br><span class="line">            b.<span class="built_in">push</span>(a[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 处理非法字符</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Please check your expression.&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 输出栈内剩余字符</span></span><br><span class="line">    <span class="keyword">while</span> (!b.<span class="built_in">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        c.<span class="built_in">push_back</span>(b.<span class="built_in">top</span>());</span><br><span class="line">        b.<span class="built_in">pop</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    string expression;  cin &gt;&gt; expression;</span><br><span class="line">    string postfix_expression;</span><br><span class="line">    <span class="built_in">convert_expression</span>(expression, postfix_expression);</span><br><span class="line">    cout &lt;&lt; postfix_expression &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Daily/c2dbc95da2d9.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1028,7 +1128,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-count">68</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
