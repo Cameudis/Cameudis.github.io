@@ -19,20 +19,24 @@
     var CONFIG = {"hostname":"www.cameudis.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="关于教育和学习的一些想法（黑历史，但留着吧hhh）">
+  <meta name="description" content="如果你突然有了任意物理内存地址写的能力，你会做什么？">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【杂谈#0x00】">
-<meta property="og:url" content="https://www.cameudis.com/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html">
+<meta property="og:title" content="【GhostWrite#0x01】漏洞利用思路介绍">
+<meta property="og:url" content="https://www.cameudis.com/Tech/PWN/d8e15581152a.html">
 <meta property="og:site_name" content="Cameudis&#39; Blog">
-<meta property="og:description" content="关于教育和学习的一些想法（黑历史，但留着吧hhh）">
+<meta property="og:description" content="如果你突然有了任意物理内存地址写的能力，你会做什么？">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-09-17T02:56:55.000Z">
-<meta property="article:modified_time" content="2024-01-11T08:34:02.990Z">
+<meta property="og:image" content="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png">
+<meta property="og:image" content="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119426.png">
+<meta property="og:image" content="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png">
+<meta property="article:published_time" content="2024-09-15T14:04:24.000Z">
+<meta property="article:modified_time" content="2024-09-15T14:09:05.790Z">
 <meta property="article:author" content="Cameudis">
 <meta property="article:tag" content="blog">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png">
 
-<link rel="canonical" href="https://www.cameudis.com/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html">
+<link rel="canonical" href="https://www.cameudis.com/Tech/PWN/d8e15581152a.html">
 
 
 <script id="page-configurations">
@@ -45,7 +49,7 @@
   };
 </script>
 
-  <title>【杂谈#0x00】 | Cameudis' Blog</title>
+  <title>【GhostWrite#0x01】漏洞利用思路介绍 | Cameudis' Blog</title>
   
 
 
@@ -171,7 +175,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PWN/d8e15581152a.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/ava1.jpg">
@@ -184,7 +188,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          【杂谈#0x00】
+          【GhostWrite#0x01】漏洞利用思路介绍
         </h1>
 
         <div class="post-meta">
@@ -193,32 +197,26 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2022-09-17 10:56:55" itemprop="dateCreated datePublished" datetime="2022-09-17T10:56:55+08:00">2022-09-17</time>
+              <time title="Created: 2024-09-15 22:04:24 / Modified: 22:09:05" itemprop="dateCreated datePublished" datetime="2024-09-15T22:04:24+08:00">2024-09-15</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-01-11 16:34:02" itemprop="dateModified" datetime="2024-01-11T16:34:02+08:00">2024-01-11</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Daily/" itemprop="url" rel="index"><span itemprop="name">Daily</span></a>
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
                 </span>
                   , 
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Daily/%E6%9D%82%E8%B0%88/" itemprop="url" rel="index"><span itemprop="name">杂谈</span></a>
+                  <a href="/categories/Tech/PWN/" itemprop="url" rel="index"><span itemprop="name">PWN</span></a>
                 </span>
             </span>
 
           
-            <span id="/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html" class="post-meta-item leancloud_visitors" data-flag-title="【杂谈#0x00】" title="Views">
+            <span id="/Tech/PWN/d8e15581152a.html" class="post-meta-item leancloud_visitors" data-flag-title="【GhostWrite#0x01】漏洞利用思路介绍" title="Views">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -233,8 +231,8 @@
       </span>
       <span class="post-meta-item-text">Valine: </span>
     
-    <a title="valine" href="/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Daily/%E6%9D%82%E8%B0%88/e00dbc7a5b22.html" itemprop="commentCount"></span>
+    <a title="valine" href="/Tech/PWN/d8e15581152a.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PWN/d8e15581152a.html" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -249,36 +247,43 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>关于教育和学习的一些想法（黑历史，但留着吧hhh）</p>
+        <p>如果你突然有了任意物理内存地址写的能力，你会做什么？</p>
 <span id="more"></span>
 
-<p>金城老师的ICS，属实是一门非常神奇的课，我甚至觉得他不是在教ICS。<br><strong>认真水</strong>了三节金老师的ICS之后，我不禁开始思考（上帝开始发笑.jpg），在现今的2202年，什么样的教学方式才是对现代（CS）学生来说最合适的？</p>
-<p>首先，现代学生和近现代学生差别在哪里？最大的差异无非是更加丰富的资源，不仅全世界最顶尖的名校都会公开许多的课程资源，而且由于互联网允许用户自由发声（确信），使各类的<strong>好课推荐</strong>、<strong>好书推荐</strong>很容易就能找到，一个最好的例子就是 <a target="_blank" rel="noopener" href="https://csdiy.wiki/">CS自学指南</a>。</p>
-<p>有了如此丰富的资源，所谓名校与野鸡大学，在教学方面的差距，完全可以通过自学名校的资源来进行弥补。<br>当然，我们会自然地质疑自学，认为自学终究和上课还是有差别的。<br>那么差别在哪里呢？</p>
-<p>以我目前仅有的一年大学经历来看，差别确实是非常非常大的。一方面自学比起传统的教学方式有着极大的优越性，但另一方面上课又有着自学无法超越的特性。</p>
-<p>第一个问题不是本次讨论的重点，因此一笔带过。<br>参考资料有：<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/559705516">学校让人沾染上的 100+ 恶习 - Wozniak博士</a><br><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1hY4y157rF">现在的教学，比二十年前有什么提升？- YJango博士</a></p>
-<p>第二个问题：上课有着上面特性令自学无法超越？自学还有哪些缺点？</p>
-<p>首先就是<strong>缺少沟通与交流</strong>。<br>不仅是<strong>与老师的沟通和交流</strong>，还有<strong>和同伴之间的沟通和交流</strong>。</p>
-<p>其次就是自学<strong>很难坚持</strong>，需要极强的自律。<br>在学校中上课会有各种事情催人去学习，包括对于绩点的担忧、对于同伴的追赶、老师和TA的催促等等……<br>但自学是没用这些东西的，“自学仅仅依靠你变强的信念”，仅此而已。</p>
-<p>那么，有没有一种可能，能够把课堂教学的优点和自学的优点结合起来，成为究极的教学方式呢？<br>我不知道金城老师有没有想过上述这些事情（我估计必然是想过的）。总之目前看来，他的意思就是把这二者融合起来。<br>于是就诞生了这门<strong>神奇</strong>的课，以及他的一些<strong>神奇</strong>的话：</p>
-<blockquote>
-<p>PPT上有的东西，我上课基本不讲。</p>
-</blockquote>
-<p>翻译：<strong>请课后自学。</strong></p>
-<blockquote>
-<p>知识是最不重要的，重要的是尝试解决问题的过程与思路。</p>
-</blockquote>
-<p>翻译：<strong>请课后自学知识，上课的时候我们一起来聊天。（大雾）</strong></p>
-<blockquote>
-<p>大家现在都是社恐，不过没关系。后面大家都会变成社牛的。</p>
-</blockquote>
-<p>翻译：<strong>我们上课会有很多 <del>聊天</del> 交流的。</strong></p>
-<p>所以总之我还是对金城老师之后打算整什么活、以及怎么整活非常期待的！（当然还有TA大大们）</p>
-<p>cs自学指南的作者在后记中写道：</p>
-<blockquote>
-<p>试问谁不想在课堂上和那么多优秀的同学济济一堂，热烈讨论呢？谁不想遇到问题直接找老师答疑解惑呢？谁不想辛苦学习的成果可以直接化作学校承认的学分绩点呢？可如果一个兢兢业业、按时到堂的学生收获的却是痛苦，而那个一学期只有考试会出席的学生却学得自得其乐，这公平吗？我不知道。</p>
-</blockquote>
-<p>我期望这门ICS真的能够真的部分解决一部分上述的问题。<br>然后我决定每个礼拜五中午都去抢一个前排位置，去和同学们交流♂了hhhhhh</p>
+<p>在 2024 暑期，来自 CISPA 的研究人员发现了国产的 CPU 芯片玄铁 C910 等型号的极高危漏洞，允许攻击者通过 RISC-V Vector 拓展中的错误实现指令实现<strong>任意地址物理内存写入</strong>。这是工作的官网：<a target="_blank" rel="noopener" href="https://ghostwriteattack.com/">https://ghostwriteattack.com/</a>。本篇博客将介绍作者团队使用的漏洞利用方法。</p>
+<p>物理内存空间不同于受限的虚拟内存空间，电脑上所有的进程、操作系统内核、虚拟化管理器、设备的内存映射……所有大家能想到的东西都在这里。时光倒流回了 1950s，那个没有虚拟内存的时代。</p>
+<p>或许你曾经听说过 Core War：在这个 1984 年的游戏中，双方玩家编写的两个程序会在同一片内存空间中进行角斗，通过覆盖对方的代码等方式尝试“杀死”对方的控制流。我们现在遇到的场景就有些类似于这个游戏。</p>
+<p>直接进行物理内存的写入几乎可以无视一切内存安全的保护机制。不论是用户态的 NX、KPTI 还是内核态的 SMEP、SMAP，这些基于页表的检查全都无法发挥作用。留给攻击者唯一的困扰就是地址随机化（KASLR）了，这种保护会在每次内核启动时随机一个加载地址，使得攻击者无法使用硬编码的地址完成攻击。</p>
+<p>对于我们今天的主角——RISC-V 架构的玄铁处理器来说，情况则有所不同。直到去年的九月份，RISC-V 架构的 KASLR 支持才被合并进入 Linux 主线的 6.6 版本。</p>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png" alt="Pasted image 20240813155119.png"></p>
+<p>熟悉 Linux 的小伙伴都知道，重视稳定性的发行版常常会绑定某个特定版本的内核，包括 Debian、Ubuntu、CentOS、RHEL 等等。因此，Linux 6.6 以及之后的版本并不会那么快地部署到各个发行版中。（就算新版采用了最新的内核，程序员或许还是喜欢使用老发行版）</p>
+<p>比如，目前最新的 Debian 12.6 版本只绑定了 6.1 版本的 Linux 内核；而在 Ubuntu 这边，22.04 LTS 绑定的内核是 5.15 或 5.17 版本，最早使用 6.6 以上内核的是今年发布的 Ubuntu 24.04。总结一下：大部分稳定的发行版都还没有支持 RISC-V 架构的 KASLR！攻击者表示：我从来没有打过如此富裕的仗。</p>
+<h2 id="From-write-to-execute"><a href="#From-write-to-execute" class="headerlink" title="From write to execute"></a>From write to execute</h2><p>首先介绍普通用户的 root 提权。</p>
+<p>Linux 会根据某个进程的 <code>UID</code> 来判断其权限，其中 <code>UID</code> 0 是系统为 root 用户专门保留的 ID。考虑到我们现在能写入内核的任意代码、劫持任意函数，我们可以劫持 <code>getuid()</code> 这一系统调用，将其函数开头覆盖成我们自己的机器码，使它永远返回 0。</p>
+<p><code>sudo</code>、<code>su</code> 这样的 Setuid 程序会通过 <code>getuid()</code> 系统调用来判断用户是否已经是 root，如果是的话（也就是 <code>UID</code> 为零）就不再要求用户进行认证。因此，在劫持了系统调用之后，攻击者直接进行 <code>su</code> 就可以切换成 root 用户，完成攻击。</p>
+<p>完整的攻击流程如下：</p>
+<ol>
+<li>确定内核加载地址以及函数的偏移；</li>
+<li>往 <code>getuid</code> 的物理内存地址处，写入 <code>li a0,0; ret</code> 的机器码；</li>
+<li>命令行输入 <code>su</code>，即可切换为 root 用户。</li>
+</ol>
+<p>在大部分发行版上，由于 KASLR 不会开启，所以只需要通过本地调试或其他方法拿到 <code>getuid</code> 的地址就行了。至于小部分使用了 6.6 及以上内核版本的发行版，还需要结合进行物理内存的扫描来获取信息，关于物理内存读取的部分，会在后面进行介绍。</p>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119426.png" alt="ad02993e5f8b310a48309b1835c64a11.png"></p>
+<p>如果你想要玩点更加花哨的，想在权限级别更高的 Machine Mode 执行代码，也可以使用类似的攻击手法，直接写入修改 Supervisor 代码。作者以 OpenSBI 这套 Supervisor 实现为例，说明了如何进行 Machine Mode 代码执行：</p>
+<ol>
+<li>确定 OpenSBI 的版本号以及加载位置；</li>
+<li>修改其中 <code>SBI_EXT_BASE_GET_MVENDORID</code> 这一 SBI <code>ecall</code> 的 handler 代码；</li>
+<li>劫持内核调用该 SBI <code>ecall</code>，即可以 machine mode 执行代码。</li>
+</ol>
+<p>在基于 C910 的系统上，OpenSBI 的二进制会被加载到固定地址 <code>0x0</code>，不存在随机化的保护，因此上述攻击的第一步并不是一个很难完成的任务。</p>
+<h2 id="From-write-to-read"><a href="#From-write-to-read" class="headerlink" title="From write to read"></a>From write to read</h2><p>如果攻击者无法确认内核的内存布局（比如内核系统开启了 KASLR 保护），物理内存任意写原语就显得有些力不从心。</p>
+<p>作者受到之前利用 rowhammer 漏洞进行提权的启发（这个 DRAM bug 会导致内存中一些比特发生翻转），使用了类似的攻击方法，能基于写原语得到读原语。</p>
+<p>页表作为虚拟地址转换的关键数据结构，可以修改它就可以进行任意读写。虽然攻击者不知道自己进程的页表位于物理内存的哪里，但他可以通过不断往内存里映射同一个文件，来让整个物理内存都被自己进程的页表填满。 这样以来，攻击者随便写入一个物理地址的内存，就大概率会修改到自己的页表。这也是经典的 NOP Sled 思想。</p>
+<p>如果攻击者成功修改到了某个自己进程的页表项，他就可以检测到有一个虚拟地址的映射发生了改变（不再映射到原来的文件）。后续，攻击者只需要继续修改这个页表项，就可以修改对应虚拟地址的映射目标，从而读写任意的物理内存地址。</p>
+<p>但注意，能够修改页表相当于只是获取了内核同等级的读写权限，但有一些物理内存区域连内核也无法读取（物理内存保护机制），比如 SMM 所在的内存区域。</p>
+<p>下图是我基于自己 patch 过的 qemu，在 ubuntu 22.04 上进行攻击的 PoC。可以看到攻击者的用户态程序成功读出了物理地址 0x80400000 的值。</p>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png"></p>
+<p>关于 qemu 的 patch 以及攻击代码，可以见下一篇博客。</p>
 
     </div>
 
@@ -294,13 +299,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/Tech/Pwn/6825f1bc6742.html" rel="prev" title="【Pwn#0x06】pwnable.tw applestore writeup">
-      <i class="fa fa-chevron-left"></i> 【Pwn#0x06】pwnable.tw applestore writeup
+    <a href="/Daily/%E6%9D%82%E8%B0%88/22e3ce1da9dc.html" rel="prev" title="【杂谈#0x07】大三下期末日志">
+      <i class="fa fa-chevron-left"></i> 【杂谈#0x07】大三下期末日志
     </a></div>
-      <div class="post-nav-item">
-    <a href="/Tech/Pwn/2fdf0cd9555e.html" rel="next" title="【Pwn#0x04】BUUCTF get_started_3dsctf_2016">
-      【Pwn#0x04】BUUCTF get_started_3dsctf_2016 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -360,6 +362,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#From-write-to-execute"><span class="nav-number">1.</span> <span class="nav-text">From write to execute</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#From-write-to-read"><span class="nav-number">2.</span> <span class="nav-text">From write to read</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -166,6 +166,310 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Linux/def2b48d2855.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/ava1.jpg">
+      <meta itemprop="name" content="Cameudis">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Cameudis' Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/Tech/Linux/def2b48d2855.html" class="post-title-link" itemprop="url">【Linux#0x01】Linux权限模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-09 23:36:16" itemprop="dateCreated datePublished" datetime="2023-11-09T23:36:16+08:00">2023-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-04-17 14:40:17" itemprop="dateModified" datetime="2024-04-17T14:40:17+08:00">2024-04-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tech/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/Tech/Linux/def2b48d2855.html" class="post-meta-item leancloud_visitors" data-flag-title="【Linux#0x01】Linux权限模型" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/Tech/Linux/def2b48d2855.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/Tech/Linux/def2b48d2855.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Linux系列第一篇！<br>本期介绍Linux中的权限模型，从 <code>ls -l</code> 的解释一路科普到内核漏洞的利用（什么！）</p>
+<hr>
+<p>由于 Linux 设计时是一个多用户系统，可能有很多人共用一个 Linux 系统，因此 Linux 中存在<strong>用户</strong>和<strong>用户组</strong>的概念，每个用户或者用户组都有一个自己的 id，每个用户可以属于多个用户组。<br>有了用户之间的区分，就可以为文件设置权限，限制不应该访问的用户的访问，于是就有了权限系统。</p>
+<p>用户和用户组这两个抽象的概念，其实主要体现在两个地方：</p>
+<ul>
+<li>进程系统：每个进程都有自己所属的用户和用户组</li>
+<li>文件系统：每个文件都有自己所属的用户和用户组，以及相应的读写权限设置</li>
+</ul>
+<p>可以使用 <code>getuid()</code> 系列系统调用获取当前进程的用户 id，在 shell 里可以直接输入 <code>id</code> 查看当前 shell 进程的用户和用户组 id。（这里先不提及 id 的区别，后面再进行讲解）</p>
+<h2 id="文件系统中的权限模型"><a href="#文件系统中的权限模型" class="headerlink" title="文件系统中的权限模型"></a>文件系统中的权限模型</h2><p>使用命令 <code>ls -l</code> 可以查看文件的详细信息，比如：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ll</span><br><span class="line">drwxr-xr-x  4 cameudis cameudis   4096 Mar 24  2023 .cargo/</span><br><span class="line">drwx------  2 cameudis cameudis   4096 Nov  2 10:43 .ssh/</span><br><span class="line">-rw-r--r--  1 cameudis cameudis   4957 Oct 31 18:41 .bashrc</span><br><span class="line">-rw-r--r--  1 cameudis cameudis    619 Oct 31 10:11 memo.txt</span><br></pre></td></tr></table></figure>
+
+<p>我们以第一条为例：</p>
+<table>
+<thead>
+<tr>
+<th>文件类型</th>
+<th>权限信息</th>
+<th>连结数</th>
+<th>拥有者</th>
+<th>用户组</th>
+<th>文件大小</th>
+<th>修改日期</th>
+<th>文件名</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>d</code></td>
+<td><code>rwxr-xr-x</code></td>
+<td><code>4</code></td>
+<td><code>cameudis</code></td>
+<td><code>cameudis</code></td>
+<td><code>4096</code></td>
+<td><code>Mar 24  2023</code></td>
+<td><code>.cargo/</code></td>
+</tr>
+</tbody></table>
+<p>第一个字段文件类型包括以下这些（从这里也可以看到万物皆文件的思想）：</p>
+<table>
+<thead>
+<tr>
+<th>字符</th>
+<th>文件类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-</td>
+<td>普通文件</td>
+</tr>
+<tr>
+<td>d</td>
+<td>目录</td>
+</tr>
+<tr>
+<td>|</td>
+<td>符号链接</td>
+</tr>
+<tr>
+<td>p</td>
+<td>named pipe</td>
+</tr>
+<tr>
+<td>c</td>
+<td>字符设备</td>
+</tr>
+<tr>
+<td>b</td>
+<td>块设备</td>
+</tr>
+<tr>
+<td>s</td>
+<td>socket 文件</td>
+</tr>
+</tbody></table>
+<p>我们可以看到，每个文件都会有一个所属的用户、一个所属的用户组。相应地，一个文件的权限设置会有三档：<strong>对于所属用户的权限</strong>、<strong>对于所属用户组中用户的权限</strong>、<strong>对于其他用户的权限</strong>。在一些权限设置工具 <code>chmod</code> 中，这三者分别简称为 <code>U</code> <code>G</code> <code>O</code>，即 User、Group、Others。</p>
+<p>在 <code>ls -h</code> 看到的信息中，我们看到的 <code>rwxr--r--</code> 字符串，其实就类似一个 bit vector。前三个字符表示对于所属用户的权限，中间三个表示所属用户组中用户的权限，最后三个字符表示对于其他用户的权限。</p>
+<p>比如，<code>.cargo</code> 目录归 cameudis 所有，那么 cameudis 作为拥有者，其权限是 <code>rwx</code>（Read、Write、eXecute）；而另一个用户 Jern，若他不属于 cameudis 用户组，那么他的权限是 <code>r--</code>（Read only）。</p>
+<blockquote>
+<p>你可能会好奇，为什么 Linux 下各种目录大小都显示为 4096：这是硬盘中用来存储目录 metadata 信息的大小，这些 metadata 有：<br>如果你需要计算目录大小，可以使用 <code>du</code> 指令，比如 <code>du -sh /tmp</code>。</p>
+</blockquote>
+<h3 id="修改文件权限"><a href="#修改文件权限" class="headerlink" title="修改文件权限"></a>修改文件权限</h3><p>一句废话就是：如果想要修改文件的权限，你必须拥有文件的权限。<br>在命令行中，我们最常使用的修改权限工具是 <code>chmod</code>。</p>
+<p>在 <code>chmod</code> 中，最简单的用法就是：<code>chmod &lt;+/-&gt;&lt;r/w/x&gt; &lt;filename&gt;</code>，这样会给用户、组和其他人通通加上或减去某个权限，比如：<code>chmod +x a.out</code> 就能让所有人都获取执行该文件的权限。</p>
+<p>在此基础上，还可以特别指定某一群体：<code>chmod [ugoa...]&lt;+/-&gt;&lt;r/w/x&gt; &lt;filename&gt;</code>。比如 <code>chmod u+x a.out</code> 就可以只给拥有者执行该文件的权限。</p>
+<p>不过，根据笔者观察，大家最常用的用法是直接使用数字指定。我们知道每个文件有三组权限，所以可以用三个 3 比特的值来分别表示一个文件的三组权限。在这个 3 比特的值中，约定最高位表示 r，中间一位表示 w，最后一位表示 x。所以，<code>111</code> 就对应 <code>rwx</code>，<code>010</code> 就对应 <code>-w-</code>。</p>
+<p>然后，我们再将其写为 8 进制，<code>111</code> 就会变成 <code>7</code>（如果你硬要说是更大的进制也可以），这样我们就可以用一个阿拉伯数字表示一组权限。</p>
+<p>再将其推广一下之后，就可以用三个数字表达三组权限，我们列出一些经常用到的权限作为例子：</p>
+<table>
+<thead>
+<tr>
+<th>权限编码</th>
+<th>权限说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>755</td>
+<td>rwxr-xr-x</td>
+</tr>
+<tr>
+<td>600</td>
+<td>rw——-</td>
+</tr>
+<tr>
+<td>644</td>
+<td>rw-r–r–</td>
+</tr>
+<tr>
+<td>777</td>
+<td>rwxrwxrwx</td>
+</tr>
+</tbody></table>
+<p>chmod 使用这种语法来让我们快速指定权限：<code>chmod 755 ./a.out</code> </p>
+<blockquote>
+<p><strong>冷知识：</strong><br>在著名动漫《新世纪福音战士新剧场版》中，明日香操纵 EVA 二号机进入野兽模式时，使用的指令是 “Code 777”，这说明 EVA 二号机运行的是 Linux 操作系统⊂彡☆))∀`)<br><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311082023947.png" alt="chmod 777"></p>
+</blockquote>
+<blockquote>
+<p><strong>常见的文件权限</strong><br>目录权限通常设置为755。其中7表示rwx，5表示rx。这里，x权限用于进入目录，r权限用于读取目录；换句话说，若去掉某个目录dir的x权限，则cd dir会报错；若去掉r保留x，则可以进入这个目录，但在目录中运行ls会出错；没有w权限，表示不能在目录中删除或新建文件。注意，删掉一个文件并不需要该文件的w权限，而只需要文件所在目录的w权限。一个文档文件的权限通常设置为422，即没有x权限。符号链接文件的权限为777，因为真正起作用的是链接所指向文件的权限。（来自<a target="_blank" rel="noopener" href="https://ipads.se.sjtu.edu.cn/ospi/">银杏书</a>）</p>
+</blockquote>
+<blockquote>
+<p><strong>文件的权限被修改，对已被打开的文件会立即生效么？</strong><br>考虑如下情况：在进程 A 打开某个文件时，该文件具有可写权限，因此进程 A 以可读可写权限打开了文件；然后，文件的权限被拥有者修改为只读，那么之后当进程 A 对文件进行写操作时，会成功还是失败呢？根据前一段的描述，进程 A 会一直拥有对文件的写权限，直到关闭该文件。若系统希望对文件的权限更新立即生效，则需要在更新权限的同时，遍历所有打开文件的 fd 并做相应的处理，例如直接关闭所有权限不匹配的 fd，这样进程 A 下次进行文件操作时就会出现错误。（来自<a target="_blank" rel="noopener" href="https://ipads.se.sjtu.edu.cn/ospi/">银杏书</a>）</p>
+</blockquote>
+<h2 id="进程系统中的权限模型"><a href="#进程系统中的权限模型" class="headerlink" title="进程系统中的权限模型"></a>进程系统中的权限模型</h2><p>每个进程都会有 UID 和 GID，且相关数据会继承给子进程（当然满足条件就可以修改自己的 UID 和 GID，只要符合一些要求，可以到对应系统调用的 man page 中查看具体要求）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> getuid.c</span><br><span class="line">int <span class="function"><span class="title">main</span></span>() &#123; <span class="built_in">printf</span>(<span class="string">&quot;UID: %d\n&quot;</span>, getuid()); &#125;</span><br><span class="line">$ gcc -w -o getuid ./getuid.c</span><br><span class="line">$ <span class="built_in">id</span></span><br><span class="line">uid=1000(cameudis) gid=1000(cameudis) <span class="built_in">groups</span>=1000(cameudis),4(adm),20(dialout),24(cdrom),25(floppy),27(sudo),29(audio),30(dip),44(video),46(plugdev),117(netdev),1001(docker)</span><br><span class="line">$ ./getuid</span><br><span class="line">UID: 1000</span><br></pre></td></tr></table></figure>
+
+<p>一个进程并不是只有一个 UID（用户 ID）和一个 GID（用户组 ID），而是根据不同用途有多个。</p>
+<p>在操作系统为进程准备的结构体中，一个进程包含如下几种 ID：</p>
+<ul>
+<li><strong>Effective（eUID、eGID）</strong>：大多数权限检查都使用这两个 ID。</li>
+<li><strong>Real（UID、GID）</strong>：真正的 ID，可能与 eUID、eGID 不同，用作信号检查等。</li>
+<li><strong>Saved</strong>：用于切换的 UID&#x2F;GID，在临时降权的时候用到。</li>
+</ul>
+<p>eUID 和 eGID 最为常用，进程是否能够打开文件等权限检查都使用 eUID 和 eGID，因此 <code>id</code> 指令默认显示的也是 eUID 和 eGID。（不过可以用 <code>-r</code> 参数指定显示 real UID&#x2F;GID）。</p>
+<h3 id="SUID-amp-SGID"><a href="#SUID-amp-SGID" class="headerlink" title="SUID &amp; SGID"></a>SUID &amp; SGID</h3><p>之所以需要区分 effective ID 和 read ID，是因为在某些场景中，需要区分这两个 ID。我们设想这样一个场景（纯虚构，细节问题不要在意）：</p>
+<blockquote>
+<p>Jern 安装了一个 Web 服务器软件（假设服务器软件的所有者和用户组都是 Jern），想要让运维 Cameudis 也能够执行该软件，因此他就把软件文件的权限设置为 <code>r-x</code>。<br>Cameudis 开心地启动！了 Web 服务器，但是访问网站时发现无法正常访问网页。</p>
+<p>原来由 Cameudis 执行的 Web 服务器进程，其 eUID 和 eGID 都是 Cameudis 的，因此这个进程没办法访问 Jern 放在目录中的 html 网页文件！</p>
+</blockquote>
+<p>为了解决场景中的这一问题，一个方法就是再给 Cameudis 目录中所有的文件的权限。但这种方法的缺陷在于，万一程序还需要访问未知位置的一些目录，我们可能不能一直及时地给 Cameudis 权限。<br>另一个方法就是将 Cameudis 加入 Jern 所在的用户组。这种方法挺好的，不过需要具体情况具体分析下加入之后有没有潜在危害。</p>
+<p>此外，还有一种 Linux 提供的方法，这种机制允许用户在文件中加入 <code>SUID</code>、<code>SGID</code> 权限位（就和 RWX 一样），如下所示：</p>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311092333758.png"></p>
+<ul>
+<li><code>SUID</code> (Set-UID)：当前文件被执行时，以文件拥有者 UID 作为 eUID 而不是父进程的 eUID。</li>
+<li><code>SGID</code> (Set-GID)：当前文件被执行时，以文件拥有组 GID 作为 eGID 而不是父进程的 eGID。</li>
+</ul>
+<blockquote>
+<p>这里说当前文件被执行，显然默认了文件是可执行文件。不可执行文件被设置这两个位是可行的但并没有意义。</p>
+</blockquote>
+<p>因此，Jern 可以给 Web 服务器的程序文件加上 <code>SUID</code> bit，这样 Cameudis 执行 Web 服务器时，服务器进程会以 Jern 的 <code>eUID</code> 运行，从而就能够访问所有 Jern 本人可以访问的文件。</p>
+<p>一个具体的例子就是 <code>sudo</code> 程序，我们可以这样查看其权限信息：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> sudo       <span class="comment"># which 让shell查找某个程序的具体位置</span></span><br><span class="line">/usr/bin/sudo</span><br><span class="line">$ ll /usr/bin/sudo</span><br><span class="line">-rwsr-xr-x 1 root root 166056 Apr  4  2023 /usr/bin/sudo*</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，sudo 的 <code>U</code> 权限是 <code>rws</code>，这里的 s 就表示 <code>SUID</code>。我们在执行 sudo 时，会以 root 用户的 <code>eUID</code> 执行，从而能够访问高权限的资源。</p>
+<blockquote>
+<p>使用 chmod 给文件加 SUID 和 SGID 的方法：<br><code>chmod u+s &lt;file&gt;</code><br><code>chmod g+s &lt;file&gt;</code></p>
+</blockquote>
+<h3 id="Sticky-bit"><a href="#Sticky-bit" class="headerlink" title="Sticky bit"></a>Sticky bit</h3><p>Sticky bit 主要用于目录，对于标记为 Sticky 的目录中的文件，只有<strong>文件的所有者与目录的所有者</strong>才能重命名或删除文件，其他行为则照常。</p>
+<p>通常来说，我们用 Sticky bit 来保护一些共享的文件夹，这里的共享是指多个用户都会在这个文件夹中处理文件。比如，<code>/tmp</code> 文件夹就常常被置为 <code>Sticky</code>，来防止普通用户删除或者移动其他用户的文件：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ll /</span><br><span class="line">drwxrwxrwt  74 root root   36864 Nov  6 14:09 tmp/</span><br></pre></td></tr></table></figure>
+
+<p>至于给非目录的普通文件置 Sticky bit，各类 Unix 系统的对待方式都不一样，比如 Linux 就是直接忽略置 Sticky 的文件。</p>
+<blockquote>
+<p>使用 chmod 给文件加 Sticky 的方法：<br><code>chmod o+t &lt;file&gt;</code></p>
+</blockquote>
+<h2 id="特殊的存在-root"><a href="#特殊的存在-root" class="headerlink" title="特殊的存在 root"></a>特殊的存在 root</h2><p>以上说的各种权限限制，<strong>都对 root 用户无效</strong>。作为 Linux 系统中的真神，root 用户和用户组都拥有特殊的 ID 0。通常为了使用 root 的力量，我们会借用 <code>sudo</code> 这个 <code>SUID</code>  程序。</p>
+<p><img src="https://imgs.xkcd.com/comics/sandwich.png"></p>
+<p>root 用户可以：</p>
+<ul>
+<li>打开任何文件，包括 <code>/proc</code> 中一些高权限的文件如 <code>kallsym</code>。</li>
+<li>执行任何程序</li>
+<li>切换到任何其他用户</li>
+<li>调试任何程序</li>
+<li>关机、重启</li>
+<li>加载设备驱动等内核模块</li>
+<li>……</li>
+</ul>
+<p>简单来说，<strong>root 用户可以控制整个系统</strong>。</p>
+<p>由于 root 的力量过于强大，所以任何一个略有安全意识的人，在平时都不会以 root 用户的身份执行指令，除非必要。相关反例实在太多了，几乎每个默认 root 用户登录的人都会因此出现一些问题。（笑死）</p>
+<p>既然 root 的力量如此强大，那么可想而知，如果黑客拿到了我们机器的 root 权限，那会是多么可怕的一场<strong>安全灾难</strong>。因此，接下来我们学习如何作为黑客拿到 root 权限。</p>
+<h2 id="权限提升（提权）"><a href="#权限提升（提权）" class="headerlink" title="权限提升（提权）"></a>权限提升（提权）</h2><p>提权，一般就是指黑客将他们权限从普通用户提高到 root 的一类攻击，通常的提权流程是这样的：</p>
+<ol>
+<li>在系统上初步站稳脚跟，比如通过有漏洞的程序拿到一个 shell（pwn！）</li>
+<li>找到一个可以利用的高权限服务</li>
+<li>利用那个高权限服务，借助它拿到权限</li>
+</ol>
+<p>什么是可以利用的高权限服务呢？</p>
+<ol>
+<li><code>SUID</code> 程序就是一种高权限的服务，如果它存在漏洞的话，我们就可以通过利用漏洞来达成提权，比如 <code>sudo</code> 就有过非常多的 CVE，可以攻击 <code>sudo</code> 的漏洞来拿到 root 权限。</li>
+<li>有一些不必要有 <code>SUID</code> 的程序，如果能够以 root 权限运行的话，会带来令人意想不到的安全风险。</li>
+<li>操作系统内核显然是最高权限运行的服务了，如果内核存在漏洞，同样可以帮助我们达成提权。这就是传说中的<strong>内核漏洞利用</strong>。</li>
+</ol>
+<p>前者比较容易理解，就是普通的用户态程序利用而已，因此本文中我们主要介绍后两者。</p>
+<h3 id="SUID-提权"><a href="#SUID-提权" class="headerlink" title="SUID 提权"></a>SUID 提权</h3><p>如果你发现 <code>mv</code> 程序是 <code>SUID</code> 的，你可以做到哪些事情？<br>看起来我们只能移动一些文件，但实际上，每个常见 Linux 程序的功能都可能非常强大。比如就算是简单的 <code>mv</code> 指令，也可以做到彻底的提权。</p>
+<p><code>mv</code> 的提权方法，可以参考<a target="_blank" rel="noopener" href="https://medium.com/workindia-in/the-dark-side-of-mv-command-3419c1bd619">The Dark Side of <code>mv</code> Command. mv, short for MOVE has been one of the… | by Nikhil Jagtap | WorkIndia.in | Medium</a></p>
+<p>更多 binary 的提权方法，可以见 <a target="_blank" rel="noopener" href="https://gtfobins.github.io/">GTFOBins</a>。</p>
+<p>强烈推荐读者去 <a target="_blank" rel="noopener" href="https://pwn.college/fundamentals/program-misuse">pwn.college</a> 实地打几道题来试试看。</p>
+<blockquote>
+<p>如果 &#x2F;bin&#x2F;sh 作为一个 SUID 程序运行，即 eUID 和 rUID 不同，那么它会主动降权限，将 eUID 设置成 rUID。这就是一种应对 SUID 提权的非常简单的缓解措施。<br>遇到这种情况，只要加上 <code>-p</code> 参数即可。</p>
+</blockquote>
+<h3 id="内核漏洞"><a href="#内核漏洞" class="headerlink" title="内核漏洞"></a>内核漏洞</h3><p>我们知道，操作系统不过就是一个用户程序与资源的管理器而已，它同样也是一个由程序员写成的程序，操作系统也会有漏洞。</p>
+<p>我们平常说的操作系统，通常包括了许多东西，比如桌面系统。不过，这里我们要关注的是一个操作系统真正重要的东西——<strong>内核</strong>（<strong>kernel</strong>，台湾称为<strong>核心</strong>）。</p>
+<p>内核是一个运行在更高级别的程序，我们刚刚提到的各种机制，包括文件系统、进程系统，这些系统的实现统统位于内核之中。比如我们刚刚提到了 <code>eUID</code>、Real <code>UID</code>，这些东西统统都是内核中为每个进程准备的结构体中的一个字段。</p>
+<p>如果读者学过 OS，那么就会知道用户态程序和内核交互的最常见的方法就是通过<strong>系统调用</strong>。因此，如果系统调用涉及的某段代码中存在漏洞，我们就能<strong>从用户程序攻击内核</strong>。（这就是为什么内核 pwn 的 exp 都是一个 C 程序，自己编写软件来攻击内核显然是最方便的）</p>
+<p>提权是攻击内核最常见的目的之一。如果我们控制了内核，比如劫持了控制流，我们就可以去调用内核中存在的函数，将当前进程的权限提高至 root。</p>
+<p>具体来说，我们一般会控制内核执行 <code>commit_creds(prepare_kernel_cred(0))</code>，其中 <code>prepare_kernel_cred(0)</code> 会创建一个各个字段都是 0 的 cred 结构体，然后 <code>commit_creds()</code> 可以将当前进程的 cred 替换为参数。我们前面知道 root 拥有特殊的 id —— 0，因此调用完这两个函数后，就可以将进程权限切换为 <code>root</code>。<br>此后进程就可以想干啥就干啥了，比如起一个 root shell。</p>
+<p>当然，这里只是一个小科普，内核漏洞笔者还没有入门，希望读者里能有未来挖掘或利用内核漏洞的大能|∀`)</p>
+<hr>
+<p>参考资料：pwn.college</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/Pwn/9f086a2e9319.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1469,138 +1773,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="https://www.cameudis.com/Tech/PoRE/52df689bd98e.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/ava1.jpg">
-      <meta itemprop="name" content="Cameudis">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Cameudis' Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/Tech/PoRE/52df689bd98e.html" class="post-title-link" itemprop="url">【PoRE#0x05】Proj1 指北</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-04-22 08:34:18" itemprop="dateCreated datePublished" datetime="2023-04-22T08:34:18+08:00">2023-04-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-01-11 16:34:30" itemprop="dateModified" datetime="2024-01-11T16:34:30+08:00">2024-01-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a>
-                </span>
-                  , 
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tech/PoRE/" itemprop="url" rel="index"><span itemprop="name">PoRE</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/Tech/PoRE/52df689bd98e.html" class="post-meta-item leancloud_visitors" data-flag-title="【PoRE#0x05】Proj1 指北" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/Tech/PoRE/52df689bd98e.html#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/Tech/PoRE/52df689bd98e.html" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在上PoRE前，我是Android零基础小白，Java也没写过。<br>刚刚接触那些Lab时，虽然挑战性也是有的，但终归是小打小闹的练习性质，只是助教出的题目。</p>
-<p>然后那天，Proj1降临了。</p>
-<p>真实软件逆向，而且参考目标还是微信。（微信是操作系统（雾））</p>
-<p><img src="http://jyywiki.cn/pages/OS/img/os-classify.jpg" alt="meme"></p>
-<p>开始前，前辈和我说过：没有做的时候都会以为这不可能，但其实你可以的。<br>现在做完了PJ1，我也想对后来的同学说：虽然这可能会耗费非常多的时间、精力，但我认为这是值得的！<br>这可是复杂度超高的真实软件、商用软件、<del>以及操作系统软件</del>，逆向成功就已经代表了——你已经有了在安卓世界中遨游的资格。</p>
-<p>但是，我当然不会觉得耗费时间多是PJ1的优点。<br>我想在这里总结一些做PJ1的经验，能帮后来者节省一些时间就最好了。</p>
-<h2 id="工具-amp-环境"><a href="#工具-amp-环境" class="headerlink" title="工具 &amp; 环境"></a>工具 &amp; 环境</h2><p>在做PJ1时，我们需要准备一个好的调试环境。</p>
-<p>最好的调试环境显然是真机，因为性能足够，可以提高调试的体验。如果你有一台备用手机的话，可以尝试网上查询root方法。我的备用手机是红米K30Ultra，使用root方法是Magisk。<br>root成功之后，推荐<a target="_blank" rel="noopener" href="https://github.com/LSPosed/LSPosed">LSPosed</a>模块，这是一个支持Xposed模块的框架，在安卓高版本也可以运行。Magisk有一个<a target="_blank" rel="noopener" href="https://github.com/ViRb3/magisk-frida">MagiskFrida</a>模块可以开机自启Frida-Server，也十分推荐安装。这样一来，Frida和Xposed环境都准备好了。</p>
-<p>在模拟器上的调试环境，参考助教的文档说明即可。中间不可避免会遇到问题，这是锻炼定位问题-搜索能力-解决问题能力的好机会。当然，在连续高强度STFW（Search The Friendly Web）之后，是人都不可避免出现头晕、昏昏沉沉、眼冒金星、可能还有腰酸背痛颈椎痛的情况。此时建议出去走走，今天的PJ1就写到这里……</p>
-<p>然后就是一些工具的介绍了：</p>
-<p><strong>Frida</strong>：Hook主力<br>使用参考<a target="_blank" rel="noopener" href="https://cameudis.github.io/Tech/PoRE/f5ada88c59a3.html">上一期</a><br>由于Frida脚本启动速度极快，对脚本进行修改后，只要在本机上重新启动python脚本就可以看到新的效果，而不需要重启模拟器啥的。因此，推荐即使要开发Xposed模块，也先用Frida进行hook测试。</p>
-<p><strong>Xposed框架</strong>：略</p>
-<p><strong>DDMS</strong>：动态调试工具<br>在网上搜索DDMS，可以发现这是一个Android Studio已经废弃的功能，但现在依然可以使用，请参考<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/4115be69be7d">这篇文章</a>找到它。<br>主要推荐其中的查看控件id功能。当我想要hook某个按钮绑定的onClick函数，可以直接用DDMS查看那个按钮的控件ID，在逆向工具中根据该ID搜索，就可以找到那个控件的引用，从而找到程序在哪里为其注册了onClick函数。</p>
-<p><strong>JEB</strong>：逆向工具<br>JEB不能搜索Java代码，我觉得比Jadx难用，并且占内存似乎也要更多。</p>
-<p><strong>Jadx</strong>：逆向工具<br>可以直接在生成的Java伪代码中搜索，功能十分强大好用。<br>可以在这里安装：<a target="_blank" rel="noopener" href="https://github.com/skylot/jadx/releases">https://github.com/skylot/jadx/releases</a><br>推荐安装 <code>jadx-gui with bundled JRE</code> 版本，这个版本可以直接在启动脚本里修改JVM的最大内存，防止Jadx在逆向微信的时候爆炸。方法是找到启动脚本（jadx-gui.bat）中的 <code>&quot;-XX:MaxRAMPercentage=xxx&quot;</code>，然后将后面的那个 <code>xx</code> 改得大一点，比如 <code>90.0</code> 之类的。也可以把这条直接改成 <code>-Xmx4g</code> 来指定具体的内存数量。</p>
-<p><strong>PKiD</strong>：查壳工具<br>链接：<a target="_blank" rel="noopener" href="http://www.legendsec.org/1888.html">http://www.legendsec.org/1888.html</a><br>可以查询APP有么有加壳，不过比较古老了。如果加了壳的话，很多代码逻辑都不会在APP里直接看到。我遇到的第一个目标就加壳了，用这个软件检测出来了。</p>
-<p><strong>FRIDA-DEXDump</strong>：脱壳工具<br>链接：<a target="_blank" rel="noopener" href="https://github.com/hluwa/FRIDA-DEXDump">https://github.com/hluwa/FRIDA-DEXDump</a><br>可以从内存里把dex代码给Dump出来，存到本地之后可以用jadx直接打开那个文件夹，用dump下来的代码进行分析。</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>面对一个庞大的APP文件，眼花缭乱的代码（经过混淆之后确实是眼花缭乱），你是否迷茫？反正我是挺迷茫的。<br>思路很重要。我们需要<strong>有目标的逆向</strong>，而不是漫无目的的逆向。</p>
-<p>我们首要思考的，就是逆向目标和软件逻辑之间的练习。比如想要做一个广告跳过功能，就可以思考：程序如何启动广告？程序如何关闭广告？最直接的入口，就是广告右上角的跳过或者关闭按钮。从按钮入手，找到点击按钮时的程序逻辑，就一定可以找到跳过广告的方法。</p>
-<p>微信发送消息也是类似的。程序在什么时候会发送消息呢？当我们点击发送键的时候。所以发送消息的逻辑一定可以通过按钮来找到。</p>
-<p>像跳过广告、发送消息这种有明确按钮，可以在手机上通过点击来进行的操作是最好逆向的。但我们也会遇到很多不好逆向的情况，比如我选的任务目标之一是破解一个软件的会员内购；又比如我的另一个目标是微信机器人，需要逆向找到接受消息的逻辑。这种情况下，没有明显的入口可供我们调用，我们就需要从其他的角度入手。</p>
-<p>在破解会员内购中，一种思路是支付的时候伪造成功的回复消息；另一种思路是通过某个界面组件在开通VIP前后的变化，找到用以判断VIP的那个关键逻辑函数。这两者都比前者难找一些，不过都是可行的思路，我前后两个思路都试了一遍才成功。</p>
-<p>在微信接受消息中，可能就需要从聊天框中显示的对方发来的消息组件入手，找到它的类、它的父类……不过，我并没有老老实实找，因为PJ1文档中给的一篇<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-226674.htm">参考文章</a>作者已经提供了一个非常有用的信息——微信会把聊天数据存到数据库中。（注意，由于很多数据库API都是以字符串为参数的，这大大方便了逆向时的信息获取）</p>
-<h2 id="Trick"><a href="#Trick" class="headerlink" title="Trick"></a>Trick</h2><p>有了思路以后，就需要在开始寻找目标了。在寻找目标时，也有一些能够帮助逆向的小技巧。</p>
-<p>其中，最有用的技巧一定是jadx中的<strong>搜索功能</strong>。想要找“发送”按钮就搜索“发送”，想要搜索“跳过广告”就搜索“跳过广告”，想要搜索SQL处理逻辑就搜索“SQL”，想要搜索一个抽象接口类的实现类就搜索那个接口的名字……<br>由于jadx的搜索支持类名、函数名、代码、注释、资源，想要搜什么都可以Ctrl+Shift+F召喚出搜索界面！</p>
-<p>此外，还推荐多多使用Frida动静态结合地调试。在jadx中右键某函数后，选择“复制为Frida片段”，粘贴到Frida脚本之后，运行脚本，马上就可以看到那个函数的调用情况、参数以及返回值。比如在一个函数中，有大量的在if中的语句，我们不知道它们是否会被执行，此时就可以hook住那个函数，通过打印参数、打印this的各个域等等方式来打印出真实情况下这些判断条件的值，从而得知真实的执行流是怎样的。</p>
-<p>最后，我在逆向时遇到的一个比较逆天的情况是真机环境的微信函数名、类名和我本地的安装包中的函数名、类名是不一样的。我本地的安装包可是直接用真机上的微信导出的啊，真不知道哪里出了问题。一种可能是微信做了安装时混淆，另一种可能是我自己把安装包弄混了。遇到hook不上的情况，可以试试打印可以确定的类的各个域和成员函数，如下代码所示：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> listener = <span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&quot;com.tencent.mm.pluginsdk.ui.chat.q&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> methods = listener.<span class="property">class</span>.<span class="title function_">getDeclaredMethods</span>();</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; methods.<span class="property">length</span>; j++)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(methods[j])</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> fields = listener.<span class="property">class</span>.<span class="title function_">getDeclaredFields</span>();</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; fields.<span class="property">length</span>; j++)&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(fields[j].<span class="title function_">getName</span>())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="领悟（建议）"><a href="#领悟（建议）" class="headerlink" title="领悟（建议）"></a>领悟（建议）</h2><p>面对一个新的情况，最好的办法是先网上搜一下。我感到使用谷歌进行搜索比百度要强一万倍，并且要多进行搜索，中文搜不到换英文再试试。比如像微信这样的软件，网络上一定会有许多已有的逆向资料（比如PJ1文档里助教给的参考文章），多搜多看，说不定就能遇到想找的东西。</p>
-<p>在做PJ的时候，一定要注意保护好身体，注意坐姿和眼睛，不要沉迷逆向无法自拔！逆向的时间是过得很快的，并且有时会不断产生新的希望，让人在电脑面前坐着走不开。但很多时候，故意停下来去做别的事情，可能会产生更新更好的思路。<br>（Windows的话可以开个桌面专门当作逆向的工作桌面，这样停下来只要切换桌面就可以干别的事了）</p>
-<p>此外，多和好同学交流一下思路、方法论非常有用，同学的思路往往能够大大地启发人！（可能比我写的破文章要更启发人）</p>
-<p>最后，Proj1确实是很具有挑战性的一个作业，也是很难忘的一段旅途。我在Proj1里学到了一些东西，希望能帮助我以后解决更大的挑战，也希望能帮助到一些未来的同学~</p>
-<p>P.S. 我也觉得PoRE这个难度坡度太大了，直接上真实的软件……或许可以在中间加一些小练习的，比如frida小练习（？）</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1672,7 +1844,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-count">69</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
