@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.cameudis.com/Music/20db37a1b726.html</loc>
+    
+    <lastmod>2024-10-10</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://www.cameudis.com/Tech/PWN/d8e15581152a.html</loc>
     
     <lastmod>2024-09-15</lastmod>
@@ -41,15 +50,6 @@
     <loc>https://www.cameudis.com/Daily/%E6%9D%82%E8%B0%88/9475ac409066.html</loc>
     
     <lastmod>2024-08-14</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.cameudis.com/Music/20db37a1b726.html</loc>
-    
-    <lastmod>2024-07-24</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -661,7 +661,7 @@
 
   <url>
     <loc>https://www.cameudis.com/</loc>
-    <lastmod>2024-09-16</lastmod>
+    <lastmod>2024-10-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
