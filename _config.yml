@@ -33,6 +33,7 @@ domain: www.cameudis.com       # if you want to force HTTPS, specify the domain 
 url: https://www.cameudis.com  # the base hostname and protocol for your site, e.g. http://example.com
 # baseurl: /REPOSITORY-NAME/      # place folder name if the site is served in a subfolder
 destination: ./docs
+include: ["CNAME"]
 
 port: 4001
 
