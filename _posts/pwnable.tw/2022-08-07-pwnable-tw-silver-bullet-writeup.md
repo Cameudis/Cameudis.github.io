@@ -2,6 +2,7 @@
 Layout: Post
 title: pwnable.tw silver_bullet
 date: 2022-08-07 09:28:56
+tags: pwnable.tw
 ---
 
 Off-by-NULL

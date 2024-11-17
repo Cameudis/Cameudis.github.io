@@ -2,6 +2,7 @@
 Layout: Post
 title: pwnable.tw dubblesort
 date: 2022-08-06 07:49:02
+tags: pwnable.tw
 ---
 难度不大的一关，而且网上有比我的做法更简单（但具有技巧性）的做法。
 但是还是做了好久好久……不是耗在题目上，主要是耗在搞libc版本上。

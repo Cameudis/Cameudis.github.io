@@ -23,6 +23,18 @@ layout: default
     {%- include disqus_comments.html -%}
   {%- endif -%}
 
+  {% for tag in page.tags %}
+    {% if site.tags[tag] %}
+      <b>本博客上与 {{ tag }} 相关的贴子：</b>
+      <ul>
+        {% assign posts = site.tags[tag] | slice: 0, 10 %}
+        {% for post in posts %}
+          <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+
   <div id="comments"></div>
   {% include valine_comments.html %}
 

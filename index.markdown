@@ -5,5 +5,6 @@
 layout: home
 ---
 
-
+我是 **Y²** (a.k.a **cameudis**), 计算机安全研究与爱好者。<br>
+现在是 [G.O.S.S.I.P 软件安全研究小组](https://gossip.team/)，[复旦 sixtars 战队](https://ctftime.org/team/12592) 以及 [W&M 战队](https://wm-team.cn/) 的成员。
 

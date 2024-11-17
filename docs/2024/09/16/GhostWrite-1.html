@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>GhostWrite #1: 漏洞利用思路介绍 | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="GhostWrite #1: 漏洞利用思路介绍" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="如果你突然有了任意物理内存地址写的能力，你会做什么？" />
+<meta property="og:description" content="如果你突然有了任意物理内存地址写的能力，你会做什么？" />
+<link rel="canonical" href="https://www.cameudis.com/2024/09/16/GhostWrite-1.html" />
+<meta property="og:url" content="https://www.cameudis.com/2024/09/16/GhostWrite-1.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-09-16T06:04:24+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="GhostWrite #1: 漏洞利用思路介绍" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-09-16T06:04:24+08:00","datePublished":"2024-09-16T06:04:24+08:00","description":"如果你突然有了任意物理内存地址写的能力，你会做什么？","headline":"GhostWrite #1: 漏洞利用思路介绍","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2024/09/16/GhostWrite-1.html"},"url":"https://www.cameudis.com/2024/09/16/GhostWrite-1.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">GhostWrite #1: 漏洞利用思路介绍</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-09-16T06:04:24+08:00" itemprop="datePublished">Sep 16, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>如果你突然有了任意物理内存地址写的能力，你会做什么？</p>
+
+<!-- more -->
+
+<p>在 2024 暑期，来自 CISPA 的研究人员发现了国产的 CPU 芯片玄铁 C910 等型号的极高危漏洞，允许攻击者通过 RISC-V Vector 拓展中的错误实现指令实现<strong>任意地址物理内存写入</strong>。这是工作的官网：<a href="https://ghostwriteattack.com/">https://ghostwriteattack.com/</a>。本篇博客将介绍作者团队使用的漏洞利用方法。</p>
+
+<p>物理内存空间不同于受限的虚拟内存空间，电脑上所有的进程、操作系统内核、虚拟化管理器、设备的内存映射……所有大家能想到的东西都在这里。时光倒流回了 1950s，那个没有虚拟内存的时代。</p>
+
+<p>或许你曾经听说过 Core War：在这个 1984 年的游戏中，双方玩家编写的两个程序会在同一片内存空间中进行角斗，通过覆盖对方的代码等方式尝试“杀死”对方的控制流。我们现在遇到的场景就有些类似于这个游戏。</p>
+
+<p>直接进行物理内存的写入几乎可以无视一切内存安全的保护机制。不论是用户态的 NX、KPTI 还是内核态的 SMEP、SMAP，这些基于页表的检查全都无法发挥作用。留给攻击者唯一的困扰就是地址随机化（KASLR）了，这种保护会在每次内核启动时随机一个加载地址，使得攻击者无法使用硬编码的地址完成攻击。</p>
+
+<p>对于我们今天的主角——RISC-V 架构的玄铁处理器来说，情况则有所不同。直到去年的九月份，RISC-V 架构的 KASLR 支持才被合并进入 Linux 主线的 6.6 版本。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png" alt="Pasted image 20240813155119.png" /></p>
+
+<p>熟悉 Linux 的小伙伴都知道，重视稳定性的发行版常常会绑定某个特定版本的内核，包括 Debian、Ubuntu、CentOS、RHEL 等等。因此，Linux 6.6 以及之后的版本并不会那么快地部署到各个发行版中。（就算新版采用了最新的内核，程序员或许还是喜欢使用老发行版）</p>
+
+<p>比如，目前最新的 Debian 12.6 版本只绑定了 6.1 版本的 Linux 内核；而在 Ubuntu 这边，22.04 LTS 绑定的内核是 5.15 或 5.17 版本，最早使用 6.6 以上内核的是今年发布的 Ubuntu 24.04。总结一下：大部分稳定的发行版都还没有支持 RISC-V 架构的 KASLR！攻击者表示：我从来没有打过如此富裕的仗。</p>
+
+<h2 id="from-write-to-execute">From write to execute</h2>
+
+<p>首先介绍普通用户的 root 提权。</p>
+
+<p>Linux 会根据某个进程的 <code class="language-plaintext highlighter-rouge">UID</code> 来判断其权限，其中 <code class="language-plaintext highlighter-rouge">UID</code> 0 是系统为 root 用户专门保留的 ID。考虑到我们现在能写入内核的任意代码、劫持任意函数，我们可以劫持 <code class="language-plaintext highlighter-rouge">getuid()</code> 这一系统调用，将其函数开头覆盖成我们自己的机器码，使它永远返回 0。</p>
+
+<p><code class="language-plaintext highlighter-rouge">sudo</code>、<code class="language-plaintext highlighter-rouge">su</code> 这样的 Setuid 程序会通过 <code class="language-plaintext highlighter-rouge">getuid()</code> 系统调用来判断用户是否已经是 root，如果是的话（也就是 <code class="language-plaintext highlighter-rouge">UID</code> 为零）就不再要求用户进行认证。因此，在劫持了系统调用之后，攻击者直接进行 ` su ` 就可以切换成 root 用户，完成攻击。</p>
+
+<p>完整的攻击流程如下：</p>
+
+<ol>
+  <li>确定内核加载地址以及函数的偏移；</li>
+  <li>往 <code class="language-plaintext highlighter-rouge">getuid</code> 的物理内存地址处，写入 <code class="language-plaintext highlighter-rouge">li a0,0; ret</code> 的机器码；</li>
+  <li>命令行输入 <code class="language-plaintext highlighter-rouge">su</code>，即可切换为 root 用户。</li>
+</ol>
+
+<p>在大部分发行版上，由于 KASLR 不会开启，所以只需要通过本地调试或其他方法拿到 <code class="language-plaintext highlighter-rouge">getuid</code> 的地址就行了。至于小部分使用了 6.6 及以上内核版本的发行版，还需要结合进行物理内存的扫描来获取信息，关于物理内存读取的部分，会在后面进行介绍。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119426.png" alt="ad02993e5f8b310a48309b1835c64a11.png" /></p>
+
+<p>如果你想要玩点更加花哨的，想在权限级别更高的 Machine Mode 执行代码，也可以使用类似的攻击手法，直接写入修改 Supervisor 代码。作者以 OpenSBI 这套 Supervisor 实现为例，说明了如何进行 Machine Mode 代码执行：</p>
+
+<ol>
+  <li>确定 OpenSBI 的版本号以及加载位置；</li>
+  <li>修改其中 <code class="language-plaintext highlighter-rouge">SBI_EXT_BASE_GET_MVENDORID</code> 这一 SBI <code class="language-plaintext highlighter-rouge">ecall</code> 的 handler 代码；</li>
+  <li>劫持内核调用该 SBI <code class="language-plaintext highlighter-rouge">ecall</code>，即可以 machine mode 执行代码。</li>
+</ol>
+
+<p>在基于 C910 的系统上，OpenSBI 的二进制会被加载到固定地址 <code class="language-plaintext highlighter-rouge">0x0</code>，不存在随机化的保护，因此上述攻击的第一步并不是一个很难完成的任务。</p>
+
+<h2 id="from-write-to-read">From write to read</h2>
+
+<p>如果攻击者无法确认内核的内存布局（比如内核系统开启了 KASLR 保护），物理内存任意写原语就显得有些力不从心。</p>
+
+<p>作者受到之前利用 rowhammer 漏洞进行提权的启发（这个 DRAM bug 会导致内存中一些比特发生翻转），使用了类似的攻击方法，能基于写原语得到读原语。</p>
+
+<p>页表作为虚拟地址转换的关键数据结构，可以修改它就可以进行任意读写。虽然攻击者不知道自己进程的页表位于物理内存的哪里，但他可以通过不断往内存里映射同一个文件，来让整个物理内存都被自己进程的页表填满。 这样以来，攻击者随便写入一个物理地址的内存，就大概率会修改到自己的页表。这也是经典的 NOP Sled 思想。</p>
+
+<p>如果攻击者成功修改到了某个自己进程的页表项，他就可以检测到有一个虚拟地址的映射发生了改变（不再映射到原来的文件）。后续，攻击者只需要继续修改这个页表项，就可以修改对应虚拟地址的映射目标，从而读写任意的物理内存地址。</p>
+
+<p>但注意，能够修改页表相当于只是获取了内核同等级的读写权限，但有一些物理内存区域连内核也无法读取（物理内存保护机制），比如 SMM 所在的内存区域。</p>
+
+<p>下图是我基于自己 patch 过的 qemu，在 ubuntu 22.04 上进行攻击的 PoC。可以看到攻击者的用户态程序成功读出了物理地址 0x80400000 的值。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>
+
+<p>关于 qemu 的 patch 以及攻击代码，可以见下一篇博客。</p>
+
+  </div>
+    
+      <b>本博客上与 riscv 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/09/16/GhostWrite-1.html">GhostWrite #1: 漏洞利用思路介绍</a></li>
+        
+          <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 kernel 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/09/16/GhostWrite-1.html">GhostWrite #1: 漏洞利用思路介绍</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 arch 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/09/16/GhostWrite-1.html">GhostWrite #1: 漏洞利用思路介绍</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2024/09/16/GhostWrite-1.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

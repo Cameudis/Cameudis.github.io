@@ -2,6 +2,7 @@
 Layout: Post
 title: pwnable.tw hacknote
 date: 2022-09-01 15:04:01
+tags: pwnable.tw
 ---
 
 UAF，以及发现了使用 `system()` 的小技巧。

