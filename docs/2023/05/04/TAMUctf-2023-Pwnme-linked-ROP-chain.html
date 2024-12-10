@@ -15,17 +15,17 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
 <meta property="og:description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
-<link rel="canonical" href="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
-<meta property="og:url" content="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<link rel="canonical" href="http://localhost:4001/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<meta property="og:url" content="http://localhost:4001/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
 <meta property="og:site_name" content="Y² 的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2023-05-04T15:55:01+08:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="TAMUctf 2023 Pwnme - linked ROP chain" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-05-04T15:55:01+08:00","datePublished":"2023-05-04T15:55:01+08:00","description":"当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。","headline":"TAMUctf 2023 Pwnme - linked ROP chain","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"},"url":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-05-04T15:55:01+08:00","datePublished":"2023-05-04T15:55:01+08:00","description":"当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。","headline":"TAMUctf 2023 Pwnme - linked ROP chain","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4001/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"},"url":"http://localhost:4001/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4001/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
 </head>
 <body><header class="site-header" role="banner">
 
@@ -243,7 +243,7 @@ stack ├────────┤    │        │
 </div>
 
       <div class="footer-col footer-col-3">
-        <p>料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。</p>
+        <p>amor fati.</p>
       </div>
     </div>
 
