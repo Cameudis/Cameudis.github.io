@@ -7,19 +7,13 @@ tags: 思考
 
 ![学会提问](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102135042.png)
 
-在这个 gossip 满天飞的时代，选择相信什么、选择质疑什么好像变成了每天不得不面对的问题！最近正在读《学会提问（原书 12 版）》，是关于如何判断一个论证是否可信的一本简短的教程。这篇博客分享一下我找到书中一个 bug 的趣事。
+在这个 gossip 满天飞的时代，选择相信什么、选择质疑什么好像变成了每天不得不面对的问题！最近正在读《学会提问（原书 12 版）》，是关于如何判断一个论证是否可信的一本简短教程。这篇博客分享一下我捉到书中 bug 的小趣事。
 
 在介绍研究成果的证明效力时，作者提到了一项研究：“结果令人信服地表明，原来的断言中有 41% 都是错误的或被极大地夸大的。”（下图的 "WTF!" 左边的内容）
 
 ![学会提问截图](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102142045.png)
 
-41% 这个数字实在是太震撼了（WTF!），我立马拍照发给了学医的朋友，配文“医学不存在了”。然后继续读下去：
-
-![学会提问下一页截图](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102156367.png)
-
-发言者和写作者常常歪曲或者简化研究结论，此时我默默在上面标记了“科普者”以及“新闻作者”。
-
-我有一个奇怪的想法，总是觉得“阅读其他领域的论文”是一个很有趣的事。这个想法可能来自 [l0tus](https://l0tus.vip/cn/5.19/)，他说：“但很巧也不幸的是，我喜欢看论文。”于是我看完了这章后就尝试在网上寻找 41% 这个研究的原文。
+41% 这个数字实在是太震撼了，有一种“医学不存在了”的感觉。我想知道这个数据的出处，于是我开始了我的调查。
 
 首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇[杂志文章](https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf)。
 
@@ -28,6 +22,8 @@ tags: 思考
 这篇文章并不是数据的出处，而只是介绍了 Dr. John Ioannidis 的研究成果。这个数字作为他开展的一项研究的结论出现在文章中：
 
 ![image.png](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102233822.png)
+
+我有一个很奇怪的想法，总是觉得“阅读其他领域的论文”是一个很有趣的事。这个想法可能来自 [l0tus](https://l0tus.vip/cn/5.19/)，他说：“但很巧也不幸的是，我喜欢看论文。”我尝试继续搜索原论文。
 
 根据期刊名 "Journal of the American Medical Association" 以及作者名 "Dr. John Ioannidis" 继续搜索，我们可以找到原论文《Contradicted and Initially Stronger Effects in Highly Cited Clinical Research》（[PDF链接](https://files.givewell.org/files/methods/Ioannidis%202005-Contradicted%20and%20Initially%20Stronger%20Effects%20in%20Highly%20Cited%20Clinical%20Research.pdf)），引用量高达 1830 次。
 
@@ -43,7 +39,11 @@ tags: 思考
 
 有趣的是，在原版的论文中 "significant" 一次被使用了 33 次，然而，大多数的使用都位于否定句中，其余的都是对样本研究结论的引用。这就和杂志报道形成了反差。
 
-最终，《学会提问》完成了自指——漂亮地攻击到了自己，于是就有了这篇神奇的博客。
+当翻到《学会提问》的下一页时，我们发现了这样一段话：
 
-> There are three kinds of lies: Lies, Damned Lies, and Journalism. ——鲁迅
+![学会提问下一页截图](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102156367.png)
+
+发言者和写作者常常歪曲或者简化研究结论，此时我默默在上面标记了“科普者”以及“新闻作者”。最终，《学会提问》完成了自指——漂亮地攻击到了自己，于是就有了这篇神奇的博客。
+
+> There are three kinds of lies: Lies, Damned Lies, and Journalism. ——鲁迅说他没说过
 
