@@ -22,7 +22,7 @@ permalink: /links/
 
 [XueDuGu](https://juejin.cn/user/3145055758457438)
 
-[LunaSakura](https://lunasakura.com)
+[LunaSakura](https://lunasakura.top)
 
 [Yi Sun](https://boreas618.github.io/)
 
