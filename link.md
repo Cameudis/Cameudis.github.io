@@ -20,7 +20,7 @@ permalink: /links/
 
 [Nevgiver](https://thenights1.github.io/)
 
-[XueDuGu](https://juejin.cn/user/3145055758457438)
+[XueDuGu](https://xuedugu.github.io/)
 
 [LunaSakura](https://lunasakura.top)
 
@@ -31,6 +31,8 @@ permalink: /links/
 [Ethan Cao](https://blog.ethancao.cn/)
 
 [其锜](https://qqi-he.github.io/)
+
+[FDU Tristin](https://fdutristin.github.io/)
 
 <!--
 [TokameinE](https://tokameine.top/)
