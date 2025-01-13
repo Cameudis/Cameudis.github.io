@@ -4,6 +4,8 @@ title: Links
 permalink: /links/
 ---
 
+### 计算机安全
+
 [Li Juanru (Liarod RomanGol)](https://www.lijuanru.com/)
 
 [sh1kaku](https://sh1k4ku.github.io/)
@@ -21,6 +23,10 @@ permalink: /links/
 [Nevgiver](https://thenights1.github.io/)
 
 [XueDuGu](https://xuedugu.github.io/)
+
+[Qanux](https://9anux.org/)
+
+### 其他朋友
 
 [LunaSakura](https://lunasakura.top)
 

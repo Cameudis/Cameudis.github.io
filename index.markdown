@@ -14,8 +14,7 @@ layout: home
   var typed = new Typed('#im', {
     strings: [
         '计算机研究爱好者。',
-        '复旦大学学生。',
-        '上海交通大学学生。',
+        '复旦大学/上海交通大学学生。',
         '鼓手。',
     ],
     typeSpeed: 50,
