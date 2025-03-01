@@ -4,7 +4,7 @@ title: Links
 permalink: /links/
 ---
 
-### 计算机安全
+### 计算机安全/CTF
 
 [Li Juanru (Liarod RomanGol)](https://www.lijuanru.com/)
 
@@ -25,6 +25,8 @@ permalink: /links/
 [XueDuGu](https://xuedugu.github.io/)
 
 [Qanux](https://9anux.org/)
+
+[py 超级无敌猫猫虫大王](https://juryorca.github.io/)
 
 ### 其他朋友
 
