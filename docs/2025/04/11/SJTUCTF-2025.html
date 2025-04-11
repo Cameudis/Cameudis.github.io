@@ -333,15 +333,7 @@
 
 <p>0x114514 大小的空间由 mmap 分配，默认会和 <code class="language-plaintext highlighter-rouge">libc.so.6</code>, <code class="language-plaintext highlighter-rouge">ld.so</code> 分配在相近的位置上，且它们的相对偏移一致。（这个特性是不是在 ubuntu 22 对应的内核版本中修复了？）但经过本地测试，攻击者可以控制的只有 <code class="language-plaintext highlighter-rouge">ld.so</code> 的部分。</p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>使用 pwndbg 的 tele 功能，可以检查 <code class="language-plaintext highlighter-rouge">ld.so</code> 的 <code class="language-plaintext highlighter-rouge">rw-</code> 部分内存中有哪些数据，首当其冲的就是 <code class="language-plaintext highlighter-rouge">_rtld_global</code> 结构体，并且里面一看就有很多函数指针。上网搜索，可以找到 [[原创]hctf2018_the_end（IO FILE attack 和 exit_hook attack）-Pwn-看雪-安全社区</td>
-      <td>安全招聘</td>
-      <td>kanxue.com]( https://bbs.kanxue.com/thread-262459.htm )这篇 wp（写得巨烂，疑似是搬运或者缝合的）：劫持 <code class="language-plaintext highlighter-rouge">__rtld_lock_unlock_recursive</code> 这个函数指针，可以在 <code class="language-plaintext highlighter-rouge">exit</code> 时触发控制流劫持，具体调用链是 <code class="language-plaintext highlighter-rouge">exit()-&gt;__run_exit_handlers-&gt;_dl_fini-&gt;__rtld_lock_unlock_recursive</code>。</td>
-    </tr>
-  </tbody>
-</table>
+<p>使用 pwndbg 的 tele 功能，可以检查 <code class="language-plaintext highlighter-rouge">ld.so</code> 的 <code class="language-plaintext highlighter-rouge">rw-</code> 部分内存中有哪些数据，首当其冲的就是 <code class="language-plaintext highlighter-rouge">_rtld_global</code> 结构体，并且里面一看就有很多函数指针。上网搜索，可以找到 <a href="https://bbs.kanxue.com/thread-262459.htm">[原创]hctf2018_the_end（IO FILE attack 和 exit_hook attack）-Pwn-看雪-安全社区|安全招聘|kanxue.com</a> 这篇 wp（写得巨烂，疑似是搬运或者缝合的）：劫持 <code class="language-plaintext highlighter-rouge">__rtld_lock_unlock_recursive</code> 这个函数指针，可以在 <code class="language-plaintext highlighter-rouge">exit</code> 时触发控制流劫持，具体调用链是 <code class="language-plaintext highlighter-rouge">exit()-&gt;__run_exit_handlers-&gt;_dl_fini-&gt;__rtld_lock_unlock_recursive</code>。</p>
 
 <p>在上面这篇 wp 中，该函数指针的偏移是 <code class="language-plaintext highlighter-rouge">__rtld_lock_unlock_recursive = _rtld_global + 0xf08</code>，经过我的实测，更改这个位置的函数指针确实可以触发 RCE，但疑似题目函数设计导致没办法改到这个位置。</p>
 
@@ -448,14 +440,7 @@
 
 <p>pwn.college 告诉我们，在 shellcode 受限的情况下，应该考虑分两个阶段读入 shellcode。虽然在进入执行 shellcode 时，有三个寄存器都保存了 shellcode 的地址，但程序 ban 了 64-bits 的 PREFIX，使我们没办法把地址直接移动到 <code class="language-plaintext highlighter-rouge">rsi</code> 寄存器中进行 <code class="language-plaintext highlighter-rouge">read(0, buf, size)</code>。</p>
 
-<table>
-  <tbody>
-    <tr>
-      <td>好在，查询 [coder64 edition</td>
-      <td>X86 Opcode and Instruction Reference 1.12](http://ref.x86asm.net/coder64.html) 时我发现 <code class="language-plaintext highlighter-rouge">pop r64</code> 的指令编码居然是 <code class="language-plaintext highlighter-rouge">58+r</code> ，这意味着 <code class="language-plaintext highlighter-rouge">pop rsi</code> 这条指令没有被 ban。通过调试发现，七条 <code class="language-plaintext highlighter-rouge">pop</code> 就可以把站上保存的那个 shellcode 地址拿出来。</td>
-    </tr>
-  </tbody>
-</table>
+<p>好在，查询 <a href="http://ref.x86asm.net/coder64.html">coder64 edition | X86 Opcode and Instruction Reference 1.12</a> 时我发现 <code class="language-plaintext highlighter-rouge">pop r64</code> 的指令编码居然是 <code class="language-plaintext highlighter-rouge">58+r</code> ，这意味着 <code class="language-plaintext highlighter-rouge">pop rsi</code> 这条指令没有被 ban。通过调试发现，七条 <code class="language-plaintext highlighter-rouge">pop</code> 就可以把站上保存的那个 shellcode 地址拿出来。</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># http://ref.x86asm.net/coder64.html#:~:text=Onto%20the%20Stack-,58%2Br,-E
 </span>    <span class="n">readcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">"""
@@ -563,6 +548,10 @@
     <span class="n">pwn</span><span class="p">()</span>
 
 </code></pre></div></div>
+
+<blockquote>
+  <p>TAKEAWAY: <a href="http://ref.x86asm.net/coder64.html">coder64 edition | X86 Opcode and Instruction Reference 1.12</a> 这个网站很好用。</p>
+</blockquote>
 
 <h2 id="happyos">HappyOS</h2>
 
