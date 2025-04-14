@@ -1,0 +1,44 @@
+<footer class="site-footer h-card">
+  <data class="u-url" href="{{ "/" | relative_url }}"></data>
+
+  <div class="wrapper">
+
+    <div style="float: left; width: 75%;">
+
+      <h2 class="footer-heading">{{ site.title | escape }}</h2>
+
+      <div class="footer-col-wrapper">
+        <div class="footer-col footer-col-1">
+          <ul class="contact-list">
+            <li class="p-name">
+              {%- if site.author -%}
+                {{ site.author | escape }}
+              {%- else -%}
+                {{ site.title | escape }}
+              {%- endif -%}
+              </li>
+              {%- if site.email -%}
+              <li><a class="u-email" href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+              {%- endif -%}
+          </ul>
+        </div>
+
+        <div class="footer-col footer-col-2">
+          {%- include social.html -%}
+        </div>
+
+        <div class="footer-col footer-col-3">
+          <!-- <p>{{- site.description | escape -}}</p> -->
+        </div>
+      </div>
+      
+    </div>
+
+    <div style="float: right;">
+      <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script>
+      <!-- <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&cl=ffffff&w=200"></script> -->
+    </div>
+
+  </div>
+
+</footer>
