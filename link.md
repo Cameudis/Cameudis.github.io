@@ -18,7 +18,7 @@ permalink: /links/
 
 [nich0las](https://nicholas-wei.github.io/)
 
-[J3rry](https://j3rry0610.github.io/)
+[NyxWh1sper](https://nyxwh1sper.github.io/)
 
 [Nevgiver](https://thenights1.github.io/)
 
