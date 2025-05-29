@@ -14,7 +14,9 @@ permalink: /links/
 
 [Zihan Zhang (Ghost 1032)](https://zhangzihan.com/)
 
+<!--
 [Hurrison](https://hurrison.com)
+-->
 
 [nich0las](https://nicholas-wei.github.io/)
 
@@ -35,8 +37,6 @@ permalink: /links/
 [Yi Sun](https://boreas618.github.io/)
 
 [精益君](https://blog.jingyijun.xyz/)
-
-[Ethan Cao](https://blog.ethancao.cn/)
 
 [其锜](https://qqi-he.github.io/)
 
