@@ -14,7 +14,7 @@ layout: home
     font-family: 'Courier New', monospace;
     white-space: pre;
     line-height: 1;
-    font-size: 5px;
+    font-size: 4px;
     background: #000;
     padding: 0px 20px;
     border-radius: 8px;
@@ -70,7 +70,7 @@ layout: home
   <div class="ascii-glow" id="asciiGlow"></div>
 </div>
 
-<br>欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个一个一个<span id="im"></span>
+<br>欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个<span id="im"></span>
 
 你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （<ゝω・）☆>      
 
@@ -80,9 +80,10 @@ layout: home
   // Typed.js 初始化
   var typed = new Typed('#im', {
     strings: [
-        '计算机搞机爱好者。',
+        '计算机爱好者。',
         '复旦大学/上海交通大学学生。',
         '鼓手。',
+        '一个一个。',
     ],
     typeSpeed: 50,
     backSpeed: 50,
