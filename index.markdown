@@ -7,6 +7,7 @@ layout: home
 
 <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 
+<!--
 <style>
   .ascii-container {
     position: relative;
@@ -55,7 +56,6 @@ layout: home
   }
 </style>
 
-<!-- 径向渐变发光效果 - 绝对坐标鼠标跟踪 -->
 <div class="ascii-container" id="asciiContainer1">
   <div class="ascii-art">
 ▄████████    ▄████████   ▄▄▄▄███▄▄▄▄      ▄████████ ███    █▄  ████████▄   ▄█     ▄████████ 
@@ -69,8 +69,10 @@ layout: home
   </div>
   <div class="ascii-glow" id="asciiGlow"></div>
 </div>
+<br>
+-->
 
-<br>欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个<span id="im"></span>
+欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个<span id="im"></span>
 
 你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （<ゝω・）☆>      
 
@@ -91,18 +93,15 @@ layout: home
     loop: true,
   });
 
-  // 绝对坐标发光效果（限制在ASCII容器内）
+  /*
   const container1 = document.getElementById('asciiContainer1');
   
-  // 监听整个页面的鼠标移动
   document.addEventListener('mousemove', (e) => {
-    // 获取ASCII容器的位置信息
     const rect = container1.getBoundingClientRect();
     
-    // 计算鼠标相对于ASCII容器的位置（像素值）
     const relativeX = e.clientX - 0.75 * rect.left;
     
-    // 设置发光条的相对位置
     container1.style.setProperty('--mouse-x', relativeX + 'px');
   });
+  */
 </script>
