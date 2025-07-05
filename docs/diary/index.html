@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Y²のDiary | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Y²のDiary" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="计算机、安全和其他" />
+<meta property="og:description" content="计算机、安全和其他" />
+<link rel="canonical" href="https://www.cameudis.com/diary/" />
+<meta property="og:url" content="https://www.cameudis.com/diary/" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Y²のDiary" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"计算机、安全和其他","headline":"Y²のDiary","url":"https://www.cameudis.com/diary/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Y² 的博客</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Y²のDiary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Y²のDiary</h1>
+  </header>
+
+  <div class="post-content">
+    <p>碎碎念、摸鱼与拾贝日志。</p>
+
+<h3 id="2025-7-3">2025-7-3</h3>
+<ol>
+  <li>CVE-2025-32462: sudo –host 提权。<a href="https://www.stratascale.com/vulnerability-alert-CVE-2025-32462-sudo-host">博客原文</a>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">sudo</code> 的 man 里有介绍 <code class="language-plaintext highlighter-rouge">--host</code> 参数的用途，基本上就是在使用 <code class="language-plaintext highlighter-rouge">-l</code> 查询当前用户的权限时，可以加一个 <code class="language-plaintext highlighter-rouge">--host xxx.com</code> 来查询在另一个 host 上的权限。没错，<code class="language-plaintext highlighter-rouge">sudo</code> 是支持一个配置文件给多个主机的用户配置权限的。（我终于理解了为什么我机器上的 <code class="language-plaintext highlighter-rouge">sudo</code> 配置里，第二个字段都是神秘的ALL，原来是“在所有主机上”的意思）</li>
+      <li>然而，<code class="language-plaintext highlighter-rouge">sudo</code> 的 <code class="language-plaintext highlighter-rouge">--help</code> 中却说 <code class="language-plaintext highlighter-rouge">--host</code> 可以和执行命令一起用，然后大家神奇地发现，这个居然能允许用户以“指定host”上自己的权限，在“当前host”上执行命令。这个漏洞完全让 <code class="language-plaintext highlighter-rouge">sudo</code> 的这套跨host功能变得完全没用了，因为用户现在可以以他拥有的最高权限在任意服务器上执行指令。</li>
+    </ul>
+  </li>
+  <li>CVE-2025-32463：sudo 在不加检查地 chroot 后，触发了 Name Service Switch（NSS）操作，导致攻击者可以构造恶意的 NSS 配置文件（/etc/nsswitch.conf）达成提权。<a href="https://www.stratascale.com/vulnerability-alert-CVE-2025-32463-sudo-chroot">博客原文</a>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">chroot</code> 实在是太危险了，尤其不能允许用户随意chroot到他具有任意写权限的目录下！利用时和配置文件劫持打组合拳有奇效。</li>
+      <li>怀疑这些人每天就关注 <code class="language-plaintext highlighter-rouge">sudo</code> 这种有 SUID 的 Binary 更新了什么新功能参数，然后研究它们有什么问题。</li>
+    </ul>
+  </li>
+  <li>学习了 <a href="https://github.com/XUANTIE-RV/openc910/">OpenC910</a> 中的 AXI 总线接口，<a href="https://developer.arm.com/documentation/ihi0022/latest/">ARM IHI0022 手册</a>写得非常通俗易懂。</li>
+  <li>大致了解了下 Android 上的 BootLoader 锁和 ARMv8 安全启动的关系：
+    <ul>
+      <li>BootLoader 锁（OEM锁）是厂商为了防止用户刷入非自家的镜像，在 recovery 模式程序中实现的一个“功能”。</li>
+      <li>ARMv8 安全启动（Secure Boot）是一套标准，力求实现标准化的、基于密码学的信任链。ARM 官方提供了 <a href="https://www.trustedfirmware.org/projects/tf-a/">Trusted Firmware-A (TF-A)</a> 作为 ARMv8-A Secure Boot 的参考实现。（在 ARMv7 中不存在标准化的 Secure Boot，通常由厂商自行实现启动信任链，但也可以使用 TF-A 作为启动软件。）（在 ARMv8-M 中使用的是 Trusted Firmware-M）</li>
+    </ul>
+  </li>
+  <li>搬到了张江，开启暑假打工生涯。住宿是老师在贝壳上租的，叫了保洁来帮忙清理，把屋子里的各种发霉的地方都清掉了。不得不说，虽然在房东和租客之间加上中介服务这一层抽象层会带来额外开销（服务费），但确实能给租客省下不少心。</li>
+</ol>
+
+<h3 id="2025-7-4">2025-7-4</h3>
+<ol>
+  <li>大致了解了下 Android 如何在 Linux Kernel 的基础上限制越狱：
+    <ul>
+      <li>Android 4.3 版本开始，限制了 <code class="language-plaintext highlighter-rouge">setgid</code> / <code class="language-plaintext highlighter-rouge">setuid</code> 系统调用，并启用了 SELinux。SELinux 是内核中的Linux Security Module (LSM) 框架的组成部分。LSM 在各种系统调用的函数入口处添加了安全钩子（security hooks），检查 SELinux 的策略（安全规则）来判断当前用户态程序是否具有合法权限。</li>
+      <li>SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：<a href="https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te">app.te - platform/external/sepolicy - Git at Google</a></li>
+      <li>在 Android 中，即使已经拿到了 root 用户权限，由于安卓自带 SELinux 策略的设置，也是残血的 root 用户。安卓源码中自带的 SELinux 策略会在编译成内核可加载的二进制格式后，集成到内核的 boot image 中或嵌入到 ramdisk 中，受到安全启动链的保护。Android 启动时，init 进程将查找并加载策略文件。</li>
+      <li>因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见<a href="https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md">awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub</a></li>
+    </ul>
+  </li>
+  <li>调整了博客的字体、字体大小和行距。字体设置参考了<a href="https://moecm.com/the-blog-font-setting-scheme/">博客字体设置方案 | Daniel’s Blog</a>；字体大小设置为 15 px，行距设置为 2，更适合中文排版了（方块字比较密，行距应该设置得比英文大一些）。</li>
+  <li>看了<a href="https://mp.weixin.qq.com/s/Ku9v3mf76TpxQW2Y1rj2LQ">发现外星生命痕迹，确定度99.7%！——等等，这是怎么算出来的？</a>，一篇关于统计学和概率的科普文。即使一项研究的确定度非常高，达到了5σ的黄金标准（置信度约为99.99994%），也有可能是受到干扰因素影响导致的结果，可能会被推翻。</li>
+  <li>把 OpenC910 的仿真跑通了，并且安装了 vcs、verdi、scl 工具，学会了用 verdi 看 vcs 仿真的波形。
+    <ul>
+      <li>Vcs、Verdi 安装和使用参考 <a href="https://blog.csdn.net/qq_24287711/article/details/130017583">ubuntu 18.04 安装 vcs、verdi 2018</a>、<a href="https://blog.csdn.net/m0_50662459/article/details/130565406">记一次VCS报错：/usr/bin/ld: undefined reference to <code class="language-plaintext highlighter-rouge">pthread_yield</code></a>。但不得不说前面那个教程写得特么有点太烂了。验证服务器会跑在 27000 端口，需要确保这个端口可以访问。这篇教程写了如何配置防火墙规则开放 27000 端口，然后说“firewall 没有安装的需要用 apt 进行安装”——我都没有安装防火墙当然不用开放 27000 端口啊！</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2025-7-5">2025-7-5</h3>
+<ol>
+  <li>在外面演出，上午去洗吹做了个造型，下午彩排和演出，晚上聚餐。</li>
+</ol>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div style="float: left; width: 75%;">
+
+      <h2 class="footer-heading">Y² 的博客</h2>
+
+      <div class="footer-col-wrapper">
+        <div class="footer-col footer-col-1">
+          <ul class="contact-list">
+            <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+        </div>
+
+        <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+        <div class="footer-col footer-col-3">
+          <!-- <p>计算机、安全和其他</p> -->
+        </div>
+      </div>
+      
+    </div>
+
+    <div style="float: right;">
+      <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script>
+      <!-- <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&cl=ffffff&w=200"></script> -->
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

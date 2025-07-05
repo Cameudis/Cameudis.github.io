@@ -20,7 +20,7 @@ permalink: /links/
 
 [nich0las](https://nicholas-wei.github.io/)
 
-[NyxWh1sper](https://nyxwh1sper.github.io/)
+[wqhacker](https://nyxwh1sper.github.io/)
 
 [Nevgiver](https://thenights1.github.io/)
 

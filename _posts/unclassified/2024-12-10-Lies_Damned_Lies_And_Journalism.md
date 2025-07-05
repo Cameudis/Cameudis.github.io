@@ -2,7 +2,7 @@
 layout: post
 title: "Lies, Damned lies, and Journalism"
 date: "2024-12-10 23:00:00"
-tags: 思考
+tags: 杂记
 ---
 
 ![学会提问](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102135042.png)
