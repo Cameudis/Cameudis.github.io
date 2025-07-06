@@ -72,7 +72,7 @@ layout: home
 <br>
 -->
 
-欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个<span id="im"></span>
+欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是<span id="im"></span>
 
 你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （<ゝω・）☆>      
 
@@ -82,9 +82,9 @@ layout: home
   // Typed.js 初始化
   var typed = new Typed('#im', {
     strings: [
-        '计算机爱好者。',
-        '复旦大学/上海交通大学学生。',
-        '鼓手。',
+        '一个计算机爱好者。',
+        '一个复旦大学->上海交通大学学生。',
+        '一个鼓手。',
         '一个一个。',
     ],
     typeSpeed: 50,
