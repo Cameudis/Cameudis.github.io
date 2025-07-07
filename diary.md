@@ -22,9 +22,9 @@ permalink: /diary/
 ### 2025-7-4   
 1. 大致了解了下 Android 如何在 Linux Kernel 的基础上限制越狱：
 - Android 4.3 版本开始，限制了 `setgid` / `setuid` 系统调用，并启用了 SELinux。SELinux 是内核中的Linux Security Module (LSM) 框架的组成部分。LSM 在各种系统调用的函数入口处添加了安全钩子（security hooks），检查 SELinux 的策略（安全规则）来判断当前用户态程序是否具有合法权限。
-- SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：[app.te - platform/external/sepolicy - Git at Google](https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te)
+- SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：[app.te - platform/external/sepolicy - Git at Google](https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te)。
 - 在 Android 中，即使已经拿到了 root 用户权限，由于安卓自带 SELinux 策略的设置，也是残血的 root 用户。安卓源码中自带的 SELinux 策略会在编译成内核可加载的二进制格式后，集成到内核的 boot image 中或嵌入到 ramdisk 中，受到安全启动链的保护。Android 启动时，init 进程将查找并加载策略文件。
-- 因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见[awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub](https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md)
+- 因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见 [awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub](https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md)。
 1. 调整了博客的字体、字体大小和行距。字体设置参考了[博客字体设置方案 \| Daniel’s Blog](https://moecm.com/the-blog-font-setting-scheme/)；字体大小设置为 15 px，行距设置为 2，更适合中文排版了（方块字比较密，行距应该设置得比英文大一些）。
 2. 看了[发现外星生命痕迹，确定度99.7%！——等等，这是怎么算出来的？](https://mp.weixin.qq.com/s/Ku9v3mf76TpxQW2Y1rj2LQ)，一篇关于统计学和概率的科普文。即使一项研究的确定度非常高，达到了5σ的黄金标准（置信度约为99.99994%），也有可能是受到干扰因素影响导致的结果，可能会被推翻。
 3. 把 OpenC910 的仿真跑通了，并且安装了 vcs、verdi、scl 工具，学会了用 verdi 看 vcs 仿真的波形。
@@ -45,3 +45,10 @@ permalink: /diary/
 - 不管怎么说，在创造财富的过程中，很大一部分的财富是以公司（具体来说，现代股份制公司）的形式生产和创造出来的。从荷兰的东印度公司（1602 年）开始，公司就开始通过售卖自己的股权来筹集资金，而股东则可以享受公司的分红。一个公司的股价是随着市场波动变化的——投资者既按照自己对公司价值的预期（即公司给他回报的分红多少）而购入他的股票，也可以根据市场对公司价值的预期而选择购入或抛出股票（即赚其他投资人的钱）。
 1. 下午去了前滩太古里的茑屋书店。太古里的装修和建筑真是太漂亮了，感觉像来到了东京。茑屋书店人很多，很大一片地方，书的质量属于还不错，买了本特德姜的小说集。
 2. 晚上六星小聚，四个 pwn 猫齐聚一堂（还有一个外包手），讨论二进制的灰暗未来。绕着徐家汇散步散了挺久的，算是一起锻炼身体了。
+
+### 2025-7-7
+1. 看完了《摇滚乃是淑女的爱好》，看到最后主角乐队薄纱了现充乐队，用执着的东西打败了浅薄的东西，还是挺感动的。
+2. 学习了 Linux 的 Buddy 内存管理机制，现在终于看得懂了。
+- 最好的资料是官方文档：[Memory Management — The Linux Kernel documentation](https://docs.kernel.org/admin-guide/mm/index.html)，我也对照着 [Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging 这篇论文](https://comsec-files.ethz.ch/papers/rubicon_eurosp25.pdf) 以及 [CVE-2022-27666: Exploit esp6 modules in Linux kernel 这篇博客](https://etenal.me/archives/1825)学习。
+3. 继续学习 OpenC910 中的 smart_run SoC，基本搞懂了总线互联的拓扑，原来 SRAM 才是主角。
+4. 更新了博客的[友链界面](/links/)，现在可以自动parse YAML格式的数据变成友链卡片了。

@@ -81,9 +81,9 @@
   <li>大致了解了下 Android 如何在 Linux Kernel 的基础上限制越狱：
     <ul>
       <li>Android 4.3 版本开始，限制了 <code class="language-plaintext highlighter-rouge">setgid</code> / <code class="language-plaintext highlighter-rouge">setuid</code> 系统调用，并启用了 SELinux。SELinux 是内核中的Linux Security Module (LSM) 框架的组成部分。LSM 在各种系统调用的函数入口处添加了安全钩子（security hooks），检查 SELinux 的策略（安全规则）来判断当前用户态程序是否具有合法权限。</li>
-      <li>SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：<a href="https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te">app.te - platform/external/sepolicy - Git at Google</a></li>
+      <li>SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：<a href="https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te">app.te - platform/external/sepolicy - Git at Google</a>。</li>
       <li>在 Android 中，即使已经拿到了 root 用户权限，由于安卓自带 SELinux 策略的设置，也是残血的 root 用户。安卓源码中自带的 SELinux 策略会在编译成内核可加载的二进制格式后，集成到内核的 boot image 中或嵌入到 ramdisk 中，受到安全启动链的保护。Android 启动时，init 进程将查找并加载策略文件。</li>
-      <li>因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见<a href="https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md">awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub</a></li>
+      <li>因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见 <a href="https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md">awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub</a>。</li>
     </ul>
   </li>
   <li>调整了博客的字体、字体大小和行距。字体设置参考了<a href="https://moecm.com/the-blog-font-setting-scheme/">博客字体设置方案 | Daniel’s Blog</a>；字体大小设置为 15 px，行距设置为 2，更适合中文排版了（方块字比较密，行距应该设置得比英文大一些）。</li>
@@ -119,6 +119,18 @@
   </li>
   <li>下午去了前滩太古里的茑屋书店。太古里的装修和建筑真是太漂亮了，感觉像来到了东京。茑屋书店人很多，很大一片地方，书的质量属于还不错，买了本特德姜的小说集。</li>
   <li>晚上六星小聚，四个 pwn 猫齐聚一堂（还有一个外包手），讨论二进制的灰暗未来。绕着徐家汇散步散了挺久的，算是一起锻炼身体了。</li>
+</ol>
+
+<h3 id="2025-7-7">2025-7-7</h3>
+<ol>
+  <li>看完了《摇滚乃是淑女的爱好》，看到最后主角乐队薄纱了现充乐队，用执着的东西打败了浅薄的东西，还是挺感动的。</li>
+  <li>学习了 Linux 的 Buddy 内存管理机制，现在终于看得懂了。
+    <ul>
+      <li>最好的资料是官方文档：<a href="https://docs.kernel.org/admin-guide/mm/index.html">Memory Management — The Linux Kernel documentation</a>，我也对照着 <a href="https://comsec-files.ethz.ch/papers/rubicon_eurosp25.pdf">Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging 这篇论文</a> 以及 <a href="https://etenal.me/archives/1825">CVE-2022-27666: Exploit esp6 modules in Linux kernel 这篇博客</a>学习。</li>
+    </ul>
+  </li>
+  <li>继续学习 OpenC910 中的 smart_run SoC，基本搞懂了总线互联的拓扑，原来 SRAM 才是主角。</li>
+  <li>更新了博客的<a href="/links/">友链界面</a>，现在可以自动parse YAML格式的数据变成友链卡片了。</li>
 </ol>
 
   </div>
