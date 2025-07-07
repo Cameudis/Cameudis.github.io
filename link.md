@@ -30,6 +30,12 @@ permalink: /links/
 
 [py 超级无敌猫猫虫大王](https://juryorca.github.io/)
 
+[M1aoo0bin](https://zenaxu.cn/)
+
+[溴化锂](https://www.nvme0n1p.dev/)
+
+[LoboQ1ng](https://loboq1ng.github.io/)
+
 ### 其他朋友
 
 [LunaSakura](https://lunasakura.top)
