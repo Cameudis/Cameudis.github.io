@@ -52,3 +52,11 @@ permalink: /diary/
 - 最好的资料是官方文档：[Memory Management — The Linux Kernel documentation](https://docs.kernel.org/admin-guide/mm/index.html)，我也对照着 [Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging 这篇论文](https://comsec-files.ethz.ch/papers/rubicon_eurosp25.pdf) 以及 [CVE-2022-27666: Exploit esp6 modules in Linux kernel 这篇博客](https://etenal.me/archives/1825)学习。
 3. 继续学习 OpenC910 中的 smart_run SoC，基本搞懂了总线互联的拓扑，原来 SRAM 才是主角。
 4. 更新了博客的[友链界面](/links/)，现在可以自动parse YAML格式的数据变成友链卡片了。
+
+### 2025-7-8
+1. 学习了 Single Error Correcting 和 Double Error Detecting Code 的原理，当年的图灵奖，太天才了。
+2. 继续看论文《Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging》。
+3. 参考 [Linux Kernel Exploitation - Setup | r1ru](https://r1ru.github.io/posts/0/) 配好了简单的 Linux 内核调试环境。下一步准备把 Buddy System 里的一些关键的结构体和函数搞清楚，然后来自己复现下 Rubicon。
+- 我在 busybox 的编译选项里打开了 telnetd、tar 支持 gz。我用 musl-gcc 编译好静态的程序之后，用 [PWN Cheatsheet - HackMD](https://hackmd.io/@cameudis/rJuGtPyh6#Qemu) 这里的脚本把它压缩成 `.tar.gz` 后用 `base64` 慢慢发上去，然后解码再解压成原来的程序。搞这么复杂都是因为 busybox 不带 sshd（不能 scp 了），且我的 `qemu-system-x86_64` 是系统包管理器安装的，不支持虚拟文件系统（不能直接共享目录了），有点蠢。
+- 内核启动选项中（`qemu -append` 后面跟着的就是内核启动选项）记得要加一个 `nokaslr`，不然 `gdb` 加载了符号文件之后也还是会一脸懵逼的。
+- 在 qemu 里可以用户态和内核态使用同一个 gdb 实例来调试，只需要把编译好的用户态文件的符号告诉 gdb 就可以下断点调试用户程序了。具体步骤是首先需要提前在用户态文件的编译选项中加上 `-fno-pie` 以禁用 ASLR，然后 `objdump -S` 看看代码段（`.text`）的加载位置（比如 `0x401020`），最后在 gdb 当中使用 `add-symbole-file <elf> -s .text <addr>` 加载符号信息。不知道为什么 gdb 好像并不能直接正确识别 ELF 文件的地址，所以才需要按照这样手动加载一个段进去。如果需要加载其他段的话直接在后面 append 就可以，比如 `-s .text 0x401020 -s .init 0x401000`。

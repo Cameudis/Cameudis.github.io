@@ -1,5 +1,7 @@
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
+.bundle
+.obsidian/workspace.json
 vendor
 Gemfile.lock

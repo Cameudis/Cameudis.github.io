@@ -133,6 +133,19 @@
   <li>更新了博客的<a href="/links/">友链界面</a>，现在可以自动parse YAML格式的数据变成友链卡片了。</li>
 </ol>
 
+<h3 id="2025-7-8">2025-7-8</h3>
+<ol>
+  <li>学习了 Single Error Correcting 和 Double Error Detecting Code 的原理，当年的图灵奖，太天才了。</li>
+  <li>继续看论文《Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging》。</li>
+  <li>参考 <a href="https://r1ru.github.io/posts/0/">Linux Kernel Exploitation - Setup | r1ru</a> 配好了简单的 Linux 内核调试环境。下一步准备把 Buddy System 里的一些关键的结构体和函数搞清楚，然后来自己复现下 Rubicon。
+    <ul>
+      <li>我在 busybox 的编译选项里打开了 telnetd、tar 支持 gz。我用 musl-gcc 编译好静态的程序之后，用 <a href="https://hackmd.io/@cameudis/rJuGtPyh6#Qemu">PWN Cheatsheet - HackMD</a> 这里的脚本把它压缩成 <code class="language-plaintext highlighter-rouge">.tar.gz</code> 后用 <code class="language-plaintext highlighter-rouge">base64</code> 慢慢发上去，然后解码再解压成原来的程序。搞这么复杂都是因为 busybox 不带 sshd（不能 scp 了），且我的 <code class="language-plaintext highlighter-rouge">qemu-system-x86_64</code> 是系统包管理器安装的，不支持虚拟文件系统（不能直接共享目录了），有点蠢。</li>
+      <li>内核启动选项中（<code class="language-plaintext highlighter-rouge">qemu -append</code> 后面跟着的就是内核启动选项）记得要加一个 <code class="language-plaintext highlighter-rouge">nokaslr</code>，不然 <code class="language-plaintext highlighter-rouge">gdb</code> 加载了符号文件之后也还是会一脸懵逼的。</li>
+      <li>在 qemu 里可以用户态和内核态使用同一个 gdb 实例来调试，只需要把编译好的用户态文件的符号告诉 gdb 就可以下断点调试用户程序了。具体步骤是首先需要提前在用户态文件的编译选项中加上 <code class="language-plaintext highlighter-rouge">-fno-pie</code> 以禁用 ASLR，然后 <code class="language-plaintext highlighter-rouge">objdump -S</code> 看看代码段（<code class="language-plaintext highlighter-rouge">.text</code>）的加载位置（比如 <code class="language-plaintext highlighter-rouge">0x401020</code>），最后在 gdb 当中使用 <code class="language-plaintext highlighter-rouge">add-symbole-file &lt;elf&gt; -s .text &lt;addr&gt;</code> 加载符号信息。不知道为什么 gdb 好像并不能直接正确识别 ELF 文件的地址，所以才需要按照这样手动加载一个段进去。如果需要加载其他段的话直接在后面 append 就可以，比如 <code class="language-plaintext highlighter-rouge">-s .text 0x401020 -s .init 0x401000</code>。</li>
+    </ul>
+  </li>
+</ol>
+
   </div>
 
 </article>
