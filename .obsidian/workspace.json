@@ -44,7 +44,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Files"
+              "title": "文件列表"
             }
           },
           {
@@ -160,27 +160,39 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
-      "graph:Open graph view": false,
-      "canvas:Create new canvas": false,
-      "daily-notes:Open today's daily note": false,
-      "templates:Insert template": false,
-      "command-palette:Open command palette": false
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
     }
   },
   "active": "0fe3e3a546eb37e3",
   "lastOpenFiles": [
+    "_algolia_api_key",
+    "_layouts/post.html~",
+    "_layouts/default.html",
+    "docs/2025/04/11/SJTUCTF-2025.html",
+    "docs/2025/01/20/XHLJ-2025.html",
+    "docs/2025/01/06/GhostWrite-2.html",
+    "docs/2025/04/11",
+    "docs/2025/01/20",
+    "docs/2025/01/06",
+    "docs/2025/04",
+    "docs/2025/01",
+    "docs/images/favicon-32x32.png",
+    "docs/images/favicon-16x16.png",
+    "docs/images/ava1.jpg",
+    "docs/images/applestore_2.png",
+    "docs/images/applestore_1.png",
+    "docs/images/apple-touch-icon.png",
+    "docs/images/android-chrome-512x512.png",
+    "docs/images/android-chrome-192x192.png",
+    "docs/images/about.webp",
+    "docs/images/3x17_3.jpg",
     "link.md",
     "readings.md",
-    "diary.md",
-    "Gemfile.lock",
-    "_data/link.yaml",
-    "_data",
-    "index.markdown~",
-    "_posts/unclassified/2024-12-10-Lies_Damned_Lies_And_Journalism.md~",
-    "_sass/minima.scss~",
-    "docs/diary/index.html",
-    "docs/diary",
-    "diary.md~"
+    "diary.md"
   ]
 }

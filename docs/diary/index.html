@@ -352,15 +352,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <main class="page-content" aria-label="Content">
+      
       <div class="wrapper">
-        <article class="post">
+        <div class="post-layout">
+          <!-- 左侧内容区域 -->
+          <div class="post-main">
+            <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <header class="post-header">
-    <h1 class="post-title">Y²のDiary</h1>
-  </header>
+              <header class="post-header">
+                <h1 class="post-title p-name" itemprop="name headline">Y²のDiary</h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="" itemprop="datePublished">
+                  </time></p>
+              </header>
 
-  <div class="post-content">
-    <p>碎碎念、摸鱼与拾贝日志。</p>
+              <div class="post-content e-content" itemprop="articleBody">
+                <p>碎碎念、摸鱼与拾贝日志。</p>
 
 <h3 id="2025-7-3">2025-7-3</h3>
 <ol>
@@ -456,10 +463,48 @@ document.addEventListener('DOMContentLoaded', function() {
   </li>
 </ol>
 
-  </div>
+<h3 id="2025-7-9">2025-7-9</h3>
+<ol>
+  <li>给博客加了简单的搜索功能，不过现在还没有支持搜索日记内容。
+    <ul>
+      <li>用的是 <a href="https://www.algolia.com/">Algolia</a> 的服务，需要先注册账号，然后把博客内容上传到自己的数据库中，最后在博客的前端中实现一个搜索框，向 Algolia 后端发送请求。</li>
+      <li>将博客内容上传到服务器可以使用 <a href="https://github.com/algolia/jekyll-algolia">GitHub - algolia/jekyll-algolia: Add fast and relevant search to your Jekyll site</a> 这个插件（别的静态网页生成框架应该也有类似的插件可以用），虽然已经停止维护了，但 jekyll 本身并不经常大更新所以这个插件现在和未来一段时间应该还是可用的。插件的官方文档和教程已经挂了，可以访问 <a href="https://deepakmahakale.com/jekyll-algolia/">Algolia for Jekyll | Add fast and relevant search to your Jekyll site</a> 这个网友自己搭的镜像站阅读。</li>
+      <li>集成到前端中还是比较繁琐的，我拜托 claude 帮我写了一下，简单用用还是足够的。</li>
+    </ul>
+  </li>
+  <li>继续学习 OpenC 910 中的 smart_run SoC。发现了<a href="https://zhuanlan.zhihu.com/p/655723549">玄铁处理器的Linux移植</a>这个系列博客，是母校智能体系架构与开源芯片实验室的，实在是太有技术了，目前只看了第一章，后面技术细节太丰富了有机会再看吧。</li>
+  <li>读了<a href="https://mp.weixin.qq.com/s/iM4AGQ5vLYGdf2cfNdwmiQ">关于财务自由若干问题的实践与思考 - 纯牛马的救赎</a>，觉得作者对财务自由的理解还是很有启发性的。作者追求的财富自由并不仅仅是财富，而是建立在对自己的了解基础上的、一种自己适合和喜欢的生活状态，或者说是一种逐渐探索志趣，逐渐探索自在愉悦的生活方式。作者关于开源节流两方面的论述也挺有道理的。</li>
+  <li>基于 <a href="https://github.com/allejo/jekyll-toc">GitHub - allejo/jekyll-toc: A GitHub Pages compatible Table of Contents generator without a plugin or JavaScript :octocat:</a> 给博客文章加了目录。前端也是靠 Claude 写的，我爱 AI。</li>
+</ol>
 
-</article>
+              </div>
 
+              <br><br>
+              <div id="comments"></div>
+              <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+              <a class="u-url" href="/diary/" hidden></a>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧目录区域 -->
+      <div class="toc-sidebar">
+        <div class="toc-container">
+          <h3>目录</h3>
+          <div class="toc" id="toc-auto">
+            <ul><li><a href="#2025-7-3">2025-7-3</a></li><li><a href="#2025-7-4">2025-7-4</a></li><li><a href="#2025-7-5">2025-7-5</a></li><li><a href="#2025-7-6">2025-7-6</a></li><li><a href="#2025-7-7">2025-7-7</a></li><li><a href="#2025-7-8">2025-7-8</a></li><li><a href="#2025-7-9">2025-7-9</a></li></ul>
+          </div>
+        </div>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>
@@ -494,6 +539,199 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
 </footer>
-</body>
+<style>
+      /* 布局样式 */
+      .post-layout {
+        display: flex;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .post-main {
+        flex: 1;
+        min-width: 0; /* 防止内容溢出 */
+      }
+
+      .toc-sidebar {
+        width: 280px;
+        flex-shrink: 0;
+      }
+
+      .toc-container {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 250px;
+        z-index: 1000;
+        border-left: 1px solid gray;
+        padding: 0 0.7rem;
+      }
+
+      .toc-container h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .toc {
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+
+      .toc ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+
+      .toc li {
+        margin: 0.3rem 0;
+      }
+
+      .toc a {
+        color: #666;
+        text-decoration: none;
+        display: block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+      }
+
+      .toc a:hover {
+        background-color: #efefef;
+        color: #333;
+      }
+
+      .toc a.active {
+        /* background-color: #f8f8ff; */
+        color: black;
+        font-weight: bold;
+      }
+
+      /* 嵌套层级缩进 */
+      .toc ul ul {
+        padding-left: 1rem;
+      }
+
+      .toc ul ul a {
+        font-size: 0.85rem;
+      }
+
+      /* 移动端响应式 */
+      @media (max-width: 768px) {
+        .post-layout {
+          flex-direction: column;
+        }
+        
+        .toc-sidebar {
+          width: 100%;
+          order: -1; /* 在移动端将目录放在内容前面 */
+        }
+        
+        .toc-container {
+          position: static;
+          max-height: 200px;
+          margin-bottom: 1rem;
+        }
+      }
+
+      /* 可选：滚动条样式 */
+      .toc-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .toc-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .toc-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      .toc-container::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 等待页面完全加载
+        setTimeout(function() {
+          const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
+          
+          // 收集所有有效的标题元素
+          const headings = [];
+          tocLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+              const id = href.substring(1);
+              const heading = document.getElementById(id);
+              if (heading) {
+                headings.push({
+                  element: heading,
+                  link: link,
+                  id: id
+                });
+              } else {
+                console.warn('找不到标题元素:', id);
+              }
+            }
+          });
+          
+          if (headings.length === 0) {
+            console.warn('没有找到有效的标题元素，可能需要检查目录生成或标题ID');
+            return;
+          }
+          
+          // 按页面位置排序
+          headings.sort((a, b) => a.element.offsetTop - b.element.offsetTop);
+          
+          function highlightCurrentSection() {
+            const scrollPos = window.scrollY + 100; // 偏移量
+            let current = null;
+            
+            // 找到当前应该高亮的标题
+            for (let i = 0; i < headings.length; i++) {
+              if (headings[i].element.offsetTop <= scrollPos) {
+                current = headings[i];
+              } else {
+                break;
+              }
+            }
+            
+            // 移除所有高亮
+            headings.forEach(heading => {
+              heading.link.classList.remove('active');
+            });
+            
+            // 添加当前高亮
+            if (current) {
+              current.link.classList.add('active');
+            }
+          }
+          
+          // 防抖函数，提高性能
+          let scrollTimeout;
+          function throttledHighlight() {
+            if (scrollTimeout) {
+              clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(highlightCurrentSection, 10);
+          }
+          
+          window.addEventListener('scroll', throttledHighlight);
+          highlightCurrentSection(); // 初始化
+          
+        }, 500); // 延迟500ms确保页面完全加载
+      });
+    </script>
+
+  </body>
 
 </html>

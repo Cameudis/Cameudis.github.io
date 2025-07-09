@@ -353,18 +353,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <main class="page-content" aria-label="Content">
+      
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <div class="post-layout">
+          <!-- 左侧内容区域 -->
+          <div class="post-main">
+            <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">pwnable.tw Re-alloc</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2023-04-14T07:03:41+08:00" itemprop="datePublished">Apr 14, 2023
-      </time></p>
-  </header>
+              <header class="post-header">
+                <h1 class="post-title p-name" itemprop="name headline">pwnable.tw Re-alloc</h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2023-04-14T07:03:41+08:00" itemprop="datePublished">Apr 14, 2023
+                  </time></p>
+              </header>
 
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>相关：realloc、tcache2.29</p>
+              <div class="post-content e-content" itemprop="articleBody">
+                <p>相关：realloc、tcache2.29</p>
 
 <p>借用了很多巧合，实在是特别“幸运”的一个利用，和大部分网上的解法都不太一样。</p>
 
@@ -574,39 +578,39 @@ off_404068 dq offset __isoc99_scanf
 
 <p>这个故事告诉我们：涉及内存安全的函数还是要小心小心再小心，仔细阅读手册、了解边界行为……</p>
 
-  </div>
-    
-      <b>本博客上与 pwnable.tw 相关的贴子：</b>
-      <ul>
-        
-        
-          <li><a href="/2023/10/24/pwnable-tw-BabyStack-writeup.html">pwnable.tw BabyStack</a></li>
-        
-          <li><a href="/2023/10/13/pwnable-tw-Starbound-writeup.html">pwnable.tw Starbound</a></li>
-        
-          <li><a href="/2023/05/07/pwnable-tw-seethefile-writeup.html">pwnable.tw seethefile</a></li>
-        
-          <li><a href="/2023/04/14/pwnable-tw-re-alloc.html">pwnable.tw Re-alloc</a></li>
-        
-          <li><a href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html">pwnable.tw tcache_tear</a></li>
-        
-          <li><a href="/2022/09/08/pwnable-tw-applestore-writeup.html">pwnable.tw applestore</a></li>
-        
-          <li><a href="/2022/09/01/pwnable-tw-hacknote-writeup.html">pwnable.tw hacknote</a></li>
-        
-          <li><a href="/2022/08/07/pwnable-tw-silver-bullet-writeup.html">pwnable.tw silver_bullet</a></li>
-        
-          <li><a href="/2022/08/06/pwnable-tw-dubblesort-writeup.html">pwnable.tw dubblesort</a></li>
-        
-          <li><a href="/2022/08/04/pwnable-tw-3x17-writeup.html">pwnable.tw 3x17</a></li>
-        
-      </ul>
-    
-  
+              </div>
+                
+                  <b>本博客上与 pwnable.tw 相关的贴子：</b>
+                  <ul>
+                    
+                    
+                      <li><a href="/2023/10/24/pwnable-tw-BabyStack-writeup.html">pwnable.tw BabyStack</a></li>
+                    
+                      <li><a href="/2023/10/13/pwnable-tw-Starbound-writeup.html">pwnable.tw Starbound</a></li>
+                    
+                      <li><a href="/2023/05/07/pwnable-tw-seethefile-writeup.html">pwnable.tw seethefile</a></li>
+                    
+                      <li><a href="/2023/04/14/pwnable-tw-re-alloc.html">pwnable.tw Re-alloc</a></li>
+                    
+                      <li><a href="/2023/02/01/pwnable-tw-tcache-tear-writeup.html">pwnable.tw tcache_tear</a></li>
+                    
+                      <li><a href="/2022/09/08/pwnable-tw-applestore-writeup.html">pwnable.tw applestore</a></li>
+                    
+                      <li><a href="/2022/09/01/pwnable-tw-hacknote-writeup.html">pwnable.tw hacknote</a></li>
+                    
+                      <li><a href="/2022/08/07/pwnable-tw-silver-bullet-writeup.html">pwnable.tw silver_bullet</a></li>
+                    
+                      <li><a href="/2022/08/06/pwnable-tw-dubblesort-writeup.html">pwnable.tw dubblesort</a></li>
+                    
+                      <li><a href="/2022/08/04/pwnable-tw-3x17-writeup.html">pwnable.tw 3x17</a></li>
+                    
+                  </ul>
+                
+              
 
-  <br><br>
-  <div id="comments"></div>
-  <script>
+              <br><br>
+              <div id="comments"></div>
+              <script>
   new Valine({
     el: "#comments",
     app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
@@ -616,9 +620,20 @@ off_404068 dq offset __isoc99_scanf
 </script>
 
 
-  <a class="u-url" href="/2023/04/14/pwnable-tw-re-alloc.html" hidden></a>
-</article>
+              <a class="u-url" href="/2023/04/14/pwnable-tw-re-alloc.html" hidden></a>
+            </article>
+          </div>
+        </div>
+      </div>
 
+      <!-- 右侧目录区域 -->
+      <div class="toc-sidebar">
+        <div class="toc-container">
+          <h3>目录</h3>
+          <div class="toc" id="toc-auto">
+            <ul><li><a href="#漏洞分析">漏洞分析</a></li><li><a href="#exploitation">Exploitation</a><ul><li><a href="#泄露libc地址">泄露libc地址</a></li><li><a href="#攻击">攻击！</a></li><li><a href="#完整脚本">完整脚本</a></li></ul></li></ul>
+          </div>
+        </div>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>
@@ -653,6 +668,199 @@ off_404068 dq offset __isoc99_scanf
   </div>
 
 </footer>
-</body>
+<style>
+      /* 布局样式 */
+      .post-layout {
+        display: flex;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .post-main {
+        flex: 1;
+        min-width: 0; /* 防止内容溢出 */
+      }
+
+      .toc-sidebar {
+        width: 280px;
+        flex-shrink: 0;
+      }
+
+      .toc-container {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 250px;
+        z-index: 1000;
+        border-left: 1px solid gray;
+        padding: 0 0.7rem;
+      }
+
+      .toc-container h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .toc {
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+
+      .toc ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+
+      .toc li {
+        margin: 0.3rem 0;
+      }
+
+      .toc a {
+        color: #666;
+        text-decoration: none;
+        display: block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+      }
+
+      .toc a:hover {
+        background-color: #efefef;
+        color: #333;
+      }
+
+      .toc a.active {
+        /* background-color: #f8f8ff; */
+        color: black;
+        font-weight: bold;
+      }
+
+      /* 嵌套层级缩进 */
+      .toc ul ul {
+        padding-left: 1rem;
+      }
+
+      .toc ul ul a {
+        font-size: 0.85rem;
+      }
+
+      /* 移动端响应式 */
+      @media (max-width: 768px) {
+        .post-layout {
+          flex-direction: column;
+        }
+        
+        .toc-sidebar {
+          width: 100%;
+          order: -1; /* 在移动端将目录放在内容前面 */
+        }
+        
+        .toc-container {
+          position: static;
+          max-height: 200px;
+          margin-bottom: 1rem;
+        }
+      }
+
+      /* 可选：滚动条样式 */
+      .toc-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .toc-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .toc-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+      }
+
+      .toc-container::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 等待页面完全加载
+        setTimeout(function() {
+          const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
+          
+          // 收集所有有效的标题元素
+          const headings = [];
+          tocLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+              const id = href.substring(1);
+              const heading = document.getElementById(id);
+              if (heading) {
+                headings.push({
+                  element: heading,
+                  link: link,
+                  id: id
+                });
+              } else {
+                console.warn('找不到标题元素:', id);
+              }
+            }
+          });
+          
+          if (headings.length === 0) {
+            console.warn('没有找到有效的标题元素，可能需要检查目录生成或标题ID');
+            return;
+          }
+          
+          // 按页面位置排序
+          headings.sort((a, b) => a.element.offsetTop - b.element.offsetTop);
+          
+          function highlightCurrentSection() {
+            const scrollPos = window.scrollY + 100; // 偏移量
+            let current = null;
+            
+            // 找到当前应该高亮的标题
+            for (let i = 0; i < headings.length; i++) {
+              if (headings[i].element.offsetTop <= scrollPos) {
+                current = headings[i];
+              } else {
+                break;
+              }
+            }
+            
+            // 移除所有高亮
+            headings.forEach(heading => {
+              heading.link.classList.remove('active');
+            });
+            
+            // 添加当前高亮
+            if (current) {
+              current.link.classList.add('active');
+            }
+          }
+          
+          // 防抖函数，提高性能
+          let scrollTimeout;
+          function throttledHighlight() {
+            if (scrollTimeout) {
+              clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(highlightCurrentSection, 10);
+          }
+          
+          window.addEventListener('scroll', throttledHighlight);
+          highlightCurrentSection(); // 初始化
+          
+        }, 500); // 延迟500ms确保页面完全加载
+      });
+    </script>
+
+  </body>
 
 </html>

@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: Y²のDiary
 permalink: /diary/
 ---
@@ -60,3 +60,12 @@ permalink: /diary/
 - 我在 busybox 的编译选项里打开了 telnetd、tar 支持 gz。我用 musl-gcc 编译好静态的程序之后，用 [PWN Cheatsheet - HackMD](https://hackmd.io/@cameudis/rJuGtPyh6#Qemu) 这里的脚本把它压缩成 `.tar.gz` 后用 `base64` 慢慢发上去，然后解码再解压成原来的程序。搞这么复杂都是因为 busybox 不带 sshd（不能 scp 了），且我的 `qemu-system-x86_64` 是系统包管理器安装的，不支持虚拟文件系统（不能直接共享目录了），有点蠢。
 - 内核启动选项中（`qemu -append` 后面跟着的就是内核启动选项）记得要加一个 `nokaslr`，不然 `gdb` 加载了符号文件之后也还是会一脸懵逼的。
 - 在 qemu 里可以用户态和内核态使用同一个 gdb 实例来调试，只需要把编译好的用户态文件的符号告诉 gdb 就可以下断点调试用户程序了。具体步骤是首先需要提前在用户态文件的编译选项中加上 `-fno-pie` 以禁用 ASLR，然后 `objdump -S` 看看代码段（`.text`）的加载位置（比如 `0x401020`），最后在 gdb 当中使用 `add-symbole-file <elf> -s .text <addr>` 加载符号信息。不知道为什么 gdb 好像并不能直接正确识别 ELF 文件的地址，所以才需要按照这样手动加载一个段进去。如果需要加载其他段的话直接在后面 append 就可以，比如 `-s .text 0x401020 -s .init 0x401000`。
+
+### 2025-7-9
+1. 给博客加了简单的搜索功能，不过现在还没有支持搜索日记内容。
+- 用的是 [Algolia](https://www.algolia.com/) 的服务，需要先注册账号，然后把博客内容上传到自己的数据库中，最后在博客的前端中实现一个搜索框，向 Algolia 后端发送请求。
+- 将博客内容上传到服务器可以使用 [GitHub - algolia/jekyll-algolia: Add fast and relevant search to your Jekyll site](https://github.com/algolia/jekyll-algolia) 这个插件（别的静态网页生成框架应该也有类似的插件可以用），虽然已经停止维护了，但 jekyll 本身并不经常大更新所以这个插件现在和未来一段时间应该还是可用的。插件的官方文档和教程已经挂了，可以访问 [Algolia for Jekyll \| Add fast and relevant search to your Jekyll site](https://deepakmahakale.com/jekyll-algolia/) 这个网友自己搭的镜像站阅读。
+- 集成到前端中还是比较繁琐的，我拜托 claude 帮我写了一下，简单用用还是足够的。
+1. 继续学习 OpenC 910 中的 smart_run SoC。发现了[玄铁处理器的Linux移植](https://zhuanlan.zhihu.com/p/655723549)这个系列博客，是母校智能体系架构与开源芯片实验室的，实在是太有技术了，目前只看了第一章，后面技术细节太丰富了有机会再看吧。
+2. 读了[关于财务自由若干问题的实践与思考 - 纯牛马的救赎](https://mp.weixin.qq.com/s/iM4AGQ5vLYGdf2cfNdwmiQ)，觉得作者对财务自由的理解还是很有启发性的。作者追求的财富自由并不仅仅是财富，而是建立在对自己的了解基础上的、一种自己适合和喜欢的生活状态，或者说是一种逐渐探索志趣，逐渐探索自在愉悦的生活方式。作者关于开源节流两方面的论述也挺有道理的。
+3. 基于 [GitHub - allejo/jekyll-toc: A GitHub Pages compatible Table of Contents generator without a plugin or JavaScript :octocat:](https://github.com/allejo/jekyll-toc) 给博客文章加了目录。前端也是靠 Claude 写的，我爱 AI。
