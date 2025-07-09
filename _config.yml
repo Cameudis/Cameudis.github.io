@@ -56,3 +56,11 @@ port: 4001
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+# _config.yml
+
+algolia:
+  application_id: 'YU3CCWYOVD'
+  index_name: 'blog-jekyll'
+  search_only_api_key: 'dec1d1e53d245f8fc3122fa9b41ab7ae'
+  powered_by: true
