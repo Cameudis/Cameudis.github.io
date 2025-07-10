@@ -69,3 +69,8 @@ permalink: /diary/
 1. 继续学习 OpenC 910 中的 smart_run SoC。发现了[玄铁处理器的Linux移植](https://zhuanlan.zhihu.com/p/655723549)这个系列博客，是母校智能体系架构与开源芯片实验室的，实在是太有技术了，目前只看了第一章，后面技术细节太丰富了有机会再看吧。
 2. 读了[关于财务自由若干问题的实践与思考 - 纯牛马的救赎](https://mp.weixin.qq.com/s/iM4AGQ5vLYGdf2cfNdwmiQ)，觉得作者对财务自由的理解还是很有启发性的。作者追求的财富自由并不仅仅是财富，而是建立在对自己的了解基础上的、一种自己适合和喜欢的生活状态，或者说是一种逐渐探索志趣，逐渐探索自在愉悦的生活方式。作者关于开源节流两方面的论述也挺有道理的。
 3. 基于 [GitHub - allejo/jekyll-toc: A GitHub Pages compatible Table of Contents generator without a plugin or JavaScript :octocat:](https://github.com/allejo/jekyll-toc) 给博客文章加了目录。前端也是靠 Claude 写的，我爱 AI。
+
+### 2025-7-10
+1. 看完了《Rubicon》，借助 AI 学习了一点点 Buddy System 的代码。AI 用作解读代码还是不错的👍。
+2. 继续看《投资第一课》，思考人生……
+3. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排。
