@@ -74,3 +74,9 @@ permalink: /diary/
 1. 看完了《Rubicon》，借助 AI 学习了一点点 Buddy System 的代码。AI 用作解读代码还是不错的👍。
 2. 继续看《投资第一课》，思考人生……
 3. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排。
+
+### 2025-7-11
+1. 把要设计的加密模块的功能和流程拆分了一下，分出了几个子模块来。似乎设计整个模块也不像想象中的那么难了。
+2. 继续看 Buddy System 源码，感觉内核这种项目也不是很恐怖了，毕竟也是人类维护的。网上相关的代码解读还挺多的，比如 [Memory Management \| What is the Utopian World!](https://utopianfuture.github.io/kernel/Memory-Management.html)、[3.2.4 Buddy System(伙伴系统) \| Linux核心概念详解](https://s3.shizhz.me/linux-mm/3.2-wu-li-nei-cun/3.2.4-buddy-system-huo-ban-xi-tong)，不过我感觉在了解了大致的机制以后自己结合 AI 看源码比阅读这些写好的博客要好，理解速度更快，而且可以自己发掘感兴趣的细节。
+3. 搭了一个简单的 Folo Webhook to Telegram 服务，可以收集安全新闻和博客推送了。
+4. 发现 [《东方幼灵梦》](https://www.bilibili.com/video/BV1r3411j7Qe)和[《东方灵灵梦》](https://www.bilibili.com/video/BV1Hm4y1d7e4)都有人做了高清重置版，看了一集就又眼泪水哒哒滴了😢
