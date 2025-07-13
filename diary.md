@@ -73,10 +73,19 @@ permalink: /diary/
 ### 2025-7-10
 1. 看完了《Rubicon》，借助 AI 学习了一点点 Buddy System 的代码。AI 用作解读代码还是不错的👍。
 2. 继续看《投资第一课》，思考人生……
-3. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排。
+3. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排（静冈胜政日式猪排）。
 
 ### 2025-7-11
 1. 把要设计的加密模块的功能和流程拆分了一下，分出了几个子模块来。似乎设计整个模块也不像想象中的那么难了。
 2. 继续看 Buddy System 源码，感觉内核这种项目也不是很恐怖了，毕竟也是人类维护的。网上相关的代码解读还挺多的，比如 [Memory Management \| What is the Utopian World!](https://utopianfuture.github.io/kernel/Memory-Management.html)、[3.2.4 Buddy System(伙伴系统) \| Linux核心概念详解](https://s3.shizhz.me/linux-mm/3.2-wu-li-nei-cun/3.2.4-buddy-system-huo-ban-xi-tong)，不过我感觉在了解了大致的机制以后自己结合 AI 看源码比阅读这些写好的博客要好，理解速度更快，而且可以自己发掘感兴趣的细节。
 3. 搭了一个简单的 Folo Webhook to Telegram 服务，可以收集安全新闻和博客推送了。
 4. 发现 [《东方幼灵梦》](https://www.bilibili.com/video/BV1r3411j7Qe)和[《东方灵灵梦》](https://www.bilibili.com/video/BV1Hm4y1d7e4)都有人做了高清重置版，看了一集就又眼泪水哒哒滴了😢
+
+### 2025-7-12
+1. 学习 Linux 音频软件栈，看到这篇博客讲得还可以（有的地方讲得很浅，在 AI 辅助之下阅读会好一些）：[Making Sense of The Audio Stack On Unix](https://venam.net/blog/unix/2021/02/07/audio-stack.html)。但是还是没有搞懂为什么我的 Thinkpad X1C gen13 Fedora 没办法正常使用耳机，我已经使用了最新的内核和 SoF 固件版本了。
+2. 乐队排练，晚上在日月光吃了平成屋，算是还不错吧。
+
+### 2025-7-13
+1. 继续研究为什么笔记本 Linux 没办法用耳机，失败。一直以来俺的理想都是理解计算机这个黑盒在背后是如何工作的。现在在以 Linux 为契机学习音频系统的时候，真的有感觉到抽象层的伟大，将无数复杂的细节都隐藏了起来。物理的声卡提供了各种配置寄存器，在固件驱动下，变成 Linux 内核音频模块 ALSA 所提供的抽象的声卡接口。在用户空间，各种声音服务器（PulseAudio、PipeWure）又基于 ALSA 提供的接口，为 Linux 桌面提供了统一管理的功能。应用开发者只需要基于一些接口库，向这些音频服务器发赛音频，就可以简单地完成音频播放的功能。这其中有着一般路人难以想象的工程量，也因此我不得不佩服程序员们合作的力量。但我还是不知道我的耳机为什么不能用，感觉是固件的问题。
+2. 昨天和今天一通乱搞把 PulseAudio 搞爆炸了，还好按照[reddit上的教程](https://www.reddit.com/r/pop_os/comments/n82egy/pulseaudio_failed_to_create_sink_input_sink_is/)修好了。Average Linux User...
+3. 继续看《工作、消费主义和新穷人》和《中国文化通识》。
