@@ -90,7 +90,11 @@ permalink: /diary/
 2. 昨天和今天一通乱搞把 PulseAudio 搞爆炸了，还好按照[reddit上的教程](https://www.reddit.com/r/pop_os/comments/n82egy/pulseaudio_failed_to_create_sink_input_sink_is/)修好了。Average Linux User...
 3. 继续看《工作、消费主义和新穷人》和《中国文化通识》。
 
-### 2025-7-14
+### 2025-7-14~15
 1. 和溴化锂一起装了台机。
 2. 推进项目：把各个模块的输入输出规划了一下。
 3. 感冒了，无法干活。
+
+### 2025-7-16
+1. 调 Rubicon。
+2. 去参加了 RISC-V 中国峰会的一个付费教程（200 元你敢信），了解了一下 CHERI、CHERIoT 以及 scisemi 这家公司基于 CHERIoT 搞的一套软件栈。体验了一下基于他的 [cheriot-rtos](https://github.com/CHERIoT-Platform/cheriot-rtos) 和 SDK 开发 C/C++ 嵌入式应用，其实还挺简单有趣的。希望他们以后能搞出点实际的东西（据说是即将要有实际的 CHERI 核了，支持一些常用的嵌入式接口），不要浪费了我的 200 元。
