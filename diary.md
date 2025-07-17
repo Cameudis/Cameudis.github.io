@@ -98,3 +98,6 @@ permalink: /diary/
 ### 2025-7-16
 1. 调 Rubicon。
 2. 去参加了 RISC-V 中国峰会的一个付费教程（200 元你敢信），了解了一下 CHERI、CHERIoT 以及 scisemi 这家公司基于 CHERIoT 搞的一套软件栈。体验了一下基于他的 [cheriot-rtos](https://github.com/CHERIoT-Platform/cheriot-rtos) 和 SDK 开发 C/C++ 嵌入式应用，其实还挺简单有趣的。希望他们以后能搞出点实际的东西（据说是即将要有实际的 CHERI 核了，支持一些常用的嵌入式接口），不要浪费了我的 200 元。
+
+### 2025-7-17
+1. 依然生病中，无法干活。
