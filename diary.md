@@ -100,4 +100,11 @@ permalink: /diary/
 2. 去参加了 RISC-V 中国峰会的一个付费教程（200 元你敢信），了解了一下 CHERI、CHERIoT 以及 scisemi 这家公司基于 CHERIoT 搞的一套软件栈。体验了一下基于他的 [cheriot-rtos](https://github.com/CHERIoT-Platform/cheriot-rtos) 和 SDK 开发 C/C++ 嵌入式应用，其实还挺简单有趣的。希望他们以后能搞出点实际的东西（据说是即将要有实际的 CHERI 核了，支持一些常用的嵌入式接口），不要浪费了我的 200 元。
 
 ### 2025-7-17
-1. 依然生病中，无法干活。
+1. 依然生病中。
+
+### 2025-7-18
+1. 在 RISC-V 中国峰会的各个场之间来回窜，把和安全相关的都听了下。目前的 RISC-V 的 TEE 还在推进生态的过程中，标准和技术都还在不断更新，比如 [smmtt](https://github.com/riscv/riscv-smmtt) 还刚刚出了一个新版（指今年二月更新了 v0.3.0）。
+- 有人在把 OPTEE 迁移到 RISC-V 上以支持 GP 标准的 TA（SiFive、芯来 Nuclei），有人在基于 CoVE 标准开发 TEE 架构（玄铁），Intel 在将他们的 x86 IoT 场景 hypervisor [ACRN™](https://projectacrn.org/)迁移到 RISC-V CoVE 上（[acrn-riscv](https://github.com/intel/acrn-riscv)）。当然还有知名的 Penglai，可惜时间冲突了没去听夏老师的分享。
+- 对于开发者和厂商来说，选项还挺多的；不过对于我们搞安全的来说，部署到什么系统上才是重点，毕竟攻击需要考虑攻击的收益。目前看来，RISC-V 的 TEE 并没有部署到什么现实中的应用上。但是我们可以简单估计一下它们的使用场景，其中嵌入式、健康计算、车控会比较多，其次是 AI、云计算领域。
+- 尽管 RISC-V 目前主要推动的是 AI 主题，但我觉得 AI 的攻击面相比传统安全要少得多，TEE 用来保护 AI 目前来看更多还是噱头作用。而在云计算这块，或者说整个桌面和服务器领域，RISC-V 距离赶上 x86 差得不是一星半点，就不提了。下面这张图是今天超睿科技展示的“世界上第一颗桌面级 RISC-V CPU”：![](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202507182219227.png)难道真的要赶上 x86 了吗！在交大 tcloud 实验室的校友对这颗 CPU 做的[评测](https://zhuanlan.zhihu.com/p/1923399170653398232)中提到，UR-DP1000单核性能达到了SPECInt2006 10.4/GHz 和 SPECfp2006 12.0/GHz 的水平，ChatGPT 说这个成绩属于*极高的水平，远远超出大多数普通桌面处理器（即便是许多高端消费者级处理器）*。可惜，主频只有 2.23GHz 的话，乘上去之后还是离现在的 x86 桌面处理器有差距啊！
+1. 巴别塔圣歌真好玩。SHENZHEN I/O 太好玩了。
