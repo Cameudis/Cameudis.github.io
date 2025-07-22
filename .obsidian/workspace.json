@@ -168,8 +168,10 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "0fe3e3a546eb37e3",
+  "active": "2a150f433d41f81a",
   "lastOpenFiles": [
+    "link.md",
+    "diary.md",
     "diary.md~",
     "docs/assets/js/post.js",
     "docs/assets/js",
@@ -180,7 +182,6 @@
     "_layouts/post.html~",
     "_algolia_api_key",
     "_layouts/default.html",
-    "docs/2025/04/11/SJTUCTF-2025.html",
     "docs/images/favicon-32x32.png",
     "docs/images/favicon-16x16.png",
     "docs/images/ava1.jpg",
@@ -191,8 +192,6 @@
     "docs/images/android-chrome-192x192.png",
     "docs/images/about.webp",
     "docs/images/3x17_3.jpg",
-    "link.md",
-    "readings.md",
-    "diary.md"
+    "readings.md"
   ]
 }

@@ -123,3 +123,9 @@ permalink: /diary/
 1. 玩 shenzhen I/O，成果见 [【Shenzhen I/O】まにまに（使用汇编语言实现）\_哔哩哔哩\_bilibili](https://www.bilibili.com/video/BV1LWgVz6E4Y)
 2. 继续看《The Hardware Hacking Handbook》
 
+### 2025-7-22
+1. 又和溴化锂和 LoboQ1ng 和 M1aoo0bin 装了台机。
+2. 继续复现 Rubicon（都这么多天了，疑似效率有点太低了），发现 block merge 这一部分作者根本都没在代码里实现... 哥们有点太偷懒了！
+3. 读了[安全隔区 - 官方 Apple 支持 (中国)](https://support.apple.com/zh-cn/guide/security/sec59b0b31ff/web)，是《Apple 平台安全保护》的一章。发现基于完整性树的内存完整性保护在现在的苹果设备当中还是非常广泛地部署了的，于是为自己的内存加密项目感到欣慰。有空可以找一些逆向分析苹果设备安全机制的论文看看，有点感兴趣。
+4. 学习了 arch 上打软件包的方法，学会把 AUR 上的仓库 clone 下来自己改改安装了。
+
