@@ -181,3 +181,6 @@ toc_max_level: 2
 2. 去逛了人民广场，还去了雾雨咖啡厅可惜正好在关门修设备555。
 3. 和老妈一起看完了《鱿鱼游戏》第二季。
 
+### 2025-8-3
+
+1. 给博客目录添加了限制最大级数的功能。大致只要这样写：`{% assign h_max = page.toc_max_level | default: 6 %} {% include toc.html html=content h_max=h_max %}`，就可以在 page 的文件里面指定 `toc_max_level` 属性了。所以现在的目录栏位不像原来这么拥挤了（太棒了👍）
