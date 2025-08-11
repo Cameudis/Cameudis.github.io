@@ -652,7 +652,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <li>给 VSCode 配置了 Vim 插件，而且支持自动输入法切换（<a href="https://github.com/daipeihust/im-select">这个项目有说明如何开启这个功能</a>），挺好用的。</li>
 </ol>
 
-<h3 id="2025-8-711">2025-8-7~11</h3>
+<h3 id="2025-8-710">2025-8-7~10</h3>
 <ol>
   <li>跟着《数字设计原理与实现》又学了一遍 verilog，比以前学得深入得多了，下面是一些笔记：
     <ul>
@@ -665,6 +665,19 @@ document.addEventListener('DOMContentLoaded', function() {
     </ul>
   </li>
   <li>推进一生一芯，中间有一些思考：同步电路比异步电路实现起来更简单的原因是，在复杂的电路中往往需要涉及多个需要时间的计算或处理单元。如果简单地将它们连起来而不进行同步，那么如果上游模块在运算时产生不稳定输出，下游模块会基于这些不稳定输出做计算，从而白白增加了晶体管的状态切换、增加了电路产生意外行为的可能性。</li>
+</ol>
+
+<h3 id="2025-8-11">2025-8-11</h3>
+<ol>
+  <li>阅读了 OpenC910 的 smart_run SoC 中的 <code class="language-plaintext highlighter-rouge">axi_interconnect128</code> 模块实现。这个模块把一个 Master 连接到四个 Slave 上：
+    <ul>
+      <li>对于 AW 通道，它根据地址区间选择对应的 Slave，并记录这个 Slave 的 ID 和地址 pair。</li>
+      <li>对于 W 通道，它根据 <code class="language-plaintext highlighter-rouge">wid</code> 查找对应的 address，再根据 address 判断属于哪一个 Slave（这里实现得很蠢）</li>
+      <li>对于 B 通道，就是简单地把 Slave 的 Response 转发给上级就行，不过对于多个 Slave 同时发送 Response 的场景简单做了一个带优先级的同步机制。</li>
+      <li>对于 AR 通道，就是简单地处理一下握手（ready、valid 信号），地址什么的都是直接连到 Slave 上的，都没有经过这个中转模块。</li>
+      <li>对于 R 通道，模块对每个 Slave 维护一个状态 read_done，用来使一个 Slave 的连续多条读响应也能够连续地返回至上级。初次以外，这里也像 B 通道一样做了简单的优先级机制。</li>
+    </ul>
+  </li>
 </ol>
 
 
