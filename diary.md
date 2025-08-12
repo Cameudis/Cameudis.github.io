@@ -206,3 +206,7 @@ toc_max_level: 2
 - 对于 AR 通道，就是简单地处理一下握手（ready、valid 信号），地址什么的都是直接连到 Slave 上的，都没有经过这个中转模块。
 - 对于 R 通道，模块对每个 Slave 维护一个状态 read_done，用来使一个 Slave 的连续多条读响应也能够连续地返回至上级。初次以外，这里也像 B 通道一样做了简单的优先级机制。
 
+### 2025-8-12
+1. 给思源笔记配置了简单的模板标注功能，教程可以参考 [SiYuan 模板基础教程](https://ld246.com/article/1627298479208)。
+- 思源笔记支持使用 Golang 的 html/template 库模板，但和标准的 `{{code}}` 不同，思源需要使用 `.action{code}`。
+- 写好了模板之后需要放到思源笔记的数据目录中，由于我是使用 flatpak 安装的思源笔记，所以模板目录位于 `~/.var/app/org.b3log.siyuan/SiYuan/data/templates/`，而不是 `~/SiYuan`。
