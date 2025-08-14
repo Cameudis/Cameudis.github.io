@@ -211,3 +211,15 @@ toc_max_level: 2
 - 思源笔记支持使用 Golang 的 html/template 库模板，但和标准的 `{{code}}` 不同，思源需要使用 `.action{code}`。
 - 写好了模板之后需要放到思源笔记的数据目录中，由于我是使用 flatpak 安装的思源笔记，所以模板目录位于 `~/.var/app/org.b3log.siyuan/SiYuan/data/templates/`，而不是 `~/SiYuan`。
 2. 终于，切实地推进了一点项目，并感到之后的部分也没有我想象得那么难了。
+
+### 2025-8-13
+1. LLM 告诉我项目可能会涉及多时钟域，所以我学习了[【高级数字电路】跨时钟域/CDC设计方法总结](https://zhuanlan.zhihu.com/p/598631863)。
+- 多时钟域最头疼的问题就是，如果时钟并非是倍数关系，那么输入输出更新时，在各自时钟内的相位差是不确定的。这会导致亚稳态（在接收方处于上升沿更新数据的区间内时，发送方恰好正在更新数据，使得接受方接收不稳定的数据）、数据漏采（慢速接收者采集快信号）、同步失序（发送方的一组信号先后 available，导致接收方先后接收更新）的问题。对于亚稳态，只能通过在路径上增加几个缓冲寄存器来使数据稳定下来（处于亚稳态的寄存器会在一段时间后恢复稳定），但可惜的是这些缓冲寄存器只能使其稳定而不能确保其正确。对于数据漏采，要么采用Open-Loop方法，强行使输出的数据保持多个周期；要么采用Close-Loop方法，使用握手信号来确保数据被接收。对于同步失序，可以使用同步、异步 FIFO 等各种方法，百花齐放（具体看文章细节）。
+- 如果时钟分频得到的倍数关系，那么慢速的一方在上升沿时快速的一方肯定也处于上升沿，他们之间只需要简单的握手协议以防止漏采就可以了。
+
+### 2025-8-14
+1. 在[一生一芯的AXI协议介绍](https://ysyx.oscc.cc/docs/2407/b/1.html#%E4%B8%9A%E7%95%8C%E4%B8%AD%E5%B9%BF%E6%B3%9B%E4%BD%BF%E7%94%A8%E7%9A%84%E6%80%BB%E7%BA%BF-axi%E5%8D%8F%E8%AE%AE%E5%AE%B6%E6%97%8F)中，介绍了握手的死锁和活锁问题。[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/) 里面对握手涉及的信号进行了规范，以防止锁的出现：
+- 对于死锁，在 A3.5 Dependencies between channel handshake signals 中，要求只有数据的接收方能够等待发送方置 valid 信号而置 ready，反之则不行。因此在一生一芯文档的例子中，“master 在等 slave 将 ready 置 1 后, 才将 valid 置 1” 这一行为是不允许的。
+- 对于活锁，在 A3.3 中对各个 valid 信号的说明中，都有说明 "VALID must remain asserted until the rising clock edge after the Subordinate asserts the READY signal"，因此例子中 “因为上一个周期握手失败, master 在这个周期将 valid 置 0”这一行为是不允许的。
+2. 知道了 git 的 `stash` 功能，可以暂存现在没有 staged 的修改，然后使用 `git stash pop` 恢复，非常适合临时 checkout 到一个以前的分支的情况。
+
