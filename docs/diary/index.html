@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <li>阅读了 OpenC910 的 smart_run SoC 中的 <code class="language-plaintext highlighter-rouge">axi_interconnect128</code> 模块实现。这个模块把一个 Master 连接到四个 Slave 上：
     <ul>
       <li>对于 AW 通道，它根据地址区间选择对应的 Slave，并记录这个 Slave 的 ID 和地址 pair。</li>
-      <li>对于 W 通道，它根据 <code class="language-plaintext highlighter-rouge">wid</code> 查找对应的 address，再根据 address 判断属于哪一个 Slave（这里实现得很蠢）</li>
+      <li>对于 W 通道，它根据 <code class="language-plaintext highlighter-rouge">wid</code> 查找对应的 address，再根据 address 判断属于哪一个 Slave（实现得很蠢）</li>
       <li>对于 B 通道，就是简单地把 Slave 的 Response 转发给上级就行，不过对于多个 Slave 同时发送 Response 的场景简单做了一个带优先级的同步机制。</li>
       <li>对于 AR 通道，就是简单地处理一下握手（ready、valid 信号），地址什么的都是直接连到 Slave 上的，都没有经过这个中转模块。</li>
       <li>对于 R 通道，模块对每个 Slave 维护一个状态 read_done，用来使一个 Slave 的连续多条读响应也能够连续地返回至上级。初次以外，这里也像 B 通道一样做了简单的优先级机制。</li>
@@ -709,9 +709,14 @@ document.addEventListener('DOMContentLoaded', function() {
       <li>对于活锁，在 A3.3 中对各个 valid 信号的说明中，都有说明 “VALID must remain asserted until the rising clock edge after the Subordinate asserts the READY signal”，因此例子中 “因为上一个周期握手失败, master 在这个周期将 valid 置 0”这一行为是不允许的。</li>
     </ul>
   </li>
-  <li>知道了 git 的 <code class="language-plaintext highlighter-rouge">stash</code> 功能，可以暂存现在没有 staged 的修改，然后使用 <code class="language-plaintext highlighter-rouge">git stash pop</code> 恢复，非常适合临时 checkout 到一个以前的分支的情况。</li>
+  <li>知道了 git 的 <code class="language-plaintext highlighter-rouge">stash</code> 功能，可以暂存现在没有 staged 的修改，然后使用 <code class="language-plaintext highlighter-rouge">git stash pop</code> 恢复，非常适合临时 checkout 到一个以前的分支、或者在以前的 commit 上对代码做了 fix 想同步到最新 commit 的场景。</li>
 </ol>
 
+<h3 id="2025-8-15">2025-8-15</h3>
+<ol>
+  <li>在硬件设计领域差分测试真的非常有用，在设计加密引擎的时候可以用波形图快速比对实现是否正确。</li>
+  <li>之前在 RISC-V 峰会和两个哥们聊天，听他们说计算所做了一个内存监听卡，终于给我找到资里料了：<a href="https://asg.ict.ac.cn/hmtt/design/hmtt_v4/202504/t20250412_524222.html">HMTT v4.3： The latest HMTT version for DDR4</a>、还有<a href="https://zhuanlan.zhihu.com/p/8760007689">关于HMTT的声明-包云岗</a>。现在这张卡只能监听并记录总线上的地址信息，还没有实现数据的监听和记录，因此距离被拿来作外挂还是有点远。但是这种设备的存在就说明了也可以有监听数据的设备存在，所以内存加密真的是有场景的！</li>
+</ol>
 
               </div>
 

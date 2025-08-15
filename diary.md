@@ -201,7 +201,7 @@ toc_max_level: 2
 ### 2025-8-11
 1. 阅读了 OpenC910 的 smart_run SoC 中的 `axi_interconnect128` 模块实现。这个模块把一个 Master 连接到四个 Slave 上：
 - 对于 AW 通道，它根据地址区间选择对应的 Slave，并记录这个 Slave 的 ID 和地址 pair。
-- 对于 W 通道，它根据 `wid` 查找对应的 address，再根据 address 判断属于哪一个 Slave（这里实现得很蠢）
+- 对于 W 通道，它根据 `wid` 查找对应的 address，再根据 address 判断属于哪一个 Slave（实现得很蠢）
 - 对于 B 通道，就是简单地把 Slave 的 Response 转发给上级就行，不过对于多个 Slave 同时发送 Response 的场景简单做了一个带优先级的同步机制。
 - 对于 AR 通道，就是简单地处理一下握手（ready、valid 信号），地址什么的都是直接连到 Slave 上的，都没有经过这个中转模块。
 - 对于 R 通道，模块对每个 Slave 维护一个状态 read_done，用来使一个 Slave 的连续多条读响应也能够连续地返回至上级。初次以外，这里也像 B 通道一样做了简单的优先级机制。
@@ -221,5 +221,8 @@ toc_max_level: 2
 1. 在[一生一芯的AXI协议介绍](https://ysyx.oscc.cc/docs/2407/b/1.html#%E4%B8%9A%E7%95%8C%E4%B8%AD%E5%B9%BF%E6%B3%9B%E4%BD%BF%E7%94%A8%E7%9A%84%E6%80%BB%E7%BA%BF-axi%E5%8D%8F%E8%AE%AE%E5%AE%B6%E6%97%8F)中，介绍了握手的死锁和活锁问题。[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/) 里面对握手涉及的信号进行了规范，以防止锁的出现：
 - 对于死锁，在 A3.5 Dependencies between channel handshake signals 中，要求只有数据的接收方能够等待发送方置 valid 信号而置 ready，反之则不行。因此在一生一芯文档的例子中，“master 在等 slave 将 ready 置 1 后, 才将 valid 置 1” 这一行为是不允许的。
 - 对于活锁，在 A3.3 中对各个 valid 信号的说明中，都有说明 "VALID must remain asserted until the rising clock edge after the Subordinate asserts the READY signal"，因此例子中 “因为上一个周期握手失败, master 在这个周期将 valid 置 0”这一行为是不允许的。
-2. 知道了 git 的 `stash` 功能，可以暂存现在没有 staged 的修改，然后使用 `git stash pop` 恢复，非常适合临时 checkout 到一个以前的分支的情况。
+2. 知道了 git 的 `stash` 功能，可以暂存现在没有 staged 的修改，然后使用 `git stash pop` 恢复，非常适合临时 checkout 到一个以前的分支、或者在以前的 commit 上对代码做了 fix 想同步到最新 commit 的场景。
 
+### 2025-8-15
+1. 在硬件设计领域差分测试真的非常有用，在设计加密引擎的时候可以用波形图快速比对实现是否正确。
+2. 之前在 RISC-V 峰会和两个哥们聊天，听他们说计算所做了一个内存监听卡，终于给我找到资里料了：[HMTT v4.3： The latest HMTT version for DDR4](https://asg.ict.ac.cn/hmtt/design/hmtt_v4/202504/t20250412_524222.html)、还有[关于HMTT的声明-包云岗](https://zhuanlan.zhihu.com/p/8760007689)。现在这张卡只能监听并记录总线上的地址信息，还没有实现数据的监听和记录，因此距离被拿来作外挂还是有点远。但是这种设备的存在就说明了也可以有监听数据的设备存在，所以内存加密真的是有场景的！
