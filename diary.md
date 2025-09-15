@@ -232,3 +232,8 @@ toc_max_level: 2
 1. 杭州临平大剧院演出
 2. 沪道馆看 Reol 演出
 
+### 2025-8-18-20
+1. 学习 GNOME GTK 编程，写了个简单的市场走势查看软件 demo。推荐阅读这个知乎专栏：[死磕 GNOME 编程](https://www.zhihu.com/column/c_1940440286594573617)。
+2. 学习了 [Jujutsu—a version control system](https://github.com/jj-vcs/jj) 这个新版本控制软件的基础用法，一个很好的教程是 [Steve's Jujutsu Tutorial](https://steveklabnik.github.io/jujutsu-tutorial/introduction/introduction.html)。
+3. 发现 Linux 上有 `who` 工具可以列出当前系统上的各种伪终端文件，非常适合在同学使用终端时偷偷连上去，往他的终端里拉屎！
+
