@@ -237,3 +237,9 @@ toc_max_level: 2
 2. 学习了 [Jujutsu—a version control system](https://github.com/jj-vcs/jj) 这个新版本控制软件的基础用法，一个很好的教程是 [Steve's Jujutsu Tutorial](https://steveklabnik.github.io/jujutsu-tutorial/introduction/introduction.html)。
 3. 发现 Linux 上有 `who` 工具可以列出当前系统上的各种伪终端文件，非常适合在同学使用终端时偷偷连上去，往他的终端里拉屎！
 
+## 2025-8-21 ~ 9-14
+放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。
+
+## 2025-9-15
+1. 重新整理了一下内存加密引擎的整个思路，发现了一个看起来非常有探索价值的想法。
+
