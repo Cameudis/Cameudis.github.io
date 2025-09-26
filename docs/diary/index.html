@@ -745,6 +745,29 @@ document.addEventListener('DOMContentLoaded', function() {
   <li>配环境，搭起来了一个 VMWare 虚拟机 CentOS7 系统的仿真环境，用共享文件夹把项目目录共享进去，这样就可以用主机的代码编辑器编辑、虚拟机里的仿真器跑仿真了。同样一个 hello world 的 case，用 verilator 跑花了 4810.42s，用 vcs 只花了 35.152s，两者相比是 136.8 倍的差距！！！感觉可以加速我的开发过程 by 一个很高的系数了。</li>
 </ol>
 
+<h2 id="2025-9-1825">2025-9-18~25</h2>
+<ol>
+  <li>刚刚开学，事情比较多！买了辆电动车（九号A2Z 40，解锁方式特别高级，只要蓝牙连上的情况下坐上车就自动解锁了。感觉可以有时间试试蓝牙中继攻击）、买了学校游泳馆年卡（1500一年还挺贵的，每个教学周游泳2.5次才能回本）等等。</li>
+  <li>加入了 0ops，准备近期先学习基础的内核 PWN 知识。主要是跟着<a href="https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I">A3的内核利用基础</a>进行复现，下面简单记录一下：
+    <ul>
+      <li>内核利用的一种基础模式：先在内核态进行提权（执行 <code class="language-plaintext highlighter-rouge">commit_creds(init_cred)</code>），然后回到用户态拿shell。</li>
+      <li>在正常通过 <code class="language-plaintext highlighter-rouge">int3</code> 指令进入内核时（老式系统调用），硬件会在切换到内核栈以后自动 push 一些寄存器上去，包括<code class="language-plaintext highlighter-rouge">cs</code>、<code class="language-plaintext highlighter-rouge">ss</code>、<code class="language-plaintext highlighter-rouge">rflags</code>、<code class="language-plaintext highlighter-rouge">rsp</code>、<code class="language-plaintext highlighter-rouge">rip</code>等；与之对应，在 iretq 指令返回用户态时，硬件会自动 pop 这些寄存器。通常在内核态执行完提权代码后，可以构造一组栈上的寄存器状态让 <code class="language-plaintext highlighter-rouge">iretq</code> 去返回，这些状态的合法值可以通过在用户态时进行 <code class="language-plaintext highlighter-rouge">save_status</code> 拿到。（另外，现代的系统调用 <code class="language-plaintext highlighter-rouge">syscall</code> 指令就不会把一堆寄存器压栈（甚至都不切换栈），只是把状态保存在寄存器中（RIP-&gt;RCX, RFLAGS-&gt;R11），因此更轻量、更快；与其对应的是 <code class="language-plaintext highlighter-rouge">sysret</code> 指令。由于 <code class="language-plaintext highlighter-rouge">sysret</code> 依赖的状态控制起来不方便（涉及到很多通用和非通用寄存器，而 <code class="language-plaintext highlighter-rouge">iretq</code> 只需要控制栈就好了），所以一般 PWN 不使用 <code class="language-plaintext highlighter-rouge">sysret</code> 返回用户态）。</li>
+      <li>为了缓解 meltdown 漏洞，现代内核普遍开启了 KPTI 保护，对用户态和内核态分开使用不同的页表，使用户态无法访问内核态的内存空间（反之还是可以的，但是存在 SMEP 和 SMAP 保护）。Linux 内核对于 KPTI 的实现非常巧妙，两张页表的顶层节点在物理内存中是相邻的（内核页表在低地址处、用户页表在高地址处），因此切换页表时只需要将 CR3 寄存器（负责存储页表指针）的第13位取反即可。对于开启了 KPTI 的系统，攻击者想要返回用户态时，必须先切换到用户页表（将 CR3 的第13位取反），然后才能执行 <code class="language-plaintext highlighter-rouge">iretq</code> 返回用户态，否则会因为页表不对而导致内核 panic。这里需要用到 <code class="language-plaintext highlighter-rouge">swapgs_restore_regs_and_return_to_usermode</code> 作为 gadget，他会帮我们切换页表并执行 <code class="language-plaintext highlighter-rouge">iretq</code>。具体来说，需要布置出以下这个栈布局：
+        <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> swapgs_restore_regs_and_return_to_usermode + ? // 这里需要一个偏移，逆向找到函数中的 `mov rdi, rsp` 作为 gadget 地址
+ 0 // padding
+ 0 // padding
+ user_shell_addr
+ user_cs
+ user_rflags
+ user_sp
+ user_ss
+</code></pre></div>        </div>
+      </li>
+      <li>有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14">这个commit</a>），可以利用栈上的 <code class="language-plaintext highlighter-rouge">pt_regs</code> 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 <code class="language-plaintext highlighter-rouge">0xffff888000000000</code>。具体见我 kgadget 的 exp。</li>
+    </ul>
+  </li>
+</ol>
+
 
               </div>
 
@@ -772,7 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <h3>目录</h3>
           <div class="toc" id="toc-auto">
             
-            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-8-21--9-14">2025-8-21 ~ 9-14</a></li><li><a href="#2025-9-15">2025-9-15</a></li><li><a href="#2025-9-1617">2025-9-16~17</a></li></ul>
+            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-8-21--9-14">2025-8-21 ~ 9-14</a></li><li><a href="#2025-9-15">2025-9-15</a></li><li><a href="#2025-9-1617">2025-9-16~17</a></li><li><a href="#2025-9-1825">2025-9-18~25</a></li></ul>
           </div>
         </div>
       </div>
