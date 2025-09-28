@@ -237,16 +237,16 @@ toc_max_level: 2
 2. 学习了 [Jujutsu—a version control system](https://github.com/jj-vcs/jj) 这个新版本控制软件的基础用法，一个很好的教程是 [Steve's Jujutsu Tutorial](https://steveklabnik.github.io/jujutsu-tutorial/introduction/introduction.html)。
 3. 发现 Linux 上有 `who` 工具可以列出当前系统上的各种伪终端文件，非常适合在同学使用终端时偷偷连上去，往他的终端里拉屎！
 
-## 2025-8-21 ~ 9-14
+### 2025-8-21 ~ 9-14
 放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。
 
-## 2025-9-15
-1. 重新整理了一下内存加密引擎的整个思路，发现了一个看起来非常有探索价值的想法。
+### 2025-9-15
+1. 重新整理了一下内存加密引擎的整个思路，发现了一个看起来非常有探索价值的想法。（然后在一篇2002年的论文上找到了这个想法）
 
-## 2025-9-16~17
+### 2025-9-16~17
 1. 配环境，搭起来了一个 VMWare 虚拟机 CentOS7 系统的仿真环境，用共享文件夹把项目目录共享进去，这样就可以用主机的代码编辑器编辑、虚拟机里的仿真器跑仿真了。同样一个 hello world 的 case，用 verilator 跑花了 4810.42s，用 vcs 只花了 35.152s，两者相比是 136.8 倍的差距！！！感觉可以加速我的开发过程 by 一个很高的系数了。
 
-## 2025-9-18~25
+### 2025-9-18~25
 1. 刚刚开学，事情比较多！买了辆电动车（九号A2Z 40，解锁方式特别高级，只要蓝牙连上的情况下坐上车就自动解锁了。感觉可以有时间试试蓝牙中继攻击）、买了学校游泳馆年卡（1500一年还挺贵的，每个教学周游泳2.5次才能回本）等等。
 2. 加入了 0ops，准备近期先学习基础的内核 PWN 知识。主要是跟着[A3的内核利用基础](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I)进行复现，下面简单记录一下：
 - 内核利用的一种基础模式：先在内核态进行提权（执行 `commit_creds(init_cred)`），然后回到用户态拿shell。
@@ -262,5 +262,8 @@ toc_max_level: 2
     user_sp
     user_ss
   ```
-- 有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见[这个commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14)），可以利用栈上的 `pt_regs` 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 `0xffff888000000000`。具体见我 kgadget 的 exp。
+- 有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见[这个commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14)），可以利用栈上的 `pt_regs` 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 `0xffff888000000000`。具体见我 kgadget 的 exp（还没传到网上）。
+
+### 2025-9-26~28
+1. 我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见[Kernel #0: 环境配置](https://www.cameudis.com/2025/09/28/Kernel-0.html)。
 

