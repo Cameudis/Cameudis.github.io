@@ -240,6 +240,8 @@ toc_max_level: 2
 ### 2025-8-21 ~ 9-14
 放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。
 
+## 2025-9
+
 ### 2025-9-15
 1. 重新整理了一下内存加密引擎的整个思路，发现了一个看起来非常有探索价值的想法。（然后在一篇2002年的论文上找到了这个想法）
 
@@ -265,5 +267,15 @@ toc_max_level: 2
 - 有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见[这个commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14)），可以利用栈上的 `pt_regs` 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 `0xffff888000000000`。具体见我 kgadget 的 exp（还没传到网上）。
 
 ### 2025-9-26~28
-1. 我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见[Kernel #0: 环境配置](https://www.cameudis.com/2025/09/28/Kernel-0.html)。
+1. 我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见 [Kernel #0: 环境配置](https://www.cameudis.com/2025/09/28/Kernel-0.html)。
+
+### 2025-9-29
+
+Dating with liz
+
+### 2025-9-30
+
+1. 了解了一下内存的具体机制（作为PWN手终于补齐了一点相关知识吗）。参考了[这个视频 from Branch Education](https://www.bilibili.com/video/BV1vP411c7pt?spm_id_from=333.788.player.switch&vd_source=3b1d28e94aa0809d1c0c836d48c8d0ea)。
+- DDR5 内存条通常在主板上是双通道的（channel），每个通道有两个 DIMM 插槽（slot）。一个通道上除了有两对 32bits 的数据线（共同组成 64bits 的内存读写大小基本单位）（两个 sub-channel）外，还有许多其他的线负责元信息的传递，比如有地址和命令通路的 CA Bus（Address & Command Bus）（指定行、列、bank、bank group、rank、行列选通、写使能）、时钟和同步相关的线、错误报告的线、功耗管理线（PMIC，管理电压调节和功耗）、SPD线（Serial Presence Detect，每一颗 DIMM 都会带 EEPROM 存储芯片负责保存内存条的基础参数，包括大小、频率、时序、厂商、序列号等信息）等。在 DDR5 中，SPD 进化成了 SPD Hub，集成了温度传感器、功耗管理，就类似于一个元数据管理接口了。[BadRAM 攻击](https://badram.eu/)就利用了这个 SPD 芯片，通过修改里面的内存大小信息欺骗 CPU 造成 Memory Alias 从而攻破了 TEE。这种修改除了可以进行物理攻击达成外，也可以通过软件攻击：如果内存条的 SPD 芯片没有写保护（厂商没有将其锁定）的话，root 权限用户就可以直接修改 SPD 芯片中的内容。
+- 
 

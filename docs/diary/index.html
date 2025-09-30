@@ -735,6 +735,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <h3 id="2025-8-21--9-14">2025-8-21 ~ 9-14</h3>
 <p>放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。</p>
 
+<h2 id="2025-9">2025-9</h2>
+
 <h3 id="2025-9-15">2025-9-15</h3>
 <ol>
   <li>重新整理了一下内存加密引擎的整个思路，发现了一个看起来非常有探索价值的想法。（然后在一篇2002年的论文上找到了这个想法）</li>
@@ -770,7 +772,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <h3 id="2025-9-2628">2025-9-26~28</h3>
 <ol>
-  <li>我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见<a href="https://www.cameudis.com/2025/09/28/Kernel-0.html">Kernel #0: 环境配置</a>。</li>
+  <li>我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见 <a href="https://www.cameudis.com/2025/09/28/Kernel-0.html">Kernel #0: 环境配置</a>。</li>
+</ol>
+
+<h3 id="2025-9-29">2025-9-29</h3>
+
+<p>Dating with liz</p>
+
+<h3 id="2025-9-30">2025-9-30</h3>
+
+<ol>
+  <li>了解了一下内存的具体机制（作为PWN手终于补齐了一点相关知识吗）。参考了<a href="https://www.bilibili.com/video/BV1vP411c7pt?spm_id_from=333.788.player.switch&amp;vd_source=3b1d28e94aa0809d1c0c836d48c8d0ea">这个视频 from Branch Education</a>。
+    <ul>
+      <li>DDR5 内存条通常在主板上是双通道的（channel），每个通道有两个 DIMM 插槽（slot）。一个通道上除了有两对 32bits 的数据线（共同组成 64bits 的内存读写大小基本单位）（两个 sub-channel）外，还有许多其他的线负责元信息的传递，比如有地址和命令通路的 CA Bus（Address &amp; Command Bus）（指定行、列、bank、bank group、rank、行列选通、写使能）、时钟和同步相关的线、错误报告的线、功耗管理线（PMIC，管理电压调节和功耗）、SPD线（Serial Presence Detect，每一颗 DIMM 都会带 EEPROM 存储芯片负责保存内存条的基础参数，包括大小、频率、时序、厂商、序列号等信息）等。在 DDR5 中，SPD 进化成了 SPD Hub，集成了温度传感器、功耗管理，就类似于一个元数据管理接口了。<a href="https://badram.eu/">BadRAM 攻击</a>就利用了这个 SPD 芯片，通过修改里面的内存大小信息欺骗 CPU 造成 Memory Alias 从而攻破了 TEE。这种修改除了可以进行物理攻击达成外，也可以通过软件攻击：如果内存条的 SPD 芯片没有写保护（厂商没有将其锁定）的话，root 权限用户就可以直接修改 SPD 芯片中的内容。</li>
+      <li></li>
+    </ul>
+  </li>
 </ol>
 
 
@@ -800,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <h3>目录</h3>
           <div class="toc" id="toc-auto">
             
-            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li></ul>
+            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li></ul>
           </div>
         </div>
       </div>
