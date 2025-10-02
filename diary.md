@@ -296,3 +296,8 @@ Dating with liz
 - DRAM 本身的原理决定了它会不断漏电——电荷会通过连接到行选通信号的晶体管泄漏到位线上。RowHammer 通过快速地反复激活某一行（hammering），使得该行的 wordline 电压快速改变，通过电场耦合效应使相邻行的 wordline 也产生电压波动，从而导致相邻行电容电荷泄漏得更快，最终造成数据翻转（bit flip）。
 - 显然，防止漏电只要多刷新数据就行了，但粗暴地加快刷新速度会使性能和功耗大幅增加，因此更好的方法是只对频繁被访问的行以及其附近行进行刷新，这类防御手段被称为TRR（Target Row Refresh）。不同的内存条厂商都有不同的 TRR 实现方式，且都是闭源实现（毕竟是硬件领域），因此 RowHammer 的攻击者往往会通过实验来反向推测 TRR 的实现方式，从而找到绕过 TRR 的方法。这就是 [Phoenix: Rowhammer Attacks on DDR5 with Self-Correcting Synchronization](https://comsec.ethz.ch/research/dram/phoenix/) 这篇 S&P 26 论文做的事，（熟悉的）ETH Zurich COMSEC 组大哥们把海力士的 DDR5 内存条打穿了！
 
+### 2025-10-2
+
+1. 给日志目录添加了 Most Recent 功能，可以直达最新日志，方便视奸。
+2. 乐队排练
+

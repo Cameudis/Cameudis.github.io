@@ -29,11 +29,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 按页面位置排序
     headings.sort((a, b) => a.element.offsetTop - b.element.offsetTop);
-    
+
+    const lastHeading = headings[headings.length - 1];
+    const isDiaryPage = window.location.pathname.startsWith('/diary');
+    let mostRecentLink = null;
+
+    if (isDiaryPage && lastHeading) {
+      const tocContainer = document.querySelector('.toc');
+      if (tocContainer) {
+        let tocList = tocContainer.querySelector('ul');
+        if (!tocList) {
+          tocList = document.createElement('ul');
+          tocContainer.appendChild(tocList);
+        }
+
+        const existingItem = tocList.querySelector('li.toc-most-recent');
+        if (existingItem) {
+          existingItem.remove();
+        }
+
+        const listItem = document.createElement('li');
+        listItem.classList.add('toc-most-recent');
+        mostRecentLink = document.createElement('a');
+        mostRecentLink.textContent = 'Most Recent';
+        mostRecentLink.href = `#${lastHeading.id}`;
+        listItem.appendChild(mostRecentLink);
+
+        tocList.insertBefore(listItem, tocList.firstChild);
+      }
+    }
+
     function highlightCurrentSection() {
       const scrollPos = window.scrollY + 100; // 偏移量
       let current = null;
-      
+
       // 找到当前应该高亮的标题
       for (let i = 0; i < headings.length; i++) {
         if (headings[i].element.offsetTop <= scrollPos) {
@@ -47,10 +76,16 @@ document.addEventListener('DOMContentLoaded', function() {
       headings.forEach(heading => {
         heading.link.classList.remove('active');
       });
-      
+      if (mostRecentLink) {
+        mostRecentLink.classList.remove('active');
+      }
+
       // 添加当前高亮
       if (current) {
         current.link.classList.add('active');
+        if (mostRecentLink && lastHeading && current.element === lastHeading.element) {
+          mostRecentLink.classList.add('active');
+        }
       }
     }
     
