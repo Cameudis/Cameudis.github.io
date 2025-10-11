@@ -2,7 +2,7 @@
 layout: post
 title: HITCTF 2023 xv6-Trusted
 date: 2023-11-29 01:58:33
-tags: pwn riscv kernel-pwn
+tags: pwn riscv kernel
 ---
 
 第一次打内核题，虽然是xv6但还是感觉非常酷。比赛结束前才想到了真的可行的思路，赛后结合官方 writeup 调出来了。

