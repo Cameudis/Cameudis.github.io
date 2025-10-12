@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-10-12T13:34:48+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">Midnight Sun CTF 2025 Final - flop</title><link href="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" rel="alternate" type="text/html" title="Midnight Sun CTF 2025 Final - flop" /><published>2025-10-11T00:00:00+08:00</published><updated>2025-10-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop</id><content type="html" xml:base="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"><![CDATA[<h2 id="题目分析">题目分析</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-10-12T13:35:53+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y² 的博客</title><subtitle>计算机、安全和其他</subtitle><entry><title type="html">Midnight Sun CTF 2025 Final - flop</title><link href="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" rel="alternate" type="text/html" title="Midnight Sun CTF 2025 Final - flop" /><published>2025-10-11T00:00:00+08:00</published><updated>2025-10-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop</id><content type="html" xml:base="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"><![CDATA[<h2 id="题目分析">题目分析</h2>
 
 <p>由于在网上搜不到题目附件，不得不手动搭了一个环境，内核版本为 <code class="language-plaintext highlighter-rouge">6.12.27</code>，关闭 <code class="language-plaintext highlighter-rouge">KASLR</code>、<code class="language-plaintext highlighter-rouge">KPTI</code> 保护。</p>
 
@@ -205,7 +205,7 @@ flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">
   <p>所以内核是不是可以做一个保护把代码段直接不映射？</p>
 </blockquote>
 
-<h3 id="方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</h3>
+<h3 id="方法-2搜索-ramdisk-中的-flag-文件">方法 2：搜索 ramdisk 中的 flag 文件</h3>
 
 <p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
 

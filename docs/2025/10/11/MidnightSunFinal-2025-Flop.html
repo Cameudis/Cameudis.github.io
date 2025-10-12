@@ -575,7 +575,7 @@ flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">
   <p>所以内核是不是可以做一个保护把代码段直接不映射？</p>
 </blockquote>
 
-<h3 id="方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</h3>
+<h3 id="方法-2搜索-ramdisk-中的-flag-文件">方法 2：搜索 ramdisk 中的 flag 文件</h3>
 
 <p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
 
@@ -765,7 +765,7 @@ end
           <h3>目录</h3>
           <div class="toc" id="toc-auto">
             
-            <ul><li><a href="#题目分析">题目分析</a></li><li><a href="#利用">利用</a><ul><li><a href="#方法1劫持内核代码">方法1：劫持内核代码</a></li><li><a href="#方法-2搜索-ramdisk-中的-flag-文件todo">方法 2：搜索 ramdisk 中的 flag 文件（TODO）</a></li></ul></li><li><a href="#附录">附录</a></li></ul>
+            <ul><li><a href="#题目分析">题目分析</a></li><li><a href="#利用">利用</a><ul><li><a href="#方法1劫持内核代码">方法1：劫持内核代码</a></li><li><a href="#方法-2搜索-ramdisk-中的-flag-文件">方法 2：搜索 ramdisk 中的 flag 文件</a></li></ul></li><li><a href="#附录">附录</a></li></ul>
           </div>
         </div>
       </div>
