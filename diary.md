@@ -345,3 +345,11 @@ Dating with liz
 1. 推进项目，把数据加解密不一致修好了，继续修 MAC 计算。
 2. 尝试基于 [Liveblocks](https://liveblocks.io/) 和 [excalidraw](https://excalidraw.com/) 搭建在线白板，目前刚把 excalidraw 跑起来。
 
+### 2025-10-17
+
+1. 推项目。。。
+
+### 2025-10-18~19
+
+1. 打强网杯线上赛，做了一道 qemu pwn（babybus）。经历颇为曲折，本来马上就要做出来了，但周日下午乐队排练不得不放弃。晚上回实验室打了二十分钟就本地通了，真的气死我了！！！！！
+
