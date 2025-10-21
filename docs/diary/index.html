@@ -899,6 +899,27 @@ document.addEventListener('DOMContentLoaded', function() {
   <li>打强网杯线上赛，做了一道 qemu pwn（babybus）。经历颇为曲折，本来马上就要做出来了，但周日下午乐队排练不得不放弃。晚上回实验室打了二十分钟就本地通了，真的气死我了！！！！！</li>
 </ol>
 
+<h3 id="2025-10-20">2025-10-20</h3>
+
+<ol>
+  <li>推项目。。。继续修 MAC 计算。</li>
+  <li>看了 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/peng-wei">Shadows in Cipher Spaces: Exploiting Tweak Repetition in Hardware Memory Encryption</a> 这篇论文。
+    <ul>
+      <li>作者逆向了中科海光的 C86 架构芯片特有的海光安全加密虚拟化 CSV（China Secure Virtualization）技术。虽然自很久以前开始，AMD 就没有给海光授权指令集了，但是海光还是自己实现了对于 AMD-SEV 系列指令拓展的二进制级别兼容，CSV 的 v1, v2, v3 分别对应 AMD 的 SEV, SEV-ES, SEV-SNP。</li>
+      <li>CSV 的内存加密方案存在漏洞，对同一个缓存行（64B）里的四个 block（16B）理应也采用不同的 tweak value（nonce）进行加密，然而 CSV 实现中并没有做到这一点，导致了类似于 AES-ECB 存在的问题。一个是攻击者可以通过被动观察密文，找到明文相同的两个 block；另一个是攻击者可以替换或复制这四个 block 中的任意两个，等同于对明文做了替换和复制。</li>
+      <li>利用这两个原语，攻击者就可以绕过各种校验了。使用观察的原语，攻击者可以确定某个目标软件存在于物理内存的哪一个位置（确定偏移）；使用替换的原语，攻击者可以修改代码和数据（GOT 这种函数指针表就非常适合被攻击）。比如说，程序调用了一个做校验的函数，并且依靠返回值去判断是否通过了校验——这时候就可以把校验函数的指针直接替换掉，只要令返回值为 0 即可。又比如，可以在代码内部进行替换攻击（作者为此还基于 angr 写了一个简单的静态分析小工具，判断何种替换比较合法），让一个函数直接返回等等。</li>
+      <li>这个出成一个 CTF 题目应该还挺有意思的！</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2025-10-21">2025-10-21</h3>
+
+<ol>
+  <li>推进项目，发现现在都跑不完一个 case，但结束的时候波形都挺对的，怀疑是加解密出错了。但这个好像很难看波形搞，把问题留给明天的我。</li>
+  <li>看了 blackhat USA 2017 的一个 talk <a href="https://www.blackhat.com/us-17/briefings.html#breaking-the-x86-instruction-set">Breaking the x86 Instruction Set</a>。作者写了一个 x86 的指令 fuzzer，在各种不同厂商的 CPU 上发现了挺多条 undocumented 的指令，最严重的一个可以直接从 Ring3 锁定当前 CPU（一种 DOS 攻击）。作者在写这个 fuzzer 的时候，用了各种奇技淫巧，令人叹为观止。</li>
+</ol>
+
 
               </div>
 
