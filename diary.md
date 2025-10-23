@@ -367,3 +367,7 @@ Dating with liz
 1. 推进项目，发现现在都跑不完一个 case，但结束的时候波形都挺对的，怀疑是加解密出错了。但这个好像很难看波形搞，把问题留给明天的我。
 2. 看了 blackhat USA 2017 的一个 talk [Breaking the x86 Instruction Set](https://www.blackhat.com/us-17/briefings.html#breaking-the-x86-instruction-set)。作者写了一个 x86 的指令 fuzzer，在各种不同厂商的 CPU 上发现了挺多条 undocumented 的指令，最严重的一个可以直接从 Ring3 锁定当前 CPU（一种 DOS 攻击）。作者在写这个 fuzzer 的时候，用了各种奇技淫巧，令人叹为观止。
 
+### 2025-10-22~23
+
+1. 死命推进项目，狂看波形图，终于把最大的一个 case 跑通了，可以继续开发！
+
