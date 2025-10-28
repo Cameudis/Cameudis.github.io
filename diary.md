@@ -371,3 +371,23 @@ Dating with liz
 
 1. 死命推进项目，狂看波形图，终于把最大的一个 case 跑通了，可以继续开发！
 
+### 2025-10-24
+
+1. 去参加了 Geekcon 2025，见到了很多前辈。Geekcon 是表演性质为主的，有些攻击涉及的技术细节很少（威胁模型都没有讲清楚），看着不是很得劲；还有一些过于专业的我也没怎么听懂（比如讲 windows NTFS log 漏洞的俄罗斯哥们和 sakura 讲的 V8 Null 漏洞）。场地是徐汇龙华机场直升机坪，一块很大很开阔的地方，舞台的背后就是浦东的高楼大厦，头顶是蓝天白云，非常非常漂亮。今天哈里森也来了，于是开始怀念大二暑假在期智研究院实习，吃好饭就来这个江边散步聊天的日子了。当时是从外面看直升机坪，现在是从里面看外面的栈道。
+- 谷歌安卓红队（Google Android Redteam）的大哥来分享了他们挖掘 Android 蓝牙协议栈漏洞的经验，slide 见 [这里](https://androidoffsec.withgoogle.com/slides/art_bluetooth_offensivecon.pdf)。我觉得他们的 methodology 值得参考，把手动审计、动态分析（fuzzing）和静态分析都用上了，但各侧重于不同类型的漏洞。手动审计在 2025 年依然是寻找高复杂性或者重要漏洞的最有效方法，他们一半的漏洞都是审计出来的；尤其是逻辑漏洞、Race Condition 漏洞、涉及多个组件交互的漏洞，这几种必须要审计才能找出来；不过缺点就是需要专业知识、需要很多时间（一次性成本）且不能批量化寻找。动态分析就是一直跑着（跑在谷歌内部的 fuzzing infra 上），他们会根据不同目标选择使用或开发不同的 fuzzer。此外，静态分析（CodeQL 找到了两个漏洞）这边感觉就没啥特别的了，主要就是 OOB 数组访问比较容易分析出来。
+- sakura 大佬强调了攻击面选择的重要性，我觉得非常有道理。
+
+### 2025-10-25~26
+
+1. 待在家里看书。
+2. 借 XCTF Final 一道题学习了一下 Intel VMX 拓展（Virtual Machine eXtension）（[参考文章之一](https://calinyara.github.io/technology/2019/08/05/asor-hypervisor.html)），学了一些新的内核调试技巧（比如 `add-symbol-file`, `hbreak`）。（但题目没有做出来，不过到最后也没人做出来就是了）
+
+### 2025-10-27~28
+
+1. 看了 [RMPocalypse: How a Catch-22 Breaks AMD SEV-SNP](https://www.shwetashinde.org/publications/rmpocalypse_ccs25.pdf) 这篇论文。
+- AMD SEV-SNP 中引入的 RMP（Reverse Map Table）是一个非常关键的设计，作为一个反向的页表，记录了每个物理页的属性权限以及对应的 Guest Physical Page 映射。有了这个表，恶意的 hypervisor 就不能写入 PSP（Platform Security Processor）私有的页面和 CVM 私有的页面。RMP 同时也起到保护自己的作用，将自己所在的物理页面标记成 hypervisor 不可写的状态，阻止自己被修改。RMP 也会被缓存到各级缓存和 TLB 中，在鉴权时多数情况下会直接从 TLB 中拿配置而不是访问物理内存中的 RMP 表。（从这个设计可以看出，每次 PSP 对进行 RMP 更新时都应该强制刷新一波所有处理器中的 TLB 数据，才是安全的）
+- SEV 是在主机开机以后，由 x86 核通过 MMIO 寄存器的 API 向 PSP 发送指令来启动的，PSP 中的固件（部分源码见 [AMD-ASPFW](https://github.com/amd/AMD-ASPFW/tree/main)）会初始化 RMP 表，写入自保护条目。在初始化前，hypervisor 是可以自由控制所有的物理内存的；而在初始化结束后，我们期望 RMP 条目生效，禁止 hypervisor 去访问这块内存。然而，初始化并非一个原子的操作，需要时间来完成，因此 PSP 设计上会在初始化 RMP 前打开两道屏障阻止 hypervisor 对 RMP 区域进行写入——一道位于 x86 核内，一道（TMR,Trusted Memory Region）位于内存控制器附近（Data Fabric 上）。在初始化完毕后，这两道屏障会被取消，因为此时已开启自保护的 RMP 对所有 x86 核都开始生效，不再需要额外的保护。
+- 作者发现，他只要在初始化 SEV 的时候搞一个循环疯狂写入 RMP，就特么真的能写入 RMP，什么大力出奇迹？只要在此时把 RMP 自保护的条目干掉，整个 RMP 也就可以被干掉了，从而可以完全攻破 SEV-SNP。
+- 根据作者的实验和猜测，整个问题是 PSP 对于 x86 核的屏障未生效所导致的。（根据推测，）x86 核在循环写入时，实际上会写入 cache 内部的一个 缓存行；在 RMP初始化完毕、TMR 被关闭后，这个 dirty cache line 被从缓存中踢出，顺利地写入了内存，从而攻破了 RMP。有点竞争条件和时间差的感觉？但条件非常不苛刻以至于这个攻击的成功率很高。
+- 这个文章告诉我们涉及缓存、缓存一致性的系统，想做好权限限制也是非常复杂且容易出错的；另外搞安全的就是不能盲信文档，要亲身去确认文档里提到各种安全的设计到底有没有把安全实现落地出来。
+
