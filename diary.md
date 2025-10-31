@@ -391,3 +391,24 @@ Dating with liz
 - 根据作者的实验和猜测，整个问题是 PSP 对于 x86 核的屏障未生效所导致的。（根据推测，）x86 核在循环写入时，实际上会写入 cache 内部的一个 缓存行；在 RMP初始化完毕、TMR 被关闭后，这个 dirty cache line 被从缓存中踢出，顺利地写入了内存，从而攻破了 RMP。有点竞争条件和时间差的感觉？但条件非常不苛刻以至于这个攻击的成功率很高。
 - 这个文章告诉我们涉及缓存、缓存一致性的系统，想做好权限限制也是非常复杂且容易出错的；另外搞安全的就是不能盲信文档，要亲身去确认文档里提到各种安全的设计到底有没有把安全实现落地出来。
 
+### 2025-10-29~30
+
+1. 给项目整理了阶段性的文档，还有一些杂七杂八的事情。
+
+### 2025-10-31
+
+1. 学习了 SLUB 分配器的基础，主要参考 [Linux 内核内存管理浅析 III - Slub Allocator](https://arttnba3.cn/2023/02/24/OS-0X04-LINUX-KERNEL-MEMORY-6.2-PART-III/) 。
+- Linux 的主要的内存分配系统是 Buddy System，最小的分配单元是页；slub 分配器是小对象的分配系统，和 ptmalloc 的差异是 slub 分配器为分配“某种特定大小”的结构体做了特化。在 ptmalloc 中，所有大小的堆块都处于同一个堆里面，因此有了复杂的堆块寻址和 size 记录机制，需要在每个堆块前面记录 metadata；在 slub 分配器中，一个 slub（对应一个页或多个连续页，或者说一个 `folio`）只用来分配一种特定大小、甚至一种特定结构体的内存，因此在堆块处不用记录什么 size metadata，也不需要什么复杂的双链表机制，只需要用一个单链表把 freelist 串起来就行了。
+- 一个 slub 对应 $$2^n$$ 个连续页，对应的 `struct slab` 结构体[复用了 `folio` 结构体](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L122)，因此内核中可以方便地从一个 slub 中对象得到地址计算出其所属的 slab 结构体的地址（比如说借助 [`virt_to_slab`](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L211)）。之所以 slub 分配器的却使用 `struct slab` 作为结构体名，是因为本来这套分配器就叫做 slab，现在的 slub 分配器是改进/优化版本的 slab 分配器，所以结构体还是复用了以前的名字。（[这个 Robert Love 的 quora 回答](https://www.quora.com/Linux-Kernel/What-are-the-factors-in-choosing-among-the-different-memory-allocators-in-the-Linux-kernel)简单地介绍了 slab、slob 和 slub 分配器的不同）
+- 之前提到 slub 分配器会为某个大小甚至某个特定结构体维护独立的分配器，[`kmem_cache` 结构体](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slub_def.h#L98)就承担了这个重任。一个 `kmem_cache` 用来分配一种特定的对象，`struct kmem_cache` 中就记录了 `size`、`object_size`、`allocflags`、`ctor`（初始化函数）等对象相关信息；同时，`kmem_cache` 也会记录自己的所有 slab 们（以及他们的信息，比如 `struct kmem_cache_order_objects oo` 描述了一张 slab 上的对象数量和 slab 的 order），但这些 slab 会分成两部分，一部分是 per-cpu 的（放在 `kmem_cache_cpu` 结构体中），另一部分是各种核都可以用的（放在 `kmem_cache_node` 结构体中，又分为不同的 node，这里的 node 指的是 NUMA node，见 [What is NUMA?](https://www.kernel.org/doc/html/latest/mm/numa.html)）。
+- [`kmem_cache_cpu`](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slub_def.h#L50) 是“快速分配通道”，因为是 per-cpu 的所以支持无锁分配。里面几个关键域包括：`freelist` 指向下一个可用的 object、`slab` 指向所属的 slab 实例、`partial` 是当前 cpu 拥有的半空 slab 组成的链表。当 `freelist` 是一个 null ptr，分配器就知道该换一个 slab 了，于是会从 `partial` 再找一个；如果 `partial` 也空了，那就需要从后备内存池 `kmem_cache_node` 拿 slab。
+- [`kmem_cache_node`](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L776) 是一个 node 拥有的后备 slab 池，里面一些关键域包括：`list_lock` 锁、`partial` 和 `nr_partial` 记录半空 slab、`full` 记录已满的 slab、`nr_slabs` 记录总 slab 数量等等。
+- 内核会出厂自带一些 `kmem_cache`，他们都分为不同的类型（类型 enum 见[这里](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slab.h#L363)）。比如分配 flag 为 `GFP_NORMAL` 的通用内存池 `kmalloc-*`、用于 DMA 的内存池 `kmem-dma-*`等；cgroups 为了限制资源，也会创建自己的内存池 `kmalloc-cg-*`。通过 `ls /sys/kernel/slab/` 可以看到系统上所有活跃的 `kmem_cache` 的具体信息、触发一些操作（比如可以用 `echo 1 > /sys/kernel/slab/dentry/shrink` 强制释放空闲的 slab），也可以用 `cat /proc/slabinfo` 打开汇总的大表格。
+- `kmem_cache` 复用机制：许多时候内核代码会新建自己的 `kmem_cache`，但如果内核发现可以复用已有的 `kmem_cache`，就会直接将其返回。
+- 内核中有一些关于 SLUB 的加强，相关配置见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L193)。`CONFIG_SLAB_FREELIST_HARDENED` 会将 freelist 指针变成 `ptr ^ ptr_addr ^ kmem_cache->random`，代码见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/slub.c#L494)；`CONFIG_SLAB_FREELIST_RANDOM` 会在初始化 slab 的 freelist 时将顺序打乱（但运行时还是典型的单链表先入先出操作）（说明见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L229)）；`CONFIG_RANDOM_KMALLOC_CACHES`（默认不开启）会为同一个类型的对象准备多个 `kmem_cache` ，在分配内存时基于代码地址（没错是 code address）选择其中一个 `kmem_cache` 进行分配，这样可以让攻击者堆喷难度加强一大截（不仅要选对 size 和 flag，还要喷到目标 `kmem_cache` 里去）。
+2. 调了调 RWCTF2022 Digging into kernel 这道题，主要参考 [Kernel Heap - Arbitrary-Address Allocation](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x07-Kernel-Heap-Arbitrary-Address-Allocation)。
+- 内存分配到某个全局变量（或者多个线程可能同时访问）的时候要注意有没有加锁，这样的 Race Condition 很常见。
+- 在内核“堆基址” `page_offset_base + 0x9d000` 处存放着 `secondary_startup_64` 函数的地址，可以用于泄漏出堆基址后泄漏内核基址。
+- 内核 UAF -> 任意地址分配比 ptmalloc 简单多了，只需要把 `next` 劫持成想要的地方就行。但需要注意分配器会把目标块的前八个字节当作 `next` 指针更新到 `freelist` 变量中，因此最好目标块前八字节都是 NULL Byte，这会让分配器去搞一个新的 slab 出来。
+- 常见的任意写提权方法是把 `modprobe_path` 变量覆盖成用户恶意脚本的文件系统路径（虽然不能在里面 `cat flag` 但可以 `chmod 777 flag`），如果内核编译选项中没有设置 `CONFIG_BINFMT_MISC=n` 的话，用户只要执行一个神秘文件头（比如 `\xff\xff\xff\xff`）的文件，就会去调用恶意脚本了。
+
