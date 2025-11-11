@@ -412,3 +412,30 @@ Dating with liz
 - 内核 UAF -> 任意地址分配比 ptmalloc 简单多了，只需要把 `next` 劫持成想要的地方就行。但需要注意分配器会把目标块的前八个字节当作 `next` 指针更新到 `freelist` 变量中，因此最好目标块前八字节都是 NULL Byte，这会让分配器去搞一个新的 slab 出来。
 - 常见的任意写提权方法是把 `modprobe_path` 变量覆盖成用户恶意脚本的文件系统路径（虽然不能在里面 `cat flag` 但可以 `chmod 777 flag`），如果内核编译选项中没有设置 `CONFIG_BINFMT_MISC=n` 的话，用户只要执行一个神秘文件头（比如 `\xff\xff\xff\xff`）的文件，就会去调用恶意脚本了。
 
+## 2025-11
+
+### 2025-11-01~02
+
+1. 买了 stm32 玩，点亮了小灯。
+
+### 2025-11-03~04
+
+1. 看了 [Heracles: Chosen Plaintext Attack on AMD SEV-SNP](https://heracles-attack.github.io/Heracles-CCS2025.pdf) 这篇论文。
+- 在 AMD SEV-SNP 中，攻击者可以读取 CVM 内存数据的密文（之所以有这种设计，应该是为了简化内存读涉及的硬件通路，使性能更好）、可以调用 PSP 提供的 API 去把 CVM 的页移动到另一个位置（这种设计是方便 hypervisor 对物理内存做去碎片化）。因此，攻击者是可以做选择明文攻击，即攻击者能够通过把自己控制的 CVM 页面（明文已知）移动到目标地址处，来使用目标 tweak 值（或者说加密 oracle）加密明文，获得密文。
+- 在选择明文攻击的基础上，如果目标密文/明文的状态空间很小，就可以进行字典攻击：预先把所有可能的明文都使用目标加密 oracle 进行加密，得到 密文->明文 的映射字典，这样只需要观察密文并对照，就可以知道对应的明文数据。
+- 这篇工作就关注如何缩小明文的状态空间。作者表示有一类数据结构非常适合进行这种选择明文字典攻击：一个个字符读数据的全零 Buffer，结合已有的单步执行 CVM 的攻击（[SEV-Step](https://github.com/sev-step/sev-step)，基本原理就是用 APIC Timer 给 CVM 发中断让它停下来），攻击者可以让程序每次读一个数据就停下来，此时整个 AES block（128bits）只有一个字节未知，可以当场进行爆破；并不断重复这个过程。利用这种方法就可以泄漏 bash、sudo 这种读取输入的程序读取到的数据。
+- 还有一种技巧：可以把某段数据一个字节一个字节“顶”到缓存行开头，同样对单字节进行爆破。这有点像想要知道 AES 加密数据的明文具体长度时，观察添加到第几个字符的时候密文多了一个 block（当然，这也取决于 AES padding mode）。
+- 除此以外，还有一些状态空间本来就很小的变量，比如计数器（变化规律已知）等，可以直接爆破。
+
+### 2025-11-05~10
+
+Dating in HongKong with liz♡....
+
+### 2025-11-11
+
+1. 整理了一下强网杯的 babybus writeup，写成了博客：[强网杯线上赛 2025 babybus](http://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html)。
+2. 看了 [TDXploit: Novel Techniques for Single-Stepping and Cache Attacks on Intel TDX](https://www.usenix.org/conference/usenixsecurity25/presentation/rauscher) 这篇论文。
+- 传统的 TEE VM 单步执行都依靠 APIC Timer 的中断注入，Intel TDX 对这种攻击做了防护。在 TDX 系统上，收到中断的 TD（VM）控制流会首先交给 TDX Module（可信模块软件），由它进行处理。TDX Module 会尝试使用两种方法检测单步执行攻击，首先会尝试通过性能计数器去检测上一次 VM Enter 后执行的指令数量，如果过少就认为是单步执行攻击，这个防御相对新，叫做 Instruction-Count SingleStep Defense (ICSSD)；如果是没有支持 ICSSD 的系统，TDX Module 会通过时间 + RIP 变化的启发式条件来判断是否可能是单步执行攻击。如果 TDX Module 判定正在遭受攻击，它会控制 TD 执行 k（$$k \in [1, 32]$$）步后再返回 VMM，k 由一个 LFSR 生成。
+- 这里的问题在于：使用的 LFSR 并非是一个随机数生成器，攻击者如果知道其状态，就可以预测其后续的输出；此外，TDX Module 使用的 LFSR 并不是每个 TD 所独有的，而是一个 core 所运行的所有 TD 都会共用的（也可以说是一个 core 私有的，但这就会有混淆的问题，which 再次提醒我们涉及到多核同步、上下文切换的问题是多么 tricky），因此攻击者完全可以在自己的恶意 TD 帮助下，还原当前 core 的 LFSR 状态，然后等 LFSR roll 到 1 的时候去执行 Victim VM，从而达成“让 TDX Module 帮我单步执行”的攻击效果。这种攻击非常稳定，甚至还可以多步执行，很有意思～
+- 这个故事告诉我们，LFSR 这种伪随机数生成器，由于循环的特性，不可避免地非常容易受到攻击。在有条件的情况下（非性能攸关，比如非硬件层面）还是应该使用更好的随机数生成器（RNG，Random Number Generator）。
+
