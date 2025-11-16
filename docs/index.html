@@ -358,72 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="wrapper">
         <div class="home"><script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 
-<!--
-<style>
-  .ascii-container {
-    position: relative;
-    display: inline-block;
-    font-family: 'Courier New', monospace;
-    white-space: pre;
-    line-height: 1;
-    font-size: 4px;
-    background: #000;
-    padding: 0px 20px;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .ascii-art {
-    position: relative;
-    z-index: 2;
-    color: #fff;
-    transition: none;
-    /* text-shadow: 0 0 10px rgba(255, 255, 255, 0.6),
-                 0 0 20px rgba(255, 255, 255, 0.4),
-                 0 0 30px rgba(211, 211, 211, 0.3); */
-  }
-  
-  .ascii-glow {
-    position: absolute;
-    top: -20%;
-    left: -20%;
-    right: -20%;
-    bottom: -20%;
-    z-index: 1;
-    background: linear-gradient(75deg, 
-                                transparent 0%,
-                                rgba(255, 255, 255, 0) calc(var(--mouse-x, 50%) - 120px), 
-                                rgba(255, 255, 255, 0.1) calc(var(--mouse-x, 50%) - 80px), 
-                                rgba(255, 255, 255, 0.6) calc(var(--mouse-x, 50%) - 40px), 
-                                rgba(255, 255, 255, 0.9) var(--mouse-x, 50%), 
-                                rgba(255, 255, 255, 0.6) calc(var(--mouse-x, 50%) + 40px), 
-                                rgba(255, 255, 255, 0.1) calc(var(--mouse-x, 50%) + 80px), 
-                                rgba(255, 255, 255, 0) calc(var(--mouse-x, 50%) + 120px),
-                                transparent 100%);
-    filter: blur(5px);
-    opacity: 1;
-    pointer-events: none;
-    transform: skewX(-30deg);
-  }
-</style>
-
-<div class="ascii-container" id="asciiContainer1">
-  <div class="ascii-art">
-▄████████    ▄████████   ▄▄▄▄███▄▄▄▄      ▄████████ ███    █▄  ████████▄   ▄█     ▄████████ 
-███    ███   ███    ███ ▄██▀▀▀███▀▀▀██▄   ███    ███ ███    ███ ███   ▀███ ███    ███    ███ 
-███    █▀    ███    ███ ███   ███   ███   ███    █▀  ███    ███ ███    ███ ███▌   ███    █▀  
-███          ███    ███ ███   ███   ███  ▄███▄▄▄     ███    ███ ███    ███ ███▌   ███        
-███        ▀███████████ ███   ███   ███ ▀▀███▀▀▀     ███    ███ ███    ███ ███▌ ▀███████████ 
-███    █▄    ███    ███ ███   ███   ███   ███    █▄  ███    ███ ███    ███ ███           ███ 
-███    ███   ███    ███ ███   ███   ███   ███    ███ ███    ███ ███   ▄███ ███     ▄█    ███ 
-████████▀    ███    █▀   ▀█   ███   █▀    ██████████ ████████▀  ████████▀  █▀    ▄████████▀  
-  </div>
-  <div class="ascii-glow" id="asciiGlow"></div>
-</div>
-<br>
--->
-
-<p>欢迎来到 <strong>Y²</strong> (a.k.a <strong>cameudis</strong>) 的博客！我是<span id="im"></span></p>
+<p>欢迎来到 <strong>Y²</strong> (a.k.a <strong>cameudis</strong>) 的博客！我是一个<span id="im"></span></p>
 
 <p>你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （&lt;ゝω・）☆&gt;</p>
 
@@ -433,28 +368,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // Typed.js 初始化
   var typed = new Typed('#im', {
     strings: [
-        '一个计算机爱好者。',
-        '一个复旦大学->上海交通大学学生。',
-        '一个鼓手。',
+        '计算机爱好者。',
+        '苦逼研究生。',
+        '鼓手。',
         '一个一个。',
     ],
-    typeSpeed: 50,
+    typeSpeed: 60,
     backSpeed: 50,
     backDelay: 2500,
     loop: true,
   });
-
-  /*
-  const container1 = document.getElementById('asciiContainer1');
-  
-  document.addEventListener('mousemove', (e) => {
-    const rect = container1.getBoundingClientRect();
-    
-    const relativeX = e.clientX - 0.75 * rect.left;
-    
-    container1.style.setProperty('--mouse-x', relativeX + 'px');
-  });
-  */
 </script>
 
 <h2 class="post-list-heading">Posts</h2>

@@ -160,6 +160,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:创建新数据库": false,
       "switcher:打开快速切换": false,
       "graph:查看关系图谱": false,
       "canvas:新建白板": false,
@@ -170,9 +171,10 @@
   },
   "active": "0fe3e3a546eb37e3",
   "lastOpenFiles": [
+    "作业.md",
+    "diary.md",
     "diary.md~",
     "link.md",
-    "diary.md",
     "docs/assets/js/post.js",
     "docs/assets/js",
     "assets/js/post.js",

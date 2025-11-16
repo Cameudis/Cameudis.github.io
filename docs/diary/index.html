@@ -867,8 +867,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <ol>
   <li>继续看之前提到的 Phoenix 论文，看了看他们的逆向方法。我的理解是：对于rowhammer攻击，我们可以假设“逆向工程TRR机制对于rowhammer攻击有帮助”，但不能通过硬件逆向得到TRR机制（难度太高）；于是我们只能猜测：TRR内部存在一个复杂的状态机，控制采样和主动刷新。我们现在提供一组“普通”的hammer payload，广泛地对各个位置进行hammer。按照我们的假设，只要是状态机，那么一定会存在重复的行为、而且一定会有主动刷新的次数变化。因此，我们可以借助这个普通payload，用完全黑盒的方法测出TRR机制的盲点。为什么TRR会存在这种盲点？其实我们在做实验之前不能完全确定，但是实验结果告诉我们是存在的，因此就不用管到底为什么会存在这种盲点了！</li>
-  <li>看了看 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/roudot">Narrowbeer: A Practical Replay Attack Against the Widevine DRM</a>，了解了一下什么是 DRM（Digital Rights Management，数字版权管理）。DRM 是一种概念（有点类似 TEE 也是一种概念），用来指代用来防止数字内容盗版的技术。现在的很多流媒体网站（比如国内爱奇艺、国外 Netflix、Youtube等）都有自己的防盗版措施，基本上就是在不可信的信道上保持内容处于加密状态，并且在客户端的安全处再进行解密和播放。当然，客户端这边也不代表安全，毕竟客户端这边非常有可能是一个具有 root 权限的黑客，所以根据客户端能达到的安全级别，DRM 又会划分成不同的 level，提供不同高清程度的视频（一种纵深防御）。比如 Widevine 的 L1 表示客户端支持在 TEE 中解密和播放视频，具有非常高的安全性，所以也会提供最高清的视频；而 L3 就表示客户端是纯软件实现的，安全性很低，所以只能提供标清的视频。Narrowbeer 这篇论文主要从 Widevine L1 软件的证书相关处理入手，发现只要 hook 住随机数生成和时间戳获取的相关函数，就可以让 Widevine 误以为证书是合法且未过期的。感觉这个破解其实应该出现在吾爱破解的精华帖上，不应该出现在 USENIX 上（？）。</li>
-  <li>看了 <a href="https://wiretap.fail/">WireTap</a> 攻击，在 Intel 的服务器 SGX 上恢复得到了 attestation key。主要利用了三点：
+  <li>看了看 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/roudot">Narrowbeer: A Practical Replay Attack Against the Widevine DRM</a>（USENIX Sec 25），了解了一下什么是 DRM（Digital Rights Management，数字版权管理）。DRM 是一种概念（有点类似 TEE 也是一种概念），用来指代用来防止数字内容盗版的技术。现在的很多流媒体网站（比如国内爱奇艺、国外 Netflix、Youtube等）都有自己的防盗版措施，基本上就是在不可信的信道上保持内容处于加密状态，并且在客户端的安全处再进行解密和播放。当然，客户端这边也不代表安全，毕竟客户端这边非常有可能是一个具有 root 权限的黑客，所以根据客户端能达到的安全级别，DRM 又会划分成不同的 level，提供不同高清程度的视频（一种纵深防御）。比如 Widevine 的 L1 表示客户端支持在 TEE 中解密和播放视频，具有非常高的安全性，所以也会提供最高清的视频；而 L3 就表示客户端是纯软件实现的，安全性很低，所以只能提供标清的视频。Narrowbeer 这篇论文主要从 Widevine L1 软件的证书相关处理入手，发现只要 hook 住随机数生成和时间戳获取的相关函数，就可以让 Widevine 误以为证书是合法且未过期的。感觉这个破解其实应该出现在吾爱破解的精华帖上，不应该出现在 USENIX 上（？）。</li>
+  <li>看了 <a href="https://wiretap.fail/">WireTap</a> 攻击（CCS 25），在 Intel 的服务器 SGX 上恢复得到了 attestation key。主要利用了三点：
     <ul>
       <li>（第一点）基本上所有 TEE 都将物理内存分配的任务交给 hypervisor，因此在不做主动随机化防御的情况下，一个 hypervisor 可以将 TA 的一个变量精确控制到某一个物理地址。（可能需要许多工程上的努力）</li>
       <li>（第二点）部署在至强服务器上的 SGX 和原来的不同，叫做 Scalable SGX，最多支持 512G 内存，这是以取消了完整性树为代价换来的。没了完整性树之后，不存在 ctr 这种东西，因此相同的密文在固定的物理地址上一定会对应一个固定的密文。</li>
@@ -903,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <ol>
   <li>推项目。。。继续修 MAC 计算。</li>
-  <li>看了 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/peng-wei">Shadows in Cipher Spaces: Exploiting Tweak Repetition in Hardware Memory Encryption</a> 这篇论文。
+  <li>看了 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/peng-wei">Shadows in Cipher Spaces: Exploiting Tweak Repetition in Hardware Memory Encryption</a> 这篇论文（USENIX Sec 25）。
     <ul>
       <li>作者逆向了中科海光的 C86 架构芯片特有的海光安全加密虚拟化 CSV（China Secure Virtualization）技术。虽然自很久以前开始，AMD 就没有给海光授权指令集了，但是海光还是自己实现了对于 AMD-SEV 系列指令拓展的二进制级别兼容，CSV 的 v1, v2, v3 分别对应 AMD 的 SEV, SEV-ES, SEV-SNP。</li>
       <li>CSV 的内存加密方案存在漏洞，对同一个缓存行（64B）里的四个 block（16B）理应也采用不同的 tweak value（nonce）进行加密，然而 CSV 实现中并没有做到这一点，导致了类似于 AES-ECB 存在的问题。一个是攻击者可以通过被动观察密文，找到明文相同的两个 block；另一个是攻击者可以替换或复制这四个 block 中的任意两个，等同于对明文做了替换和复制。</li>
@@ -947,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <h3 id="2025-10-2728">2025-10-27~28</h3>
 
 <ol>
-  <li>看了 <a href="https://www.shwetashinde.org/publications/rmpocalypse_ccs25.pdf">RMPocalypse: How a Catch-22 Breaks AMD SEV-SNP</a> 这篇论文。
+  <li>看了 <a href="https://www.shwetashinde.org/publications/rmpocalypse_ccs25.pdf">RMPocalypse: How a Catch-22 Breaks AMD SEV-SNP</a> 这篇论文（CCS 25）。
     <ul>
       <li>AMD SEV-SNP 中引入的 RMP（Reverse Map Table）是一个非常关键的设计，作为一个反向的页表，记录了每个物理页的属性权限以及对应的 Guest Physical Page 映射。有了这个表，恶意的 hypervisor 就不能写入 PSP（Platform Security Processor）私有的页面和 CVM 私有的页面。RMP 同时也起到保护自己的作用，将自己所在的物理页面标记成 hypervisor 不可写的状态，阻止自己被修改。RMP 也会被缓存到各级缓存和 TLB 中，在鉴权时多数情况下会直接从 TLB 中拿配置而不是访问物理内存中的 RMP 表。（从这个设计可以看出，每次 PSP 对进行 RMP 更新时都应该强制刷新一波所有处理器中的 TLB 数据，才是安全的）</li>
       <li>SEV 是在主机开机以后，由 x86 核通过 MMIO 寄存器的 API 向 PSP 发送指令来启动的，PSP 中的固件（部分源码见 <a href="https://github.com/amd/AMD-ASPFW/tree/main">AMD-ASPFW</a>）会初始化 RMP 表，写入自保护条目。在初始化前，hypervisor 是可以自由控制所有的物理内存的；而在初始化结束后，我们期望 RMP 条目生效，禁止 hypervisor 去访问这块内存。然而，初始化并非一个原子的操作，需要时间来完成，因此 PSP 设计上会在初始化 RMP 前打开两道屏障阻止 hypervisor 对 RMP 区域进行写入——一道位于 x86 核内，一道（TMR,Trusted Memory Region）位于内存控制器附近（Data Fabric 上）。在初始化完毕后，这两道屏障会被取消，因为此时已开启自保护的 RMP 对所有 x86 核都开始生效，不再需要额外的保护。</li>
@@ -1000,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <h3 id="2025-11-0304">2025-11-03~04</h3>
 
 <ol>
-  <li>看了 <a href="https://heracles-attack.github.io/Heracles-CCS2025.pdf">Heracles: Chosen Plaintext Attack on AMD SEV-SNP</a> 这篇论文。
+  <li>看了 <a href="https://heracles-attack.github.io/Heracles-CCS2025.pdf">Heracles: Chosen Plaintext Attack on AMD SEV-SNP</a> 这篇论文（CCS 25）。
     <ul>
       <li>在 AMD SEV-SNP 中，攻击者可以读取 CVM 内存数据的密文（之所以有这种设计，应该是为了简化内存读涉及的硬件通路，使性能更好）、可以调用 PSP 提供的 API 去把 CVM 的页移动到另一个位置（这种设计是方便 hypervisor 对物理内存做去碎片化）。因此，攻击者是可以做选择明文攻击，即攻击者能够通过把自己控制的 CVM 页面（明文已知）移动到目标地址处，来使用目标 tweak 值（或者说加密 oracle）加密明文，获得密文。</li>
       <li>在选择明文攻击的基础上，如果目标密文/明文的状态空间很小，就可以进行字典攻击：预先把所有可能的明文都使用目标加密 oracle 进行加密，得到 密文-&gt;明文 的映射字典，这样只需要观察密文并对照，就可以知道对应的明文数据。</li>
@@ -1013,13 +1013,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <h3 id="2025-11-0510">2025-11-05~10</h3>
 
-<p>Dating in HongKong with liz♡….</p>
+<p>家里有事。</p>
 
 <h3 id="2025-11-11">2025-11-11</h3>
 
 <ol>
   <li>整理了一下强网杯的 babybus writeup，写成了博客：<a href="http://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html">强网杯线上赛 2025 babybus</a>。</li>
-  <li>看了 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/rauscher">TDXploit: Novel Techniques for Single-Stepping and Cache Attacks on Intel TDX</a> 这篇论文。
+  <li>看了 <a href="https://www.usenix.org/conference/usenixsecurity25/presentation/rauscher">TDXploit: Novel Techniques for Single-Stepping and Cache Attacks on Intel TDX</a> 这篇论文（USENIX Security 25）。
     <ul>
       <li>传统的 TEE VM 单步执行都依靠 APIC Timer 的中断注入，Intel TDX 对这种攻击做了防护。在 TDX 系统上，收到中断的 TD（VM）控制流会首先交给 TDX Module（可信模块软件），由它进行处理。TDX Module 会尝试使用两种方法检测单步执行攻击，首先会尝试通过性能计数器去检测上一次 VM Enter 后执行的指令数量，如果过少就认为是单步执行攻击，这个防御相对新，叫做 Instruction-Count SingleStep Defense (ICSSD)；如果是没有支持 ICSSD 的系统，TDX Module 会通过时间 + RIP 变化的启发式条件来判断是否可能是单步执行攻击。如果 TDX Module 判定正在遭受攻击，它会控制 TD 执行 k（\(k \in [1, 32]\)）步后再返回 VMM，k 由一个 LFSR 生成。</li>
       <li>这里的问题在于：使用的 LFSR 并非是一个随机数生成器，攻击者如果知道其状态，就可以预测其后续的输出；此外，TDX Module 使用的 LFSR 并不是每个 TD 所独有的，而是一个 core 所运行的所有 TD 都会共用的（也可以说是一个 core 私有的，但这就会有混淆的问题，which 再次提醒我们涉及到多核同步、上下文切换的问题是多么 tricky），因此攻击者完全可以在自己的恶意 TD 帮助下，还原当前 core 的 LFSR 状态，然后等 LFSR roll 到 1 的时候去执行 Victim VM，从而达成“让 TDX Module 帮我单步执行”的攻击效果。这种攻击非常稳定，甚至还可以多步执行，很有意思～</li>
@@ -1028,6 +1028,44 @@ document.addEventListener('DOMContentLoaded', function() {
   </li>
 </ol>
 
+<h3 id="2025-11-1213">2025-11-12~13</h3>
+
+<ol>
+  <li>大致了解了 <a href="https://eprint.iacr.org/2013/280.pdf">Path ORAM</a> 的工作模式。
+    <ul>
+      <li>ORAM（Oblivious RAM）是一种防护机制，阻止攻击者通过观察内存访问的模式（pattern）、地址、频次等信息推断出程序的运行状态（也是一种侧信道）。ORAM 的最终目标是让攻击者看不到内存读写的地址、访问频率、访问间数据依赖关系、访问模式（随机访问/顺序访问）、读写种类。</li>
+      <li>Path ORAM 是一种经典的（1400 次引用！）ORAM 方案，由位于不可信外部存储的一颗二叉树（用于存储数据）、位于可信存储（称为客户端）的一个 Position Table（用于记录数据的原地址到树上对应叶子的映射，记录叶子编号意味着这个数据 block 可能出现于树根到这片叶子的路径上的任意一个节点中，所以这种方案被称为 Path ORAM）和一个 Stash（用于暂存读来的数据）组成。</li>
+      <li>二叉树上的每个节点都可以保存多个数据 block，因此被称为 Bucket。里面保存的所有数据都是密文，且加密算法是随机化的对称加密模式（带 freshness 机制），被取回后再加密会得到不同的密文。</li>
+      <li>在访问某数据时，首先查 Position Table 得到对应叶节点编号，然后从树中取出一整条路径的数据放到 Stash 中。Stash 中除了保存数据的值，也会记录对应的叶子节点。此时就可以对 Stash 中的对应数据块进行读写了。读写完成后，这个数据 block 就会随机归属到一个新的叶片。写回阶段会一个个读取 Stash 中的数据 block，如果属于刚取出的那条路径，就会贪心地把它放到节点上，从叶片开始。（如果 Stash 中 block 不足会使用 PRNG 生成 dummy block 放进去）</li>
+      <li>加密算法在每次读取写入内存时，都会用不同的 nonce 进行加密，因此攻击者完全不知道写回一整条 path 时里面哪些数据原来就有、哪些数据消失或新增。如果对 Path ORAM 进行监听，攻击者只能观察到每次都是取了一条 Path 出来、放了一条 Path 回去，而且上面的数据都是叽里咕噜不知道什么东西。</li>
+    </ul>
+  </li>
+  <li>看了 <a href="https://arxiv.org/abs/2402.15824">A New Secure Memory System for Efficient Data  Protection and Access Pattern Obfuscation</a> 这篇论文（arxiv 24）。
+    <ul>
+      <li>Shamir’s Secret Sharing（SSS）是将一个秘密分散成多个小秘密，只有集齐才能解锁大秘密的算法。算法构造利用了高次方程解系数的原理：假设需要将秘密分为 k 份，就可以构造多项式 \(f(x)=s+a_1x+a_2x^2+...+a_{k-1}x^{k-1}\)，式中 \(s\) 为秘密，\(a_i\) 为随机数（需要防止攻击者的预测）。然后，算法会生成若干对 \((x, f(x))\) 分发给小秘密持有者，只有集齐其中 k 对后，才能通过插值法解出秘密 s 的值。</li>
+      <li>文章结合了 Path ORAM 的方法以及 SSS 算法，将一个数据块（大秘密）转化成多个小秘密（\((x,f(x))\) pair），作为 Path ORAM 的 data block 分散在树上。由于 ORAM 机制的保护，攻击者无法知道 data block 与具体数据的对应关系，因此也无法进行小秘密的收集与恢复。</li>
+      <li>文章的一个核心创新是用 SSS 实现了数据的完整性保护。对于一个数据块，首先会将其分块变成 \(p_1, p_2, ..., p_W\)，然后生成多项式 \(f(x)=p_1+p_2\times x+...+p_W\times x_W+a_1\times x_{W+1}+...+a_{N−W}\times x_N\)，式中 \(a_i\) 由一个可信存储的种子（coefficient seeds）和伪随机数生成器生成，需要使攻击者无法预测。由于整个方程有 \(N\) 位，因此至少需要 \(N\) 个点才能还原出所有的系数（数据分块 \(p_i\) 以及派生出来的 \(a_i\)）。这些 \(a_i\) 会充当校验 Tag 的作用，如果发现它们并非由 coefficient seeds 派生，说明密文被篡改了。这种构造在密码学中很常见，可以称为校验值嵌入编码结构（integrity-protected encoding）或者 Algebraic Manipulation Detection Codes（AMD codes）。</li>
+      <li>文章并没有详细介绍如何从种子派生出 Tag，但这里又是方案安全性一个比较关键的地方。如果每次 \(a_i\) 不变，传统 TEE 场景的攻击者可以利用选择明文攻击构造大量的全零数据块去恢复出 \(a_i\)；如果 \(a_i\) 只和混淆前地址有关，那么攻击会变得困难一些，有点类似前几天看的 <a href="https://www.cameudis.com/diary/#2025-11-03~04">Heracles攻击</a>；如果每次 \(a_i\) 都变化，就需要一种机制去记录 freshness 数据，这似乎是一个很困难的问题。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2025-11-14">2025-11-14</h3>
+
+<ol>
+  <li>看了谷歌的博客 <a href="https://blog.google/technology/ai/google-private-ai-compute/">Private AI Compute advances AI privacy</a> ，介绍了谷歌最新推出的Private AI Compute（PAC）的 AI 基础设施框架。这套框架是软硬件结合的安全机制，威胁模型是 Google 自己都不能访问云计算中的用户数据。这种需求在今天是比较关键的，因为用户显然不能在自己的终端设备上运行大模型。
+    <ul>
+      <li>整个 AI 计算流涉及四个主体，互相都通过 <a href="http://docs.cloud.google.com/docs/security/encryption-in-transit/application-layer-transport-security?hl=zh-cn">ATLS</a> 进行连接（这个协议一般是用来保护谷歌内部设施的 RPC 调用的），包括客户端（手机）、前端服务器、Scalable inference pipeline（运行于 CPU Secure enclave 中，负责调度与分发任务）、Scalable model serving（运行在 Hardened TPU platform 中，负责张量计算）。</li>
+      <li>CPU 上使用的是 TEE 技术（AMD SEV 系列）；TPU（Tensor Processing Unit）上的 hardened TPU platform 机制和传统 TEE 类似，实现了内存逻辑隔离、传统硬件安全防护（可信固件启动）、远端鉴证（Attestation）这些常见机制。Titan 安全芯片会负责安全启动的部分，验证 TPU 上的保护是否开启、固件是否签名等安全要素。这套基础设施是谷歌自己实现的，名为 <a href="https://cloud.google.com/blog/products/compute/titanium-underpins-googles-workload-optimized-infrastructure?e=48754805">Titanium</a>，从第六代 <a href="https://cloud.google.com/blog/products/compute/introducing-trillium-6th-gen-tpus">Trillium</a> 开始实现了上述这些安全功能。</li>
+    </ul>
+  </li>
+  <li>苹果也有过一篇类似的博客 <a href="https://security.apple.com/blog/private-cloud-compute/">Private Cloud Compute: A new frontier for AI privacy in the cloud</a>，有着相似的威胁模型：保护用户数据不被 Apple 公司的任何员工获取。他们的私有云计算系统命名为Private Cloud Compute (PCC)，其中的节点“使用了与 iphone 相同的硬件安全技术”，包括 <a href="https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web">Secure Enclave</a> 和 <a href="https://support.apple.com/guide/security/boot-process-for-iphone-and-ipad-devices-secb3000f149/web">Secure Boot</a>。软件上使用“<a href="https://www.swift.org/documentation/server/">Swift on Server</a>构建了一个全新的机器学习堆栈，专门用于托管<a href="https://machinelearning.apple.com/research/introducing-apple-foundation-models">我们的云端基础模型</a>”。用户（手机客户端上的 Apple Intelligence，经过 PCC 客户端包装）的推理请求会采用非对称的端到端加密直接和“已验证有效且经过加密认证的 PCC 节点”进行通信，即直接使用目标 PCC节点的公钥加密数据，因此也只有目标 PCC 节点才能解密数据。</li>
+  <li>另外还看到了一个该种威胁模型的开源安全框架 <a href="https://github.com/openpcc/openpcc">GitHub - openpcc/openpcc: An open-source framework for verifiably private AI inference</a>，感觉挺有意思的。</li>
+</ol>
+
+<h3 id="2025-11-1516">2025-11-15~16</h3>
+
+<p>整理前几天的阅读笔记。</p>
 
               </div>
 
