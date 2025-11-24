@@ -39,7 +39,7 @@ blockquote { color: #828282; border-left: 4px solid #e8e8e8; padding-left: 15px;
 blockquote > :last-child { margin-bottom: 0; }
 
 /** Code formatting */
-pre, code { font-size: 14.0625px; line-height: 1.6; border: 1px solid #e8e8e8; border-radius: 3px; background-color: #eef; }
+pre, code { font-size: 14.0625px; line-height: 1.6; border: 1px solid #e1e1e8; border-radius: 3px; background-color: #f7f7f9; }
 
 code { padding: 1px 5px; }
 
@@ -175,7 +175,7 @@ table td { border: 1px solid #e8e8e8; }
 
 /** Syntax highlighting styles */
 .highlight { background: #fff; }
-.highlighter-rouge .highlight { background: #eef; }
+.highlighter-rouge .highlight { background: #f7f7f9; }
 .highlight .c { color: #998; font-style: italic; }
 .highlight .err { color: #a61717; background-color: #e3d2d2; }
 .highlight .k { font-weight: bold; }
