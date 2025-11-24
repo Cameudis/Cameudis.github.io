@@ -2,38 +2,38 @@ document.addEventListener('DOMContentLoaded', function() {
   // 等待页面完全加载
   setTimeout(function() {
 
-    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
     // 收集所有有效的标题元素
-    // const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
-    // const headings = [];
-    // tocLinks.forEach(link => {
-    //   const href = link.getAttribute('href');
-    //   if (href && href.startsWith('#')) {
-    //     const id = href.substring(1);
-    //     const heading = document.getElementById(id);
-    //     if (heading) {
-    //       headings.push({
-    //         element: heading,
-    //         link: link,
-    //         id: id
-    //       });
-    //     } else {
-    //       console.warn('找不到标题元素:', id);
-    //     }
-    //   }
-    // });
+    const tocLinks = document.querySelectorAll('.toc a[href^="#"]');
+    const headings = [];
+    tocLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        const id = href.substring(1);
+        const heading = document.getElementById(id);
+        if (heading) {
+          headings.push({
+            element: heading,
+            link: link,
+            id: id
+          });
+        } else {
+          console.warn('找不到标题元素:', id);
+        }
+      }
+    });
     
     if (headings.length === 0) {
       console.warn('没有找到有效的标题元素，可能需要检查目录生成或标题ID');
       return;
     }
     
-    const lastHeading = headings[headings.length - 3];
     const isDiaryPage = window.location.pathname.startsWith('/diary');
     let mostRecentLink = null;
 
-    if (isDiaryPage && lastHeading) {
+    if (isDiaryPage) {
+      const allHeads = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      const lastHeading = allHeads[allHeads.length - 3];
+      
       const tocContainer = document.querySelector('.toc');
       if (tocContainer) {
         let tocList = tocContainer.querySelector('ul');

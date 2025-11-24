@@ -52,7 +52,7 @@
 }
 
 .toc a {
-  color: #666;
+  color: grey;
   text-decoration: none;
   display: block;
   padding: 0.2rem 0.5rem;
@@ -62,12 +62,12 @@
 
 .toc a:hover {
   background-color: #efefef;
-  color: #333;
+  color: #D67900;
 }
 
 .toc a.active {
   /* background-color: #f8f8ff; */
-  color: black;
+  color: #D67900;
   font-weight: bold;
 }
 

@@ -106,9 +106,9 @@ a {
   color: $brand-color;
   text-decoration: none;
 
-  &:visited {
-    color: darken($brand-color, 15%);
-  }
+  // &:visited {
+  //   color: darken($brand-color, 15%);
+  // }
 
   &:hover {
     color: $text-color;
@@ -150,9 +150,9 @@ pre,
 code {
   @include relative-font-size(0.9375);
   line-height: 1.6;
-  border: 1px solid $grey-color-light;
+  border: 1px solid #e1e1e8;
   border-radius: 3px;
-  background-color: #eef;
+  background-color: #f7f7f9;
 }
 
 code {
