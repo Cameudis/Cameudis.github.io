@@ -12,6 +12,7 @@
 
 .site-title {
   @include relative-font-size(1.625);
+  font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 300;
   line-height: $base-line-height * $base-font-size * 2.25;
   letter-spacing: -1px;
@@ -38,6 +39,7 @@
 
   .page-link {
     color: $text-color;
+    font-family: "FusionPixel10Prop", sans-serif;
     line-height: $base-line-height;
 
     // Gaps between nav items, but not on the last one
@@ -111,7 +113,8 @@
 }
 
 .footer-heading {
-  @include relative-font-size(1.125);
+  // @include relative-font-size(1.125);
+  font-family: "FusionPixel10Prop", sans-serif;
   margin-bottom: $spacing-unit / 2;
 }
 
@@ -122,7 +125,8 @@
 }
 
 .footer-col-wrapper {
-  @include relative-font-size(0.9375);
+  // @include relative-font-size(0.9375);
+  font-family: "FusionPixel10Prop", sans-serif;
   color: $grey-color;
   margin-left: -$spacing-unit / 2;
   @extend %clearfix;
@@ -135,19 +139,19 @@
 }
 
 .footer-col-1 {
-  width: -webkit-calc(35% - (#{$spacing-unit} / 2));
-  width:         calc(35% - (#{$spacing-unit} / 2));
+  width: -webkit-calc(55% - (#{$spacing-unit} / 2));
+  width:         calc(55% - (#{$spacing-unit} / 2));
 }
 
 .footer-col-2 {
-  width: -webkit-calc(20% - (#{$spacing-unit} / 2));
-  width:         calc(20% - (#{$spacing-unit} / 2));
-}
-
-.footer-col-3 {
   width: -webkit-calc(45% - (#{$spacing-unit} / 2));
   width:         calc(45% - (#{$spacing-unit} / 2));
 }
+
+// .footer-col-3 {
+//   width: -webkit-calc(45% - (#{$spacing-unit} / 2));
+//   width:         calc(45% - (#{$spacing-unit} / 2));
+// }
 
 @include media-query($on-laptop) {
   .footer-col-1,
@@ -182,10 +186,12 @@
 
 .page-heading {
   @include relative-font-size(2);
+  font-family: "FusionPixel10Prop", sans-serif;
 }
 
 .post-list-heading {
   @include relative-font-size(1.75);
+  font-family: "FusionPixel10Prop", sans-serif;
 }
 
 .post-list {
@@ -199,12 +205,14 @@
 
 .post-meta {
   font-size: $small-font-size;
+  font-family: "FusionPixel10Prop", sans-serif;
   color: $grey-color;
 }
 
 .post-link {
   display: block;
-  @include relative-font-size(1.5);
+  @include relative-font-size(1.4);
+  font-family: "FusionPixel12Prop", sans-serif;
 }
 
 
@@ -218,6 +226,7 @@
 
 .post-title {
   @include relative-font-size(2.625);
+  font-family: "FusionPixel10Prop", sans-serif;
   letter-spacing: -1px;
   line-height: 1;
 
@@ -231,6 +240,7 @@
 
   h2 {
     @include relative-font-size(2);
+    font-family: "FusionPixel10Prop", sans-serif;
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.75);
@@ -239,6 +249,7 @@
 
   h3 {
     @include relative-font-size(1.625);
+    font-family: "FusionPixel10Prop", sans-serif;
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.375);
@@ -247,9 +258,14 @@
 
   h4 {
     @include relative-font-size(1.25);
+    font-family: "FusionPixel10Prop", sans-serif;
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.125);
     }
   }
+}
+
+.rss-subscribe {
+  font-family: "FusionPixel10Prop", sans-serif;
 }

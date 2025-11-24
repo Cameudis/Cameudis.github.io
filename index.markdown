@@ -7,9 +7,11 @@ layout: home
 
 <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 
-欢迎来到 **Y²** (a.k.a **cameudis**) 的博客！我是一个<span id="im"></span>
-
-你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （<ゝω・）☆>      
+<p style='font-family: "FusionPixel12Prop";'>
+欢迎来到 <b>Y²</b> (a.k.a <b>cameudis</b>) 的博客！我是一个<span id="im"></span>
+<br>
+你可以在这里找到一些随机主题的技术相关或不相关文章。欢迎留言 （<ゝω・）☆>
+</p>
 
 <!-- P.S. 本站基于 Jekyll 和 Github Pages 搭建，使用 Valine 作为评论系统。 -->
 

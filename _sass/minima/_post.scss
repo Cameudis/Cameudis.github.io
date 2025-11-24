@@ -24,7 +24,7 @@
   transform: translateY(-50%);
   width: 250px;
   z-index: 1000;
-  border-left: 1px solid gray;
+  border-left: 2px solid gray;
   padding: 0 0.7rem;
 }
 
@@ -38,6 +38,7 @@
 
 .toc {
   font-size: 0.9rem;
+  font-family: "FusionPixel10Prop", sans-serif;
   line-height: 1.4;
 }
 
@@ -62,12 +63,12 @@
 
 .toc a:hover {
   background-color: #efefef;
-  color: #D67900;
+  color: #D6401E;
 }
 
 .toc a.active {
   /* background-color: #f8f8ff; */
-  color: #D67900;
+  color: #D6401E;
   font-weight: bold;
 }
 

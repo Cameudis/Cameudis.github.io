@@ -9,23 +9,24 @@
   <link rel="shortcut icon" href="/images/favicon.ico">
 
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Kernel: 环境配置 | Y² 的博客</title>
+<title>Kernel: 环境配置 | Y²的博客</title>
 <meta name="generator" content="Jekyll v3.10.0" />
 <meta property="og:title" content="Kernel: 环境配置" />
+<meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)" />
 <meta property="og:description" content="简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)" />
 <link rel="canonical" href="https://www.cameudis.com/2025/09/28/Kernel-0.html" />
 <meta property="og:url" content="https://www.cameudis.com/2025/09/28/Kernel-0.html" />
-<meta property="og:site_name" content="Y² 的博客" />
+<meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-09-28T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Kernel: 环境配置" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-09-28T00:00:00+08:00","datePublished":"2025-09-28T00:00:00+08:00","description":"简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)","headline":"Kernel: 环境配置","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/09/28/Kernel-0.html"},"url":"https://www.cameudis.com/2025/09/28/Kernel-0.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-09-28T00:00:00+08:00","datePublished":"2025-09-28T00:00:00+08:00","description":"简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)","headline":"Kernel: 环境配置","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/09/28/Kernel-0.html"},"url":"https://www.cameudis.com/2025/09/28/Kernel-0.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y² 的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
   <script type="text/javascript" async
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
   </script>
@@ -33,7 +34,7 @@
 <body><header class="site-header" role="banner">
   <div class="wrapper"><div class="header-content">
       <div class="header-content-left">
-        <a class="site-title" rel="author" href="/">Y² 的博客</a>
+        <a class="site-title" rel="author" href="/">Y²的博客</a>
 
         <button class="search-button" id="search-toggle" aria-label="搜索">
           <svg viewBox="0 0 24 24" width="20px" height="20px">
@@ -49,7 +50,7 @@
               </svg>
             </span>
           </label>
-          <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Y²のDiary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
+          <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Diary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
         </nav></div>
   </div>
 </header>
@@ -667,29 +668,29 @@ $(eval $(generic-package))
 
   <div class="wrapper">
 
-    <div style="float: left; width: 75%;">
+    <div style="float: left; width: 40%;">
 
-      <h2 class="footer-heading">Y² 的博客</h2>
+      <h2 class="footer-heading">Y²的博客</h2>
 
       <div class="footer-col-wrapper">
         <div class="footer-col footer-col-1">
           <ul class="contact-list">
-            <li class="p-name">Y² 的博客</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
+            <li class="p-name">Y² (aka.cameudis)</li><li><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></li></ul>
         </div>
 
         <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
 </div>
 
-        <div class="footer-col footer-col-3">
+        <!-- <div class="footer-col footer-col-3"> -->
           <!-- <p>计算机、安全和其他</p> -->
-        </div>
+        <!-- </div> -->
       </div>
       
     </div>
 
     <div style="float: right;">
-      <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script>
-      <!-- <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&cl=ffffff&w=200"></script> -->
+      <!-- <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script> -->
+      <script type='text/javascript' id='clustrmaps' src='//cdn.clustrmaps.com/map_v2.js?cl=828282&w=a&t=n&d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&co=fdfdfd&ct=808080&cmo=d6401e&cmn=d6401e&w=300'></script>
     </div>
 
   </div>

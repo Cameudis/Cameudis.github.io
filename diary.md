@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Y²のDiary
+title: Diary
 permalink: /diary/
 toc_max_level: 2
 ---

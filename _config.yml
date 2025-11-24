@@ -14,7 +14,8 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Y² 的博客
+title: Y²的博客
+author: Y² (aka.cameudis)
 email: cameudis@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   计算机、安全和其他
