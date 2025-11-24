@@ -18,6 +18,11 @@ friends:
     url: "https://zhangzihan.com/"
     avatar: "https://zhangzihan.com/authors/admin/avatar_hudf36bf75024cb689a44aa559dab05e27_190615_270x270_fill_q75_lanczos_center.jpg"
     slogan: "有磁轴鼠标很了不起吗？"
+
+  - name: "Yituo He"
+    url: "https://haveyoutall.github.io"
+    avatar: "https://haveyoutall.github.io/media/icons/icon.png"
+    slogan: "国内密码优化的最强者"
     
   - name: "nich0las"
     url: "https://nicholas-wei.github.io/"
