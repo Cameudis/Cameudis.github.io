@@ -482,3 +482,12 @@ Dating with liz
 1. 对博客主题进行了大改。
 2. 最近几天想的 idea 又在 02 年的论文中被我找到了，好消息是这次的想法出现且仅出现在这篇论文中，后来大伙似乎就遗忘了这种技术，于是我似乎有一些可乘之机。
 3. 实验室里好像有毒气，所有今天来过的人都昏昏沉沉还头痛的。
+
+### 2025-11-25
+
+1. 读了 [Mole: Breaking GPU TEE with GPU-Embedded MCU](https://hongyi.lu/papers/mole-ccs25.pdf) 这篇论文（CCS 25）。
+- GPU 通常会内置一个 MCU（Micro Control Unit）负责计算任务的分发，这个 MCU 可能是一颗 RISC-V 芯片（[How NVIDIA Shipped One Billion RISC-V Cores In 2024](https://riscv.org/blog/how-nvidia-shipped-one-billion-risc-v-cores-in-2024/)），也可能是一颗 Armv7-M 芯片（ARM Mali GPU）。作为一个通用目的处理器（General Purpose Processor），这个 MCU 具有无穷的潜力（指图灵完备），因此是攻击面上的一个重要的点。
+- 作者发现，已有的学术 GPU TEE 方案都忽视了 MCU 的固件保护，而主要注重于运行时的数据隔离（比如驱动形式的 GPU TEE 方案会将数据加密送到 Secure Monitor 处再进行解密）。MCU 在初始化时并没有做固件签名校验，因此允许特权级别的攻击者直接修改位于 `/lib/firmware` 目录下的 MCU 固件（二进制形式），达成对 MCU 的完全控制，并继续达成对整个 GPU 上各种数据的控制。
+- 这篇文章修复起来似乎不难？只需要对 GPU 固件加上安全启动、固件签名验证机制就行了。这些学术方案没有考虑到这一点也很正常，毕竟涉及到签名的东西就需要硬件厂商协同一起去搞，对于学术工作来说这是 out of scope 的。不过 ARM Mali CPU 居然自己没有做安全启动的校验，这就有点搞笑了。如果 NVIDIA 也没有做这种校验，那算力锁可能就有救了，华强北狂喜。
+2. 又在装机，今年来已经装了四台了，现在我也是装机老手了（且有过 5 次及以上 **RIX 5090** 安装经验）。
+
