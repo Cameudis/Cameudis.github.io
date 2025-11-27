@@ -503,3 +503,8 @@ Dating with liz
 - 在 VM 初始化的时候，会使用 Buddy Allocater 分配一块空间用于存储 VMCS。注意，VMCS 并不仅仅存储客户 VM 的状态，还会记录主机的状态（即发生 VMEXIT 时将会进入的状态），具体可以参考 [Intel® 64 and IA-32 Architectures Software Developer’s Manual Volume 3C: System Programming Guide, Part 3](https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3c-part-3-manual.pdf) 的 24.5 章 HOST-STATE AREA。看到里面的 RIP 攻击者就应该高兴了，只要 UAF 了 VMCS，就可以把 EXIT handler 劫持成恶意代码，从而达成 hypervisor 级别的代码执行。这样就可以打通这题了，但因为代码量太大我就懒得调了啊哈哈。
 2. 实验室里继续排毒气，今天又是大家都头痛的一天。。。
 
+### 2025-11-27
+
+1. 今天我学聪明了，没有待在实验室，呵呵。
+2. 借助 codex 的力量，将项目推进了一截。AI 还是太有实力了。
+
