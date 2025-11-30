@@ -489,5 +489,22 @@ Dating with liz
 - GPU 通常会内置一个 MCU（Micro Control Unit）负责计算任务的分发，这个 MCU 可能是一颗 RISC-V 芯片（[How NVIDIA Shipped One Billion RISC-V Cores In 2024](https://riscv.org/blog/how-nvidia-shipped-one-billion-risc-v-cores-in-2024/)），也可能是一颗 Armv7-M 芯片（ARM Mali GPU）。作为一个通用目的处理器（General Purpose Processor），这个 MCU 具有无穷的潜力（指图灵完备），因此是攻击面上的一个重要的点。
 - 作者发现，已有的学术 GPU TEE 方案都忽视了 MCU 的固件保护，而主要注重于运行时的数据隔离（比如驱动形式的 GPU TEE 方案会将数据加密送到 Secure Monitor 处再进行解密）。MCU 在初始化时并没有做固件签名校验，因此允许特权级别的攻击者直接修改位于 `/lib/firmware` 目录下的 MCU 固件（二进制形式），达成对 MCU 的完全控制，并继续达成对整个 GPU 上各种数据的控制。
 - 这篇文章修复起来似乎不难？只需要对 GPU 固件加上安全启动、固件签名验证机制就行了。这些学术方案没有考虑到这一点也很正常，毕竟涉及到签名的东西就需要硬件厂商协同一起去搞，对于学术工作来说这是 out of scope 的。不过 ARM Mali CPU 居然自己没有做安全启动的校验，这就有点搞笑了。如果 NVIDIA 也没有做这种校验，那算力锁可能就有救了，华强北狂喜。
-2. 又在装机，今年来已经装了四台了，现在我也是装机老手了（且有过 5 次及以上 **RIX 5090** 安装经验）。
+2. 又在装机，今年来已经装了四台了，现在我也是装机老手了（且有过 5 次及以上 **RTX 5090** 安装经验）。
+
+### 2025-11-26
+
+1. 算是把 XCTF 决赛的 Kim and The Sun 这题大概看懂了。
+- 题目实现了一个简单的 hypervisor `svisor`，以及一个加载 hypervisor 用的内核模块 `not_a_rootkit.o`。这个内核模块会在自身初始化的时候，捕获当前的 CPU 状态、遍历物理内存标记出当前内核可用的物理页（其实是标记内核已使用的页）、分配 1MB 空间将 hypervisor 的 binary 复制进去、复用当前内核页表（除了最高级页表外）并在其中添加 hypervisor 的映射（映射到 0x69000 虚拟地址处）、关闭中断并切换到新页表（将 CR3 指向自建的页表）、最后跳转到 hypervisor 的入口处。
+- 刚刚内核模块收集到的内存使用信息等信息会作为参数传递给 hypervisor。首先，根据内核模块给的信息，将内核中的可用物理页放入临时内存管理器中，并从其中划分出 4MB 作为初始化时使用的临时内存池（称为 scratch 内存），并重新构造一套新页表用于 GPA -> HPA 的映射：建立新的连续物理内存映射并为每个物理页初始化一个 `page_t` 结构体、把这些结构体和 hypervisor 本身也加入新的映射，然后切换到新的页表，初始化 Buddy 内存管理器（此时 hypervisor 自己的 `kmalloc` 就可用了！内部和 SLUB 分配器非常类似），初始化新的描述符表。
+- 此时，内存映射和内存管理器已经初始化完毕，开始进行功能上的初始化。`svisor` 初始化分为 `arch_init` 和 `scall_init` 两个部分，其中 `arch_init` 主要是初始化 VMX、注册 VMEXIT handler、配置 APIC Timer；`scall_init` 主要是初始化后续快照使用的内存桶（类似 SLUB 分配器的 `kmem_cache` 机制）。最后，内核模块保存的状态会被用于创建一个新的虚拟机，并跳转过去，从而在 `not_a_rootkit.ko` 刚刚停下来的地方继续恢复执行。
+- hypervisor 在中断 handler 中实现了一个后门，如果指令是一条特殊指令（`0x9ec80f0f`）且寄存器满足一些条件（`rdx == 0x11451469420 && rcx == 0xC1a110C1a110`），就可以进入一个 scall 功能（类似于一个 ioctl，用户将参数放到 cmd 数据类型中通过一个指针传递给 hypervisor）。scall 提供了 vm 的新建激活销毁、以及快照（snapshot）的创建、捕捉、删除、应用、修改等功能。作为一个用户态程序，攻击者可以触发后门，捕捉自己的快照，通过修改其中的关键寄存器值来关闭保护（`cr4 &= ~(SMEP_BIT | SMAP_BIT)`）、达成提权（修改 CS 和 SS）。
+- 比赛那天我就是这么打的，然而题目不会这么简单：在物理内存的一个固定地址处，qemu 放置了一个 flag，然而不论是内核还是 hypervisor 都没有把这个 flag 给映射进来（即使是物理内存线性映射空间也没有映射）。在当前虚拟机内，即使拿到了内核权限，也无法冲破二级页表的限制，因此我们还需要提权到 hypervisor 级别，去劫持二级页表。
+- 在 scall 功能中存在 Race 漏洞，其中用于保存快照的单向链表 `snapshot_list` 虽然是各个 VM 都可以访问的全局变量，但是没有被锁保护起来，因此可以通过两个 VM 同时调用删除快照功能达成 Race，让一个被删除的快照依然留在链表中，达成 UAF。被删除的快照仍然会停留在 `snapshot_bucket` 中，即使 UAF 也做不了什么，因此需要触发 `kunit_bucket_free` 中的 `kunit_bucket_compact` 操作，将已经全空的页直接释放回 Buddy System。然后再去寻找有什么数据结构适合被劫持。
+- 在 VM 初始化的时候，会使用 Buddy Allocater 分配一块空间用于存储 VMCS。注意，VMCS 并不仅仅存储客户 VM 的状态，还会记录主机的状态（即发生 VMEXIT 时将会进入的状态），具体可以参考 [Intel® 64 and IA-32 Architectures Software Developer’s Manual Volume 3C: System Programming Guide, Part 3](https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-3c-part-3-manual.pdf) 的 24.5 章 HOST-STATE AREA。看到里面的 RIP 攻击者就应该高兴了，只要 UAF 了 VMCS，就可以把 EXIT handler 劫持成恶意代码，从而达成 hypervisor 级别的代码执行。这样就可以打通这题了，但因为代码量太大我就懒得调了啊哈哈。
+2. 实验室里继续排毒气，今天又是大家都头痛的一天。。。
+
+### 2025-11-27
+
+1. 今天我学聪明了，没有待在实验室，呵呵。
+2. 借助 codex 的力量，将项目推进了一截。AI 还是太有实力了。
 
