@@ -1,8 +1,8 @@
 friends:
   - name: "Li Juanru (Liarod RomanGol)"
     url: "https://www.lijuanru.com/"
-    avatar: "https://www.lijuanru.com/files/head.png"
-    slogan: "Leader of G.O.S.S.I.P"
+    # avatar: "https://www.lijuanru.com/files/head.png"
+    slogan: "导师，但HTTPS证书已过期"
     
   - name: "sh1kaku"
     url: "https://sh1k4ku.github.io/"
@@ -22,7 +22,7 @@ friends:
   - name: "Yituo He"
     url: "https://haveyoutall.github.io"
     avatar: "https://haveyoutall.github.io/media/icons/icon.png"
-    slogan: "国内密码优化的最强者"
+    slogan: "国内密码优化的巅峰"
     
   - name: "nich0las"
     url: "https://nicholas-wei.github.io/"
@@ -53,6 +53,11 @@ friends:
     url: "https://juryorca.github.io/"
     avatar: "https://juryorca.github.io/images/avatar.jpg"
     slogan: "请不要再给我发史了"
+
+  - name: "Lunatic Quasimodo"
+    url: "https://lunaticquasimodo.top/"
+    avatar: "https://lunaticquasimodo.top/uploads/Weixin_Image_20251127215810_517_1118_36aea2ec08.png"
+    slogan: "很艺术的学弟，具体为什么艺术请点击这个链接"
     
   - name: "M1aoo0bin"
     url: "https://zenaxu.cn/"
@@ -86,8 +91,8 @@ friends:
     
   - name: "FDU Tristin"
     url: "https://fdutristin.github.io/"
-    avatar: "https://fduTristin.github.io/images/profile.png"
-    slogan: "敬爱的唐泽"
+    avatar: "https://fdutristin.github.io/images/fox.png"
+    slogan: "唐泽"
 
   - name: "Qanux"
     url: "https://9anux.org/"
