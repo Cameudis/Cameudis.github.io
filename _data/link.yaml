@@ -62,7 +62,12 @@ friends:
   - name: "Lunatic Quasimodo"
     url: "https://lunaticquasimodo.top/"
     avatar: "https://lunaticquasimodo.top/uploads/Weixin_Image_20251127215810_517_1118_36aea2ec08.png"
-    slogan: "很艺术的学弟，具体为什么艺术请点击这个链接"
+    slogan: "很艺术的博客，具体为什么艺术请点击这个链接"
+
+  - name: "GyroJ"
+    url: "https://gyrojibering.github.io/"
+    avatar: "https://gyrojibering.github.io/avatar.jpeg"
+    slogan: "在博客里放小游戏的天才"
     
   - name: "M1aoo0bin"
     url: "https://zenaxu.cn/"
