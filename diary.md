@@ -508,3 +508,25 @@ Dating with liz
 1. 今天我学聪明了，没有待在实验室，呵呵。
 2. 借助 codex 的力量，将项目推进了一截。AI 还是太有实力了。
 
+### 2025-11-28~30
+
+1. 准备最后一次演出，但演出前一天下午突然发消息来说演出取消了，唉高市早苗。
+
+## 2025-12
+
+### 2025-12-1~4
+
+1. 在 \*0xA 参加了 Blackhat MEA Final，非常非常幸运地拿到了冠军，学到了很多！PWN 部分出题人是 [ptr-yudai](https://ptr-yudai.hatenablog.com/)，出得太好了，他还赛后马上就放了 [官方WP](https://gist.github.com/ptr-yudai/ebf09b77256853fdfc3b2da5335b5ff2)。
+- agent 的力量！Gemini 神力！Agent 有时候需要跑在 ubuntu 下才能发挥全部的神力，在别的发行版下就不太能自己装一些工具了。同样的 Agent（Codex）和题目，空白桑跑在 ubuntu wsl 下就跑出来了，我在自己的 fedora 下跑就跑不出。
+- 两道 pwn 题都和 TCP 的特殊功能有关，比如 [OOB](https://en.wikipedia.org/wiki/Out-of-band_data)。如果使用 VMWare 开 Linux 虚拟机和题目交互的话，需要注意网卡的模式：如果是 NAT 模式，意味着 VMWare 实现的虚拟网卡代码会修改你的 TCP Packet，其中不一定会实现（从我们的比赛经历来看就是没有实现）对 OOB 这种特性的支持（或者说对 TCP 的 URG 标志的支持）。因此，这种场景下需要一个裸机 Linux 或者一个开启了桥接模式的 VMWare 虚拟机，桥接模式下的虚拟机是一台单独的机器，其虚拟网卡不用对也不会对虚拟机发出的数据包进行任何修改。
+- 知道了任何 PCI（以及 PCIe）设备想要进行 DMA 操作（或者说在 PCI 总线上进行发送请求的 Master 操作），就需要将其 Command Register 中的 Bus Master Enable (BME) bit 置为一，这是 [PCI Spec](https://lekensteyn.nl/files/docs/PCI_SPEV_V3_0.pdf) 以及 [PCIe Spec](https://picture.iczhiku.com/resource/eetop/SYkDTqhOLhpUTnMx.pdf) 中硬性规定的。
+- 第一次接触了 UEFI PWN。一个是知道了在 Linux 下也有和 UEFI 交互的方式（通过 `/sys/firmware/efi/`），UEFI 变量可以通过访问 `/sys/firmware/efi/efivars` 下的文件或者通过 `efivar` 工具进行读取或修改（理应只有特权用户才有权限，但如果配置不好的话就是一个攻击面了）。另一个是大致知道了 UEFI PWN 的场景下的攻击目标：进入管理界面、修改 Linux 启动参数、在启动时直接进 root shell。这道题的官方解法是劫持控制流调用了 `PlatformBootManagerUnableToboot` 函数，这个函数会启动 Management 菜单。自己调试的时候发现如果不挂 Linux 盘就可以进 UEFI 菜单，但由于没什么经验，不知道要去 [OVMF](https://github.com/tianocore/tianocore.github.io/wiki/OVMF) 找目标。
+
+### 2025-12-5~7
+
+1. 在沙特旅游，拜访了世界之崖。
+
+### 2025-12-8~10
+
+1. 项目这边，在一个 gem5 原型上把 Linux Boot 了，非常好。
+

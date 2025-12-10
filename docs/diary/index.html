@@ -1127,6 +1127,39 @@ document.addEventListener('DOMContentLoaded', function() {
   <li>借助 codex 的力量，将项目推进了一截。AI 还是太有实力了。</li>
 </ol>
 
+<h3 id="2025-11-2830">2025-11-28~30</h3>
+
+<ol>
+  <li>准备最后一次演出，但演出前一天下午突然发消息来说演出取消了，唉高市早苗。</li>
+</ol>
+
+<h2 id="2025-12">2025-12</h2>
+
+<h3 id="2025-12-14">2025-12-1~4</h3>
+
+<ol>
+  <li>在 *0xA 参加了 Blackhat MEA Final，非常非常幸运地拿到了冠军，学到了很多！PWN 部分出题人是 <a href="https://ptr-yudai.hatenablog.com/">ptr-yudai</a>，出得太好了，他还赛后马上就放了 <a href="https://gist.github.com/ptr-yudai/ebf09b77256853fdfc3b2da5335b5ff2">官方WP</a>。
+    <ul>
+      <li>agent 的力量！Gemini 神力！Agent 有时候需要跑在 ubuntu 下才能发挥全部的神力，在别的发行版下就不太能自己装一些工具了。同样的 Agent（Codex）和题目，空白桑跑在 ubuntu wsl 下就跑出来了，我在自己的 fedora 下跑就跑不出。</li>
+      <li>两道 pwn 题都和 TCP 的特殊功能有关，比如 <a href="https://en.wikipedia.org/wiki/Out-of-band_data">OOB</a>。如果使用 VMWare 开 Linux 虚拟机和题目交互的话，需要注意网卡的模式：如果是 NAT 模式，意味着 VMWare 实现的虚拟网卡代码会修改你的 TCP Packet，其中不一定会实现（从我们的比赛经历来看就是没有实现）对 OOB 这种特性的支持（或者说对 TCP 的 URG 标志的支持）。因此，这种场景下需要一个裸机 Linux 或者一个开启了桥接模式的 VMWare 虚拟机，桥接模式下的虚拟机是一台单独的机器，其虚拟网卡不用对也不会对虚拟机发出的数据包进行任何修改。</li>
+      <li>知道了任何 PCI（以及 PCIe）设备想要进行 DMA 操作（或者说在 PCI 总线上进行发送请求的 Master 操作），就需要将其 Command Register 中的 Bus Master Enable (BME) bit 置为一，这是 <a href="https://lekensteyn.nl/files/docs/PCI_SPEV_V3_0.pdf">PCI Spec</a> 以及 <a href="https://picture.iczhiku.com/resource/eetop/SYkDTqhOLhpUTnMx.pdf">PCIe Spec</a> 中硬性规定的。</li>
+      <li>第一次接触了 UEFI PWN。一个是知道了在 Linux 下也有和 UEFI 交互的方式（通过 <code class="language-plaintext highlighter-rouge">/sys/firmware/efi/</code>），UEFI 变量可以通过访问 <code class="language-plaintext highlighter-rouge">/sys/firmware/efi/efivars</code> 下的文件或者通过 <code class="language-plaintext highlighter-rouge">efivar</code> 工具进行读取或修改（理应只有特权用户才有权限，但如果配置不好的话就是一个攻击面了）。另一个是大致知道了 UEFI PWN 的场景下的攻击目标：进入管理界面、修改 Linux 启动参数、在启动时直接进 root shell。这道题的官方解法是劫持控制流调用了 <code class="language-plaintext highlighter-rouge">PlatformBootManagerUnableToboot</code> 函数，这个函数会启动 Management 菜单。自己调试的时候发现如果不挂 Linux 盘就可以进 UEFI 菜单，但由于没什么经验，不知道要去 <a href="https://github.com/tianocore/tianocore.github.io/wiki/OVMF">OVMF</a> 找目标。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2025-12-57">2025-12-5~7</h3>
+
+<ol>
+  <li>在沙特旅游，拜访了世界之崖。</li>
+</ol>
+
+<h3 id="2025-12-810">2025-12-8~10</h3>
+
+<ol>
+  <li>项目这边，在一个 gem5 原型上把 Linux Boot 了，非常好。</li>
+</ol>
+
 
               </div>
 
@@ -1154,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <!-- <h3>目录</h3> -->
           <div class="toc" id="toc-auto">
             
-            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li></ul>
+            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li><li><a href="#2025-12">2025-12</a></li></ul>
           </div>
         </div>
       </div>
