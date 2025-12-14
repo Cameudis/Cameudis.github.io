@@ -520,7 +520,7 @@ Dating with liz
 - agent 的力量！Gemini 神力！Agent 有时候需要跑在 ubuntu 下才能发挥全部的神力，在别的发行版下就不太能自己装一些工具了。同样的 Agent（Codex）和题目，空白桑跑在 ubuntu wsl 下就跑出来了，我在自己的 fedora 下跑就跑不出。
 - 两道 pwn 题都和 TCP 的特殊功能有关，比如 [OOB](https://en.wikipedia.org/wiki/Out-of-band_data)。如果使用 VMWare 开 Linux 虚拟机和题目交互的话，需要注意网卡的模式：如果是 NAT 模式，意味着 VMWare 实现的虚拟网卡代码会修改你的 TCP Packet，其中不一定会实现（从我们的比赛经历来看就是没有实现）对 OOB 这种特性的支持（或者说对 TCP 的 URG 标志的支持）。因此，这种场景下需要一个裸机 Linux 或者一个开启了桥接模式的 VMWare 虚拟机，桥接模式下的虚拟机是一台单独的机器，其虚拟网卡不用对也不会对虚拟机发出的数据包进行任何修改。
 - 知道了任何 PCI（以及 PCIe）设备想要进行 DMA 操作（或者说在 PCI 总线上进行发送请求的 Master 操作），就需要将其 Command Register 中的 Bus Master Enable (BME) bit 置为一，这是 [PCI Spec](https://lekensteyn.nl/files/docs/PCI_SPEV_V3_0.pdf) 以及 [PCIe Spec](https://picture.iczhiku.com/resource/eetop/SYkDTqhOLhpUTnMx.pdf) 中硬性规定的。
-- 第一次接触了 UEFI PWN。一个是知道了在 Linux 下也有和 UEFI 交互的方式（通过 `/sys/firmware/efi/`），UEFI 变量可以通过访问 `/sys/firmware/efi/efivars` 下的文件或者通过 `efivar` 工具进行读取或修改（理应只有特权用户才有权限，但如果配置不好的话就是一个攻击面了）。另一个是大致知道了 UEFI PWN 的场景下的攻击目标：进入管理界面、修改 Linux 启动参数、在启动时直接进 root shell。这道题的官方解法是劫持控制流调用了 `PlatformBootManagerUnableToboot` 函数，这个函数会启动 Management 菜单。自己调试的时候发现如果不挂 Linux 盘就可以进 UEFI 菜单，但由于没什么经验，不知道要去 [OVMF](https://github.com/tianocore/tianocore.github.io/wiki/OVMF) 找目标。
+- 第一次接触了 UEFI PWN。一个是知道了在 Linux 下也有和 UEFI 交互的方式（通过 `/sys/firmware/efi/`），UEFI 变量可以通过访问 `/sys/firmware/efi/efivars` 下的文件或者通过 `efivar` 工具进行读取或修改（理应只有特权用户才有权限，但如果配置不好的话就是一个攻击面了）。另一个是大致知道了 UEFI PWN 的场景下的攻击目标：进入管理界面、修改 Linux 启动参数、在启动时直接进 root shell。这道题的官方解法是劫持控制流调用了 `PlatformBootManagerUnableToboot` 函数，这个函数会启动 Management 菜单。自己调试的时候发现如果不挂 Linux 盘就可以进 UEFI 菜单，但由于没什么经验，不知道要去看 [OVMF](https://github.com/tianocore/tianocore.github.io/wiki/OVMF) 代码找目标。
 
 ### 2025-12-5~7
 
@@ -529,4 +529,12 @@ Dating with liz
 ### 2025-12-8~10
 
 1. 项目这边，在一个 gem5 原型上把 Linux Boot 了，非常好。
+
+### 2025-12-11~13
+
+1. 看了 [Exploiting a 13-years old bug on QEMU](https://kqx.io/post/qemu-nday/)。QEMU 9.1 以前的版本中， x86-64 的 TCG 引擎在实现 `iret` 和 `call far` 时出了岔子（这么复杂的指令集，QEMU 能没出岔子地实现才怪了），没有考虑到它们在用户态下的语义会有所不同，甚至没有考虑到它们在用户态下被调用的情况。在 TCG 引擎的实现代码中，直接调用了 `cpu_mmu_index_kernel` 这种为内核态准备的函数。换句话说，即使在用户态下调用 `iret` 以及 `call far`，qemu 也会直接以内核（ring 0）权限执行这条指令，导致用户态可以（在已知内核内存地址的情况下）对内核数据进行读写。
+- `call far [mem]` 指令从 `[mem]` 里取出一个 **(offset, selector)** 形式的远指针（long mode 下是 8 字节 offset + 2 字节 selector）（其实就是允许用户同时更改 `CS` 段寄存器和 `rip`），把当前的 `rip` 和 `CS` 等信息压到当前 `rsp` 上，并跳转到目标。因此在 QEMU 实现错误的场景下，在跳转前把 `rsp` 设置成一个受害者地址，我们就可以往那个地址写入一个 `rip` 和 `CS`，其中 `rip` 的低位是我们作为一个用户态程序也可以主动去控制的，由此构造一个粗糙的（因为会在后面多写 N 个字节）内核权限任意写原语。
+- `iret` 在内核态用于从中断中返回，此在 [2025-9-18~25](https://www.cameudis.com/diary/#2025-9-1825) 中亦有记载。这个指令会从栈上（`rsp`）取出一些数据放到 `rip` 等寄存器中。在漏洞场景下，这条指令可以用来泄漏数据。我们知道在用户态发生异常的时候，硬件会查询 `IDT` 表找到目标 handler 地址以及新的栈地址，然后往栈上 push 一些数据（`user_ss`, `user_rsp`, `rflags`, `user_cs`, `user_rip`）。在现代开启 KPTI 保护的内核中，内核和用户态会维护两套不同的页表，但这个隔离做得不是那么彻底。x86-64 硬件不会在异常发生时自动切换页表，但又需要这样一个栈存放自动 push 的数据，所以内核不得不维护一个用户态页表也可见的内存页，作为异常发生时用户态页表和内核态页表都可见的共享的栈。在 Linux 的实现中，这个栈名为 [`entry_stack_page`](https://elixir.bootlin.com/linux/v6.6/source/arch/x86/include/asm/cpu_entry_area.h#L101)：作为一个临时的栈，内核代码会在处理中断时切换到 task stack 上（[对应源码](https://elixir.bootlin.com/linux/v6.18/source/arch/x86/entry/entry_64.S#L299)）进行实际的中断处理。不过在进行切换前，`entry_stack_page` 上也会保存许多信息，包括在 `error_entry` 函数中调用 `PUSH_AND_CLEAR_REGS` 保存的大量用户态寄存器信息，以及许多内核指针。（一些相关的源码链接：[中断入口](https://elixir.bootlin.com/linux/v6.6/source/arch/x86/entry/entry_64.S#L383)，[PUSH\_REGS宏实现](https://elixir.bootlin.com/linux/v6.6/source/arch/x86/entry/calling.h#L68)）
+- `entry_stack_page` 的地址应该受到随机化的保护，但由于 qemu TCG 引擎的实现缺陷（没有实现 [UMIP](https://lwn.net/Articles/716461/) 特性），用户态可以随便拿到它的地址，见同作者写的 [make cpu-entry-area great again](https://kqx.io/post/sp0/)。只需要 `sgdt [rsp]; mov rax, qword [rsp+2]`，就可以通过拿到 `gdt` 的地址（也即 [cpu_entry_area](https://elixir.bootlin.com/linux/v6.6/source/arch/x86/include/asm/cpu_entry_area.h#L90) 的地址）来间接计算出 `entry_stack_page` 的地址。
+- 文章的作者用了一个巧妙的 trick：利用 `PUSH_REGS` 操作在 `entry_stack_page` 上布置一个合法的 `iret` frame，让 `rsp` 指向它并执行 `iret`，此时 qemu 会（错误地）以 ring 0 权限访问这片区域并取出其中的值放入 `rsp`, `rip` 等寄存器中。通过偏移控制，攻击者可以让想要泄漏的数据（内核指针）被当作 `user_rip` 字段放入 `rip` 中，随后在 `iret` 后触发的（在用户态声明实现的） `SIGSEGV` handler 中就能直接拿到想要泄漏的数据地址（`uc->uc_mcontext.gregs[REG_RIP]` 字段），从而完成 KASLR 的绕过。
 
