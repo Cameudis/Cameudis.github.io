@@ -1,0 +1,188 @@
+// ============================================
+// TABLE OF CONTENTS (TOC) COMPONENT
+// ============================================
+// This file contains all styles related to the table of contents sidebar
+// functionality, including positioning, typography, interactive states,
+// and responsive behavior.
+
+// ============================================
+// LAYOUT & STRUCTURE
+// ============================================
+
+.toc-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.toc-container {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 250px;
+  z-index: 1000;
+  border-left: 2px solid gray;
+  padding: 0 0.7rem;
+
+  // Smooth transition for auto-hide feature
+  transition: transform 0.3s ease, opacity 0.3s ease;
+
+  // Collapsed state (hidden off-screen)
+  &.collapsed {
+    transform: translateY(-50%) translateX(calc(100% + 20px));
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.toc-container h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+// ============================================
+// TOC TYPOGRAPHY & STYLING
+// ============================================
+
+.toc {
+  font-size: 0.9rem;
+  font-family: "FusionPixel10Prop", sans-serif;
+  line-height: 1.4;
+}
+
+.toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc li {
+  margin: 0.3rem 0;
+}
+
+.toc a {
+  color: grey;
+  text-decoration: none;
+  display: block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+// ============================================
+// INTERACTIVE STATES
+// ============================================
+
+.toc a:hover {
+  background-color: #efefef;
+  color: #D6401E;
+}
+
+.toc a.active {
+  /* background-color: #f8f8ff; */
+  color: #D6401E;
+  font-weight: bold;
+}
+
+// ============================================
+// NESTED LEVELS (INDENTATION)
+// ============================================
+
+.toc ul ul {
+  padding-left: 1rem;
+}
+
+.toc ul ul a {
+  font-size: 0.85rem;
+}
+
+// ============================================
+// TOC TOGGLE BUTTON
+// ============================================
+// Button to manually show/hide TOC when auto-hide is active
+
+.toc-toggle {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1001;
+  background: #D6401E;
+  color: white;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  padding: 0.5rem 0.3rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+
+  // Hidden by default, shown by JavaScript when needed
+  display: none;
+
+  &.visible {
+    display: block;
+  }
+
+  &:hover {
+    background: darken(#D6401E, 10%);
+    padding-right: 0.5rem;
+  }
+
+  // When TOC is collapsed, button moves to edge
+  &.toc-hidden {
+    right: 0;
+  }
+}
+
+// ============================================
+// SCROLLBAR STYLING
+// ============================================
+
+.toc-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.toc-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.toc-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.toc-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+// ============================================
+// RESPONSIVE BEHAVIOR
+// ============================================
+
+@media (max-width: 768px) {
+  .toc-sidebar {
+    width: 100%;
+    order: -1; // Place TOC before content on mobile
+  }
+
+  .toc-container {
+    position: static;
+    transform: none;
+    max-height: 200px;
+    margin-bottom: 1rem;
+    width: 100%;
+
+    &.collapsed {
+      transform: none;
+    }
+  }
+
+  .toc-toggle {
+    display: none !important; // No toggle button on mobile
+  }
+}
