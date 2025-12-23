@@ -1169,11 +1169,36 @@ document.addEventListener('DOMContentLoaded', function() {
       <li><code class="language-plaintext highlighter-rouge">iret</code> 在内核态用于从中断中返回，此在 <a href="https://www.cameudis.com/diary/#2025-9-1825">2025-9-18~25</a> 中亦有记载。这个指令会从栈上（<code class="language-plaintext highlighter-rouge">rsp</code>）取出一些数据放到 <code class="language-plaintext highlighter-rouge">rip</code> 等寄存器中。在漏洞场景下，这条指令可以用来泄漏数据。我们知道在用户态发生异常的时候，硬件会查询 <code class="language-plaintext highlighter-rouge">IDT</code> 表找到目标 handler 地址以及新的栈地址，然后往栈上 push 一些数据（<code class="language-plaintext highlighter-rouge">user_ss</code>, <code class="language-plaintext highlighter-rouge">user_rsp</code>, <code class="language-plaintext highlighter-rouge">rflags</code>, <code class="language-plaintext highlighter-rouge">user_cs</code>, <code class="language-plaintext highlighter-rouge">user_rip</code>）。在现代开启 KPTI 保护的内核中，内核和用户态会维护两套不同的页表，但这个隔离做得不是那么彻底。x86-64 硬件不会在异常发生时自动切换页表，但又需要这样一个栈存放自动 push 的数据，所以内核不得不维护一个用户态页表也可见的内存页，作为异常发生时用户态页表和内核态页表都可见的共享的栈。在 Linux 的实现中，这个栈名为 <a href="https://elixir.bootlin.com/linux/v6.6/source/arch/x86/include/asm/cpu_entry_area.h#L101"><code class="language-plaintext highlighter-rouge">entry_stack_page</code></a>：作为一个临时的栈，内核代码会在处理中断时切换到 task stack 上（<a href="https://elixir.bootlin.com/linux/v6.18/source/arch/x86/entry/entry_64.S#L299">对应源码</a>）进行实际的中断处理。不过在进行切换前，<code class="language-plaintext highlighter-rouge">entry_stack_page</code> 上也会保存许多信息，包括在 <code class="language-plaintext highlighter-rouge">error_entry</code> 函数中调用 <code class="language-plaintext highlighter-rouge">PUSH_AND_CLEAR_REGS</code> 保存的大量用户态寄存器信息，以及许多内核指针。（一些相关的源码链接：<a href="https://elixir.bootlin.com/linux/v6.6/source/arch/x86/entry/entry_64.S#L383">中断入口</a>，<a href="https://elixir.bootlin.com/linux/v6.6/source/arch/x86/entry/calling.h#L68">PUSH_REGS宏实现</a>）</li>
       <li><code class="language-plaintext highlighter-rouge">entry_stack_page</code> 的地址应该受到随机化的保护，但由于 qemu TCG 引擎的实现缺陷（没有实现 <a href="https://lwn.net/Articles/716461/">UMIP</a> 特性），用户态可以随便拿到它的地址，见同作者写的 <a href="https://kqx.io/post/sp0/">make cpu-entry-area great again</a>。只需要 <code class="language-plaintext highlighter-rouge">sgdt [rsp]; mov rax, qword [rsp+2]</code>，就可以通过拿到 <code class="language-plaintext highlighter-rouge">gdt</code> 的地址（也即 <a href="https://elixir.bootlin.com/linux/v6.6/source/arch/x86/include/asm/cpu_entry_area.h#L90">cpu_entry_area</a> 的地址）来间接计算出 <code class="language-plaintext highlighter-rouge">entry_stack_page</code> 的地址。</li>
       <li>文章的作者用了一个巧妙的 trick：利用 <code class="language-plaintext highlighter-rouge">PUSH_REGS</code> 操作在 <code class="language-plaintext highlighter-rouge">entry_stack_page</code> 上布置一个合法的 <code class="language-plaintext highlighter-rouge">iret</code> frame，让 <code class="language-plaintext highlighter-rouge">rsp</code> 指向它并执行 <code class="language-plaintext highlighter-rouge">iret</code>，此时 qemu 会（错误地）以 ring 0 权限访问这片区域并取出其中的值放入 <code class="language-plaintext highlighter-rouge">rsp</code>, <code class="language-plaintext highlighter-rouge">rip</code> 等寄存器中。通过偏移控制，攻击者可以让想要泄漏的数据（内核指针）被当作 <code class="language-plaintext highlighter-rouge">user_rip</code> 字段放入 <code class="language-plaintext highlighter-rouge">rip</code> 中，随后在 <code class="language-plaintext highlighter-rouge">iret</code> 后触发的（在用户态声明实现的） <code class="language-plaintext highlighter-rouge">SIGSEGV</code> handler 中就能直接拿到想要泄漏的数据地址（<code class="language-plaintext highlighter-rouge">uc-&gt;uc_mcontext.gregs[REG_RIP]</code> 字段），从而完成 KASLR 的绕过。</li>
-      <li>虽然这个漏洞在新版本 QEMU 被缓解了，但利用 <code class="language-plaintext highlighter-rouge">entry_stack_page</code> 在内核空间中布置数据的方法似乎依然有效，等我有空调试一下。</li>
     </ul>
   </li>
 </ol>
 
+<h3 id="2025-12-1819">2025-12-18~19</h3>
+
+<ol>
+  <li>给 <a href="https://ctftime.org/event/2997">0CTF</a> 紧急出了一个 RISC-V TEE PWN 题，攻击者需要利用 TA 的漏洞劫持其控制流，然后编写 shellcode 去调用 Host 侧的 ocall 接口 get shell。虽然构思的时候觉得很有意思，但是实际打的时候就只是一个简单的 RISC-V 用户态 PWN 题而已，稍稍有些可惜（出题时间有点紧张）。</li>
+</ol>
+
+<h3 id="2025-12-22">2025-12-22</h3>
+
+<ol>
+  <li>读了 <a href="https://www.zionbasque.com/files/papers/dec-synergy-study.pdf">Decompiling the Synergy: An Empirical Study of Human–LLM Teaming in Software Reverse Engineering</a> 这篇 NDSS 26 论文。
+    <ul>
+      <li>论文研究了非 agent 形式的 LLM 对新手/专家进行逆向漏洞挖掘的帮助（不涉及反混淆）。</li>
+      <li>LLM 最擅长的是快速给出一个总结，不擅长对于一个函数深入的研究，最不善于用来做漏洞的寻找。尤其是在识别一些常见又代码量不大的算法时，LLM 非常有实力！一旦涉及到代码量大一些的函数，LLM 就会有些吃力了。但总得来说，遇到一个陌生函数时马上让 LLM 做一个总结总是会有一些帮助。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2025-12-23">2025-12-23</h3>
+
+<ol>
+  <li>读了 <a href="https://www.os.is.s.u-tokyo.ac.jp/en/publication/conference/2025-ccs-takekoshi/">BadAML: Exploiting Legacy Firmware Interfaces to Compromise Confidential Virtual Machines</a> 这篇 CCS 25 论文，我觉得这篇论文的攻击非常非常好！有些类似于 S&amp;P 25 的 <a href="https://badram.eu/">BadRAM</a>，都是利用硬件/固件给上层操作系统提供的接口来进行攻击。
+    <ul>
+      <li>在上古时期，操作系统想要支持一套硬件平台，需要编写大量的适配代码，工作量非常大，这都是因为硬件没有给操作系统提供一个统一的接口。ACPI 标准在 90 年代被发明，好困明天再写。</li>
+    </ul>
+  </li>
+</ol>
 
               </div>
 
