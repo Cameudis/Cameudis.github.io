@@ -548,7 +548,11 @@ Dating with liz
 - 论文研究了非 agent 形式的 LLM 对新手/专家进行逆向漏洞挖掘的帮助（不涉及反混淆）。
 - LLM 最擅长的是快速给出一个总结，不擅长对于一个函数深入的研究，最不善于用来做漏洞的寻找。尤其是在识别一些常见又代码量不大的算法时，LLM 非常有实力！一旦涉及到代码量大一些的函数，LLM 就会有些吃力了。但总得来说，遇到一个陌生函数时马上让 LLM 做一个总结总是会有一些帮助。
 
-### 2025-12-23
+### 2025-12-23~24
 
-1. 读了 [BadAML: Exploiting Legacy Firmware Interfaces to Compromise Confidential Virtual Machines](https://www.os.is.s.u-tokyo.ac.jp/en/publication/conference/2025-ccs-takekoshi/) 这篇 CCS 25 论文，我觉得这篇论文的攻击非常非常好！有些类似于 S&P 25 的 [BadRAM](https://badram.eu/)，都是利用硬件/固件给上层操作系统提供的接口来进行攻击。
-- 在上古时期，操作系统想要支持一套硬件平台，需要编写大量的适配代码，工作量非常大，这都是因为硬件没有给操作系统提供一个统一的接口。ACPI 标准在 90 年代被发明，好困明天再写。
+1. 读了 [BadAML: Exploiting Legacy Firmware Interfaces to Compromise Confidential Virtual Machines](https://www.os.is.s.u-tokyo.ac.jp/en/publication/conference/2025-ccs-takekoshi/) 这篇 CCS 25 论文，我觉得这篇论文的攻击非常非常之好！有些类似于 S&P 25 的 [BadRAM](https://badram.eu/)，都是利用硬件/固件给上层操作系统提供的接口来进行攻击。
+- [ACPI](https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E9%85%8D%E7%BD%AE%E4%B8%8E%E7%94%B5%E6%BA%90%E6%8E%A5%E5%8F%A3) 是一个允许操作系统去配置各个主板硬件设备、管理其电源的协议。主板的固件中会携带 ACPI 表，UEFI 程序会将其传递给操作系统，表中记载了硬件拓扑、设备配置、以及一些 AML（ACPI Machine Language）程序。操作系统有着向目标设备的寄存器写入数据进行配置、控制的需求，AML 是一种允许操作系统方便地进行控制的解耦方法，操作系统无需为特定设备实现专用驱动、只需要根据 ACPI 预定义的一些目的（比如调整设备电源等）来调用固件提供的 AML 函数即可，操控逻辑的实验从操作系统解耦出来，交给了主板固件的开发者（这些开发者本来就需要和各种设备打交道）。此外还有一个有趣的设计，AML 是一种字节码，需要操作系统在内部实现一个虚拟机去解释 AML 程序并执行。
+- 举个例子，在笔者多年前查询 Windows 上的休眠、睡眠、关机这些状态到底有什么差别的时候，[知乎老哥写的科普](https://zhuanlan.zhihu.com/p/140517413) 就已经介绍了 ACPI。ACPI 协议对整个系统电源管理的睡眠状态做了定义，包括 S0 ~ S5 六个级别，从 S0（正常运转）到 S5（完全关机）渐变。实际上不论是 Windows 还是 Linux，我们想要知道一个电源功能到底会对设备进行什么操作，只需要去看看底层是调用了哪个级别对应的 AML 程序，比如 Windows 上的休眠就对应了 S4（Suspend to Disk），当按下休眠按钮时，如果当前固件支持 S4 睡眠，内核会拿出 ACPI 表中的对应 AML 程序（大概可以称其为 S4 Handler）并执行它。
+- 内核会在内核态（Ring 0）执行 AML 程序，这是因为内核天然就会信任固件（UEFI），真要说的话其实固件的权限比内核还高，因为固件是运行在 SMM 模式（也称为 Ring -2）下的。然而在 TEE 场景下，CVM 中的内核其实是不应该这么信任固件的！这一点就写在 TEE 的威胁模型里，但大家并没有在意到 ACPI 协议中的一个隐藏的攻击面。虽然 CVM 在启动的时候会对整个系统（包括固件在内）做 attestation，确保固件提供的 ACPI 表也合法（虽然固件会根据硬件配置不同，比如从 SPD 获取具体有多少内存的信息*（此在 [2025-9-30](https://www.cameudis.com/diary/#2025-9-30) 中亦有记载）*并动态生成 ACPI 表，但总体来说生成的 ASPI 表不会特别离谱，比如包含恶意代码）。但现代虚拟化场景下，为了支持动态的 VM 配置且无需每次都生成一个不一样的固件 Binary，qemu 等虚拟机软件会选择在 UEFI 固件中（这个也是虚拟机软件自己实现的）加入一个额外的功能，使固件尝试从某个自定义设备去 fetch 动态的 VM 配置。比如 qemu 会通过 [`fw_cfg`](https://www.qemu.org/docs/master/specs/fw_cfg.html) 向固件注入 ASCI 配置、启动顺序、虚拟机 UUID、SMP 信息、NUMA 信息、甚至是内核/initrd的镜像。注意，TEE 场景下的 qemu 即恶意的 hypervisor，它能够向固件注入 ACPI 表，意味着它可以控制 CVM 内核执行任意的 AML 程序，完全攻破了 TEE 的威胁模型。对于其他虚拟机实现也是类似的：虚拟机软件实现的固件都有注入配置的接口，攻击者从接口中注入恶意的 ACPI 表就可以绕过 Attestation 控制 TEE 内的操作系统内核。TEE 不存在了！
+- 这个漏洞最直接的修复方式是把虚拟机固件的动态配置注入功能直接删掉，换成每次动态生成携带不同 ACPI 表的固件。但在 TEE 场景下，不同的固件意味着不同的 Attestation 值，导致每跑在一个不同配置的虚拟机上就需要为其维护一个参考 Attestation 值，这也是挺烦的。作者认为已有的几种防御都有一些缺陷，因此提出在内核的 AML 虚拟机中添加 sandbox 的设计，只允许 AML 程序对 MMIO 区域做读写、对 UEFI 固件区域只读，从而阻止 AML 程序劫持内核。他们把 AML 程序的 `C-bit` 关掉（AMD SEV 中的 entrypted bit），从硬件上阻止了 AML 程序访问 CVM 中的关键数据。我觉得这个防御也还不错。
+
