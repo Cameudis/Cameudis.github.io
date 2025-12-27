@@ -1203,6 +1203,29 @@ document.addEventListener('DOMContentLoaded', function() {
   </li>
 </ol>
 
+<h3 id="2025-12-25">2025-12-25</h3>
+
+<p>Merry Christmas!</p>
+
+<h3 id="2025-12-2627">2025-12-26~27</h3>
+
+<ol>
+  <li>看了 <a href="https://www.youtube.com/watch?v=2zrcemxCg4Y">HEXACON2024 - Caught in the wild, past, present and future by Clem1</a>，来自 Google Threat Analysis Group 的研究员分享了他们抓在野利用 0day 的各种小妙招，还有他们对 0day 利用的一些观察。
+    <ul>
+      <li>作为搜索引擎，谷歌维护着全球最大规模的爬虫，因此他们很容易从公共的互联网上找到浏览器 0day 的线索。水坑攻击（Watering Hole）是在目标群体可能会访问的网站上植入利用等待触发的攻击，爬虫如果发现某个网页突然多链接了一个 js 或者奇妙的域名（甚至是 <code class="language-plaintext highlighter-rouge">ip:port</code> 组合，其中 <code class="language-plaintext highlighter-rouge">port</code> 是 6666 这种怪数字），就可以知道它可能被挂马了。Typosquatting（拼写抢注 / 错别字域名劫持）也是一种类似水坑攻击的手法。在谷歌拿到 js 代码后，由于 exp 往往有一些 helper 函数（比如 <code class="language-plaintext highlighter-rouge">d2u</code>）、gc 函数（循环 new 一些对象）和浏览器版本检测函数，有时甚至会硬编码一个 binary（文件头很明显），这些特征可以非常有效地识别出 exp 代码。有时攻击者可能会使用 One-time link 分发 exploit，即第一次被访问时给出 exploit，之后返回正常网页，从而隐藏自己；谷歌维护了 pipeline 去遍历网上的这种链接，确保自己比用户先访问它，这样用户就可以被保护（他们也拿到了 exp）。最困难的方式是看 crash，因为 chrome 的 crash 实在是太多了（悲）。由 exp 导致的 crash 有一些非常明显，比如一个奇怪的段错误（如果 <code class="language-plaintext highlighter-rouge">rip</code> 指向 <code class="language-plaintext highlighter-rouge">0x114514</code> 那可能大概率是东亚的黑客）、或者在 GC 时崩溃（在触发漏洞到构建原语的间隙中如果 GC 介入就会因为奇怪的 JS 结构导致崩溃）。如果有两个不同设备的可疑 crash 都源自同一个域名，这个域名可就非常可疑了：他们（和 Project Zero 合作）靠这种方法曝光并破坏了一个西方政府持续九个月的反恐行动，成功拿到了 <a href="https://pwnies.com/googles-top-security-teams-unilaterally-shut-down-a-counterterrorism-operation/">2022 年的 pwnie 最烂厂商回应奖</a>，成为一大传奇屎诗。哈哈哈。除此以外他们还会从 VirusTotal 等公开的仓库寻找利用等。</li>
+      <li>接下来他们介绍了漏洞的分发：在分发利用前攻击者会通过服务器端指纹（攻击者服务器通过 HTTP 的 flag 等信息）以及客户端指纹（在 js 代码中通过各种 API）收集客户端信息。这方面的 trick 真是很多，比如在服务器端有着 <a href="https://browserleaks.com/http2">HTTP/2 Fingerprint</a>，在客户端更是有着五花八门的 API，比如有 <a href="https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API">User-Agent Client Hint API</a>、WebGL（JS 图形库）版本（示例：<code class="language-plaintext highlighter-rouge">WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)</code>）和 VENDOR 信息（示例：<code class="language-plaintext highlighter-rouge">WebKit</code>）、视频编码支持情况（一些平台会因为证书原因不支持某些编码）、浏览器的平台（示例：<code class="language-plaintext highlighter-rouge">Linux armv81</code>）和语言（示例：<code class="language-plaintext highlighter-rouge">zh-CN</code>）、甚至目标设备的电量（可以区分移动目标和固定目标）等。这方面的技巧之多令演讲者感到非常呕吐。</li>
+      <li>接下来他们介绍了漏洞的利用。一个典型的面向手机的浏览器漏洞利用链包括以下步骤：渲染器漏洞触发 -&gt; PAC / V8 堆沙盒绕过 -&gt; Chrome 沙盒绕过 -&gt; 权限逃逸 -&gt; 内核保护绕过 -&gt; 控制手机，中间每一步都允许攻击者获取更多设备信息。在浏览器 RCE 领域，公开研究和在野利用的水平非常接近，唯一显著的区别是在野利用往往会加混淆。”Half-day 漏洞” 在利用中很常见，上游的软件（如 v8、linux kernel）修复的漏洞没有及时传播到下游软件（手机厂商自己的浏览器和分发的内核）就会导致一个漏洞利用的时期。有攻击者会尝试将恶意 payload 网页重定向到厂商浏览器打开，从而触发 Half-day 漏洞，因此谷歌将 silent intent 也视作漏洞（不过即使 silent intent 修复后，用户如果在显式的浏览器选择中选择过时的厂商浏览器，还是会触发漏洞）。在 chrome 沙盒逃逸领域，公开研究并不多，但在野利用的手法都神奇地长得差不多（神奇的 0day 工业），都是一个内嵌了 <code class="language-plaintext highlighter-rouge">libchopin.so</code> 的 blob。在提权领域，厂商 patch 不及时仍然是一个非常严重的问题。（虽然我们总是嘲笑 pixel 是研究专用机，但它 patch 得确实比别人快。）</li>
+      <li>后利用（Post-Exploitation）中攻击者需要清除利用痕迹（一大堆 crash 文件之类的），然后去尝试提取各种 App 的文件。现代手机的 App 太多了，攻击者需要一个一个 App 去适配，这个工作量非常之恐怖！所以后利用也是工作量非常大的一个领域。</li>
+      <li>作者认为随着安全行业的<del>自内卷</del>不断进步，各种缓解措施的部署，未来以手机为目标的完整利用链会越来越少，利用会转向 partial exploit，比如打完浏览器就提取出 cookie 并到此为止。比起浏览器，更有潜力的方向是去打消息应用（如微信）：消息应用的漏洞利用虽然不通用，但打完就可以把隐私资料都提取出来了，而不用像传统的浏览器利用链一样需要本地提权以后才能拿到数据。</li>
+    </ul>
+  </li>
+  <li>看了一个 Merry Christmas Day：<a href="https://www.ox.security/blog/attackers-could-exploit-zlib-to-exfiltrate-data-cve-2025-14847/#technical_analysis">CVE-2025-14847</a>。希望读者 get 到笑点。
+    <ul>
+      <li>一个 <code class="language-plaintext highlighter-rouge">decompressData()</code> 函数本来应该返回解压后数据的实际长度，但错误地返回了<strong>分配的内存空间</strong>长度，导致的信息泄漏漏洞。非常轻松写意的漏洞，非常适合节日氛围（我是不是学疯了？）。</li>
+    </ul>
+  </li>
+</ol>
+
 
               </div>
 
