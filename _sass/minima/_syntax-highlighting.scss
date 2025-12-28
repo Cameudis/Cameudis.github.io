@@ -2,24 +2,27 @@
  * Syntax highlighting styles
  */
 
+// Nord-inspired syntax colors
 :root {
-  --tok-comment: #b28a65;   /* 暖棕色 */
-  --tok-keyword: #d67900;   /* 主色：亮橙 */
-  --tok-string: #bf4f00;    /* 深橙 / 琥珀色 */
-  --tok-number: #d47f2f;    /* 淡橙棕 */
-  --tok-func: #b34a00;      /* 深焦橙 */
-  --tok-type: #cc6600;      /* 暖橙偏棕，略深于 keyword */
+  --tok-comment: #616e88;
+  --tok-keyword: #81a1c1;
+  --tok-string: #a3be8c;
+  --tok-number: #b48ead;
+  --tok-func: #88c0d0;
+  --tok-type: #ebcb8b;
+  --code-bg: #2e3440;
 }
 
 .highlight {
-  background: #fff;
+  background: var(--code-bg) !important;
+  color: #d8dee9;
   @extend %vertical-rhythm;
 
   .highlighter-rouge & {
-    background: #f7f7f9;
+    background: var(--code-bg) !important;
   }
 
-  
+
   // [data-theme="dark"] {
   //   --code-bg: #0d1117;
   //   --code-border: #22272e;
@@ -30,14 +33,51 @@
   //   --tok-func: #79b8ff;
   //   --tok-type: #4fd1ff;
   // }
-  
-  .c, .cm, .c1 { color: var(--tok-comment); font-style: italic; }
-  .k, .kr, .kp, .kc, .kd { color: var(--tok-keyword); font-weight: bold; }
-  .s, .s1, .s2, .sh, .sb, .sc { color: var(--tok-string); }
-  .m, .mi, .mf, .mh { color: var(--tok-number); }
-  .nf, .fm { color: var(--tok-func); font-weight: bold; }
-  .kt, .nc { color: var(--tok-type); font-weight: bold; }
-  
+
+  .c,
+  .cm,
+  .c1 {
+    color: var(--tok-comment);
+    font-style: italic;
+  }
+
+  .k,
+  .kr,
+  .kp,
+  .kc,
+  .kd {
+    color: var(--tok-keyword);
+    font-weight: bold;
+  }
+
+  .s,
+  .s1,
+  .s2,
+  .sh,
+  .sb,
+  .sc {
+    color: var(--tok-string);
+  }
+
+  .m,
+  .mi,
+  .mf,
+  .mh {
+    color: var(--tok-number);
+  }
+
+  .nf,
+  .fm {
+    color: var(--tok-func);
+    font-weight: bold;
+  }
+
+  .kt,
+  .nc {
+    color: var(--tok-type);
+    font-weight: bold;
+  }
+
   // .c     { color: #998; font-style: italic } // Comment
   // .err   { color: #a61717; background-color: #e3d2d2 } // Error
   // .k     { font-weight: bold } // Keyword

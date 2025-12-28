@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-12-27T23:38:56+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">强网杯线上赛 2025 babybus</title><link href="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html" rel="alternate" type="text/html" title="强网杯线上赛 2025 babybus" /><published>2025-11-11T00:00:00+08:00</published><updated>2025-11-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus</id><content type="html" xml:base="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html"><![CDATA[<h2 id="题目简介">题目简介</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2025-12-28T13:17:03+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">强网杯线上赛 2025 babybus</title><link href="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html" rel="alternate" type="text/html" title="强网杯线上赛 2025 babybus" /><published>2025-11-11T00:00:00+08:00</published><updated>2025-11-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus</id><content type="html" xml:base="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html"><![CDATA[<h2 id="题目简介">题目简介</h2>
 
 <p>拿到附件是一个 <code class="language-plaintext highlighter-rouge">qemu-system-x86_64</code> binary 和 Dockerfile、entry script，里面这样启动了 qemu：</p>
 
@@ -715,7 +715,7 @@ flag<span class="o">{</span>你怎么知道cameudis有对象了?<span class="o">
   <p>所以内核是不是可以做一个保护把代码段直接不映射？</p>
 </blockquote>
 
-<h3 id="方法-2搜索-ramdisk-中的-flag-文件">方法 2：搜索 ramdisk 中的 flag 文件</h3>
+<h3 id="方法2搜索-ramdisk-中的-flag-文件">方法2：搜索 ramdisk 中的 flag 文件</h3>
 
 <p>由于题目给出的 flag 直接存在于 ramdisk 里，因此也会被加载到内存中。我们可以先在调试环境搜索到 flag 的位置，然后在脚本中暴力搜索周围的内存空间。虽然 flag 的位置有随机性，但由于线性映射区都是大页映射，因此我们可以在修改完 1 个比特之后就开始搜索大页，甚至也可以使用类似于方法 1 中的套娃技巧，将控制范围再度扩大。</p>
 

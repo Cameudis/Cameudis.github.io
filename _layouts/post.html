@@ -1,78 +1,65 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+<html lang="{{ page.lang | default: site.lang | default: " en" }}">
 
-  {%- include head.html -%}
+{%- include head.html -%}
 
-  <body>
+<body>
 
-    {%- include header.html -%}
+  {%- include header.html -%}
 
-    <main class="page-content" aria-label="Content">
-      
-      <div class="wrapper">
-        <div class="post-layout">
-          <!-- 左侧内容区域 -->
-          <div class="post-main">
-            <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
-              <header class="post-header">
-                <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
-                <p class="post-meta">
-                  <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
-                    {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-                    {{ page.date | date: date_format }}
-                  </time>
-                  {%- if page.author -%}
-                    • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
-                  {%- endif -%}</p>
-              </header>
-
-              <div class="post-content e-content" itemprop="articleBody">
-                {{ content }}
-              </div>
-
-              {%- if site.disqus.shortname -%}
-                {%- include disqus_comments.html -%}
-              {%- endif -%}
-
-              {% for tag in page.tags %}
-                {% if site.tags[tag] %}
-                  <b>本博客上与 {{ tag }} 相关的贴子：</b>
-                  <ul>
-                    {% assign posts = site.tags[tag] | slice: 0, 10 %}
-                    {% for post in posts %}
-                      <li><a href="{{ post.url }}">{{ post.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              {% endfor %}
-
-              <br><br>
-              <div id="comments"></div>
-              {% include valine_comments.html %}
-
-              <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
-            </article>
+        <header class="post-header">
+          <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+          <div class="post-meta">
+            <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+              {%- assign date_format = site.minima.date_format | default: "[ %Y-%m-%d ]" -%}
+              {{ page.date | date: date_format }}
+            </time>
+            {% if page.tags.size > 0 %}
+            <span class="post-tags">:: {{ page.tags | join: ' ' | prepend: '#' | replace: ' ', ' #' }}</span>
+            {% endif %}
+            {%- if page.author -%}
+            • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card"
+                itemprop="name">{{ page.author }}</span></span>
+            {%- endif -%}
           </div>
-        </div>
-      </div>
+        </header>
 
-      <!-- 右侧目录区域 -->
-      <div class="toc-sidebar">
-        <div class="toc-container">
-          <!-- <h3>目录</h3> -->
-          <div class="toc" id="toc-auto">
-            {% assign h_max = page.toc_max_level | default: 6 %}
+        <div class="post-layout-container">
+          {% assign h_max = page.toc_max_level | default: 3 %}
+          <aside class="post-toc">
+            <div class="toc-title">TABLE_OF_CONTENTS</div>
             {% include toc.html html=content h_max=h_max %}
+          </aside>
+
+          <div class="post-content e-content" itemprop="articleBody">
+            {{ content }}
           </div>
         </div>
-      </div>
-    </main>
 
-    {%- include footer.html -%}
+        {% include related_posts.html %}
 
-    <script src="{{ "/assets/js/post.js" | relative_url }}"></script>
+        {%- if site.disqus.shortname -%}
+        <div class="post-comments">
+          {%- include disqus_comments.html -%}
+        </div>
+        {%- endif -%}
 
-  </body>
+        <div id="comments" class="post-comments"></div>
+        {% include valine_comments.html %}
+
+        <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+      </article>
+    </div>
+  </main>
+
+  {%- include footer.html -%}
+
+  <script src="{{ "/assets/js/post.js" | relative_url }}"></script>
+
+</body>
 
 </html>

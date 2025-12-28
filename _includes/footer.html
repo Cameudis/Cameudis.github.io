@@ -1,44 +1,44 @@
 <footer class="site-footer h-card">
-  <data class="u-url" href="{{ "/" | relative_url }}"></data>
-
+  <data class="u-url" href="{{ " /" | relative_url }}"></data>
   <div class="wrapper">
+    <div class="footer-header">
+      <h2 class="footer-heading">[ {{ site.title | escape }} ]</h2>
+      <p class="footer-status">STATUS: ONLINE / UPTIME: ∞</p>
+    </div>
 
-    <div style="float: left; width: 40%;">
-
-      <h2 class="footer-heading">{{ site.title | escape }}</h2>
-
-      <div class="footer-col-wrapper">
-        <div class="footer-col footer-col-1">
-          <ul class="contact-list">
-            <li class="p-name">
-              {%- if site.author -%}
-                {{ site.author | escape }}
-              {%- else -%}
-                {{ site.title | escape }}
-              {%- endif -%}
-              </li>
-              {%- if site.email -%}
-              <li><a class="u-email" href="mailto:{{ site.email }}">{{ site.email }}</a></li>
-              {%- endif -%}
-          </ul>
+    <div class="footer-layout">
+      <!-- Col 1: Contact -->
+      <div class="footer-col">
+        <div class="footer-title">CONTACT_INFO</div>
+        <div class="footer-content">
+          <p class="p-name">{{ site.author | escape }}</p>
+          {%- if site.email -%}
+          <a class="u-email" href="mailto:{{ site.email }}">{{ site.email }}</a>
+          {%- endif -%}
         </div>
+      </div>
 
-        <div class="footer-col footer-col-2">
+      <!-- Col 2: Social Links -->
+      <div class="footer-col">
+        <div class="footer-title">SOCIAL_NETWORKS</div>
+        <div class="footer-content">
           {%- include social.html -%}
         </div>
-
-        <!-- <div class="footer-col footer-col-3"> -->
-          <!-- <p>{{- site.description | escape -}}</p> -->
-        <!-- </div> -->
       </div>
-      
+
+      <!-- Col 3: Visitor Map -->
+      <div class="footer-col">
+        <div class="footer-title">VISITOR_MAP</div>
+        <div class="footer-map-mini">
+          <script type='text/javascript' id='clustrmaps'
+            src='//cdn.clustrmaps.com/map_v2.js?cl=4c566a&w=a&t=n&d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&co=121212&ct=b8b8b8&cmo=5e81ac&cmn=5e81ac&w=220'></script>
+        </div>
+      </div>
     </div>
 
-    <div style="float: right;">
-      <!-- <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&w=150"></script> -->
-      <script type='text/javascript' id='clustrmaps' src='//cdn.clustrmaps.com/map_v2.js?cl=828282&w=a&t=n&d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&co=fdfdfd&ct=808080&cmo=d6401e&cmn=d6401e&w=300'></script>
+    <div class="footer-bottom">
+      <p class="quiet-humor">/* Free and useless. */</p>
+      <p>&copy; {{ site.time | date: '%Y' }} {{ site.author }}</p>
     </div>
-
   </div>
-
 </footer>
