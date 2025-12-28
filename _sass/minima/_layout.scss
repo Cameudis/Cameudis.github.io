@@ -110,7 +110,7 @@
       padding-left: 15px;
     }
 
-    .nav-trigger:checked+.trigger {
+    .nav-trigger:checked~.trigger {
       display: block;
     }
 
@@ -562,8 +562,13 @@
 
 .post-content {
   flex: 1;
-  min-width: $post-content-width; // Ensure minimum reading width
+  min-width: $post-content-width; // Ensure minimum reading width on desktop
   margin-bottom: $spacing-unit * 2;
+
+  @include media-query($on-laptop) {
+    min-width: 0; // Allow shrinking on small screens
+    width: 100%;
+  }
 
   > :first-child {
     margin-top: 0;

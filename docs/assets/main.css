@@ -3,6 +3,8 @@
 @font-face { font-family: "FusionPixel12Prop"; src: url("fonts/fusion-pixel-font-12px-proportional-otf.woff2-v2025.10.20/fusion-pixel-12px-proportional-zh_hans.otf.woff2") format("woff2"); font-display: swap; }
 @font-face { font-family: "FusionPixel12Mono"; src: url("fonts/fusion-pixel-font-12px-monospaced-otf.woff2-v2025.10.20/fusion-pixel-12px-monospaced-zh_hans.otf.woff2") format("woff2"); font-display: swap; }
 /** Reset some basic elements */
+* { box-sizing: border-box; }
+
 body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
 
 /** Basic styling */
@@ -50,8 +52,8 @@ pre { padding: 8px 12px; overflow-x: auto; }
 pre > code { border: 0; padding-right: 0; padding-left: 0; background-color: transparent !important; }
 
 /** Wrapper */
-.wrapper { max-width: -webkit-calc(1000px - (40px * 2)); max-width: calc(1000px - (40px * 2)); margin-right: auto; margin-left: auto; padding-right: 40px; padding-left: 40px; }
-@media screen and (max-width: 800px) { .wrapper { max-width: -webkit-calc(1000px - (40px)); max-width: calc(1000px - (40px)); padding-right: 20px; padding-left: 20px; } }
+.wrapper { max-width: 1000px; margin-right: auto; margin-left: auto; padding-right: 40px; padding-left: 40px; width: 100%; }
+@media screen and (max-width: 800px) { .wrapper { padding-right: 20px; padding-left: 20px; } }
 
 /** Clearfix */
 .wrapper:after, .footer-col-wrapper:after { content: ""; display: table; clear: both; }
@@ -95,7 +97,7 @@ table td { border: 1px solid #3b4252; }
   .site-nav .menu-icon { display: block; float: right; width: 36px; height: 26px; line-height: 0; padding-top: 10px; text-align: center; }
   .site-nav .menu-icon > svg { fill: #d8dee9; }
   .site-nav input ~ .trigger { clear: both; display: none; padding-bottom: 5px; padding-right: 15px; padding-left: 15px; }
-  .site-nav .nav-trigger:checked + .trigger { display: block; }
+  .site-nav .nav-trigger:checked ~ .trigger { display: block; }
   .site-nav .page-link { display: block; padding: 10px 0; margin-right: 0 !important; border-bottom: 1px dashed #3b4252; }
   .site-nav .page-link:last-child { border-bottom: none; } }
 
@@ -203,6 +205,7 @@ table td { border: 1px solid #3b4252; }
 .toc-title { font-family: "FusionPixel10Prop", sans-serif; font-weight: 700; color: #5e81ac; margin-bottom: 10px; font-size: 1em; letter-spacing: 2px; }
 
 .post-content { flex: 1; min-width: 700px; margin-bottom: 80px; }
+@media screen and (max-width: 800px) { .post-content { min-width: 0; width: 100%; } }
 .post-content > :first-child { margin-top: 0; }
 .post-content h2 { font-size: 22.4px; font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; font-weight: 700; margin-top: 60px; color: #d8dee9; border-bottom: 1px solid #3b4252; padding-bottom: 5px; }
 @media screen and (max-width: 800px) { .post-content h2 { font-size: 24.5px; } }
