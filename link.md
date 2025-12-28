@@ -31,30 +31,30 @@ permalink: /links/
 
 <style>
 .friends-section {
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 40px;
 }
 
 .friends-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
 }
 
 .friend-card {
-  background:rgb(255, 255, 255);
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 20px 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  height: 40px;
-  display: flex;
-  align-items: center;
+  background: rgba(46, 52, 64, 0.4); /* Nord Darker Blue-Gray with opacity */
+  border: 1px dashed #4c566a;
+  padding: 15px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .friend-card:hover {
+  border-color: #5e81ac; /* Brand color */
+  background: rgba(46, 52, 64, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .friend-card a {
@@ -64,26 +64,25 @@ permalink: /links/
   align-items: center;
   gap: 15px;
   width: 100%;
-  height: 100%;
 }
 
 .friend-avatar {
   flex-shrink: 0;
-  width: 60px;
-  height: 60px;
-  border-radius: 4px;
+  width: 50px;
+  height: 50px;
+  border: 1px solid #4c566a;
+  background: #2e3440;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e9ecef;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .friend-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: grayscale(20%);
 }
 
 .default-avatar {
@@ -92,10 +91,10 @@ permalink: /links/
   display: flex;
   align-items: center;
   justify-content: center;
-  color: black;
+  color: #5e81ac;
+  font-family: "FusionPixel12Mono", monospace;
   font-weight: bold;
-  font-size: 1.2em;
-  text-transform: uppercase;
+  font-size: 1.5em;
 }
 
 .friend-info {
@@ -105,39 +104,46 @@ permalink: /links/
 
 .friend-info h3 {
   margin: 0 0 5px 0;
-  color: #333;
-  font-size: 1.1em;
-  font-weight: 600;
+  color: #eceff4;
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 1.2em;
+  letter-spacing: 1px;
 }
 
 .friend-slogan {
-  margin: 0 0 8px 0;
-  color: #666;
-  font-size: 0.9em;
-  font-style: italic;
-  line-height: 1.3;
-}
-
-.friend-url {
   margin: 0;
-  color: #999;
-  font-size: 0.8em;
-  word-break: break-all;
-  line-height: 1.2;
+  color: #b8b8b8;
+  font-size: 0.85em;
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
-.friend-card a:hover h3 {
-  color: #007bff;
+/* Decoration for cards */
+.friend-card::before {
+  content: ">";
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 0.8em;
+  color: rgba(94, 129, 172, 0.3);
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .friends-grid {
     grid-template-columns: 1fr;
   }
   
-  .friends-page {
-    padding: 10px;
+  .friend-card {
+    padding: 12px;
+  }
+  
+  .friend-info h3 {
+    font-size: 1.1em;
   }
 }
 </style>
