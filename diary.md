@@ -582,4 +582,4 @@ toc_max_level: 2
 - 一个非常强悍的自动化 ROP 链工具，跨架构，而且支持各种奇奇怪怪的 binary（包括 chromium、linux kernel 等等）。
 - 整个管线非常合理：第一步是使用 angr 拿到所有 gadget，记录下它们的依赖和 effect，并从中拿出一些一定可用的基础 gadget 作为可用 gadget 初始集。这里的“一定可用”是有明确定义的：增加了栈指针 + 从栈上获取了 PC + 不含条件分支，这样的 gadget 是 “self-contained” 的。第二步是一个大循环：首先维护一个寄存器图，根据现有可用 gadget 来将图上标记为可控，或者添加边来表示攻击者可以从一个寄存器控制另一个寄存器。循环体内部会去遍历那些 `not-self-contained` 的 gadget，如果它们提供了现有 gadget 没有提供的 effect，就尝试将其和现有 gadget 组合成一个 “self-contained” gadget，具体的组合方式见论文细节。第三步就是根据已有能力进行 chain 的构造了。
 - 整个过程非常合理，工具能力也很强。虽然还是会有一些极端的 ROP chain 是工具无法搜索到的（这仅仅是我的经验，比如我在一些 RISC ISA 上写过的 ROP Chain，其 stack comsuming 并非为正，但也足够我调 `mprotect` 跑 shellcode 了），但绝大部分场景下工具表现会非常出色，绝对是够用的。论文提到 Google 等公司已经采用 ropbot 来快速验证漏洞的可利用性，帮助开发团队根据风险严重程度调整补丁修复的优先级，非常有用。
-- 论文源码仓库：[ropbot](https://github.com/sefcom/ropbot)。
+- 论文源码仓库（包含复现相关 artifacts）：[ropbot](https://github.com/sefcom/ropbot)。工具源码仓库：[angrop](https://github.com/angr/angrop)。
