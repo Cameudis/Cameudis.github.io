@@ -422,7 +422,8 @@
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody">
-            <p>碎碎念、摸鱼与拾贝日志。</p>
+            <div class="diary-content">
+  <p>碎碎念、摸鱼与拾贝日志。</p>
 
 <h2 id="2025-7">2025-7</h2>
 
@@ -788,7 +789,9 @@
 </ol>
 
 <h3 id="2025-8-21--9-14">2025-8-21 ~ 9-14</h3>
-<p>放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。</p>
+<ol>
+  <li>放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。</li>
+</ol>
 
 <h2 id="2025-9">2025-9</h2>
 
@@ -832,7 +835,9 @@
 
 <h3 id="2025-9-29">2025-9-29</h3>
 
-<p>Dating with liz</p>
+<ol>
+  <li>Dating with liz</li>
+</ol>
 
 <h3 id="2025-9-30">2025-9-30</h3>
 
@@ -1065,7 +1070,9 @@
 
 <h3 id="2025-11-0510">2025-11-05~10</h3>
 
-<p>家里有事。</p>
+<ol>
+  <li>Dating with liz in Hong Kong.</li>
+</ol>
 
 <h3 id="2025-11-11">2025-11-11</h3>
 
@@ -1117,11 +1124,15 @@
 
 <h3 id="2025-11-1516">2025-11-15~16</h3>
 
-<p>整理前几天的阅读笔记。</p>
+<ol>
+  <li>整理前几天的阅读笔记。</li>
+</ol>
 
 <h3 id="2025-11-1718">2025-11-17~18</h3>
 
-<p>去做了胃镜，休息。</p>
+<ol>
+  <li>去做了胃镜，休息。</li>
+</ol>
 
 <h3 id="2025-11-1921">2025-11-19~21</h3>
 
@@ -1131,7 +1142,9 @@
 
 <h3 id="2025-11-2223">2025-11-22~23</h3>
 
-<p>休息</p>
+<ol>
+  <li>休息。</li>
+</ol>
 
 <h3 id="2025-11-24">2025-11-24</h3>
 
@@ -1256,7 +1269,9 @@
 
 <h3 id="2025-12-25">2025-12-25</h3>
 
-<p>Merry Christmas!</p>
+<ol>
+  <li>Merry Christmas!</li>
+</ol>
 
 <h3 id="2025-12-2627">2025-12-26~27</h3>
 
@@ -1277,6 +1292,27 @@
   </li>
 </ol>
 
+<h3 id="2025-12-2829">2025-12-28~29</h3>
+
+<ol>
+  <li>复习信息论。</li>
+  <li>重构了我的博客，使用 Antigravity 与 Gemini 神力。</li>
+</ol>
+
+<h3 id="2025-12-30">2025-12-30</h3>
+
+<ol>
+  <li>读了 <a href="https://mschloegel.me/paper/zeng2026ropbot.pdf">ropbot: Reimaging Code Reuse Attack Synthesis</a> 这篇 NDSS’26 论文。
+    <ul>
+      <li>一个非常强悍的自动化 ROP 链工具，跨架构，而且支持各种奇奇怪怪的 binary（包括 chromium、linux kernel 等等）。</li>
+      <li>整个管线非常合理：第一步是使用 angr 拿到所有 gadget，记录下它们的依赖和 effect，并从中拿出一些一定可用的基础 gadget 作为可用 gadget 初始集。这里的“一定可用”是有明确定义的：增加了栈指针 + 从栈上获取了 PC + 不含条件分支，这样的 gadget 是 “self-contained” 的。第二步是一个大循环：首先维护一个寄存器图，根据现有可用 gadget 来将图上标记为可控，或者添加边来表示攻击者可以从一个寄存器控制另一个寄存器。循环体内部会去遍历那些 <code class="language-plaintext highlighter-rouge">not-self-contained</code> 的 gadget，如果它们提供了现有 gadget 没有提供的 effect，就尝试将其和现有 gadget 组合成一个 “self-contained” gadget，具体的组合方式见论文细节。第三步就是根据已有能力进行 chain 的构造了。</li>
+      <li>整个过程非常合理，工具能力也很强。虽然还是会有一些极端的 ROP chain 是工具无法搜索到的（这仅仅是我的经验，比如我在一些 RISC ISA 上写过的 ROP Chain，其 stack comsuming 并非为正，但也足够我调 <code class="language-plaintext highlighter-rouge">mprotect</code> 跑 shellcode 了），但绝大部分场景下工具表现会非常出色，绝对是够用的。论文提到 Google 等公司已经采用 ropbot 来快速验证漏洞的可利用性，帮助开发团队根据风险严重程度调整补丁修复的优先级，非常有用。</li>
+      <li>论文源码仓库：<a href="https://github.com/sefcom/ropbot">ropbot</a>。</li>
+    </ul>
+  </li>
+</ol>
+
+</div>
 
           </div>
         </div>

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: diary
 title: Diary
 permalink: /diary/
 toc_max_level: 2
@@ -238,7 +238,7 @@ toc_max_level: 2
 3. 发现 Linux 上有 `who` 工具可以列出当前系统上的各种伪终端文件，非常适合在同学使用终端时偷偷连上去，往他的终端里拉屎！
 
 ### 2025-8-21 ~ 9-14
-放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。
+1. 放暑假！去了山西旅游，还在家里待了两周休养生息，爽了。
 
 ## 2025-9
 
@@ -271,7 +271,7 @@ toc_max_level: 2
 
 ### 2025-9-29
 
-Dating with liz
+1. Dating with liz
 
 ### 2025-9-30
 
@@ -429,7 +429,7 @@ Dating with liz
 
 ### 2025-11-05~10
 
-家里有事。
+1. Dating with liz in Hong Kong.
 
 ### 2025-11-11
 
@@ -463,11 +463,11 @@ Dating with liz
 
 ### 2025-11-15~16
 
-整理前几天的阅读笔记。
+1. 整理前几天的阅读笔记。
 
 ### 2025-11-17~18
 
-去做了胃镜，休息。
+1. 去做了胃镜，休息。
 
 ### 2025-11-19~21
 
@@ -475,7 +475,7 @@ Dating with liz
 
 ### 2025-11-22~23
 
-休息
+1. 休息。
 
 ### 2025-11-24
 
@@ -558,7 +558,7 @@ Dating with liz
 
 ### 2025-12-25
 
-Merry Christmas!
+1. Merry Christmas!
 
 ### 2025-12-26~27
 
@@ -571,3 +571,15 @@ Merry Christmas!
 2. 看了一个 Merry Christmas Day：[CVE-2025-14847](https://www.ox.security/blog/attackers-could-exploit-zlib-to-exfiltrate-data-cve-2025-14847/#technical_analysis)。希望读者 get 到笑点。
 - 一个 `decompressData()` 函数本来应该返回解压后数据的实际长度，但错误地返回了**分配的内存空间**长度，导致的信息泄漏漏洞。非常轻松写意的漏洞，非常适合节日氛围（我是不是学疯了？）。
 
+### 2025-12-28~29
+
+1. 复习信息论。
+2. 重构了我的博客，使用 Antigravity 与 Gemini 神力。
+
+### 2025-12-30
+
+1. 读了 [ropbot: Reimaging Code Reuse Attack Synthesis](https://mschloegel.me/paper/zeng2026ropbot.pdf) 这篇 NDSS'26 论文。
+- 一个非常强悍的自动化 ROP 链工具，跨架构，而且支持各种奇奇怪怪的 binary（包括 chromium、linux kernel 等等）。
+- 整个管线非常合理：第一步是使用 angr 拿到所有 gadget，记录下它们的依赖和 effect，并从中拿出一些一定可用的基础 gadget 作为可用 gadget 初始集。这里的“一定可用”是有明确定义的：增加了栈指针 + 从栈上获取了 PC + 不含条件分支，这样的 gadget 是 “self-contained” 的。第二步是一个大循环：首先维护一个寄存器图，根据现有可用 gadget 来将图上标记为可控，或者添加边来表示攻击者可以从一个寄存器控制另一个寄存器。循环体内部会去遍历那些 `not-self-contained` 的 gadget，如果它们提供了现有 gadget 没有提供的 effect，就尝试将其和现有 gadget 组合成一个 “self-contained” gadget，具体的组合方式见论文细节。第三步就是根据已有能力进行 chain 的构造了。
+- 整个过程非常合理，工具能力也很强。虽然还是会有一些极端的 ROP chain 是工具无法搜索到的（这仅仅是我的经验，比如我在一些 RISC ISA 上写过的 ROP Chain，其 stack comsuming 并非为正，但也足够我调 `mprotect` 跑 shellcode 了），但绝大部分场景下工具表现会非常出色，绝对是够用的。论文提到 Google 等公司已经采用 ropbot 来快速验证漏洞的可利用性，帮助开发团队根据风险严重程度调整补丁修复的优先级，非常有用。
+- 论文源码仓库：[ropbot](https://github.com/sefcom/ropbot)。

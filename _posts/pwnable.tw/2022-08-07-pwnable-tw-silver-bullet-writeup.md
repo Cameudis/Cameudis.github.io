@@ -1,4 +1,5 @@
 ---
+published: false
 Layout: Post
 title: pwnable.tw silver_bullet
 date: 2022-08-07 09:28:56

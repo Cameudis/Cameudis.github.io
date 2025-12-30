@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: pwnable.tw BabyStack
 date: 2023-10-23 19:51:17

@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: pwnable.tw Re-alloc
 date: 2023-04-13 23:03:41

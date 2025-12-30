@@ -1,4 +1,5 @@
 ---
+published: false
 layout: post
 title: pwnable.tw tcache_tear
 date: 2023-02-01 15:16:30

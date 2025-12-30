@@ -1,4 +1,5 @@
 ---
+published: false
 Layout: Post
 title: pwnable.tw hacknote
 date: 2022-09-01 15:04:01

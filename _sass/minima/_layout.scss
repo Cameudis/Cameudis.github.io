@@ -347,8 +347,8 @@
 }
 
 .post-item {
-  margin-bottom: $spacing-unit * 1.5;
-  padding-bottom: $spacing-unit;
+  margin-bottom: $spacing-unit / 2;
+  padding-bottom: $spacing-unit / 2;
   border-bottom: 1px dashed $grey-color-light;
 
   &:last-child {
@@ -418,7 +418,7 @@
   list-style: none;
 
   >li {
-    margin-bottom: $spacing-unit;
+    margin-bottom: $spacing-unit / 2;
   }
 }
 

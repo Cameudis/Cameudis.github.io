@@ -153,7 +153,7 @@ table td { border: 1px solid #3b4252; }
 
 .post-list-container { margin-top: 40px; }
 
-.post-item { margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px dashed #3b4252; }
+.post-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed #3b4252; }
 .post-item:last-child { border-bottom: none; }
 
 .post-meta-top { display: flex; justify-content: space-between; font-family: "FusionPixel10Prop", sans-serif; font-size: 11.2px; color: #4c566a; margin-bottom: 5px; }
@@ -173,7 +173,7 @@ table td { border: 1px solid #3b4252; }
   to { opacity: 1; }
   50% { opacity: 0; } }
 .post-list { margin-left: 0; list-style: none; }
-.post-list > li { margin-bottom: 40px; }
+.post-list > li { margin-bottom: 20px; }
 
 .post-meta { font-size: 11.2px; font-family: "FusionPixel10Prop", sans-serif; color: #4c566a; }
 
@@ -289,3 +289,12 @@ table td { border: 1px solid #3b4252; }
 .highlight .m, .highlight .mi, .highlight .mf, .highlight .mh { color: var(--tok-number); }
 .highlight .nf, .highlight .fm { color: var(--tok-func); font-weight: bold; }
 .highlight .kt, .highlight .nc { color: var(--tok-type); font-weight: bold; }
+
+.diary-content { position: relative; }
+.diary-content h2 { position: relative; padding-left: 0; margin-top: 40px; margin-bottom: 20px; color: #5e81ac; border-bottom: none; }
+.diary-content h3 { position: relative; padding-left: 0; margin-top: 30px; margin-bottom: 15px; font-size: 1.2rem; color: #b8b8b8; }
+.diary-content ol { list-style: none; padding-left: 0; margin-left: 0; }
+.diary-content ol > li { position: relative; background: rgba(18, 18, 18, 0.5); border: 1px dashed #3b4252; padding: 15px; margin-bottom: 15px; border-radius: 0; transition: all 0.2s ease; }
+.diary-content ol > li:hover { border-color: #5e81ac; background: rgba(94, 129, 172, 0.05); transform: translateX(5px); }
+.diary-content ul { margin-top: 10px; margin-left: 0; padding-left: 0; border-left: none; }
+.diary-content ul li { margin-left: 0; padding-left: 0; margin-bottom: 12px; list-style-type: none; }

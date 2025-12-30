@@ -1,0 +1,71 @@
+.diary-content {
+    position: relative;
+
+    // Timeline removed
+
+    // Month Header (e.g. 2025-7)
+    h2 {
+        position: relative;
+        padding-left: 0; // Removed padding
+        margin-top: 40px;
+        margin-bottom: 20px;
+        color: $brand-color;
+        border-bottom: none;
+
+        // Removed circle marker
+    }
+
+    // Day Header (e.g. 2025-7-3)
+    h3 {
+        position: relative;
+        padding-left: 0; // Removed padding
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        color: $text-color;
+
+        // Removed circle marker
+    }
+
+    // List wrapping the day's items
+    ol {
+        list-style: none;
+        padding-left: 0; // Removed padding
+        margin-left: 0;
+
+        >li {
+            position: relative;
+            background: rgba($background-color, 0.5);
+            border: 1px dashed $grey-color-light;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0; // Removed rounded corners
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: $brand-color;
+                background: rgba($brand-color, 0.05);
+                transform: translateX(5px);
+            }
+
+            // Removed numbering as requested
+        }
+    }
+
+    // Sub-lists inside items
+    ul {
+        margin-top: 10px;
+        margin-left: 0; // Force zero margin
+        padding-left: 0; // Force zero padding
+        border-left: none; // Removed border
+
+        li {
+            margin-left: 0; // Force zero margin
+            padding-left: 0; // Force zero padding
+            margin-bottom: 12px; // Increased spacing between items
+            list-style-type: none;
+
+            // Removed dash
+        }
+    }
+}
