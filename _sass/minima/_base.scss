@@ -169,6 +169,21 @@ a {
       text-decoration: underline;
     }
   }
+
+  &[href^="http"]:not([href*="cameudis.com"])::after {
+    content: "\2197";
+    /* North East Arrow ↗ */
+    display: inline-block;
+    vertical-align: super;
+    margin-left: 2px;
+    font-size: 0.6em;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  &[href^="http"]:not([href*="cameudis.com"]):hover::after {
+    opacity: 1;
+  }
 }
 
 

@@ -38,6 +38,8 @@ a { color: #5e81ac; text-decoration: none; transition: all 0.2s ease; }
 a:hover { color: #eceff4; background-color: rgba(94, 129, 172, 0.1); text-decoration: none; box-shadow: 0 2px 0 #5e81ac; }
 .social-media-list a:hover { text-decoration: none; }
 .social-media-list a:hover .username { text-decoration: underline; }
+a[href^="http"]:not([href*="cameudis.com"])::after { content: "\2197"; /* North East Arrow ↗ */ display: inline-block; vertical-align: super; margin-left: 2px; font-size: 0.6em; opacity: 0.7; transition: opacity 0.2s ease; }
+a[href^="http"]:not([href*="cameudis.com"]):hover::after { opacity: 1; }
 
 /** Blockquotes */
 blockquote { color: #81a1c1; border-left: 2px solid #5e81ac; padding-left: 20px; font-style: italic; margin-top: 40px; margin-bottom: 40px; }
