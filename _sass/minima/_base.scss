@@ -174,7 +174,8 @@ a {
     content: "\2197";
     /* North East Arrow ↗ */
     display: inline-block;
-    vertical-align: super;
+    vertical-align: middle;
+    line-height: 0;
     margin-left: 2px;
     font-size: 0.6em;
     opacity: 0.7;

@@ -584,3 +584,15 @@ toc_max_level: 2
 - 整个过程非常合理，工具能力也很强。虽然还是会有一些极端的 ROP chain 是工具无法搜索到的（这仅仅是我的经验，比如我在一些 RISC ISA 上写过的 ROP Chain，其 stack comsuming 并非为正，但也足够我调 `mprotect` 跑 shellcode 了），但绝大部分场景下工具表现会非常出色，绝对是够用的。论文提到 Google 等公司已经采用 ropbot 来快速验证漏洞的可利用性，帮助开发团队根据风险严重程度调整补丁修复的优先级，非常有用。
 - 论文源码仓库（包含复现相关 artifacts）：[ropbot](https://github.com/sefcom/ropbot)。工具源码仓库：[angrop](https://github.com/angr/angrop)。
 2. 看了 [Battelle Shmoocon CTF Jump Planner (libC GOT chaining)](https://debugmen.dev/pwn/2024/01/15/jump-planner.html) 这篇博客，用 Call Oriented Programming 绕过了影子栈机制，很有趣。
+
+## 2026-01
+
+主要在捣鼓期末相关的事。复现了一个 VMWare Workstaion 逃逸漏洞，之后整理整理发一篇博客。
+
+## 2026-02
+
+### 2026-02-04
+
+1. 最近玩了玩 [google/syzkaller](https://github.com/google/syzkaller)，用来 fuzz Linux 内核。Syzkaller 内置了大量 Linux 内核接口（包括系统调用、设备接口如 [/dev/kvm](https://github.com/google/syzkaller/blob/master/sys/linux/dev_kvm.txt)、Netlink 接口如 [NETLINK_XFRM](https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_xfrm.txt) 等）的*描述*，syz-manager 作为中控管理的角色会启动多个 VM，根据这些描述文件变异生成 corpus，从中取出用户态程序在 VM 内部编译运行，并通过 Linux 为用户态 fuzzer 提供的 [KCOV](https://docs.kernel.org/dev-tools/kcov.html) 接口读取覆盖率信息。
+- Syzkaller 的描述依赖人工分析和手写，可能不完整，于是 ChatGPT 给我推了 [f0rm2l1n](https://f0rm2l1n.github.io/) 的论文：[_NLSaber_: Enhancing Netlink Family Fuzzing via Automated Syscall Description Generation](https://link.springer.com/chapter/10.1007/978-3-032-07894-0_19)。Netlink 接口传递的是 TLV 格式（Type, Length, Value）的二进制数据，内核某个子模块的开发者在向用户态提供 Netlink 接口时，会约定好接口需要哪些字段，然后解析发来的二进制数据。读者可以想象成序列化和反序列化。论文对各模块的 Netlink message parsing 部分进行了静态污点分析，通过自动化的方法能更全面地提取出这些模块都通过 Netlink 提供了哪些功能，从而给 kernel fuzzer 提供更多内核接口描述。作者用这些自动生成的描述进行 fuzzing，拿到了 12 个 CVE 编号，其中有五个是可以让攻击者拿到写原语的。作者在 artifacts 中给了其中一个类型混淆漏洞（CVE-2025-22056）的[提权 exp](https://github.com/TroySysSec/NLSaber/tree/main/proof-of-concepts/16_type-confusion_nft_tunnel_obj_geneve_init)。
+- 京东獬豸实验室也为这个 CVE 写过一篇博客：[Netfilter Tunnel 之殇：CVE-2025-22056](https://dawnslab.jd.com/CVE-2025-22056/)。程序希望计算 `某结构体指针 = 起始指针 + 偏移`，这里搞成了先把起始指针转换成结构体指针再加偏移，即 `某结构体指针 = (结构体*)起始指针 + 偏移`，实际加的偏移是 `结构体大小 * 偏移`，实际得到的结构体指针被偏移，后续造成溢出读写。

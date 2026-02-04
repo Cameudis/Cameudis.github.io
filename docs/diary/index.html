@@ -418,7 +418,7 @@
           
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li><li><a href="#2025-12">2025-12</a></li></ul>
+            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li><li><a href="#2025-12">2025-12</a></li><li><a href="#2026-01">2026-01</a></li><li><a href="#2026-02">2026-02</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody">
@@ -1313,6 +1313,23 @@
   <li>看了 <a href="https://debugmen.dev/pwn/2024/01/15/jump-planner.html">Battelle Shmoocon CTF Jump Planner (libC GOT chaining)</a> 这篇博客，用 Call Oriented Programming 绕过了影子栈机制，很有趣。</li>
 </ol>
 
+<h2 id="2026-01">2026-01</h2>
+
+<p>主要在捣鼓期末相关的事。复现了一个 VMWare Workstaion 逃逸漏洞，之后整理整理发一篇博客。</p>
+
+<h2 id="2026-02">2026-02</h2>
+
+<h3 id="2026-02-04">2026-02-04</h3>
+
+<ol>
+  <li>最近玩了玩 <a href="https://github.com/google/syzkaller">google/syzkaller</a>，用来 fuzz Linux 内核。Syzkaller 内置了大量 Linux 内核接口（包括系统调用、设备接口如 <a href="https://github.com/google/syzkaller/blob/master/sys/linux/dev_kvm.txt">/dev/kvm</a>、Netlink 接口如 <a href="https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_xfrm.txt">NETLINK_XFRM</a> 等）的<em>描述</em>，syz-manager 作为中控管理的角色会启动多个 VM，根据这些描述文件变异生成 corpus，从中取出用户态程序在 VM 内部编译运行，并通过 Linux 为用户态 fuzzer 提供的 <a href="https://docs.kernel.org/dev-tools/kcov.html">KCOV</a> 接口读取覆盖率信息。
+    <ul>
+      <li>Syzkaller 的描述依赖人工分析和手写，可能不完整，于是 ChatGPT 给我推了 <a href="https://f0rm2l1n.github.io/">f0rm2l1n</a> 的论文：<a href="https://link.springer.com/chapter/10.1007/978-3-032-07894-0_19"><em>NLSaber</em>: Enhancing Netlink Family Fuzzing via Automated Syscall Description Generation</a>。Netlink 接口传递的是 TLV 格式（Type, Length, Value）的二进制数据，内核某个子模块的开发者在向用户态提供 Netlink 接口时，会约定好接口需要哪些字段，然后解析发来的二进制数据。读者可以想象成序列化和反序列化。论文对各模块的 Netlink message parsing 部分进行了静态污点分析，通过自动化的方法能更全面地提取出这些模块都通过 Netlink 提供了哪些功能，从而给 kernel fuzzer 提供更多内核接口描述。作者用这些自动生成的描述进行 fuzzing，拿到了 12 个 CVE 编号，其中有五个是可以让攻击者拿到写原语的。作者在 artifacts 中给了其中一个类型混淆漏洞（CVE-2025-22056）的<a href="https://github.com/TroySysSec/NLSaber/tree/main/proof-of-concepts/16_type-confusion_nft_tunnel_obj_geneve_init">提权 exp</a>。</li>
+      <li>京东獬豸实验室也为这个 CVE 写过一篇博客：<a href="https://dawnslab.jd.com/CVE-2025-22056/">Netfilter Tunnel 之殇：CVE-2025-22056</a>。程序希望计算 <code class="language-plaintext highlighter-rouge">某结构体指针 = 起始指针 + 偏移</code>，这里搞成了先把起始指针转换成结构体指针再加偏移，即 <code class="language-plaintext highlighter-rouge">某结构体指针 = (结构体*)起始指针 + 偏移</code>，实际加的偏移是 <code class="language-plaintext highlighter-rouge">结构体大小 * 偏移</code>，实际得到的结构体指针被偏移，后续造成溢出读写。</li>
+    </ul>
+  </li>
+</ol>
+
 </div>
 
           </div>
@@ -1376,7 +1393,7 @@
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
           height="31">
       </div>
-      <p>&copy; 2025 Y² (aka.cameudis)</p>
+      <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer><script src="/assets/js/post.js"></script>
