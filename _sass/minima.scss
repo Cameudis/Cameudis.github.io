@@ -12,14 +12,16 @@ $base-line-height: 2.0 !default;
 
 $spacing-unit: 40px !default;
 
-// Low-contrast "Vintage Terminal" palette
-$text-color: #b8b8b8 !default; // Muted gray
-$background-color: #121212 !default; // Deep off-black
-$brand-color: #5e81ac !default; // Nord-style blue
+@import "minima/theme";
 
-$grey-color: #4c566a !default;
-$grey-color-light: #3b4252 !default;
-$grey-color-dark: #2e3440 !default;
+// Low-contrast "Vintage Terminal" palette
+$text-color: var(--text-color) !default;
+$background-color: var(--background-color) !default;
+$brand-color: var(--brand-color) !default;
+
+$grey-color: var(--grey-color) !default;
+$grey-color-light: var(--grey-color-light) !default;
+$grey-color-dark: var(--grey-color-dark) !default;
 
 $table-text-align: left !default;
 

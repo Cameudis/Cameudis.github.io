@@ -42,8 +42,8 @@ permalink: /links/
 }
 
 .friend-card {
-  background: rgba(46, 52, 64, 0.4); /* Nord Darker Blue-Gray with opacity */
-  border: 1px dashed #4c566a;
+  background: var(--card-bg); 
+  border: 1px dashed var(--grey-color);
   padding: 15px;
   transition: all 0.2s ease;
   position: relative;
@@ -51,10 +51,11 @@ permalink: /links/
 }
 
 .friend-card:hover {
-  border-color: #5e81ac; /* Brand color */
-  background: rgba(46, 52, 64, 0.6);
+  border-color: var(--brand-color);
+  background: var(--card-bg);
+  opacity: 0.9;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .friend-card a {
@@ -70,8 +71,8 @@ permalink: /links/
   flex-shrink: 0;
   width: 50px;
   height: 50px;
-  border: 1px solid #4c566a;
-  background: #2e3440;
+  border: 1px solid var(--grey-color-light);
+  background: var(--grey-color-dark);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -91,7 +92,7 @@ permalink: /links/
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #5e81ac;
+  color: var(--brand-color);
   font-family: "FusionPixel12Mono", monospace;
   font-weight: bold;
   font-size: 1.5em;
@@ -104,7 +105,7 @@ permalink: /links/
 
 .friend-info h3 {
   margin: 0 0 5px 0;
-  color: #eceff4;
+  color: var(--heading-color);
   font-family: "FusionPixel10Prop", sans-serif;
   font-size: 1.2em;
   letter-spacing: 1px;
@@ -112,13 +113,14 @@ permalink: /links/
 
 .friend-slogan {
   margin: 0;
-  color: #b8b8b8;
+  color: var(--text-color);
   font-size: 0.85em;
   font-style: italic;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.4;
+  opacity: 0.8;
 }
 
 /* Decoration for cards */
@@ -129,7 +131,8 @@ permalink: /links/
   right: 10px;
   font-family: "FusionPixel10Prop", sans-serif;
   font-size: 0.8em;
-  color: rgba(94, 129, 172, 0.3);
+  color: var(--brand-color);
+  opacity: 0.3;
 }
 
 /* 响应式设计 */

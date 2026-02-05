@@ -1,0 +1,59 @@
+:root {
+  /* Night Theme (Default) */
+  --background-color: #121212;
+  --text-color: #b8b8b8;
+  --brand-color: #5e81ac; /* Nord Blue */
+  --heading-color: #eceff4;
+  --grey-color: #4c566a;
+  --grey-color-light: #3b4252;
+  --grey-color-dark: #2e3440;
+  --header-bg: rgba(18, 18, 18, 0.8);
+  --table-text: #e5e5e5;
+  --table-bg-even: #485063;
+  --table-th-bg: #414a5b;
+  --border-color: #333946;
+  --brand-dim: rgba(94, 129, 172, 0.1);
+  --accent-orange: #d08770;
+  --nav-bg: #1c1c1c;
+  --syntax-bg: #2e3440;
+  --scanline-opacity: 0.3;
+  --card-bg: rgba(46, 52, 64, 0.4);
+
+  /* Syntax Highlighting (Night) */
+  --tok-comment: #616e88;
+  --tok-keyword: #81a1c1;
+  --tok-string: #a3be8c;
+  --tok-number: #b48ead;
+  --tok-func: #88c0d0;
+  --tok-type: #ebcb8b;
+}
+
+[data-theme="light"] {
+  /* Day Theme */
+  --background-color: #ffffff;
+  --text-color: #2e3440;
+  --brand-color: #d08770; /* Nord Orange */
+  --heading-color: #3b4252;
+  --grey-color: #4c566a;
+  --grey-color-light: #e5e9f0;
+  --grey-color-dark: #d8dee9;
+  --syntax-bg: #f5f5f5;
+  --scanline-opacity: 0.1;
+  --card-bg: #f9f9f9;
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --table-text: #505050;
+  --table-bg-even: #f9f9f9;
+  --table-th-bg: #f0f0f0;
+  --border-color: #e0e0e0;
+  --brand-dim: rgba(208, 135, 112, 0.1);
+  --accent-orange: #d08770;
+  --nav-bg: #f8f8f8;
+
+  /* Syntax Highlighting (Day - softened Nord) */
+  --tok-comment: #4c566a;
+  --tok-keyword: #5e81ac;
+  --tok-string: #4e7a3d;
+  --tok-number: #88398a;
+  --tok-func: #005a5f;
+  --tok-type: #8f5536;
+}

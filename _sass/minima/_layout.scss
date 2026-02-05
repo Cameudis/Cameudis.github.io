@@ -5,7 +5,7 @@
   border-bottom: 1px dashed $grey-color;
   min-height: $spacing-unit * 2;
   position: relative;
-  background-color: rgba($background-color, 0.8);
+  background-color: var(--header-bg);
   backdrop-filter: blur(5px);
   z-index: 100;
 }
@@ -22,7 +22,7 @@
 
   &,
   &:visited {
-    color: #eceff4;
+    color: var(--heading-color);
   }
 
   &:hover {
@@ -49,7 +49,7 @@
   }
 
   .page-link {
-    color: #d8dee9;
+    color: var(--text-color);
     font-family: "FusionPixel10Prop", sans-serif;
     line-height: $base-line-height;
 
@@ -73,7 +73,7 @@
     position: absolute;
     top: 9px;
     right: $spacing-unit / 2;
-    background-color: scale-color($background-color, $lightness: 5%);
+    background-color: var(--nav-bg);
     border: 1px dashed $grey-color;
     border-radius: 0; // Square corners
     text-align: right;
@@ -134,7 +134,7 @@
 .site-footer {
   border-top: 1px dashed $grey-color-light;
   padding: $spacing-unit * 1.5 0;
-  color: #d8dee9;
+  color: var(--text-color);
   font-size: $base-font-size;
   background-color: $background-color; // Match body
   margin-top: $spacing-unit * 2;
@@ -234,7 +234,7 @@
 
 .footer-heading {
   font-family: $base-font-family;
-  color: #eceff4;
+  color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
 }
@@ -247,7 +247,7 @@
 
 .footer-col-wrapper {
   font-family: $base-font-family;
-  color: #d8dee9;
+  color: var(--text-color);
   margin-left: -$spacing-unit / 2;
   @extend %clearfix;
 }
@@ -331,7 +331,7 @@
   @include relative-font-size(2);
   font-family: $base-font-family;
   font-weight: 700;
-  color: #eceff4;
+  color: var(--heading-color);
   margin-bottom: $spacing-unit;
 }
 
@@ -339,7 +339,7 @@
   @include relative-font-size(1.75);
   font-family: $base-font-family;
   font-weight: 700;
-  color: #eceff4;
+  color: var(--heading-color);
 }
 
 .post-list-container {
@@ -366,6 +366,7 @@
 }
 
 .post-date {
+  color: var(--accent-orange);
   &::before {
     content: "[";
     margin-right: 2px;
@@ -378,7 +379,8 @@
 }
 
 .post-tags {
-  opacity: 0.7;
+  color: var(--accent-orange);
+  opacity: 0.8;
 }
 
 .post-item-title {
@@ -433,7 +435,7 @@
   @include relative-font-size(1.4);
   font-family: $base-font-family;
   font-weight: 600;
-  color: #d8dee9;
+  color: var(--text-color);
 
   &:hover {
     color: $brand-color;
@@ -455,7 +457,7 @@
   @include relative-font-size(1.8);
   font-family: "FusionPixel12Prop", sans-serif;
   font-weight: 700;
-  color: #eceff4;
+  color: var(--heading-color);
   margin-top: $spacing-unit;
   margin-bottom: $spacing-unit / 2;
   line-height: 1.2;
@@ -505,7 +507,7 @@
   font-size: $small-font-size;
   padding: $spacing-unit / 2;
   border: 1px dashed $grey-color-light;
-  background-color: rgba($background-color, 0.5);
+  background-color: var(--card-bg);
   order: 2; // Ensure it stays on the right
 
   ul {
@@ -579,7 +581,7 @@
     font-family: $base-font-family;
     font-weight: 700;
     margin-top: $spacing-unit * 1.5;
-    color: #d8dee9;
+    color: var(--text-color);
     border-bottom: 1px solid $grey-color-light;
     padding-bottom: 5px;
 
@@ -593,7 +595,7 @@
     font-family: $base-font-family;
     font-weight: 600;
     margin-top: $spacing-unit;
-    color: #d8dee9;
+    color: var(--text-color);
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.375);
@@ -604,7 +606,7 @@
     @include relative-font-size(1.25);
     font-family: $base-font-family;
     font-weight: 500;
-    color: #d8dee9;
+    color: var(--text-color);
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.125);
@@ -622,7 +624,7 @@
   margin-top: $spacing-unit * 2;
   padding: $spacing-unit / 2;
   border: 1px dashed $grey-color-light;
-  background-color: rgba($background-color, 0.3);
+  background-color: var(--card-bg);
 }
 
 .related-posts-title {
@@ -656,7 +658,7 @@
 .related-post-link {
   font-family: $base-font-family;
   font-weight: 500;
-  color: #d8dee9;
+  color: var(--text-color);
   text-decoration: none;
 
   &:hover {

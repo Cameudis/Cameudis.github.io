@@ -54,7 +54,7 @@ body {
     z-index: 9999;
     background-size: 100% 4px, 3px 100%;
     pointer-events: none;
-    opacity: 0.3;
+    opacity: var(--scanline-opacity);
   }
 }
 
@@ -156,8 +156,8 @@ a {
   transition: all 0.2s ease;
 
   &:hover {
-    color: #eceff4; // Brighter on hover
-    background-color: rgba($brand-color, 0.1);
+    color: var(--heading-color); // Brighter on hover
+    background-color: var(--brand-dim);
     text-decoration: none;
     box-shadow: 0 2px 0 $brand-color;
   }
@@ -192,8 +192,8 @@ a {
  * Blockquotes
  */
 blockquote {
-  color: #81a1c1;
-  border-left: 2px solid $brand-color;
+  color: var(--accent-orange);
+  border-left: 2px solid var(--accent-orange);
   padding-left: $spacing-unit / 2;
   font-style: italic;
   margin-top: $spacing-unit;
@@ -216,8 +216,8 @@ code {
   line-height: 1.5;
   border: 1px solid $grey-color-light;
   border-radius: 0; // Square corners for retro look
-  background-color: $grey-color-dark !important;
-  color: #d8dee9 !important;
+  background-color: var(--syntax-bg) !important;
+  color: var(--text-color) !important;
 }
 
 code {
@@ -297,13 +297,13 @@ table {
   margin-bottom: $spacing-unit;
   width: 100%;
   text-align: $table-text-align;
-  color: lighten($text-color, 18%);
+  color: var(--table-text);
   border-collapse: collapse;
-  border: 1px solid $grey-color-light;
+  border: 1px solid var(--grey-color-light);
 
   tr {
     &:nth-child(even) {
-      background-color: lighten($grey-color-light, 6%);
+      background-color: var(--table-bg-even);
     }
   }
 
@@ -313,13 +313,12 @@ table {
   }
 
   th {
-    background-color: lighten($grey-color-light, 3%);
-    border: 1px solid darken($grey-color-light, 4%);
-    border-bottom-color: darken($grey-color-light, 12%);
+    background-color: var(--table-th-bg);
+    border: 1px solid var(--border-color);
   }
 
   td {
-    border: 1px solid $grey-color-light;
+    border: 1px solid var(--grey-color-light);
   }
 }
 

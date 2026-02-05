@@ -1,25 +1,11 @@
-/**
- * Syntax highlighting styles
- */
-
-// Nord-inspired syntax colors
-:root {
-  --tok-comment: #616e88;
-  --tok-keyword: #81a1c1;
-  --tok-string: #a3be8c;
-  --tok-number: #b48ead;
-  --tok-func: #88c0d0;
-  --tok-type: #ebcb8b;
-  --code-bg: #2e3440;
-}
 
 .highlight {
-  background: var(--code-bg) !important;
+  background: var(--syntax-bg) !important;
   color: #d8dee9;
   @extend %vertical-rhythm;
 
   .highlighter-rouge & {
-    background: var(--code-bg) !important;
+    background: var(--syntax-bg) !important;
   }
 
 
