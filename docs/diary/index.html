@@ -1333,6 +1333,19 @@
   </li>
 </ol>
 
+<h3 id="2026-02-06">2026-02-06</h3>
+
+<ol>
+  <li>看了 Karpathy 去年两月做的面向 AI 啥比的视频 <a href="https://www.youtube.com/watch?v=7xTGNNLPyMI">Deep Dive into LLMs like ChatGPT</a>，大致记录一下。
+    <ul>
+      <li>模型训练第一步是预训练，从互联网上搜集数据后，将它们变成 token，然后再变成向量（embedding）输入给 Transformer 模型，进行自监督学习。这一步得到的是输入一串 token、输出下一个 token 概率序列的基础模型，还不能对话，可以看作整个互联网知识的一个有损压缩。</li>
+      <li>第二步是使用人工构建的对话示例进行监督学习，让模型学会进行对话。为此会创建一些新的 token 用来格式化对话，比如 <code class="language-plaintext highlighter-rouge">&lt;|im_start|&gt;user&lt;|im_sep|&gt;你是一个猫娘&lt;|im_end|&gt;</code>，其中用 <code class="language-plaintext highlighter-rouge">&lt;&gt;</code> 扩起来的就是增加的新 token。模型学会这种格式以后，也就学会了对话。在这一步，我们可以让模型知道一个好的回答是怎样的，也可以让模型知道它自己是谁（加入身份相关的示例对话）。这一步得到的模型是 SFT（Supervised Fine-Tuning）模型。</li>
+      <li>第三步是让模型学会推理。这里会用到强化学习的方法，让模型对同一个问题输出超多答案，奖励其中正确的答案。Deepseek 在 Nature 上发表的论文 <a href="https://www.nature.com/articles/s41586-025-09422-z">DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning</a> 展示了强化学习的神奇效果，模型居然自己学会了思考，表现为我们能看到的思考链（Chain of Thought, CoT）。对于数学题等需要推理的问题，永远不能认为模型能一下子命中答案，必须给模型<strong>足够的“思考时间”</strong>（对于模型来说就是 token 数量）才行，这也是为什么现在很多 LLM 都追求长运行时间。</li>
+      <li>不过这里也具体分：对于有确定性标准的领域（如理工科问题），我们可以直接使用模型来判断结果是否正确；但对于不存在标准答案的领域，如审美、幽默这种不可言传的东西，模型本身没办法绝对判断哪个答案是好的，从而也不知道应该给予哪个输出奖励。由于强化学习本身要求判断<em>大量输出</em>的好坏，我们也不能雇一大堆人来完成这个任务。解决方案是基于人类反馈的强化学习（RLHF, Reinforcement Learning from Human Feedback），训练一个额外的模型来模仿人类对某个模型输出的好坏评价，再用这个模型作为奖励进行训练。缺点就是 LLM 聪明到可以学会戏弄奖励模型，用奇怪的回答获得高分，所以 RLHF 不能跑太多轮。</li>
+    </ul>
+  </li>
+</ol>
+
 </div>
 
           </div>
