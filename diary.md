@@ -601,6 +601,19 @@ toc_max_level: 2
 
 1. 看了 Karpathy 去年两月做的面向 AI 啥比的视频 [Deep Dive into LLMs like ChatGPT](https://www.youtube.com/watch?v=7xTGNNLPyMI)，大致记录一下。
 - 模型训练第一步是预训练，从互联网上搜集数据后，将它们变成 token，然后再变成向量（embedding）输入给 Transformer 模型，进行自监督学习。这一步得到的是输入一串 token、输出下一个 token 概率序列的基础模型，还不能对话，可以看作整个互联网知识的一个有损压缩。
-- 第二步是使用人工构建的对话示例进行监督学习，让模型学会进行对话。为此会创建一些新的 token 用来格式化对话，比如 `<|im_start|>user<|im_sep|>你是一个猫娘<|im_end|>`，其中用 `<>` 扩起来的就是增加的新 token。模型学会这种格式以后，也就学会了对话。在这一步，我们可以让模型知道一个好的回答是怎样的，也可以让模型知道它自己是谁（加入身份相关的示例对话）。这一步得到的模型是 SFT（Supervised Fine-Tuning）模型。
+- 第二步是使用人工构建的对话示例进行监督学习，让模型学会进行对话。为此会创建一些新的 token 用来格式化对话，比如 `<|im_start|>user<|im_sep|>你是一个猫娘<|im_end|>`，其中用 `<>` 扩起来的就是增加的新 token。模型学会这种格式以后，也就学会了对话。在这一步，我们可以让模型知道一个好的回答是怎样的，也可以让模型知道它自己是谁（加入身份相关的示例对话，当然这也可以放在 system prompt 里）。这一步得到的模型是 SFT（Supervised Fine-Tuning）模型。
 - 第三步是让模型学会推理。这里会用到强化学习的方法，让模型对同一个问题输出超多答案，奖励其中正确的答案。Deepseek 在 Nature 上发表的论文 [DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning](https://www.nature.com/articles/s41586-025-09422-z) 展示了强化学习的神奇效果，模型居然自己学会了思考，表现为我们能看到的思考链（Chain of Thought, CoT）。对于数学题等需要推理的问题，永远不能认为模型能一下子命中答案，必须给模型**足够的“思考时间”**（对于模型来说就是 token 数量）才行，这也是为什么现在很多 LLM 都追求长运行时间。
 - 不过这里也具体分：对于有确定性标准的领域（如理工科问题），我们可以直接使用模型来判断结果是否正确；但对于不存在标准答案的领域，如审美、幽默这种不可言传的东西，模型本身没办法绝对判断哪个答案是好的，从而也不知道应该给予哪个输出奖励。由于强化学习本身要求判断*大量输出*的好坏，我们也不能雇一大堆人来完成这个任务。解决方案是基于人类反馈的强化学习（RLHF, Reinforcement Learning from Human Feedback），训练一个额外的模型来模仿人类对某个模型输出的好坏评价，再用这个模型作为奖励进行训练。缺点就是 LLM 聪明到可以学会戏弄奖励模型，用奇怪的回答获得高分，所以 RLHF 不能跑太多轮。
+
+### 2026-02-07
+1. 了解了一些 prompt engineering（提示词工程）的手法，参考资料是 [CS146S 的课件](https://docs.google.com/presentation/d/1MIhw8p6TLGdbQ9TcxhXSs5BaPf5d_h77QY70RHNfeGs/edit?slide=id.g37b974b8d4d_0_0#slide=id.g37b974b8d4d_0_0)、[Prompt Engineering Guide](https://www.promptingguide.ai/techniques)。其实现在大家用 agent 的时候，基本上不太需要自己去进行提示词工程了，agent 自带 prompt 来 push 自己。但是作为模型使用的底层技术，对于 chat 型任务、调 API 完成的一些特定任务来说，还是需要自己写 prompt 并进行调试的。另外这个东西并不像我之前所想的这么无用。
+- 大致可以把提示词工程总结为几个优化方向：把事情交代清楚、引导模型更好地使用推理、给模型提供工具、克服模型缺陷、质量控制与对齐。之所以叫做提示词**工程**而不是提示词编写，是因为我们不仅在考虑一次性的 chat 任务，更想要让模型跑一些批量、重复的工作，为了这些重复的工作我们需要尝试不同的提示词在效果上的差异。
+- “把事情交代清楚” 意味着给模型提供更充分的任务上下文，包括任务描述、背景信息、任务输入输出、甚至是任务步骤。所谓的 Few-shot Prompting（给模型提供若干输入输出的样例）、Meta Prompting（把任务输入输出、处理步骤都提取出来变成抽象的任务描述提交给模型）、Retrieval Augmented Generation（RAG，给模型提供任务相关的背景知识）其实都是朝着这个方向努力。
+- “引导模型使用推理” 是让模型解决复杂问题的关键步骤，其原理可以类比人类的问题解决流程，即复杂问题需要提供足够的思考时间，对于大模型而言就是需要提供足够的 token 数量（而不是直接让模型给出答案）。虽然在训练模型的时候就已经有意识地尝试让模型学会先思考后给答案的输出模式，但在提示词工程中我们还是最好手动让模型“step by step”完成任务，相当于显式声明“这是一个复杂任务”，从而保证模型有足够的思考时间。
+- “给模型提供工具” 是现在 agent 能力的一大来源，就像给手下提供一台工作电脑来让他自己搜索、完成任务一样。有了工具还需要会使用工具，现在很流行的 agent skills 就是教 agent 如何使用工具（的一种方法，这和在提示词里写上怎么用工具本质上是一样的）。还有一个关键点是要使 LLM 能够自行验证解决方案是否准确：我们在使用 agent 的时候往往会发现，只要让 agent 能够接入自行编译、调试、查看报错、解决问题的循环之中，它就能自己表现地很好。[On the Coming Industrialisation of Exploit Generation with LLMs – Sean Heelan's Blog](https://sean.heelan.io/2026/01/18/on-the-coming-industrialisation-of-exploit-generation-with-llms/) 也提到了这点：“The agent must have some way to verify its solution. The verifier needs to be accurate, fast and again not involve a human.”，这篇博客非常推荐安全研究者阅读，主要展望了未来的 token 密集型安全研究模式。
+- “克服模型缺陷” 就是让 LLM 不要整天幻觉了，要求它引用来源、标注不确定、拒绝编造。幻觉这个缺陷和模型本身的训练过程有关：监督学习让模型学会了自信地😎回答问题。为了防止幻觉（目前的模型在训练时已经采取措施减少幻觉了），我们可以在提示词中强制要求模型先搜索（或者先读代码之类的）。
+- “质量控制与对齐” 是模型工程化必不可少的一环，主要解决“失败时怎么办”的问题，比如如何处理空的输入等等。要定义好 fallback，让模型在任何情况下都能 handle 住问题。
+
+### 2026-02-08
+
+1. 写了三天，终于写好了这篇博客：[协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）](http://www.cameudis.com/2026/02/08/VMware-1.html)。

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang=" en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('user-color-scheme');
+      if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870） | Y²的博客</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）" />
+<meta name="author" content="Y² (aka.cameudis)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。" />
+<meta property="og:description" content="小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。" />
+<link rel="canonical" href="https://www.cameudis.com/2026/02/08/VMware-1.html" />
+<meta property="og:url" content="https://www.cameudis.com/2026/02/08/VMware-1.html" />
+<meta property="og:site_name" content="Y²的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-02-08T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2026-02-08T00:00:00+08:00","datePublished":"2026-02-08T00:00:00+08:00","description":"小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。","headline":"协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2026/02/08/VMware-1.html"},"url":"https://www.cameudis.com/2026/02/08/VMware-1.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script src="/assets/js/theme.js" defer></script>
+</head>
+<body><header class="site-header" role="banner">
+  <div class="wrapper"><div class="header-content">
+      <div class="header-content-left">
+        <a class="site-title" rel="author" href="/">Y²的博客</a>
+
+        <button class="search-button" id="search-toggle" aria-label="搜索">
+          <svg width="20px" height="20px" viewBox="0 0 100 100" style="shape-rendering: crispEdges;">
+            <!-- Frame (Light Gray for dark theme visibility) -->
+            <rect x="30" y="10" width="10" height="10" fill="#eee" />
+            <rect x="40" y="10" width="10" height="10" fill="#eee" />
+            <rect x="50" y="10" width="10" height="10" fill="#eee" />
+            <rect x="20" y="20" width="10" height="10" fill="#eee" />
+            <rect x="60" y="20" width="10" height="10" fill="#eee" />
+            <rect x="10" y="30" width="10" height="10" fill="#eee" />
+            <rect x="70" y="30" width="10" height="10" fill="#eee" />
+            <rect x="10" y="40" width="10" height="10" fill="#eee" />
+            <rect x="70" y="40" width="10" height="10" fill="#eee" />
+            <rect x="10" y="50" width="10" height="10" fill="#eee" />
+            <rect x="70" y="50" width="10" height="10" fill="#eee" />
+            <rect x="20" y="60" width="10" height="10" fill="#eee" />
+            <rect x="60" y="60" width="10" height="10" fill="#eee" />
+            <rect x="30" y="70" width="10" height="10" fill="#eee" />
+            <rect x="40" y="70" width="10" height="10" fill="#eee" />
+            <rect x="50" y="70" width="10" height="10" fill="#eee" />
+            <!-- Handle -->
+            <rect x="70" y="70" width="10" height="10" fill="#eee" />
+            <rect x="80" y="80" width="10" height="10" fill="#eee" />
+            <rect x="90" y="90" width="10" height="10" fill="#eee" />
+          </svg>
+        </button>
+
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="切换主题">
+          [ DAY / NIGHT ]
+        </button>
+      </div><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path
+                d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+            </svg>
+          </span>
+        </label>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Diary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
+      </nav></div>
+  </div>
+</header>
+
+<!-- 搜索弹窗 -->
+<div class="search-overlay" id="search-overlay">
+  <div class="search-modal">
+    <div class="search-header">
+      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
+      <button class="search-close" id="search-close">&times;</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<style>
+  /* Header 样式修改 */
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-content-left {
+    display: flex;
+    gap: 5px;
+  }
+
+  .search-button, .theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: left;
+    color: var(--heading-color);
+  }
+
+  .theme-toggle-btn {
+    font-family: "FusionPixel10Prop", sans-serif;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+  }
+
+  .search-button:hover, .theme-toggle-btn:hover {
+    background-color: rgba(var(--brand-color), 0.1);
+    color: var(--brand-color);
+  }
+
+  .search-button:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .search-button svg {
+    fill: currentColor;
+  }
+
+  /* 搜索弹窗样式 */
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 100px;
+  }
+
+  .search-overlay.active {
+    display: flex;
+  }
+
+  .search-modal {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    animation: searchModalIn 0.3s ease-out;
+  }
+
+  @keyframes searchModalIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .search-input,
+  #search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 18px;
+    padding: 10px 0;
+    background: transparent;
+  }
+
+  .search-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 15px;
+    color: #666;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-close:hover {
+    background-color: #f0f0f0;
+  }
+
+  .search-results {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  .search-result {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-result:hover {
+    background-color: #f8f9fa;
+  }
+
+  .search-result:last-child {
+    border-bottom: none;
+  }
+
+  .search-result h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .search-result h3 a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .search-result p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .search-result small {
+    color: #999;
+    font-size: 12px;
+  }
+
+  .search-highlight {
+    background-color: #fff3cd;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+
+  .search-no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 600px) {
+    .search-overlay {
+      padding-top: 50px;
+    }
+
+    .search-modal {
+      width: 95%;
+      margin: 0 auto;
+    }
+
+    .search-header {
+      padding: 15px;
+    }
+
+    .search-input,
+    #search-input {
+      font-size: 16px;
+    }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchClient = algoliasearch('YU3CCWYOVD', 'dec1d1e53d245f8fc3122fa9b41ab7ae');
+    const index = searchClient.initIndex('blog-jekyll');
+
+    const searchToggle = document.getElementById('search-toggle');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchClose = document.getElementById('search-close');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+
+    let searchTimeout;
+
+    searchToggle.addEventListener('click', function () {
+      searchOverlay.classList.add('active');
+      searchInput.focus();
+    });
+
+    // 关闭搜索弹窗
+    function closeSearch() {
+      searchOverlay.classList.remove('active');
+      searchInput.value = '';
+      searchResults.innerHTML = '';
+    }
+
+    searchClose.addEventListener('click', closeSearch);
+
+    // 点击遮罩关闭
+    searchOverlay.addEventListener('click', function (e) {
+      if (e.target === searchOverlay) {
+        closeSearch();
+      }
+    });
+
+    // ESC 键关闭
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+        closeSearch();
+      }
+    });
+
+    // 搜索功能
+    searchInput.addEventListener('input', function () {
+      const query = this.value.trim();
+
+      clearTimeout(searchTimeout);
+
+      if (query.length === 0) {
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      // 防抖处理
+      searchTimeout = setTimeout(() => {
+        performSearch(query);
+      }, 300);
+    });
+
+    function performSearch(query) {
+      index.search(query, {
+        hitsPerPage: 10,
+        attributesToHighlight: ['title', 'content'],
+        highlightPreTag: '<span class="search-highlight">',
+        highlightPostTag: '</span>'
+      }).then(({ hits }) => {
+        displayResults(hits, query);
+      }).catch(error => {
+        console.error('搜索错误:', error);
+        searchResults.innerHTML = '<div class="search-no-results">搜索出错，请稍后重试</div>';
+      });
+    }
+
+    function displayResults(hits, query) {
+      if (hits.length === 0) {
+        searchResults.innerHTML = '<div class="search-no-results">没有找到相关内容</div>';
+        return;
+      }
+
+      const resultsHtml = hits.map(hit => {
+        const title = hit._highlightResult?.title?.value || hit.title || '无标题';
+        const excerpt = hit._highlightResult?.content?.value || hit.excerpt || hit.content || '';
+        const url = hit.url || '#';
+        const date = hit.date || '';
+
+        // 截取摘要
+        const cleanExcerpt = excerpt.replace(/<[^>]*>/g, '').substring(0, 150);
+
+        return `
+        <div class="search-result" onclick="window.location.href='${url}'">
+          <h3><a href="${url}">${title}</a></h3>
+          <p>${cleanExcerpt}${cleanExcerpt.length === 150 ? '...' : ''}</p>
+          ${date ? `<small>${date}</small>` : ''}
+        </div>
+      `;
+      }).join('');
+
+      searchResults.innerHTML = resultsHtml;
+    }
+  });
+</script>
+<main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+        <header class="post-header">
+          <h1 class="post-title p-name" itemprop="name headline">协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）</h1>
+          <div class="post-meta">
+            <time class="dt-published" datetime="2026-02-08T00:00:00+08:00" itemprop="datePublished">[ 2026-02-08 ]
+            </time>
+            
+            <span class="post-tags">:: #vmware #parser</span>
+            </div>
+        </header>
+
+        <div class="post-layout-container">
+          
+          <aside class="post-toc">
+            <div class="toc-title">TABLE_OF_CONTENTS</div>
+            <ul><li><a href="#协议的禁区非法构造">协议的禁区：非法构造</a><ul><li><a href="#vmware-与蓝牙">VMware 与蓝牙</a></li><li><a href="#cve-202320869-栈溢出">CVE-2023–20869 栈溢出</a></li></ul></li><li><a href="#协议的留白未定义行为">协议的留白：未定义行为</a><ul><li><a href="#cve-2023-20870-信息泄露">CVE-2023-20870 信息泄露</a></li></ul></li><li><a href="#总结">总结</a></li></ul>
+          </aside>
+
+          <div class="post-content e-content" itemprop="articleBody">
+            <p>小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。</p>
+
+<p>2023 年，新加坡 STAR Labs 研究员 Nguyễn Hoàng Thạch（<a href="https://twitter.com/hi_im_d4rkn3ss"><em>@hi_im_d4rkn3ss</em></a>）在 Pwn2Own Vancouver 通过一条 VMware Workstation Escape 利用链拿下了 <a href="https://www.zerodayinitiative.com/blog/2023/5/17/cve-2023-2086920870-exploiting-vmware-workstation-at-pwn2own-vancouver">八万美刀和 8 个 Master of PWN 点数</a>。他所用到的两个漏洞 CVE-2023-20869、CVE-2023-20870 非常适合拿来作为解析类漏洞的例子，let’s dive in。</p>
+
+<h2 id="协议的禁区非法构造">协议的禁区：非法构造</h2>
+
+<p>CVE-2023-20869 发生在 VMware 的虚拟蓝牙模块，为此首先需要介绍这个模块是干啥的。</p>
+
+<h3 id="vmware-与蓝牙">VMware 与蓝牙</h3>
+
+<p>蓝牙作为一种无线通信协议，它的整个协议栈架构由三层组成：Application、Host、Controller。App 只管用就行了；Host 层包括蓝牙最常用的那些概念，比如功能发现、配对等；Controller 层则负责链路层和物理层，通常是由硬件实现的。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052044252.png" alt="image.png" /></p>
+
+<p>在 Host 层和 Controller 层之间有着软件和硬件的分水岭，换句话说通常都是由软件去提供 Host 侧的功能，然后通过设备 IO 向硬件发送指令，由硬件完成 Controller 的功能。在 Host 和 Controller 之间的接口格式也由蓝牙协议规定，就叫 HCI（Host Controller Interface）。诸如“开始扫描“、”建立连接”、“连接成功”以及数据的传输都遵循 HCI 格式。HCI 数据包需要通过真实的物理连接（CPU 和蓝牙芯片之间的连接）进行传输，这可以是嵌入式里比较常见的 UART、也可以是 USB，这就无所谓了。</p>
+
+<blockquote>
+  <p>对蓝牙协议栈感兴趣可以看看 xuanxuanblingbling 师傅写的 <a href="https://xuanxuanblingbling.github.io/wireless/ble/2021/06/26/ble/">用西湖论剑 IoT 闯关赛蓝牙赛题理解蓝牙协议</a>。</p>
+</blockquote>
+
+<p>VMware 为了使虚拟机用上主机的蓝牙芯片可谓煞费苦心。首先需要知道一个前提：同一个设备通常来说不能被多套驱动一起使用。举个例子：在我安装了 Windows 和 Fedora Linux 双系统的电脑上，如果我直接从 Windows “重启”到 Linux，蓝牙耳机功能就会完全爆炸。几个月后我才发现 Windows 的“重启”不会完全地对设备进行关闭，只有“关机”才会。所以解决办法是每次都确保 Windows 彻底关机，再开机进入 Linux。</p>
+
+<p>类似地，在主机蓝牙还在工作的时候，虚拟机上的软件显然不能向蓝牙设备直接发送 HCI 请求。所以 VMware 作为中间人实现了一个蓝牙代理：在虚拟机侧提供一个模拟出来的蓝牙芯片，对其接受到的所有 HCI 数据包进行解析，然后在主机侧代为执行。</p>
+
+<p>以具体例子说明，当虚拟机和一个经典蓝牙设备建立连接时，它会向目标设备发送“连接”、“配对”的 HCI 请求。VMware 在接受到并解析这些指令，理解了“虚拟机需要做这些操作”后，自行调用主机蓝牙 API 和目标设备完成实际的连接与配对。在进行 PIN 配对时，提示输入 PIN 码的对话框会出现在主机侧而非虚拟机侧，这就表明实际的蓝牙连接和配对在设备和 Host 之间发生。VMware 通过不断地解析和构造 HCI 请求或回应，给虚拟机维持一个蓝牙设备的假象。</p>
+
+<p>出于安全考虑，VMware 会限制虚拟机的蓝牙能力，比如在 <a href="https://techdocs.broadcom.com/us/en/vmware-cis/desktop-hypervisors/fusion-pro/13-0/using-vmware-fusion/configuring-your-virtual-machines/add-a-device/sharing-bluetooth-devices-with-a-virtual-machine.html">Sharing Bluetooth Devices with a Virtual Machine</a> 文档中有提到：</p>
+
+<ul>
+  <li>只允许向外发起连接（outgoing connections）</li>
+  <li>远端设备看不到虚拟机试图通知/发布的服务（如果虚拟机想当服务器、对外暴露服务记录，远端是不可见的）</li>
+  <li>主机完全控制蓝牙适配器的名称/可发现性、以及配对过程/PIN 展示</li>
+  <li>主机蓝牙设备上的供应商特定功能不会传给虚拟机，虚拟机看到的是通用 VMware 虚拟蓝牙设备</li>
+</ul>
+
+<p>从第二条限制可以发现，VMware 不仅需要解析 HCI 层面的数据，也同样需要解析 Host 层协议的数据，才能做到这种功能。这对于一个复杂的协议栈来说可不是好事。</p>
+
+<h3 id="cve-202320869-栈溢出">CVE-2023–20869 栈溢出</h3>
+
+<p>SDP（Service Discovery Protocol）是经典蓝牙中的服务发现协议，功能类似老黄页目录，允许设备相互告知能提供的服务类型及其属性。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052123033.png" alt="image.png" /></p>
+
+<p>SDP 协议定义了一套自己的序列化机制，在 <a href="https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/host/service-discovery-protocol--sdp--specification.html#:~:text=Service%20browsing%20hierarchy-,3.%20Data%20representation,-Attribute%20values%20can">SDP 规范</a>中有详细的定义。下图展示了几种数据被表示成规范中 <em>Data Element</em> 的方式，我们可以看到这个规范是经典的 TLV 结构（Type-length-value，在通信协议的编码或者说序列化的领域中非常常见，类似的还有 Linux 内核的 Netlink 接口，见 <a href="https://docs.kernel.org/userspace-api/netlink/intro.html">官方文档</a>，或是 TLS Extension 的编码）。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052133019.png" alt="image.png" /></p>
+
+<p>CVE-2023-20869 发生在 VMware 对 SDP 数据包进行反序列化的代码中。下面这个函数的功能是解析 uint 类型的 Data Element。逻辑很简单，先把目标数据用 <code class="language-plaintext highlighter-rouge">copy_out</code> 复制到 <code class="language-plaintext highlighter-rouge">buf</code> 中，然后进行大小端转换并放到参数提供的 <code class="language-plaintext highlighter-rouge">out</code> 指针中。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">char</span> <span class="kr">__fastcall</span> <span class="nf">de_read_uint</span><span class="p">(</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">**</span><span class="n">data</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">*</span><span class="n">out_little</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">*</span><span class="n">out_large</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// al</span>
+  <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="n">buf</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="c1">// [rsp+20h] [rbp-58h] BYREF</span>
+
+  <span class="n">result</span> <span class="o">=</span> <span class="n">copy_out</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">len</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">result</span> <span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">memcpy</span><span class="p">((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">len</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">len</span><span class="p">);</span>
+    <span class="o">*</span><span class="n">out_little</span> <span class="o">=</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">|</span> <span class="n">HIDWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xFF0000</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
+                <span class="o">|</span> <span class="p">(((</span><span class="n">HIDWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">|</span> <span class="n">WORD2</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xFF00u</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span>
+                <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF000000</span>
+                  <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF0000</span> <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">|</span> <span class="p">(</span><span class="n">LODWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">);</span> <span class="c1">// 这里是大小端转换</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">out_large</span> <span class="p">)</span>
+      <span class="o">*</span><span class="n">out_large</span> <span class="o">=</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">int</span><span class="p">)(</span><span class="n">HIWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="n">HIDWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xFF0000</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span>
+                 <span class="o">|</span> <span class="p">((</span><span class="n">WORD2</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xFF00u</span> <span class="o">|</span> <span class="p">(</span><span class="n">HIDWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span>
+                 <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF000000</span>
+                   <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF0000</span> <span class="o">|</span> <span class="p">((</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span> <span class="o">|</span> <span class="p">(</span><span class="n">LODWORD</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">);</span> <span class="c1">// 这里也是大小端转换</span>
+    <span class="k">return</span> <span class="n">sub_14083BB60</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>规范中允许 uint 类型有 5 种不同长度，也就是下表中的 <code class="language-plaintext highlighter-rouge">0, 1, 2, 3, 4</code> 五种长度描述符：</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061009449.png" alt="image.png" /></p>
+
+<p>长度描述符的具体含义见下表，0 到 5 分别对应 1 字节到 16 字节。注意，这里的 5 到 7 描述符是很灵活的，比如 5 就允许我们用一个 8 bits 的数来表示实际的大小。</p>
+
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061013217.png" alt="image.png" /></p>
+
+<p>程序调用 <code class="language-plaintext highlighter-rouge">de_read_uint</code> 前，会用通用的长度描述符解析函数计算出 Data Element 的 Size，然后作为 <code class="language-plaintext highlighter-rouge">len</code> 传给这个函数。然而<strong>程序并没有对 “Valid Size Descriptor Values” 做校验</strong>，导致恶意的 SDP 包构建者可以对 uint 使用 5 到 7 号描述符，构造一个拥有巨大 <code class="language-plaintext highlighter-rouge">len</code> 的 uint。</p>
+
+<p>于是 <code class="language-plaintext highlighter-rouge">de_read_uint</code> 中就会发生栈溢出：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">char</span> <span class="kr">__fastcall</span> <span class="nf">de_read_uint</span><span class="p">(</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">**</span><span class="n">data</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">len</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">*</span><span class="n">out_little</span><span class="p">,</span>
+        <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="o">*</span><span class="n">out_large</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">result</span><span class="p">;</span> <span class="c1">// al</span>
+  <span class="kt">unsigned</span> <span class="n">__int64</span> <span class="n">buf</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span> <span class="c1">// [rsp+20h] [rbp-58h] BYREF</span>
+
+  <span class="n">result</span> <span class="o">=</span> <span class="n">copy_out</span><span class="p">(</span><span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">len</span><span class="p">);</span> <span class="c1">// OVERFLOW</span>
+  <span class="k">if</span> <span class="p">(</span> <span class="n">result</span> <span class="p">)</span> <span class="c1">// 一定会继续</span>
+  <span class="p">{</span>
+    <span class="n">memcpy</span><span class="p">((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">len</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buf</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">len</span><span class="p">);</span> <span class="c1">// ANOTHER OVERFLOW</span>
+</code></pre></div></div>
+
+<p>第一次溢出是从 <code class="language-plaintext highlighter-rouge">buf</code> 开始的；第二次溢出更夸张，是从 <code class="language-plaintext highlighter-rouge">buf-len</code> 开始的，会直接把 <code class="language-plaintext highlighter-rouge">memcpy</code> 的返回地址给劫持掉。</p>
+
+<p>不过这个漏洞有着触发条件的限制：主机显然要有蓝牙功能。VMware 虚拟机会默认开启共用主机蓝牙的功能，所以这个漏洞还是相对很危险的！</p>
+
+<blockquote>
+  <p>除此以外在 <a href="https://www.nccgroup.com/media/b2chcbti/vmware-workstation-guest-to-host-escape.pdf">nccgroup 的复现报告</a> 中还提到，主机附近必须存在可以建立连接的蓝牙设备。SDP 协议基于 L2CAP（Logical Link Control and Adaptation Protocol）协议，后者是蓝牙中的多路复用 + 封包 + 适配层，类似于 TCP。TCP 和 L2CAP 都是有状态的协议，需要先握手建立信道后才能传数据。因此，这个攻击似乎会要求虚拟机首先能够和某个蓝牙设备建立 L2CAP 连接，然后才能发送 SDP 包触发解析和栈溢出漏洞，否则一个单独的 SDP/L2CAP 包可能会直接被 VMware 扔掉。这个限制是否具体存在我<em>并没有验证</em>！有可能不需要真的建立连接，直接发一个包 VMware 也会对它做解析。</p>
+</blockquote>
+
+<p>程序员在实现协议的解析时，功能性大于安全性。当他看到文档里的 “valid size descriptor”时，发生的思维活动很可能是：“嗯，uint 字段<em>可以</em>是这些”，而不是“看来我需要限制 uint 字段的长度”。</p>
+
+<p>对于这种非法的构造，通常软件开发者应该在测试阶段就将其拦截下来，这就要求测试工程师不仅仅测试正确性，还要测试安全性和鲁棒性。虽然使用模糊测试的方法很容易就能发现这种问题，但在实际软件开发中，往往还要考虑到赶工、激励机制（员工不会因为产品更安全得到绩效）、技能水平（好像未来水平会更低！）等问题，最终导致漏洞的发生。</p>
+
+<h2 id="协议的留白未定义行为">协议的留白：未定义行为</h2>
+
+<h3 id="cve-2023-20870-信息泄露">CVE-2023-20870 信息泄露</h3>
+
+<p>这个漏洞位于 VMware 蓝牙设备处理 URB（USB Request Block，即 USB 数据包）的代码中。能够触发漏洞的是一个怪怪的 URB：</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">libusb_control_transfer</span><span class="p">(</span><span class="n">bluetooth_handle</span><span class="p">,</span> <span class="n">LIBUSB_REQUEST_TYPE_CLASS</span> <span class="o">|</span> <span class="n">LIBUSB_ENDPOINT_IN</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dataOutput</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>按照字段解析，首先是 <code class="language-plaintext highlighter-rouge">bmRequestType = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_ENDPOINT_IN</code>。<code class="language-plaintext highlighter-rouge">LIBUSB_REQUEST_TYPE_CLASS</code> 表示 class-specific，意思是这个包的具体语义由设备所属的特定 USB Class 规范定义，与其相对的是 <code class="language-plaintext highlighter-rouge">LIBUSB_REQUEST_TYPE_STANDARD</code>。另外，<code class="language-plaintext highlighter-rouge">LIBUSB_ENDPOINT_IN</code> 表示这个包由主机发出，尝试读取设备信息。（这里的“主机”是相对设备而言的，实际上是指 VMware 中运行的虚拟机）</p>
+
+<p>然后是第二个参数：<code class="language-plaintext highlighter-rouge">bRequest = 0</code>。上面提到，这个包使用 class-specific 规则，此时 <code class="language-plaintext highlighter-rouge">bRequest = 0</code> 的实际语义由 USB 蓝牙设备所属的 Wireless Controller Class（0xE0）规范决定，但问题来了，Wireless Controller Class 规范根本<strong>没有定义</strong>过 <code class="language-plaintext highlighter-rouge">bRequest = 0</code> 时的行为，甚至不管 <code class="language-plaintext highlighter-rouge">bRequest</code> 是几都没有定义，这种情况下设备应该如何回应也属于未定义行为。<em>通常来说</em>，这种情况下设备应该返回一个异常，拒绝这个 URB。</p>
+
+<p>我们继续看，<code class="language-plaintext highlighter-rouge">wValue = 0</code>、<code class="language-plaintext highlighter-rouge">wIndex = 0</code> 这两个没什么好说的。<code class="language-plaintext highlighter-rouge">dataOutput</code> 是会被用来存放 response 数据的 buffer，之前提到了这是一个“尝试读取设备信息”的 URB。</p>
+
+<p>然后是 <code class="language-plaintext highlighter-rouge">wLength = 0x80</code>，这表示主机期望设备的回应长度为 <code class="language-plaintext highlighter-rouge">0x80</code> 字节。当然设备可以回应的少一点也没关系，但 VMware 人真的怪好的，说 <code class="language-plaintext highlighter-rouge">0x80</code> 字节就回了 <code class="language-plaintext highlighter-rouge">0x80</code> 字节了。最后的 <code class="language-plaintext highlighter-rouge">1000</code> 表示 1000 毫秒的超时限制。</p>
+
+<p>综上，这是一个主机发向虚拟蓝牙设备的请求包，想拿到的数据是<em>未定义</em>的，并且主机想要读取 <code class="language-plaintext highlighter-rouge">0x80</code> 字节的数据。</p>
+
+<p>VMware 的虚拟蓝牙设备对于这个请求的处理方式：它直接用 <code class="language-plaintext highlighter-rouge">malloc</code> 申请了一块 <code class="language-plaintext highlighter-rouge">wLength = 0x80</code> 大小的空间作为 response，然后就把它发回了主机。此时 response 中的数据都是堆上未经初始化为 0 的遗留数据，从而产生信息泄露漏洞，攻击者可以通过在里面读取指针来计算出程序在虚拟地址空间中的加载位置，从而攻破 ASLR。</p>
+
+<p>对于这种协议的留白，显式的拒绝才是最好的做法，在代码里多加一些 <code class="language-plaintext highlighter-rouge">assert</code> 总归是没错的！当然也有着例外，比如 Linux 的 libxml2 库就因为对 xml 解析过于严格，导致这么多年来大家都无法用 wine 安装 Adobe Photoshop（<a href="https://www.phoronix.com/news/Adobe-Photoshop-2025-Wine-Patch">Adobe Photoshop 2025 Installer Now Working On Linux With Patched Wine</a>）。反观 Windows 的 msxml3 解析器就非常宽容。问题发现者 PhialsBasement 在一月已经给 wine 提交了补丁，专门处理 Adobe 的神秘 xml 文件。在 wine 11.2 版本中，将会拥有丝滑的 Adobe Photoshop / Adobe Creative Cloud 体验（<a href="https://www.phoronix.com/news/Wine-Staging-11.2">Wine-Staging 11.2 Brings More Patches To Help Adobe Photoshop On Linux</a>）。</p>
+
+<p><del>当然在这种情况下，究竟是应该夸赞 msxml3 的宽容，还是应该辱骂 Adobe 乱写 xml，空间留给读者。</del></p>
+
+<p>这种信息泄露类型的漏洞其实也可以通过模糊测试找出来，可以先 hook 住主机上的堆内存分配器，将内容初始化为 <code class="language-plaintext highlighter-rouge">deadbeef</code> 之类的东西，然后从攻击者视角检查有没有此类数据被泄露出来。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>在这篇水文里，我们看到了不管是协议规定的非法构造，还是协议留白的未定义行为，都很容易导向实现中的漏洞。或许在下一篇博客中，我们将具体复现这两个漏洞，顺便带领读者（其实是笔者）领略一下 Windows PWN 的神秘领域。</p>
+
+          </div>
+        </div>
+
+        
+
+
+
+
+  
+
+  
+    <section class="related-posts">
+      <h3 class="related-posts-title">RELATED POSTS</h3>
+      <div class="related-posts-list">
+        
+    
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+          <div class="related-post-item">
+            <span class="related-post-date">[ 2025-04-11 ]</span>
+            <a href="/2025/04/11/SJTUCTF-2025.html" class="related-post-link">SJTU CTF 2025 PWN Writeup</a>
+            <span class="common-tags"> #parser</span>
+          </div>
+          
+          
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+      
+        
+        
+        
+
+        
+      
+    
+  
+      </div>
+    </section>
+  
+
+<div id="comments" class="post-comments"></div>
+        <script>
+  new Valine({
+    el: "#comments",
+    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
+    app_key: "6VqGye1352LX381YQDTOaiXs",
+    placeholder: "El Psy Congroo",
+  });
+</script>
+
+
+        <a class="u-url" href="/2026/02/08/VMware-1.html" hidden></a>
+      </article>
+    </div>
+  </main><footer class="site-footer h-card">
+  <data class="u-url" href="/%20/"></data>
+  <div class="wrapper">
+    <div class="footer-header">
+      <h2 class="footer-heading">[ Y²的博客 ]</h2>
+      <p class="footer-status">STATUS: ONLINE / UPTIME: ∞</p>
+    </div>
+
+    <div class="footer-layout">
+      <!-- Col 1: Contact -->
+      <div class="footer-col">
+        <div class="footer-title">CONTACT_INFO</div>
+        <div class="footer-content">
+          <p class="p-name">Y² (aka.cameudis)</p><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></div>
+      </div>
+
+      <!-- Col 2: Social Links -->
+      <div class="footer-col">
+        <div class="footer-title">SOCIAL_NETWORKS</div>
+        <div class="footer-content"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://www.twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul>
+</div>
+      </div>
+
+      <!-- Col 3: Visitor Map -->
+      <div class="footer-col">
+        <div class="footer-title">VISITOR_MAP</div>
+        <div class="footer-map-mini">
+          <script type='text/javascript' id='clustrmaps'
+            src='//cdn.clustrmaps.com/map_v2.js?cl=4c566a&w=a&t=n&d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&co=121212&ct=b8b8b8&cmo=5e81ac&cmn=5e81ac&w=220'></script>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="quiet-humor">/* Free and useless. */</p>
+      <div style="margin-bottom: 20px;">
+        <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
+          height="31">
+      </div>
+      <p>&copy; 2026 Y² (aka.cameudis)</p>
+    </div>
+  </div>
+</footer><script src="/assets/js/post.js"></script>
+
+</body>
+
+</html>
