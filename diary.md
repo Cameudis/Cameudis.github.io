@@ -617,3 +617,8 @@ toc_max_level: 2
 ### 2026-02-08
 
 1. 写了三天，终于写好了这篇博客：[协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）](http://www.cameudis.com/2026/02/08/VMware-1.html)。
+
+### 2026-02-24
+
+1. 看了 [FLIPPYRAM: A Large-Scale Study of  Rowhammer Prevalence](https://www.ndss-symposium.org/wp-content/uploads/2026-f1810-paper.pdf) 这篇论文。作者做了 row hammer 的大规模研究，将截至 2024 的工具打包成一个框架，通过 u 盘分发给志愿者，通过这种方法得到了 822 个不同配置的 1006 个数据集。其中有 12.5% 可以触发 bit flip。超过一半系统的失败原因是 DRAM 的地址映射函数没能成功逆向出来，具体原因有工具不稳定、超时、1GB huge page 不可用等。由于论文未包含 [ZenHammer: Rowhammer Attacks on AMD Zen-based Platforms](https://www.usenix.org/system/files/sec24fall-prepub-1050-jattke.pdf) 的工具，实际的受害比率应该会更高。如果 APT 级别的攻击者对 Row Hammer 工具做了工程化的努力，完全能够获得更高的攻击成功率。不过论文仅仅关注 bit flip 成功率，后续 exploit 的成功率没有研究。
+2. 也顺便看了 [GPUHammer: Rowhammer Attacks on GPU Memories are Practical](https://www.usenix.org/conference/usenixsecurity25/presentation/lin-shaopeng) 这篇论文。在 GPU 的显存上触发 bit flip，很有意思。现在有很多 GPU 分时租赁的服务，如果攻击者租赁了一块 GPU 并能够 bit flip 攻击，他可能可以对同一块 GPU 上其他用户的模型进行参数的修改，降低或完全破坏服务质量；这个攻击的前提是 GPU 并非独占或分时切换，即同一时间内显存里会存在多个用户程序。论文没有提到的是，目前几种租赁方式中，整卡独占、NVIDIA MIG（Multi-Instance GPU，把一张 GPU 切成多个独立实例，每个实例有固定显存）这两种不太会被 Rowhammer 影响，CUDA 多进程共享和 NVIDIA MPS（Multi-Process Service）由于会复用显存，所以确实会受到攻击。ChatGPT 说现在整卡租赁和 MIG 用得比较多，所以这篇文章的攻击效果还是有限的。
