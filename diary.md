@@ -610,6 +610,23 @@ toc_max_level: 2
 1. 看了 [FLIPPYRAM: A Large-Scale Study of  Rowhammer Prevalence](https://www.ndss-symposium.org/wp-content/uploads/2026-f1810-paper.pdf) 这篇论文。作者做了 Rowhammer 的大规模研究，将截至 2024 的工具打包成一个框架，通过 u 盘分发给志愿者，通过这种方法得到了 822 个不同配置的 1006 个数据集。其中有 12.5% 可以触发 bit flip。超过一半系统的失败原因是 DRAM 的地址映射函数没能成功逆向出来，具体原因有工具不稳定、超时、1GB huge page 不可用等。由于论文未包含 [ZenHammer: Rowhammer Attacks on AMD Zen-based Platforms](https://www.usenix.org/system/files/sec24fall-prepub-1050-jattke.pdf) 的工具，实际的受害比率应该会更高。如果 APT 级别的攻击者对 Rowhammer 工具做了工程化的努力，完全能够获得更高的攻击成功率。不过论文仅仅关注 bit flip 成功率，后续 exploit 的成功率没有研究。
 2. 也顺便看了 [GPUHammer: Rowhammer Attacks on GPU Memories are Practical](https://www.usenix.org/conference/usenixsecurity25/presentation/lin-shaopeng) 这篇论文。在 GPU 的显存上触发 bit flip，很有意思。现在有很多 GPU 分时租赁的服务，如果攻击者租赁了一块 GPU 并能够 bit flip 攻击，他可能可以对同一块 GPU 上其他用户的模型进行参数的修改，降低或完全破坏服务质量；这个攻击的前提是 GPU 并非独占或分时切换，即同一时间内显存里会存在多个用户程序。论文没有提到的是，目前几种租赁方式中，整卡独占、NVIDIA MIG（Multi-Instance GPU，把一张 GPU 切成多个独立实例，每个实例有固定显存）这两种不太会被 Rowhammer 影响，CUDA 多进程共享和 NVIDIA MPS（Multi-Process Service）由于会复用显存，所以确实会受到攻击。ChatGPT 说现在整卡租赁和 MIG 用得比较多，所以这篇文章的攻击效果还是有限的。
 
+## 2026-03
+
+### 2026-03-02
+
+1. 仔细学习了一下内存的Interleaving机制。
+- 在 CPU 的世界里，内存是一片连续的大数组。但当 CPU 的访存信号抵达内存控制器时，一串物理地址就会被拆分、映射到某个具体内存芯片的某些比特上。Interleaving 是通过修改调整地址的映射，来优化内存访问速度的一种技术。
+- 在最简单的映射方案中，一个内存地址会从高位到低位，按顺序分流到不同的路径中（请读者回忆数字逻辑中的 Multiplexer）。内存连接的架构大致是 `Memory Controller -> Channel -> DIMM -> Rank -> BankGroup -> Bank -> Row -> Column`，所以一个内存地址可以拆分成 `[MC][Channel][DIMM][Rank][BankGroup][Bank][Row][Column][CacheLine Offset]`，最终选择到一个字节。
+- 举例来说，如果系统中每个 BankGroup 都有 4 个 Bank，那么用于选择 Bank 的位宽就应该是 2。除了 CacheLine Offset（一个 Cache Line 是 64B，需要 8 个位表示偏移）之外，用于选择 Row 和 Column 的位宽比较大。在 DDR5 中，通常一个 bank 会有 64K rows，需要 16 个比特来表示；一个 row 中约有 128 个 Cache Line 大小的 Column，所以需要 7 个比特来表示。其他的分流选项通常只需要一两个 bit，比如 PC 里通常只有两个 Channel、一个 Channel 只有两个 DIMM 插槽。
+- 这样朴素的映射方法会带来性能问题。内存访问不是简单的 MUX 导通问题，每次访存时，器件都需要准备时间和善后时间。如果现在 CPU 发出了一连串顺序访存请求（这也是计算机最常见的访存模式），这些请求会全都落在同一个 Bank 上。我们有更好的方法：在一个 Bank 等待的时候，其他的 Bank 可以提供服务。只要我们把连续的访存请求“平摊”到各处，整体性能就会提升，如图所示：
+- ![](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20260302163044144.png)[图片来源：DRAM基本工作原理7\_内存地址映射\_Bilibili](https://www.bilibili.com/video/BV1w94y1F7ML)
+- 除了 Bank 外，Column 和其他层次也存在类似的机制，同样可以通过将连续的请求平摊开来，优化整体的带宽。这种交错访问不同路径的优化就是 Interleaving。
+2. 然后考虑具体的映射。
+- 内存最常见的访问方式是连续访问缓存行，但按照某个其他的固定 stride（间隔）访问也非常非常常见，比如遍历结构体数组时就会以结构体大小为 stride 访问内存。在进行 interleaving 优化时，我们的主要目标是将这种顺序访问分散到不同的地方。在上面这种朴素的分法下，如果访存的 stride 非常硕大、达到了一个 Bank 的大小，那其实就直接满足了“分散访问”的目标，因为每次访存都会分流到不同的 Bank 上。但是一般来说 stride 都比较小，以页（4KB）为 Stride 已经属于大了。我们可以将较低的位设置为 Bank、Channel 这些分流选项的选择位，只要在进行连续访存时翻转了这些选择位，请求就会随着比特翻转而分流到不同的 Bank、Channel 等地方。
+- 并不是每种交叉访问都会带来同样的性能提升，浓缩了互联网知识的 GPT 告诉我 Channel 和 Bank 级别的交叉访问最为常用，我没有找到具体的参考资料。至少有一点是可以确认的：Bank level 的 interleaving 非常重要，由于比 Bank 上级的所有分流其实也会导向不同的 Bank,，所以上级的分流同样也是要紧的。
+- 但“重要”的选择就那么几个，地址大部分比特还是用来决定 Bank 内的行和列的。如果重要的选择都被放到了低位，如果出现 stride 较大的情况，就会没有重要的比特发生翻转，导致所有的请求又集中在某个 Bank 上了。这种情况下，我们可以用 XOR-based Interleaving 的方法增加 Select bit。比如现在用于选择 Bank 的 bit 位于较低位，我们可以将某个高位用于选择 Column 的与 Bank bit 异或得到最终的 Bank 选择。这样，在我们选中高位比特翻转时，Bank 选择也会翻转，达到交叉访问的效果。
+
+
 ## 2026-04
 
 ### 2026-04-06
