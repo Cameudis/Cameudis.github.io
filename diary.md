@@ -75,8 +75,7 @@ toc_max_level: 2
 
 ### 2025-7-10
 1. 看完了《Rubicon》，借助 AI 学习了一点点 Buddy System 的代码。AI 用作解读代码还是不错的👍。
-2. 继续看《投资第一课》，思考人生……
-3. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排（静冈胜政日式猪排）。
+2. 今天是生日，白天摸鱼，晚上和大学好哥们一起去金虹桥吃了非常うまい的炸猪排（静冈胜政日式猪排）。
 
 ### 2025-7-11
 1. 把要设计的加密模块的功能和流程拆分了一下，分出了几个子模块来。似乎设计整个模块也不像想象中的那么难了。
@@ -91,7 +90,6 @@ toc_max_level: 2
 ### 2025-7-13
 1. 继续研究为什么笔记本 Linux 没办法用耳机，失败。一直以来俺的理想都是理解计算机这个黑盒在背后是如何工作的。现在在以 Linux 为契机学习音频系统的时候，真的有感觉到抽象层的伟大，将无数复杂的细节都隐藏了起来。物理的声卡提供了各种配置寄存器，在固件驱动下，变成 Linux 内核音频模块 ALSA 所提供的抽象的声卡接口。在用户空间，各种声音服务器（PulseAudio、PipeWure）又基于 ALSA 提供的接口，为 Linux 桌面提供了统一管理的功能。应用开发者只需要基于一些接口库，向这些音频服务器发赛音频，就可以简单地完成音频播放的功能。这其中有着一般路人难以想象的工程量，也因此我不得不佩服程序员们合作的力量。但我还是不知道我的耳机为什么不能用，感觉是固件的问题。
 2. 昨天和今天一通乱搞把 PulseAudio 搞爆炸了，还好按照[reddit上的教程](https://www.reddit.com/r/pop_os/comments/n82egy/pulseaudio_failed_to_create_sink_input_sink_is/)修好了。Average Linux User...
-3. 继续看《工作、消费主义和新穷人》和《中国文化通识》。
 
 ### 2025-7-14~15
 1. 和溴化锂一起装了台机。
@@ -115,12 +113,8 @@ toc_max_level: 2
 
 ### 2025-7-19
 1. 学习 OP-TEE。里面一个很重要的概念是 [Hardware Unique Key](https://optee.readthedocs.io/en/latest/architecture/porting_guidelines.html#hardware-unique-key)，OPTEE 的 [Secure storage](https://optee.readthedocs.io/en/latest/architecture/secure_storage.html#secure-storage) 子系统会基于这个硬件密钥派生加密文件用的密钥。这个 HUK 需要是一个固定的值（不然就没法解密之前加密的文件了），并且“in the best case the HUK should never ever be readable directly from software, not even from the secure side”。但和这句英文可能冲突的是，对 OPTEE 进行适配的厂商需要自己实现 `tee_otp_get_hw_unique_key` 函数，允许 OPTEE 与他的硬件交互获取 HUK；按照这句英文的说法，厂商的最佳做法应该是：只允许硬件提供一个密钥派生接口，而不允许任何方式拿到 HUK 本身。总之这是一个重要的 asset，在评估 OPTEE 安全性的时候需要重点考虑。
-2. 拜访了浦东图书馆，人流量是期末季的级别。
-- 看了两章周国平写的通俗书《尼采：在世纪的转折点上》。之前哲学课助教推荐的书是《导读尼采》，但这本书还是偏专业，是需要去啃的。周国平这本通俗书就很易读，但通俗的缺点就是叽里咕噜好像说了很多，信息量没那么大；但又觉得这对我来说倒是一个优点了。一个人对于哲学的追问是和他的经历与个性难以分开的，虽然我对哲学略有兴趣，但那些问题并不会给我带来痛苦和危机，而只是出于好奇，因此注定是个不入流的半吊子罢了；但总之我还是乐在其中的，所以还是会去读去啃。
-- 继续看《工作、消费主义和新穷人》。中国的扶贫是真的花了很多人力物力的，另一方面底层的岗位数量也不少，还没有像书中描述的那样可怕。赢！
-- 随便翻了翻《有钱，能买到快乐吗》，作者有个挺反常识的说法，说刚开始工作的年轻人应该偏重于选择高薪而稳定的职业，从年轻时开始积累财富，即使这和梦想冲突。我们通常觉得随着年龄增长，一个人的负担会越来越重，尤其是面临裁员和家庭压力的中年危机。中年危机的实质是需要用每个月的工资去填补老人和小孩的需求，总的来说就是钱的问题。但如果从工作第一年就开始存钱并同时进行长线投资，在复利的效应之下这笔钱或许可以缓解甚至解决中年危机（以及类似的问题）。另外，如果在工作了几年后更了解了自己所适合的职业和行业，也可以比较有底气地选择改变。作者的这个观点源于他自己的经历，或许对于很多情况并不适用，但作为一个比较新奇的想法还是有一些启发价值。
-1. 跟随 Dr.604 学习了快速手工扒谱的技术。
-2. 和室友聊天，他实习的 leader 是 [Atum](https://atum.li/)。听说 Atum 正在推进三件事：学习投资（这样就不用担心失业）、成为行业大佬（这样就不用担心失业）和强健身体（这样失业了可以回家送外卖）。我非常认同这个想法，希望我也能推进好这几件事！
+2. 跟随 Dr.604 学习了快速手工扒谱的技术。
+3. 和室友聊天，他实习的 leader 是 [Atum](https://atum.li/)。听说 Atum 正在推进三件事：学习投资（这样就不用担心失业）、成为行业大佬（这样就不用担心失业）和强健身体（这样失业了可以回家送外卖）。我非常认同这个想法，希望我也能推进好这几件事！
 
 ### 2025-7-20~21
 1. 玩 shenzhen I/O，成果见 [【Shenzhen I/O】まにまに（使用汇编语言实现）\_哔哩哔哩\_bilibili](https://www.bilibili.com/video/BV1LWgVz6E4Y)
@@ -154,9 +148,7 @@ toc_max_level: 2
 - 很有意思的是，不管你 VM 再复杂，模拟内存也不过是一个明文大数组，因此我还可以不断检测虚拟的栈上变量。在依靠这个拿到一些常量之后解出了这题。
 
 ### 2025-7-27
-1. 偷偷在导师的平板上安装了 CytusII，登陆了我已经好多年没有登陆的账号，打了几首歌玩哈哈。
-2. 继续看《HHH》，学习了一些常见的低速 bus 协议（UART、SPI、IIC）。
-3. 乐队排练。
+1. 继续看《HHH》，学习了一些常见的低速 bus 协议（UART、SPI、IIC）。
 
 ### 2025-7-28
 1. 复习 Cache 机制，讨论项目。
@@ -304,7 +296,6 @@ toc_max_level: 2
 ### 2025-10-3~8
 
 1. 在瓦肆ear演出，也算是和水中 spica、hitorie 跨时空同台了。
-2. 在星偶界演出，碰到了另一个杨洋（xs），是职业吉他高手。
 
 ### 2025-10-9
 
@@ -426,10 +417,6 @@ toc_max_level: 2
 - 这篇工作就关注如何缩小明文的状态空间。作者表示有一类数据结构非常适合进行这种选择明文字典攻击：一个个字符读数据的全零 Buffer，结合已有的单步执行 CVM 的攻击（[SEV-Step](https://github.com/sev-step/sev-step)，基本原理就是用 APIC Timer 给 CVM 发中断让它停下来），攻击者可以让程序每次读一个数据就停下来，此时整个 AES block（128bits）只有一个字节未知，可以当场进行爆破；并不断重复这个过程。利用这种方法就可以泄漏 bash、sudo 这种读取输入的程序读取到的数据。
 - 还有一种技巧：可以把某段数据一个字节一个字节“顶”到缓存行开头，同样对单字节进行爆破。这有点像想要知道 AES 加密数据的明文具体长度时，观察添加到第几个字符的时候密文多了一个 block（当然，这也取决于 AES padding mode）。
 - 除此以外，还有一些状态空间本来就很小的变量，比如计数器（变化规律已知）等，可以直接爆破。
-
-### 2025-11-05~10
-
-1. Dating with liz in Hong Kong.
 
 ### 2025-11-11
 
@@ -595,14 +582,14 @@ toc_max_level: 2
 
 1. 最近玩了玩 [google/syzkaller](https://github.com/google/syzkaller)，用来 fuzz Linux 内核。Syzkaller 内置了大量 Linux 内核接口（包括系统调用、设备接口如 [/dev/kvm](https://github.com/google/syzkaller/blob/master/sys/linux/dev_kvm.txt)、Netlink 接口如 [NETLINK_XFRM](https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_xfrm.txt) 等）的*描述*，syz-manager 作为中控管理的角色会启动多个 VM，根据这些描述文件变异生成 corpus，从中取出用户态程序在 VM 内部编译运行，并通过 Linux 为用户态 fuzzer 提供的 [KCOV](https://docs.kernel.org/dev-tools/kcov.html) 接口读取覆盖率信息。
 - Syzkaller 的描述依赖人工分析和手写，可能不完整，于是 ChatGPT 给我推了 [f0rm2l1n](https://f0rm2l1n.github.io/) 的论文：[_NLSaber_: Enhancing Netlink Family Fuzzing via Automated Syscall Description Generation](https://link.springer.com/chapter/10.1007/978-3-032-07894-0_19)。Netlink 接口传递的是 TLV 格式（Type, Length, Value）的二进制数据，内核某个子模块的开发者在向用户态提供 Netlink 接口时，会约定好接口需要哪些字段，然后解析发来的二进制数据。读者可以想象成序列化和反序列化。论文对各模块的 Netlink message parsing 部分进行了静态污点分析，通过自动化的方法能更全面地提取出这些模块都通过 Netlink 提供了哪些功能，从而给 kernel fuzzer 提供更多内核接口描述。作者用这些自动生成的描述进行 fuzzing，拿到了 12 个 CVE 编号，其中有五个是可以让攻击者拿到写原语的。作者在 artifacts 中给了其中一个类型混淆漏洞（CVE-2025-22056）的[提权 exp](https://github.com/TroySysSec/NLSaber/tree/main/proof-of-concepts/16_type-confusion_nft_tunnel_obj_geneve_init)。
-- 京东獬豸实验室也为这个 CVE 写过一篇博客：[Netfilter Tunnel 之殇：CVE-2025-22056](https://dawnslab.jd.com/CVE-2025-22056/)。程序希望计算 `某结构体指针 = 起始指针 + 偏移`，这里搞成了先把起始指针转换成结构体指针再加偏移，即 `某结构体指针 = (结构体*)起始指针 + 偏移`，实际加的偏移是 `结构体大小 * 偏移`，实际得到的结构体指针被偏移，后续造成溢出读写。
+- 京东獬豸实验室也为这个 CVE 写过一篇博客：[Netfilter Tunnel 之殇：CVE-2025-22056](https://dawnslab.jd.com/CVE-2025-22056/)。程序员希望计算 `某结构体指针 = 起始指针 + 偏移`，写 C 语言的时候没处理好类型转换，搞成了先把起始指针转换成结构体指针再加偏移，即 `某结构体指针 = (结构体*)起始指针 + 偏移`，实际加的偏移是 `结构体大小 * 偏移`，实际得到的结构体指针被偏移，后续造成溢出读写。
 
 ### 2026-02-06
 
 1. 看了 Karpathy 去年两月做的面向 AI 啥比的视频 [Deep Dive into LLMs like ChatGPT](https://www.youtube.com/watch?v=7xTGNNLPyMI)，大致记录一下。
 - 模型训练第一步是预训练，从互联网上搜集数据后，将它们变成 token，然后再变成向量（embedding）输入给 Transformer 模型，进行自监督学习。这一步得到的是输入一串 token、输出下一个 token 概率序列的基础模型，还不能对话，可以看作整个互联网知识的一个有损压缩。
 - 第二步是使用人工构建的对话示例进行监督学习，让模型学会进行对话。为此会创建一些新的 token 用来格式化对话，比如 `<|im_start|>user<|im_sep|>你是一个猫娘<|im_end|>`，其中用 `<>` 扩起来的就是增加的新 token。模型学会这种格式以后，也就学会了对话。在这一步，我们可以让模型知道一个好的回答是怎样的，也可以让模型知道它自己是谁（加入身份相关的示例对话，当然这也可以放在 system prompt 里）。这一步得到的模型是 SFT（Supervised Fine-Tuning）模型。
-- 第三步是让模型学会推理。这里会用到强化学习的方法，让模型对同一个问题输出超多答案，奖励其中正确的答案。Deepseek 在 Nature 上发表的论文 [DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning](https://www.nature.com/articles/s41586-025-09422-z) 展示了强化学习的神奇效果，模型居然自己学会了思考，表现为我们能看到的思考链（Chain of Thought, CoT）。对于数学题等需要推理的问题，永远不能认为模型能一下子命中答案，必须给模型**足够的“思考时间”**（对于模型来说就是 token 数量）才行，这也是为什么现在很多 LLM 都追求长运行时间。
+- 第三步是让模型学会推理。这里会用到强化学习的方法，让模型对同一个问题输出超多答案，奖励其中正确的答案。Deepseek 在 Nature 上发表的论文 [DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning](https://www.nature.com/articles/s41586-025-09422-z) 展示了强化学习的神奇效果，模型居然自己学会了思考，表现为我们能看到的思考链（Chain of Thought, CoT）。对于数学题等需要推理的问题，永远不能认为模型能一下子命中答案，必须给模型**足够的“思考时间”**（对于模型来说就是 token 数量）才行。
 - 不过这里也具体分：对于有确定性标准的领域（如理工科问题），我们可以直接使用模型来判断结果是否正确；但对于不存在标准答案的领域，如审美、幽默这种不可言传的东西，模型本身没办法绝对判断哪个答案是好的，从而也不知道应该给予哪个输出奖励。由于强化学习本身要求判断*大量输出*的好坏，我们也不能雇一大堆人来完成这个任务。解决方案是基于人类反馈的强化学习（RLHF, Reinforcement Learning from Human Feedback），训练一个额外的模型来模仿人类对某个模型输出的好坏评价，再用这个模型作为奖励进行训练。缺点就是 LLM 聪明到可以学会戏弄奖励模型，用奇怪的回答获得高分，所以 RLHF 不能跑太多轮。
 
 ### 2026-02-07
@@ -611,7 +598,7 @@ toc_max_level: 2
 - “把事情交代清楚” 意味着给模型提供更充分的任务上下文，包括任务描述、背景信息、任务输入输出、甚至是任务步骤。所谓的 Few-shot Prompting（给模型提供若干输入输出的样例）、Meta Prompting（把任务输入输出、处理步骤都提取出来变成抽象的任务描述提交给模型）、Retrieval Augmented Generation（RAG，给模型提供任务相关的背景知识）其实都是朝着这个方向努力。
 - “引导模型使用推理” 是让模型解决复杂问题的关键步骤，其原理可以类比人类的问题解决流程，即复杂问题需要提供足够的思考时间，对于大模型而言就是需要提供足够的 token 数量（而不是直接让模型给出答案）。虽然在训练模型的时候就已经有意识地尝试让模型学会先思考后给答案的输出模式，但在提示词工程中我们还是最好手动让模型“step by step”完成任务，相当于显式声明“这是一个复杂任务”，从而保证模型有足够的思考时间。
 - “给模型提供工具” 是现在 agent 能力的一大来源，就像给手下提供一台工作电脑来让他自己搜索、完成任务一样。有了工具还需要会使用工具，现在很流行的 agent skills 就是教 agent 如何使用工具（的一种方法，这和在提示词里写上怎么用工具本质上是一样的）。还有一个关键点是要使 LLM 能够自行验证解决方案是否准确：我们在使用 agent 的时候往往会发现，只要让 agent 能够接入自行编译、调试、查看报错、解决问题的循环之中，它就能自己表现地很好。[On the Coming Industrialisation of Exploit Generation with LLMs – Sean Heelan's Blog](https://sean.heelan.io/2026/01/18/on-the-coming-industrialisation-of-exploit-generation-with-llms/) 也提到了这点：“The agent must have some way to verify its solution. The verifier needs to be accurate, fast and again not involve a human.”，这篇博客非常推荐安全研究者阅读，主要展望了未来的 token 密集型安全研究模式。
-- “克服模型缺陷” 就是让 LLM 不要整天幻觉了，要求它引用来源、标注不确定、拒绝编造。幻觉这个缺陷和模型本身的训练过程有关：监督学习让模型学会了自信地😎回答问题。为了防止幻觉（目前的模型在训练时已经采取措施减少幻觉了），我们可以在提示词中强制要求模型先搜索（或者先读代码之类的）。
+- “克服模型缺陷” 就是让 LLM 不要整天幻觉了，要求它引用来源、标注不确定、拒绝编造。幻觉这个缺陷和模型本身的训练过程有关：监督学习让模型学会了自信地回答问题😎。为了防止幻觉（目前的模型在训练时已经采取措施减少幻觉了），我们可以在提示词中强制要求模型先搜索（或者先读代码之类的）。
 - “质量控制与对齐” 是模型工程化必不可少的一环，主要解决“失败时怎么办”的问题，比如如何处理空的输入等等。要定义好 fallback，让模型在任何情况下都能 handle 住问题。
 
 ### 2026-02-08
@@ -620,5 +607,17 @@ toc_max_level: 2
 
 ### 2026-02-24
 
-1. 看了 [FLIPPYRAM: A Large-Scale Study of  Rowhammer Prevalence](https://www.ndss-symposium.org/wp-content/uploads/2026-f1810-paper.pdf) 这篇论文。作者做了 row hammer 的大规模研究，将截至 2024 的工具打包成一个框架，通过 u 盘分发给志愿者，通过这种方法得到了 822 个不同配置的 1006 个数据集。其中有 12.5% 可以触发 bit flip。超过一半系统的失败原因是 DRAM 的地址映射函数没能成功逆向出来，具体原因有工具不稳定、超时、1GB huge page 不可用等。由于论文未包含 [ZenHammer: Rowhammer Attacks on AMD Zen-based Platforms](https://www.usenix.org/system/files/sec24fall-prepub-1050-jattke.pdf) 的工具，实际的受害比率应该会更高。如果 APT 级别的攻击者对 Row Hammer 工具做了工程化的努力，完全能够获得更高的攻击成功率。不过论文仅仅关注 bit flip 成功率，后续 exploit 的成功率没有研究。
+1. 看了 [FLIPPYRAM: A Large-Scale Study of  Rowhammer Prevalence](https://www.ndss-symposium.org/wp-content/uploads/2026-f1810-paper.pdf) 这篇论文。作者做了 Rowhammer 的大规模研究，将截至 2024 的工具打包成一个框架，通过 u 盘分发给志愿者，通过这种方法得到了 822 个不同配置的 1006 个数据集。其中有 12.5% 可以触发 bit flip。超过一半系统的失败原因是 DRAM 的地址映射函数没能成功逆向出来，具体原因有工具不稳定、超时、1GB huge page 不可用等。由于论文未包含 [ZenHammer: Rowhammer Attacks on AMD Zen-based Platforms](https://www.usenix.org/system/files/sec24fall-prepub-1050-jattke.pdf) 的工具，实际的受害比率应该会更高。如果 APT 级别的攻击者对 Rowhammer 工具做了工程化的努力，完全能够获得更高的攻击成功率。不过论文仅仅关注 bit flip 成功率，后续 exploit 的成功率没有研究。
 2. 也顺便看了 [GPUHammer: Rowhammer Attacks on GPU Memories are Practical](https://www.usenix.org/conference/usenixsecurity25/presentation/lin-shaopeng) 这篇论文。在 GPU 的显存上触发 bit flip，很有意思。现在有很多 GPU 分时租赁的服务，如果攻击者租赁了一块 GPU 并能够 bit flip 攻击，他可能可以对同一块 GPU 上其他用户的模型进行参数的修改，降低或完全破坏服务质量；这个攻击的前提是 GPU 并非独占或分时切换，即同一时间内显存里会存在多个用户程序。论文没有提到的是，目前几种租赁方式中，整卡独占、NVIDIA MIG（Multi-Instance GPU，把一张 GPU 切成多个独立实例，每个实例有固定显存）这两种不太会被 Rowhammer 影响，CUDA 多进程共享和 NVIDIA MPS（Multi-Process Service）由于会复用显存，所以确实会受到攻击。ChatGPT 说现在整卡租赁和 MIG 用得比较多，所以这篇文章的攻击效果还是有限的。
+
+## 2026-04
+
+### 2026-04-06
+
+1. 了解了一些 iOS 越狱相关知识。
+- 安卓越狱的目标基本上就是拿到一个满血的 root shell，但在 iOS 上纵深防御做得好得多，光是提权还不够达成越狱的目标！
+- 首先是代码签名绕过。苹果有一套用户态代码的签名验证机制叫做 AMFI（AppleMobileFileIntegrity），每次 `execve` （以及 page fault 加载新的代码）时，都会触发内核 AMFI 模块（`AppleMobileFileIntegrity.kext`）对代码进行校验，看看这段代码是否通过某个证书注册过。来自 App Store 的 App 会在安装时将它的 [CDHash](https://developer.apple.com/documentation/endpointsecurity/es_process_t/cdhash)（SHA256 哈希）注册到本地，自行安装的 App 也会通过企业证书或者开发者证书进行签名……但所有没有注册过、被修改过的代码，在默认策略下都会被拒绝执行。实际的校验会由一个系统进程 `/usr/libexec/amfid` 进行，内核模块会向这个 daemon 发起查询请求。为了性能考虑（规避大量的内核用户态切换），在内核侧也会维护一个 TrustCache 存储可信的 CDHash。因此，对于一个越狱工具来说，尤其重要的一点就是绕过或关闭 AMFI，这可以通过攻击 `amfid` 或 amfi.kext 来完成。只有在绕过 AMFI 以后，安装第三方应用和实现 tweak（app hook）才具有讨论空间。
+- 其次是持久化。在通常的安卓 root 中不存在“越狱持久化”的问题，因为大部分时候越狱本来就是通过厂商开放的接口直接解锁 bootloader（也就是关闭签名校验），刷一个 patch 过的内核镜像到硬盘里。iOS 越狱想要做到持久化，不得不面对一整个不可关闭的可信启动链，从 BootRom 到 iboot（bootloader）到内核再到文件系统中的 System 卷（包括系统 framework、daemon 和 launchd 配置等），每一步都有签名校验保护。古早时期 System 卷没有签名保护，可以有所谓的完美越狱（Untethered Jailbreak），即通过修改 System 卷达成持久化，重启之后越狱状态仍然可以保留；有了 SSV（Signed System Volume）保护后，大多越狱方案都只能做到半完美越狱（Semi-untethered Jailbreak）（重启后需要使用设备上的越狱 App 重新越狱）或半不完美越狱（Semi-tethered Jailbreak）（重启后需要连接电脑越狱）了。
+- 再者是内核内部的纵深防护，即 PAC（Pointer Authentication）以及 PPL（Page Protection Layer），使得攻击者极难完全操控内核。PAC 限制了 ROP/JOP、函数指针替换、shellcode 注入这些手法，而 PPL 作为内核中通过硬件拓展隔离出来的一套额外的页表管理系统，也使得攻击者无法通过简单的任意读写原语篡改页表权限。因此，在 iOS 上，“提权”（或者说获取系统服务的权限）比起在内核执行任意代码要简单得多，最近史诗级的 [DarkSword](https://cloud.google.com/blog/topics/threat-intelligence/darksword-ios-exploit-chain) 利用链使用了 7 个 0day，最终也只是做到了 LPE（Local Privilege Escape），通过向一些重要的特权服务注入 js payload 来以它们的权限收集和窃取各种敏感信息。对于越狱而言，DarkSword 这些漏洞还不够。
+- 苹果的 BootROM 是越狱的一个关键战场，如果能够发现它的漏洞、绕过它对后续启动链的校验，就能和安卓一样刷一个 patch 过的内核进去，也可以做到真正的持久化（BootROM 出厂时就完全固化，无法进行修改或修复）。一个经典的漏洞是 A5-A11 芯片的 checkm8，由 [axi0mX](https://github.com/axi0mX) 在 2019 年发现：攻击者可以在 DFU 模式下触发 USB 协议栈漏洞，注入 shellcode 去做一些 patch，然后就能得到一个 pwned DFU mode，可以加载任意 ramdisk 了，这里还有他写的 [checkm8 exp](https://github.com/axi0mX/ipwndfu/blob/master/checkm8.py)。当然，BootROM 的防护也是越来越强，它的固件并不像后续阶段的固件一样有着官方公开[公开下载](https://ipsw.me/)，不过研究员们自己也提取出了[非常多 ROM 固件](https://securerom.fun/)（里面的 SecureROM 就是 BootROM，只是苹果官方喜欢把它叫做 SecureROM）。
+- 最近出的 [vphone-cli](https://github.com/Lakr233/vphone-cli) ，实现流程就和越狱有点像，见 [Building virtual iPhone using VPHONE600AP component of recently released PCC firmware](https://github.com/wh1te4ever/super-tart-vphone-writeup)。
