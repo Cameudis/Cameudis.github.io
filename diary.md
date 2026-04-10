@@ -638,3 +638,11 @@ toc_max_level: 2
 - 再者是内核内部的纵深防护，即 PAC（Pointer Authentication）以及 PPL（Page Protection Layer），使得攻击者极难完全操控内核。PAC 限制了 ROP/JOP、函数指针替换、shellcode 注入这些手法，而 PPL 作为内核中通过硬件拓展隔离出来的一套额外的页表管理系统，也使得攻击者无法通过简单的任意读写原语篡改页表权限。因此，在 iOS 上，“提权”（或者说获取系统服务的权限）比起在内核执行任意代码要简单得多，最近史诗级的 [DarkSword](https://cloud.google.com/blog/topics/threat-intelligence/darksword-ios-exploit-chain) 利用链使用了 7 个 0day，最终也只是做到了 LPE（Local Privilege Escape），通过向一些重要的特权服务注入 js payload 来以它们的权限收集和窃取各种敏感信息。对于越狱而言，DarkSword 这些漏洞还不够。
 - 苹果的 BootROM 是越狱的一个关键战场，如果能够发现它的漏洞、绕过它对后续启动链的校验，就能和安卓一样刷一个 patch 过的内核进去，也可以做到真正的持久化（BootROM 出厂时就完全固化，无法进行修改或修复）。一个经典的漏洞是 A5-A11 芯片的 checkm8，由 [axi0mX](https://github.com/axi0mX) 在 2019 年发现：攻击者可以在 DFU 模式下触发 USB 协议栈漏洞，注入 shellcode 去做一些 patch，然后就能得到一个 pwned DFU mode，可以加载任意 ramdisk 了，这里还有他写的 [checkm8 exp](https://github.com/axi0mX/ipwndfu/blob/master/checkm8.py)。当然，BootROM 的防护也是越来越强，它的固件并不像后续阶段的固件一样有着官方公开[公开下载](https://ipsw.me/)，不过研究员们自己也提取出了[非常多 ROM 固件](https://securerom.fun/)（里面的 SecureROM 就是 BootROM，只是苹果官方喜欢把它叫做 SecureROM）。
 - 最近出的 [vphone-cli](https://github.com/Lakr233/vphone-cli) ，实现流程就和越狱有点像，见 [Building virtual iPhone using VPHONE600AP component of recently released PCC firmware](https://github.com/wh1te4ever/super-tart-vphone-writeup)。
+
+### 2026-04-10
+
+1. 看了 [RE//verse 2026: Breaking Encrypted USB Drives with Time-Travel Debugging by Xusheng Li](https://www.youtube.com/watch?v=Rv6jdnQ4YhY)，挺有意思的。这位师傅是 Shellphish 的逆向手，在 Binary Ninja 工作，打通过四次 Flare-On。这个演讲主要介绍了两个东西：一些加密存储实现的漏洞、以及如何在 Binary Ninja 中使用 Time-Travel Debugging（TTD）。
+- 联想 Thinkplus FU100 加密 U 盘：根本没加密，拆开后里面是一张存储着明文的 SD 卡。口令（以及指纹）只用来解锁 USB 连接。
+- Netac NetacLockFile 加密软件：只加密了三分之一的文件内容（入选最令人费解的程序大赏），且密钥硬编码。
+- 联想 Thinkplus TSD303 加密 SSD：在校验用户口令时，SSD 会向软件驱动直接发送口令明文，在软件侧完成口令校验。第一次修复后，变成传输一个加密的口令，但密钥是固定的，还是会在软件侧解锁得到口令明文。关键：口令明文不应该出现在内存中！
+- TTD 调试是预先使用工具记录程序的 Trace，然后在这个 Trace 上进行调试（前进或后退），最大的好处是完全不用担心跑飞，而且可以在不重启程序的情况下追踪某个地址的上一次写入（甚至是所有的写入）。记录 Trace 通常有成熟的工具可以做到（比如微软就给 Windows 开发了 [WinDbg TTD](https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/time-travel-debugging-overview)），Binary Ninja 自己的 debugger 给 WinDbg TTD [内置了支持](https://docs.binary.ninja/guide/debugger/dbgeng-ttd.html)（就是用 WinDbg TTD 作为后端），用户可以使用美丽的 Binary Ninja UI 来进行 Windows TTD（也支持 Linux，使用 [rr](https://rr-project.org/) 作为后端，使用方法见[文档](https://docs.binary.ninja/guide/debugger/gdbrsp-ttd.html)）
