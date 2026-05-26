@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "diary.md",
+                "file": "_posts/ctf/2026-05-26-CTF-Dot.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "diary"
+              "title": "2026-05-26-CTF-Dot"
             }
           }
         ]
@@ -171,13 +171,15 @@
   },
   "active": "0fe3e3a546eb37e3",
   "lastOpenFiles": [
+    "_posts/ctf/2025-11-11-QWB-Qual-2025-babybus.md",
+    "_posts/ctf/2026-05-26-CTF-Dot.md",
+    "diary.md",
     "docs/2026/02/08/VMware-1.html",
     "docs/2026/02/08",
     "docs/2026/02",
     "docs/2026",
     "_posts/binary/2026-02-08-VMware-1.md",
     "link.md",
-    "diary.md",
     "作业.md",
     "diary.md~",
     "docs/assets/js/post.js",
@@ -185,7 +187,6 @@
     "assets/js/post.js",
     "assets/js",
     "assets",
-    "_sass/minima/_post.scss",
     "docs/images/favicon-32x32.png",
     "docs/images/favicon-16x16.png",
     "docs/images/ava1.jpg",
