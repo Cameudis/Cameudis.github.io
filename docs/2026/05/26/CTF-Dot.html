@@ -16,21 +16,22 @@
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
-  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>CTF 的句点 | Y²的博客</title>
-<meta name="generator" content="Jekyll v3.10.0" />
+<meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="CTF 的句点" />
 <meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。" />
-<meta property="og:description" content="刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。" />
+<meta name="twitter:description" property="og:description" content="刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。" />
 <link rel="canonical" href="https://www.cameudis.com/2026/05/26/CTF-Dot.html" />
 <meta property="og:url" content="https://www.cameudis.com/2026/05/26/CTF-Dot.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2026-05-26T00:00:00+08:00" />
+<meta property="article:modified_time" content="2026-05-26T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="CTF 的句点" />
+<meta name="twitter:title" content="CTF 的句点" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2026-05-26T00:00:00+08:00","datePublished":"2026-05-26T00:00:00+08:00","description":"刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。","headline":"CTF 的句点","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2026/05/26/CTF-Dot.html"},"url":"https://www.cameudis.com/2026/05/26/CTF-Dot.html"}</script>
 <!-- End Jekyll SEO tag -->
@@ -438,9 +439,9 @@
 
 <p>好吧，既然通过 agent 打比赛争取比赛名次变得使人厌烦，那至少我仍旧可以从 CTF 里学到很多新东西不是吗？但等等，如果 agent 都已经会做这些事情，而且未来只会越来越厉害，那为什么我还要去学这些东西，难道不是把任务分发给 agent 就行了吗？</p>
 
-<p>有人会说：CTF 中学到的这些东西，可以对实际的漏洞挖掘和安全研究有帮助，但 2026 年的漏洞挖掘简直可以用惨烈来形容，漏洞挖掘因门槛的降低而变得满天飞（以及经常空中追尾），我的 fedora 一周给我弹三四次 critical update，更新到烦。Agent 通过 CTF 学到的哪些漏洞挖掘和利用技巧可不仅仅只能用来打 CTF！</p>
+<p>我们知道，CTF 中学到的这些东西，对实际的漏洞挖掘当然是有帮助的，但 2026 年的通用软件漏洞挖掘（尤其是 pwn2own）简直可以用惨烈来形容。漏洞挖掘因门槛的降低而变得满天飞（以及经常空中追尾），我的 fedora 一周给我弹三四次 critical update，更新到烦。Agent 通过 CTF 学到的哪些漏洞挖掘和利用技巧可不仅仅只能用来打 CTF！</p>
 
-<p>好吧，还有没有安全研究的人类净土，或者说我们喜欢的那种很有意思又不会撞车，还能让发现者自我感觉良好的领域？当然！但这些领域和 CTF 本就关系不大，不是 CTF 战场的主角。CTF 已经迎来了句点。</p>
+<p>好吧，还有没有安全研究的人类净土，或者说我们喜欢的那种很有意思又不会撞车，还能让发现者自我感觉良好的领域？当然！但这些领域和 CTF 本就关系不大，不是 CTF 战场的主角。CTF 已经迎来了句点。“AI handles the fun tasks you trained for and enjoy.”</p>
 
 <p>任何事都有落幕的时候，曾经的 CTF 也一样。但有趣的事情永远不会消失，随着 AI 的进步我已经看到了许多以前不存在的有趣的玩法。在 22 年我第一次接触 CTF 时，****** 的前辈们已经告诉我了答案：”Hacking for fun!”。相信作为 CTF 选手退役的大家，退役的理由和当初决定打 CTF 的初衷其实都是相同的：整点有意思的东西玩～</p>
 
@@ -460,6 +461,14 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
+    
+      
+        
+        
+        
+
+        
+      
     
       
     

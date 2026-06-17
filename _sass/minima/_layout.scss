@@ -1,3 +1,5 @@
+@use "sass:math";
+
 /**
  * Site header
  */
@@ -72,7 +74,7 @@
   @include media-query($on-palm) {
     position: absolute;
     top: 9px;
-    right: $spacing-unit / 2;
+    right: math.div($spacing-unit, 2);
     background-color: var(--nav-bg);
     border: 1px dashed $grey-color;
     border-radius: 0; // Square corners
@@ -146,7 +148,7 @@
   align-items: flex-end;
   border-bottom: 1px dashed $grey-color-light;
   margin-bottom: $spacing-unit;
-  padding-bottom: $spacing-unit / 2;
+  padding-bottom: math.div($spacing-unit, 2);
 
   @include media-query($on-palm) {
     flex-direction: column;
@@ -222,7 +224,7 @@
 .footer-bottom {
   margin-top: $spacing-unit;
   border-top: 1px dashed $grey-color-light;
-  padding-top: $spacing-unit / 2;
+  padding-top: math.div($spacing-unit, 2);
   font-size: 0.8em;
 }
 
@@ -248,12 +250,12 @@
 .footer-col-wrapper {
   font-family: $base-font-family;
   color: var(--text-color);
-  margin-left: -$spacing-unit / 2;
+  margin-left: math.div(-$spacing-unit, 2);
   @extend %clearfix;
 }
 
 .footer-col {
-  margin-bottom: $spacing-unit / 2;
+  margin-bottom: math.div($spacing-unit, 2);
 }
 
 .footer-title {
@@ -347,8 +349,8 @@
 }
 
 .post-item {
-  margin-bottom: $spacing-unit / 2;
-  padding-bottom: $spacing-unit / 2;
+  margin-bottom: math.div($spacing-unit, 2);
+  padding-bottom: math.div($spacing-unit, 2);
   border-bottom: 1px dashed $grey-color-light;
 
   &:last-child {
@@ -420,7 +422,7 @@
   list-style: none;
 
   >li {
-    margin-bottom: $spacing-unit / 2;
+    margin-bottom: math.div($spacing-unit, 2);
   }
 }
 
@@ -459,7 +461,7 @@
   font-weight: 700;
   color: var(--heading-color);
   margin-top: $spacing-unit;
-  margin-bottom: $spacing-unit / 2;
+  margin-bottom: math.div($spacing-unit, 2);
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -505,7 +507,7 @@
   top: $spacing-unit; // Align with content start
   margin-top: 0; // Ensure no top offset
   font-size: $small-font-size;
-  padding: $spacing-unit / 2;
+  padding: math.div($spacing-unit, 2);
   border: 1px dashed $grey-color-light;
   background-color: var(--card-bg);
   order: 2; // Ensure it stays on the right
@@ -622,7 +624,7 @@
 
 .related-posts {
   margin-top: $spacing-unit * 2;
-  padding: $spacing-unit / 2;
+  padding: math.div($spacing-unit, 2);
   border: 1px dashed $grey-color-light;
   background-color: var(--card-bg);
 }
@@ -631,7 +633,7 @@
   font-family: "FusionPixel10Prop", sans-serif;
   font-size: 0.9em;
   color: $brand-color;
-  margin-bottom: $spacing-unit / 2;
+  margin-bottom: math.div($spacing-unit, 2);
   letter-spacing: 2px;
   text-transform: uppercase;
 }

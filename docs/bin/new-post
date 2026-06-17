@@ -1,0 +1,125 @@
+#!/usr/bin/env -S ruby --disable=gems
+# frozen_string_literal: true
+
+require "date"
+require "fileutils"
+require "optparse"
+require "shellwords"
+
+ROOT = File.expand_path("..", __dir__)
+POSTS_DIR = File.join(ROOT, "_posts")
+DEFAULT_CATEGORY = "unclassified"
+
+options = {
+  category: DEFAULT_CATEGORY,
+  date: Date.today,
+  tags: [],
+  edit: false
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: bin/new-post [options] TITLE"
+  opts.separator ""
+  opts.separator "Options:"
+
+  opts.on("-c", "--category CATEGORY", "Post category directory under _posts (default: #{DEFAULT_CATEGORY})") do |value|
+    options[:category] = value
+  end
+
+  opts.on("-d", "--date DATE", "Publish date in YYYY-MM-DD format (default: today)") do |value|
+    begin
+      options[:date] = Date.iso8601(value)
+    rescue Date::Error
+      abort "error: invalid date #{value.inspect}; expected YYYY-MM-DD"
+    end
+  end
+
+  opts.on("-t", "--tags TAGS", "Tags separated by comma or spaces, for example: -t 'pwn parser'") do |value|
+    options[:tags] = value.split(/[,\s]+/).reject(&:empty?)
+  end
+
+  opts.on("-s", "--slug SLUG", "Override the filename slug") do |value|
+    options[:slug] = value
+  end
+
+  opts.on("-e", "--edit", "Open the new post with $EDITOR after creating it") do
+    options[:edit] = true
+  end
+
+  opts.on("-h", "--help", "Show this help") do
+    puts opts
+    exit
+  end
+end
+
+parser.parse!
+
+title = ARGV.join(" ").strip
+if title.empty?
+  warn parser
+  abort "error: missing TITLE"
+end
+
+def normalize_path_part(value, fallback:)
+  normalized = value.to_s.strip.gsub("\\", "/").split("/").map do |part|
+    part
+      .downcase
+      .gsub(/[[:space:]]+/, "-")
+      .gsub(%r{[^0-9a-z._\-\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]+}u, "-")
+      .gsub(/-+/, "-")
+      .gsub(/\A[.-]+|[.-]+\z/, "")
+  end.reject(&:empty?).join("/")
+
+  normalized.empty? ? fallback : normalized
+end
+
+def filename_slug(value)
+  slug = normalize_path_part(value, fallback: "post").tr("/", "-")
+  slug.empty? ? "post" : slug
+end
+
+category = normalize_path_part(options[:category], fallback: DEFAULT_CATEGORY)
+slug = filename_slug(options[:slug] || title)
+post_dir = File.expand_path(File.join(POSTS_DIR, category))
+
+unless post_dir.start_with?(POSTS_DIR + File::SEPARATOR)
+  abort "error: category resolves outside _posts"
+end
+
+FileUtils.mkdir_p(post_dir)
+
+date_prefix = options[:date].strftime("%Y-%m-%d")
+path = File.join(post_dir, "#{date_prefix}-#{slug}.md")
+if File.exist?(path)
+  counter = 2
+  loop do
+    candidate = File.join(post_dir, "#{date_prefix}-#{slug}-#{counter}.md")
+    unless File.exist?(candidate)
+      path = candidate
+      break
+    end
+    counter += 1
+  end
+end
+
+tags_line = options[:tags].empty? ? "tags:" : "tags: #{options[:tags].join(' ')}"
+content = <<~MARKDOWN
+  ---
+  layout: post
+  title: #{title.inspect}
+  #{tags_line}
+  ---
+
+MARKDOWN
+
+File.write(path, content, mode: "wx")
+
+relative_path = path.delete_prefix(ROOT + File::SEPARATOR)
+puts "created #{relative_path}"
+
+if options[:edit]
+  editor = ENV.fetch("EDITOR", "").strip
+  abort "error: --edit was passed but $EDITOR is not set" if editor.empty?
+
+  exec("#{editor} #{Shellwords.escape(path)}")
+end
