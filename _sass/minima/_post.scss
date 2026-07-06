@@ -1,28 +1,6 @@
 // ============================================
 // POST LAYOUT
 // ============================================
-// Layout structure for blog posts with main content area.
-// TOC-specific styles have been moved to _toc.scss
-
-.post-layout {
-  display: flex;
-  gap: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.post-main {
-  flex: 1;
-  min-width: 0; /* 防止内容溢出 */
-}
-
-// ============================================
-// RESPONSIVE LAYOUT
-// ============================================
-
-@media (max-width: 768px) {
-  .post-layout {
-    flex-direction: column;
-  }
-}
+// Post-specific styles. The live layout uses `.post-layout-container` with a
+// `.post-toc` aside and `.post-content` main column (defined in _layout.scss);
+// anything post-specific that doesn't fit _layout.scss goes here.

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: " en" }}">
+<html lang="{{ page.lang | default: site.lang | default: "zh-CN" }}">
 
 {%- include head.html -%}
 
@@ -41,12 +41,6 @@
         </div>
 
         {% include related_posts.html %}
-
-        {%- if site.disqus.shortname -%}
-        <div class="post-comments">
-          {%- include disqus_comments.html -%}
-        </div>
-        {%- endif -%}
 
         <div id="comments" class="post-comments"></div>
         {% include valine_comments.html %}
