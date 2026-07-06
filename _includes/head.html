@@ -22,9 +22,10 @@
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
     {%- include google-analytics.html -%}
   {%- endif -%}
-  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  {%- if page.use_math -%}
   <script type="text/javascript" async
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
   </script>
+  {%- endif -%}
   <script src="{{ "/assets/js/theme.js" | relative_url }}" defer></script>
 </head>

@@ -1,0 +1,33 @@
+// ============================================
+// SCSS VARIABLES
+// ============================================
+// All SCSS ($) variables. CSS custom properties (--*) live in _theme.scss.
+// Partials load these via `@use "minima/variables" as *;`.
+
+// Retro-Modern Variables
+$base-font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !default;
+$code-font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace !default;
+$base-font-size: 14px !default;
+$base-font-weight: 400 !default;
+$small-font-size: $base-font-size * 0.8 !default;
+$base-line-height: 2.0 !default;
+
+$spacing-unit: 40px !default;
+
+// Low-contrast "Vintage Terminal" palette (delegates to CSS custom properties)
+$text-color: var(--text-color) !default;
+$background-color: var(--background-color) !default;
+$brand-color: var(--brand-color) !default;
+
+$grey-color: var(--grey-color) !default;
+$grey-color-light: var(--grey-color-light) !default;
+$grey-color-dark: var(--grey-color-dark) !default;
+
+$table-text-align: left !default;
+
+// Wider content for better harmony between TOC and Text
+$content-width: 1000px !default;
+$post-content-width: 700px; // Ideal reading width for text content
+
+$on-palm: 600px !default;
+$on-laptop: 800px !default;

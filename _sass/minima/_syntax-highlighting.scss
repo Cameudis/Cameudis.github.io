@@ -1,4 +1,6 @@
 
+@use "minima/placeholders" as *;
+
 .highlight {
   background: var(--syntax-bg) !important;
   color: #d8dee9;

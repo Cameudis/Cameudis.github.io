@@ -20,6 +20,12 @@ include: ["CNAME"]
 
 port: 4001
 
+# Exclude non-page files from the build output (./docs).
+# Jekyll 4 appends these to its internal default exclude list.
+exclude:
+  - AGENTS.md
+  - README.md
+
 # Algolia search (search_only_api_key is safe to expose on the client)
 algolia:
   application_id: 'YU3CCWYOVD'

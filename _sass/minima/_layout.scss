@@ -1,4 +1,7 @@
 @use "sass:math";
+@use "minima/variables" as *;
+@use "minima/mixins" as *;
+@use "minima/placeholders" as *;
 
 /**
  * Site header

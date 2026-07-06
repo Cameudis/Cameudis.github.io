@@ -1,0 +1,21 @@
+// ============================================
+// SCSS MIXINS
+// ============================================
+// Partials load these via `@use "minima/mixins" as *;`.
+// Depends on $base-font-size from _variables.scss.
+
+@use "minima/variables" as *;
+
+// Use media queries like this:
+//   @include media-query($on-palm) {
+//     .wrapper { padding-right: $spacing-unit / 2; }
+//   }
+@mixin media-query($device) {
+  @media screen and (max-width: $device) {
+    @content;
+  }
+}
+
+@mixin relative-font-size($ratio) {
+  font-size: $base-font-size * $ratio;
+}

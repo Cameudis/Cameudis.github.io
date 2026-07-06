@@ -1,4 +1,7 @@
 @use "sass:math";
+@use "minima/variables" as *;
+@use "minima/mixins" as *;
+@use "minima/placeholders" as *;
 
 /**
  * Reset some basic elements
@@ -77,9 +80,8 @@ pre,
 ul,
 ol,
 dl,
-figure,
-%vertical-rhythm {
-  margin-bottom: math.div($spacing-unit, 2);
+figure {
+  @extend %vertical-rhythm;
 }
 
 
@@ -261,13 +263,8 @@ pre {
 
 
 /**
- * Clearfix
+ * Clearfix — %clearfix placeholder lives in _placeholders.scss.
  */
-%clearfix:after {
-  content: "";
-  display: table;
-  clear: both;
-}
 
 
 

@@ -1,0 +1,22 @@
+// ============================================
+// SCSS PLACEHOLDER SELECTORS
+// ============================================
+// Shared %placeholders that are @extended across partials. Under `@use`
+// module semantics, @extend only sees placeholders in the current module,
+// so shared ones must live here and be `@use`d by any partial that needs
+// them. Depends on $spacing-unit from _variables.scss.
+
+@use "sass:math";
+@use "minima/variables" as *;
+
+// Vertical rhythm: bottom margin for block-level elements.
+%vertical-rhythm {
+  margin-bottom: math.div($spacing-unit, 2);
+}
+
+// Micro clearfix (Nicolas Gallagher).
+%clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
