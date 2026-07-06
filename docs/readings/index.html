@@ -434,7 +434,26 @@
   <div class="wrapper">
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
-      <p class="footer-status">STATUS: ONLINE / UPTIME: ∞</p>
+      <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
+      <script>
+        (function () {
+          var start = new Date('2022-07-16T00:00:00');
+          function update() {
+            var now = new Date();
+            var diff = now - start;
+            if (diff < 0) { return; }
+            var years = Math.floor(diff / 31536000000);
+            var days = Math.floor((diff % 31536000000) / 86400000);
+            var hours = Math.floor((diff % 86400000) / 3600000);
+            var mins = Math.floor((diff % 3600000) / 60000);
+            var secs = Math.floor((diff % 60000) / 1000);
+            document.getElementById('site-uptime').textContent =
+              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
+          }
+          update();
+          setInterval(update, 1000);
+        })();
+      </script>
     </div>
 
     <div class="footer-layout">
@@ -456,8 +475,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type='text/javascript' id='clustrmaps'
-            src='//cdn.clustrmaps.com/map_v2.js?cl=4c566a&w=a&t=n&d=L7huRZdkUrGTYSGRyT_6pbao13uOO-F0vUN54U4t8po&co=121212&ct=b8b8b8&cmo=5e81ac&cmn=5e81ac&w=220'></script>
+          <script type="text/javascript" id="mapmyvisitors"
+            src="//mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
         </div>
       </div>
     </div>
