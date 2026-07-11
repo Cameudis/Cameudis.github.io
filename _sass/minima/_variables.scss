@@ -7,10 +7,11 @@
 // Retro-Modern Variables
 $base-font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !default;
 $code-font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace !default;
-$base-font-size: 14px !default;
+$base-font-size: 16px !default;
 $base-font-weight: 400 !default;
-$small-font-size: $base-font-size * 0.8 !default;
-$base-line-height: 2.0 !default;
+$small-font-size: $base-font-size * 0.8125 !default; // 13px: metadata and supporting text
+$micro-font-size: $base-font-size * 0.75 !default; // 12px: labels only
+$base-line-height: 1.75 !default;
 
 $spacing-unit: 40px !default;
 

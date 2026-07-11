@@ -110,7 +110,7 @@ figure {
  * Basic styling
  */
 body {
-  font: 400 14px/2 "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font: 400 16px/1.75 "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--text-color);
   background-color: var(--background-color);
   -webkit-text-size-adjust: 100%;
@@ -162,7 +162,7 @@ figure > img {
 }
 
 figcaption {
-  font-size: 11.2px;
+  font-size: 13px;
 }
 
 /**
@@ -246,7 +246,7 @@ blockquote > :last-child {
 pre,
 code {
   font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
-  font-size: 12.6px;
+  font-size: 14.4px;
   line-height: 1.5;
   border: 1px solid var(--grey-color-light);
   border-radius: 0;
@@ -361,7 +361,7 @@ table td {
 }
 
 .site-title {
-  font-size: 21px;
+  font-size: 22px;
   font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 700;
   line-height: 80px;
@@ -395,7 +395,7 @@ table td {
 .site-nav .page-link {
   color: var(--text-color);
   font-family: "FusionPixel10Prop", sans-serif;
-  line-height: 2;
+  line-height: 1.75;
 }
 .site-nav .page-link:hover {
   color: var(--brand-color);
@@ -467,7 +467,7 @@ table td {
   border-top: 1px dashed var(--grey-color-light);
   padding: 60px 0;
   color: var(--text-color);
-  font-size: 14px;
+  font-size: 16px;
   background-color: var(--background-color);
   margin-top: 80px;
 }
@@ -519,7 +519,7 @@ table td {
 .footer-status {
   display: flex;
   align-items: center;
-  font-size: 0.8em;
+  font-size: 13px;
   color: #a3be8c;
   margin-bottom: 0;
 }
@@ -554,7 +554,7 @@ table td {
   margin-top: 40px;
   border-top: 1px dashed var(--grey-color-light);
   padding-top: 20px;
-  font-size: 0.8em;
+  font-size: 13px;
 }
 
 .quiet-humor {
@@ -589,7 +589,7 @@ table td {
 .footer-title {
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
-  font-size: 0.7em;
+  font-size: 12px;
   color: var(--brand-color);
   letter-spacing: 2px;
   margin-bottom: 10px;
@@ -647,7 +647,7 @@ table td {
 }
 
 .page-heading {
-  font-size: 28px;
+  font-size: 32px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
@@ -655,7 +655,7 @@ table td {
 }
 
 .post-list-heading {
-  font-size: 24.5px;
+  font-size: 28px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
@@ -678,7 +678,7 @@ table td {
   display: flex;
   justify-content: space-between;
   font-family: "FusionPixel10Prop", sans-serif;
-  font-size: 11.2px;
+  font-size: 13px;
   color: var(--grey-color);
   margin-bottom: 5px;
 }
@@ -707,7 +707,7 @@ table td {
 
 .post-excerpt {
   margin-top: 10px;
-  font-size: 0.9em;
+  font-size: 0.9375em;
   color: var(--text-color);
   opacity: 0.8;
 }
@@ -736,14 +736,14 @@ table td {
 }
 
 .post-meta {
-  font-size: 11.2px;
+  font-size: 13px;
   font-family: "FusionPixel10Prop", sans-serif;
   color: var(--grey-color);
 }
 
 .post-link {
   display: block;
-  font-size: 19.6px;
+  font-size: 20px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
   color: var(--text-color);
@@ -762,7 +762,7 @@ table td {
 }
 
 .post-title, .page-heading {
-  font-size: 25.2px;
+  font-size: 30px;
   font-family: "FusionPixel12Prop", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
@@ -787,7 +787,7 @@ table td {
 }
 @media screen and (max-width: 600px) {
   .post-title, .page-heading {
-    font-size: 21px;
+    font-size: 26px;
   }
   .post-title::before, .post-title::after, .page-heading::before, .page-heading::after {
     margin: 0 5px;
@@ -825,7 +825,7 @@ table td {
   position: sticky;
   top: 40px;
   margin-top: 0;
-  font-size: 11.2px;
+  font-size: 13px;
   padding: 20px;
   border: 1px dashed var(--grey-color-light);
   background-color: var(--card-bg);
@@ -883,7 +883,7 @@ table td {
   margin-top: 0;
 }
 .post-content h2 {
-  font-size: 22.4px;
+  font-size: 24px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   margin-top: 60px;
@@ -891,33 +891,18 @@ table td {
   border-bottom: 1px solid var(--grey-color-light);
   padding-bottom: 5px;
 }
-@media screen and (max-width: 800px) {
-  .post-content h2 {
-    font-size: 24.5px;
-  }
-}
 .post-content h3 {
-  font-size: 18.2px;
+  font-size: 20px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
   margin-top: 40px;
   color: var(--text-color);
 }
-@media screen and (max-width: 800px) {
-  .post-content h3 {
-    font-size: 19.25px;
-  }
-}
 .post-content h4 {
-  font-size: 17.5px;
+  font-size: 18px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 500;
   color: var(--text-color);
-}
-@media screen and (max-width: 800px) {
-  .post-content h4 {
-    font-size: 15.75px;
-  }
 }
 
 .post-layout-container > .post-content {
@@ -978,7 +963,7 @@ table td {
 
 .related-post-date {
   font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
-  font-size: 0.8em;
+  font-size: 13px;
   color: var(--grey-color);
   flex-shrink: 0;
 }
@@ -996,7 +981,7 @@ table td {
 
 .common-tags {
   font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
-  font-size: 0.8em;
+  font-size: 13px;
   color: #a3be8c;
   font-style: italic;
   margin-left: 10px;
@@ -1041,7 +1026,7 @@ table td {
 
 .theme-toggle-btn {
   font-family: "FusionPixel10Prop", sans-serif;
-  font-size: 0.8em;
+  font-size: 12px;
   letter-spacing: 1px;
   padding: 8px 12px;
 }
@@ -1111,7 +1096,7 @@ table td {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 18px;
+  font-size: 16px;
   padding: 10px 0;
   background: transparent;
 }
@@ -1172,7 +1157,7 @@ table td {
 .search-result p {
   margin: 5px 0;
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
 }
 
@@ -1204,10 +1189,6 @@ table td {
   .search-header {
     padding: 15px;
   }
-  .search-input,
-  #search-input {
-    font-size: 16px;
-  }
 }
 .code-frame {
   position: relative;
@@ -1231,7 +1212,7 @@ table td {
   align-items: stretch;
   justify-content: space-between;
   font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   letter-spacing: 0.12em;
   color: var(--text-color);
@@ -1344,7 +1325,7 @@ table td {
   padding-left: 0;
   margin-top: 30px;
   margin-bottom: 15px;
-  font-size: 1.2rem;
+  font-size: 1.25em;
   color: var(--text-color);
 }
 .diary-content ol {
