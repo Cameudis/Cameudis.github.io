@@ -2,7 +2,7 @@
 layout: page
 title: Links
 permalink: /links/
-asset_version: "friends-v1"
+asset_version: "friends-v2"
 ---
 
 <section class="friends-section">
@@ -39,11 +39,11 @@ asset_version: "friends-v1"
     <div class="friend-apply-content">
       <p class="friend-apply-kicker">&gt; CONNECT_REQUEST</p>
       <h2 id="friend-apply-title">申请友链</h2>
-      <p>如果你也在维护个人博客，欢迎通过 GitHub Issue 交换友链。</p>
+      <p>如果你也有自己的个人博客/网站，欢迎交换友链。</p>
       <ul>
-        <li>网站可正常通过 HTTPS 访问</li>
+        <li>网站已支持 HTTPS</li>
         <li>内容以原创为主，并已添加本站友链</li>
-        <li>头像可填写图片地址，或使用 Gravatar 邮箱 / hash</li>
+        <li>头像建议使用 <a href="https://docs.gravatar.com/avatars/" target="_blank" rel="noopener noreferrer">Gravatar</a>，也可以填写图片 URL</li>
       </ul>
     </div>
 

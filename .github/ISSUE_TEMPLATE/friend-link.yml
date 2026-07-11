@@ -7,7 +7,7 @@ body:
       value: |
         感谢申请友链。请确保你的网站可以通过 HTTPS 正常访问、以原创内容为主，并已添加本站友链。
 
-        头像可以直接填写图片 URL，也可以使用 Gravatar。Gravatar 会根据“去除首尾空格并转为小写”的邮箱生成 MD5 hash，再通过该 hash 获取头像。Issue 内容是公开的；如果不希望公开邮箱，请只填写 Gravatar hash。
+        头像建议使用 [Gravatar](https://docs.gravatar.com/avatars/)，也可以填写图片 URL。如果不希望公开邮箱，可以只填写[邮箱 hash](https://docs.gravatar.com/rest/hash/)。
 
   - type: input
     id: name
@@ -29,7 +29,7 @@ body:
     id: slogan
     attributes:
       label: 一句话简介
-      description: 建议控制在 30 个字以内。
+      description: 建议 30 个字以内。
       placeholder: 计算机、安全和其他
     validations:
       required: true
@@ -38,22 +38,22 @@ body:
     id: avatar
     attributes:
       label: 头像 URL
-      description: 与 Gravatar 二选一；同时填写时优先使用头像 URL。
+      description: 可选；填写后优先使用该图片。
       placeholder: https://example.com/avatar.png
 
   - type: input
     id: gravatar-email
     attributes:
       label: Gravatar 邮箱
-      description: 可选。此内容会公开显示；介意公开邮箱时请留空并填写下面的 hash。
+      description: 可选；Issue 内容公开，介意时请改填 hash。
       placeholder: name@example.com
 
   - type: input
     id: gravatar-hash
     attributes:
       label: Gravatar hash
-      description: 可选。填写规范化邮箱的 32 位 MD5 hash，不要填写完整 Gravatar URL。
-      placeholder: "00000000000000000000000000000000"
+      description: 可选；不希望公开邮箱时填写。
+      placeholder: "0000000000000000000000000000000000000000000000000000000000000000"
 
   - type: input
     id: backlink

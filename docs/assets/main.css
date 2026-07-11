@@ -1451,8 +1451,8 @@ table td {
 .friend-apply-button {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 8px;
   padding: 10px 12px;
   border: 1px solid var(--brand-color);
   color: var(--heading-color);
