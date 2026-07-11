@@ -28,7 +28,8 @@ $table-text-align: left !default;
 
 // Wider content for better harmony between TOC and Text
 $content-width: 1000px !default;
-$post-content-width: 640px; // Comfortable measure for long-form CJK text
+$post-content-width: 720px; // Wider long-form measure, while keeping CJK lines readable
+$post-toc-breakpoint: 1399px; // Keep the floating TOC clear of the article card
 
 $on-palm: 600px !default;
 $on-laptop: 800px !default;

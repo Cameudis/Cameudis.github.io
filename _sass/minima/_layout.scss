@@ -341,6 +341,12 @@
   padding-bottom: $spacing-unit;
 }
 
+// On posts, keep the blue-white card behind the reading column and clear of
+// the adjacent TOC card. The article itself remains $post-content-width wide.
+[data-theme="blue-white"] .layout-post .page-content > .wrapper {
+  max-width: calc(#{$post-content-width} + #{$spacing-unit * 3});
+}
+
 .page-heading {
   @include relative-font-size(2);
   font-family: $base-font-family;
@@ -502,57 +508,59 @@
 }
 
 .post-layout-container {
-  display: grid;
-  grid-template-columns: 200px $post-content-width 200px;
-  column-gap: $spacing-unit;
-  justify-content: center;
-  align-items: flex-start;
-  width: 1120px;
-  max-width: calc(100vw - #{$spacing-unit * 2});
-  margin-left: 50%;
+  width: 100%;
+  max-width: $post-content-width;
+  margin-right: auto;
+  margin-left: auto;
   margin-top: $spacing-unit;
-  transform: translateX(-50%);
-
-  @media screen and (max-width: 1199px) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: auto;
-    max-width: none;
-    margin-left: 0;
-    transform: none;
-  }
 }
 
 .post-toc {
-  grid-column: 3;
-  grid-row: 1;
-  width: 200px;
-  position: sticky;
-  top: $spacing-unit * 2.5; // Clear the 80px sticky header with a 20px gap
-  margin-top: 0; // Ensure no top offset
+  position: fixed;
+  z-index: 2;
+  top: 50%;
+  right: clamp(24px, 3vw, 56px);
+  width: 220px;
+  max-height: calc(100vh - #{$spacing-unit * 4});
+  overflow-y: auto;
+  transform: translateY(-50%);
   font-size: $small-font-size;
-  padding: math.div($spacing-unit, 2);
-  border: 1px dashed $grey-color-light;
-  background-color: var(--card-bg);
+  padding: 8px 8px 8px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: $grey-color-light transparent;
 
-  ul {
-    margin-left: 0.8rem;
+  > ul {
+    margin-left: 0;
     padding-left: 0;
     list-style: none;
   }
 
   li {
-    margin-bottom: 2px;
+    margin-bottom: 5px;
   }
 
-  ul ul {
-    margin-left: 0.6rem;
+  > ul > li > ul {
+    max-height: 0;
+    margin: 0 0 0 0.75rem;
+    padding-left: 0.6rem;
+    overflow: hidden;
+    opacity: 0;
+    list-style: none;
+    transition: max-height 200ms ease, opacity 160ms ease, margin-top 200ms ease;
+  }
+
+  > ul > li.is-expanded > ul {
+    max-height: 50vh;
+    margin-top: 5px;
+    opacity: 1;
   }
 
   a {
+    display: block;
     color: $grey-color;
     text-decoration: none;
+    line-height: 1.45;
+    transition: color 160ms ease, opacity 160ms ease;
 
     &:hover,
     &.active {
@@ -570,13 +578,46 @@
     }
   }
 
-  @media screen and (max-width: 1199px) {
+  > ul > li > a {
+    font-weight: 600;
+  }
+
+  > ul > li.is-current > a {
+    color: $brand-color;
+  }
+
+  > ul > li > ul a {
+    font-size: 0.95em;
+    opacity: 0.78;
+
+    &.active,
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @media screen and (max-width: $post-toc-breakpoint) {
     position: static;
     width: 100%;
     max-width: $post-content-width;
+    max-height: none;
+    overflow: visible;
+    transform: none;
     margin-bottom: $spacing-unit;
     padding: 10px; // Tighter padding on mobile
-    order: 0;
+    border: 1px dashed $grey-color-light;
+    background-color: var(--card-bg);
+
+    > ul {
+      margin-left: 0.8rem;
+    }
+
+    > ul > li > ul,
+    > ul > li.is-expanded > ul {
+      max-height: none;
+      margin-top: 2px;
+      opacity: 1;
+    }
   }
 }
 
@@ -587,6 +628,10 @@
   margin-bottom: 10px;
   font-size: 1em;
   letter-spacing: 2px;
+
+  @media screen and (min-width: #{$post-toc-breakpoint + 1px}) {
+    display: none;
+  }
 }
 
 .post-content {
@@ -628,14 +673,12 @@
 // Long-form post typography. Page layouts also use `.post-content`, so keep
 // the reading measure scoped to the post-only layout container.
 .post-layout-container > .post-content {
-  grid-column: 2;
-  grid-row: 1;
   min-width: $post-content-width;
   max-width: $post-content-width;
   font-size: $base-font-size;
   line-height: 1.8;
 
-  @media screen and (max-width: 1199px) {
+  @media screen and (max-width: $post-toc-breakpoint) {
     min-width: 0;
     width: 100%;
   }
@@ -650,6 +693,10 @@
 }
 
 .post-comments {
+  width: 100%;
+  max-width: $post-content-width;
+  margin-right: auto;
+  margin-left: auto;
   margin-top: $spacing-unit * 2;
   padding-top: $spacing-unit;
   border-top: 1px dashed $grey-color-light;

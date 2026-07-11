@@ -85,6 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const contentHeadings = [];
 
   if (tocLinks.length > 0) {
+    const tocContainer = document.querySelector('.post-toc');
+    let currentActiveLink = null;
+
     // Collect headings and their corresponding TOC links
     tocLinks.forEach(link => {
       const id = decodeURIComponent(link.getAttribute('href').substring(1));
@@ -109,10 +112,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Update classes
+      // Update the active link and expand only its top-level section. On
+      // narrower layouts CSS keeps all subsections visible.
       tocLinks.forEach(link => link.classList.remove('active'));
+      const activeSection = activeItem
+        ? activeItem.link.closest('.post-toc > ul > li')
+        : null;
+      tocContainer.querySelectorAll(':scope > ul > li').forEach(item => {
+        item.classList.toggle('is-expanded', item === activeSection);
+        item.classList.toggle('is-current', item === activeSection);
+      });
+
       if (activeItem) {
         activeItem.link.classList.add('active');
+
+        // Keep the current item visible inside a long floating TOC without
+        // moving the page itself.
+        if (activeItem.link !== currentActiveLink && window.innerWidth > 1399) {
+          const tocRect = tocContainer.getBoundingClientRect();
+          const linkRect = activeItem.link.getBoundingClientRect();
+          if (linkRect.top < tocRect.top || linkRect.bottom > tocRect.bottom) {
+            tocContainer.scrollTo({
+              top: tocContainer.scrollTop + linkRect.top - tocRect.top - tocRect.height / 2,
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+            });
+          }
+        }
+
+        currentActiveLink = activeItem.link;
       }
     };
 
