@@ -493,19 +493,32 @@
 }
 
 .post-layout-container {
-  display: flex;
-  flex-direction: row; // TOC on the right
-  gap: $spacing-unit * 2; // Increase gap
+  display: grid;
+  grid-template-columns: 200px $post-content-width 200px;
+  column-gap: $spacing-unit;
+  justify-content: center;
   align-items: flex-start;
+  width: 1120px;
+  max-width: calc(100vw - #{$spacing-unit * 2});
+  margin-left: 50%;
   margin-top: $spacing-unit;
+  transform: translateX(-50%);
 
-  @include media-query($on-laptop) {
+  @media screen and (max-width: 1199px) {
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    width: auto;
+    max-width: none;
+    margin-left: 0;
+    transform: none;
   }
 }
 
 .post-toc {
-  flex: 0 0 200px;
+  grid-column: 3;
+  grid-row: 1;
+  width: 200px;
   position: sticky;
   top: $spacing-unit; // Align with content start
   margin-top: 0; // Ensure no top offset
@@ -513,7 +526,6 @@
   padding: math.div($spacing-unit, 2);
   border: 1px dashed $grey-color-light;
   background-color: var(--card-bg);
-  order: 2; // Ensure it stays on the right
 
   ul {
     margin-left: 0.8rem;
@@ -549,9 +561,10 @@
     }
   }
 
-  @include media-query($on-laptop) {
+  @media screen and (max-width: 1199px) {
     position: static;
     width: 100%;
+    max-width: $post-content-width;
     margin-bottom: $spacing-unit;
     padding: 10px; // Tighter padding on mobile
     order: 0;
@@ -613,17 +626,17 @@
 }
 
 // Long-form post typography. Page layouts also use `.post-content`, so keep
-// the reading measure scoped to the post-only flex container.
+// the reading measure scoped to the post-only layout container.
 .post-layout-container > .post-content {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1;
   min-width: $post-content-width;
   max-width: $post-content-width;
   font-size: 16px;
   line-height: 1.8;
 
-  @include media-query($on-laptop) {
+  @media screen and (max-width: 1199px) {
     min-width: 0;
-    max-width: none;
     width: 100%;
   }
 

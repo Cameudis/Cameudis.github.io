@@ -121,11 +121,6 @@
         </header>
 
         <div class="post-layout-container">
-          
-          <aside class="post-toc">
-            <div class="toc-title">TABLE_OF_CONTENTS</div>
-            
-          </aside>
 
           <div class="post-content e-content" itemprop="articleBody">
             <p>当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 <code class="language-plaintext highlighter-rouge">leave; ret</code> 或是 <code class="language-plaintext highlighter-rouge">xchg eax, esp</code> 等方法完成栈迁移。

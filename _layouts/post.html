@@ -21,11 +21,15 @@ layout: default
         </header>
 
         <div class="post-layout-container">
-          {% assign h_max = page.toc_max_level | default: 3 %}
+          {%- assign h_max = page.toc_max_level | default: 3 -%}
+          {%- capture post_toc -%}{% include toc.html html=content h_max=h_max %}{%- endcapture -%}
+          {%- assign post_toc = post_toc | strip -%}
+          {%- unless post_toc == empty %}
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            {% include toc.html html=content h_max=h_max %}
+            {{ post_toc }}
           </aside>
+          {%- endunless %}
 
           <div class="post-content e-content" itemprop="articleBody">
             {{ content }}
