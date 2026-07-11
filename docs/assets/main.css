@@ -1336,6 +1336,9 @@ table td {
   align-items: center;
   justify-content: center;
 }
+.friend-avatar > [hidden] {
+  display: none;
+}
 .friend-avatar img {
   width: 100%;
   height: 100%;

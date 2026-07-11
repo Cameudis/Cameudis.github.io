@@ -11,7 +11,9 @@ permalink: /links/
         <a href="{{ friend.url }}" target="_blank" rel="noopener noreferrer">
           <div class="friend-avatar">
             {% if friend.avatar and friend.avatar != "" %}
-              <img src="{{ friend.avatar }}" alt="{{ friend.name }}" loading="lazy">
+              <img src="{{ friend.avatar }}" alt="{{ friend.name }}" loading="lazy"
+                   onerror="this.hidden = true; this.nextElementSibling.hidden = false;">
+              <div class="default-avatar" hidden>{{ friend.name | slice: 0 }}</div>
             {% else %}
               <div class="default-avatar">{{ friend.name | slice: 0 }}</div>
             {% endif %}
