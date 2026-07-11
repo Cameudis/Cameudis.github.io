@@ -1,5 +1,90 @@
 
 @use "minima/placeholders" as *;
+@use "minima/variables" as *;
+
+.code-frame {
+  position: relative;
+  margin-bottom: 40px;
+  border: 1px solid var(--grey-color-light);
+  background: var(--syntax-bg);
+  box-shadow: 4px 4px 0 var(--brand-dim);
+
+  .highlight {
+    margin-bottom: 0;
+  }
+
+  pre {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--grey-color-light);
+  }
+}
+
+.code-toolbar {
+  min-height: 34px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  font-family: $code-font-family;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--text-color);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 7px, var(--brand-dim) 7px 8px),
+    var(--nav-bg);
+}
+
+.code-language {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+
+  &::before {
+    content: "//";
+    margin-right: 8px;
+    color: var(--accent-orange);
+  }
+}
+
+.code-copy-button {
+  min-width: 78px;
+  padding: 0 12px;
+  border: 0;
+  border-left: 1px solid var(--grey-color-light);
+  border-radius: 0;
+  color: var(--brand-color);
+  background: var(--syntax-bg);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+
+  &::before {
+    content: "[ ";
+  }
+
+  &::after {
+    content: " ]";
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--syntax-bg);
+    background: var(--brand-color);
+    outline: 0;
+  }
+
+  &.is-copied {
+    color: var(--syntax-bg);
+    background: var(--tok-string);
+  }
+
+  &.is-error {
+    color: var(--syntax-bg);
+    background: var(--accent-orange);
+  }
+}
 
 .highlight {
   background: var(--syntax-bg) !important;

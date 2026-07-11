@@ -7,7 +7,80 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Table of Contents (TOC) Scroll-Spy
+  // 1. Code block chrome and copy controls
+  const codeBlocks = document.querySelectorAll('.post-content .highlight > pre > code');
+  const copyText = async text => {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch (error) {
+        // Fall through for browsers that expose the API but deny permission.
+      }
+    }
+
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.setAttribute('readonly', '');
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    const copied = document.execCommand('copy');
+    textArea.remove();
+    if (!copied) throw new Error('Copy command was rejected');
+  };
+
+  codeBlocks.forEach(code => {
+    const highlight = code.closest('div.highlight');
+    if (!highlight || highlight.dataset.codeFrameReady === 'true') return;
+
+    const languageContainer = highlight.parentElement;
+    const languageClass = languageContainer
+      ? Array.from(languageContainer.classList).find(className => className.startsWith('language-'))
+      : null;
+    const language = languageClass ? languageClass.replace('language-', '') : 'code';
+    const frame = languageContainer && languageContainer.classList.contains('highlighter-rouge')
+      ? languageContainer
+      : highlight;
+
+    frame.classList.add('code-frame');
+    highlight.dataset.codeFrameReady = 'true';
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'code-toolbar';
+
+    const label = document.createElement('span');
+    label.className = 'code-language';
+    label.textContent = language === 'plaintext' ? 'TEXT' : language.toUpperCase();
+
+    const copyButton = document.createElement('button');
+    copyButton.className = 'code-copy-button';
+    copyButton.type = 'button';
+    copyButton.textContent = 'COPY';
+    copyButton.setAttribute('aria-label', `Copy ${label.textContent} code`);
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await copyText(code.textContent);
+        copyButton.textContent = 'COPIED';
+        copyButton.classList.add('is-copied');
+      } catch (error) {
+        copyButton.textContent = 'ERROR';
+        copyButton.classList.add('is-error');
+      }
+
+      window.setTimeout(() => {
+        copyButton.textContent = 'COPY';
+        copyButton.classList.remove('is-copied', 'is-error');
+      }, 1800);
+    });
+
+    toolbar.append(label, copyButton);
+    frame.insertBefore(toolbar, highlight);
+  });
+
+  // 2. Table of Contents (TOC) Scroll-Spy
   const tocLinks = document.querySelectorAll('.post-toc a[href^="#"]');
   const contentHeadings = [];
 
@@ -59,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     highlightToc();
   }
 
-  // 2. Diary-specific Features
+  // 3. Diary-specific Features
   const isDiaryPage = window.location.pathname.includes('/diary/');
   const tocContainer = document.querySelector('.post-toc');
 
