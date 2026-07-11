@@ -7,7 +7,6 @@
   margin-bottom: 40px;
   border: 1px solid var(--grey-color-light);
   background: var(--syntax-bg);
-  box-shadow: 4px 4px 0 var(--brand-dim);
 
   .highlight {
     margin-bottom: 0;
@@ -30,9 +29,7 @@
   line-height: 1;
   letter-spacing: 0.12em;
   color: var(--text-color);
-  background:
-    repeating-linear-gradient(90deg, transparent 0 7px, var(--brand-dim) 7px 8px),
-    var(--nav-bg);
+  background: var(--nav-bg);
 }
 
 .code-language {
