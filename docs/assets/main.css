@@ -1382,6 +1382,91 @@ table td {
   opacity: 0.8;
 }
 
+.friend-apply {
+  margin-top: 36px;
+  padding: 24px;
+  border: 1px dashed var(--grey-color);
+  background: var(--card-bg);
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(240px, 2fr);
+  gap: 32px;
+  position: relative;
+}
+.friend-apply::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 72px;
+  border-top: 2px solid var(--brand-color);
+}
+.friend-apply h2 {
+  margin: 4px 0 12px;
+  color: var(--heading-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+}
+.friend-apply p {
+  margin: 0 0 12px;
+}
+.friend-apply ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.friend-apply-kicker {
+  color: var(--brand-color);
+  font-family: "FusionPixel12Mono", monospace;
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+}
+
+.friend-apply-action {
+  border-left: 1px dashed var(--grey-color);
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.friend-site-info {
+  margin: 0;
+  font-family: "FusionPixel12Mono", monospace;
+  font-size: 0.85em;
+}
+.friend-site-info div {
+  display: grid;
+  grid-template-columns: 3.5em minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.friend-site-info dt {
+  color: var(--brand-color);
+}
+.friend-site-info dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.friend-apply-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 12px;
+  border: 1px solid var(--brand-color);
+  color: var(--heading-color);
+  background: var(--brand-dim);
+  font-family: "FusionPixel10Prop", sans-serif;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.friend-apply-button:hover {
+  color: var(--background-color);
+  background: var(--brand-color);
+  text-decoration: none;
+}
+
 @media (max-width: 600px) {
   .friends-grid {
     grid-template-columns: 1fr;
@@ -1391,6 +1476,16 @@ table td {
   }
   .friend-info h3 {
     font-size: 1.1em;
+  }
+  .friend-apply {
+    grid-template-columns: 1fr;
+    padding: 18px;
+    gap: 20px;
+  }
+  .friend-apply-action {
+    border-left: 0;
+    border-top: 1px dashed var(--grey-color);
+    padding: 18px 0 0;
   }
 }
 @font-face {

@@ -1,0 +1,74 @@
+name: 申请友链
+description: 申请加入 Y² 的博客友链页面
+title: "[友链申请] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢申请友链。请确保你的网站可以通过 HTTPS 正常访问、以原创内容为主，并已添加本站友链。
+
+        头像可以直接填写图片 URL，也可以使用 Gravatar。Gravatar 会根据“去除首尾空格并转为小写”的邮箱生成 MD5 hash，再通过该 hash 获取头像。Issue 内容是公开的；如果不希望公开邮箱，请只填写 Gravatar hash。
+
+  - type: input
+    id: name
+    attributes:
+      label: 网站名称
+      placeholder: 例如：Y²的博客
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: 网站地址
+      placeholder: https://example.com
+    validations:
+      required: true
+
+  - type: textarea
+    id: slogan
+    attributes:
+      label: 一句话简介
+      description: 建议控制在 30 个字以内。
+      placeholder: 计算机、安全和其他
+    validations:
+      required: true
+
+  - type: input
+    id: avatar
+    attributes:
+      label: 头像 URL
+      description: 与 Gravatar 二选一；同时填写时优先使用头像 URL。
+      placeholder: https://example.com/avatar.png
+
+  - type: input
+    id: gravatar-email
+    attributes:
+      label: Gravatar 邮箱
+      description: 可选。此内容会公开显示；介意公开邮箱时请留空并填写下面的 hash。
+      placeholder: name@example.com
+
+  - type: input
+    id: gravatar-hash
+    attributes:
+      label: Gravatar hash
+      description: 可选。填写规范化邮箱的 32 位 MD5 hash，不要填写完整 Gravatar URL。
+      placeholder: 00000000000000000000000000000000
+
+  - type: input
+    id: backlink
+    attributes:
+      label: 本站友链所在页面
+      placeholder: https://example.com/links/
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我的网站支持 HTTPS 且目前可以正常访问。
+          required: true
+        - label: 我已在自己的网站添加 Y²的博客（https://www.cameudis.com）。
+          required: true
