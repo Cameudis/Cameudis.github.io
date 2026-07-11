@@ -2,6 +2,7 @@
 layout: page
 title: Links
 permalink: /links/
+asset_version: "friends-v1"
 ---
 
 <section class="friends-section">

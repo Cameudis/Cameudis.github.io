@@ -53,7 +53,7 @@ body:
     attributes:
       label: Gravatar hash
       description: 可选。填写规范化邮箱的 32 位 MD5 hash，不要填写完整 Gravatar URL。
-      placeholder: 00000000000000000000000000000000
+      placeholder: "00000000000000000000000000000000"
 
   - type: input
     id: backlink
