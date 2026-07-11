@@ -110,7 +110,7 @@ figure {
  * Basic styling
  */
 body {
-  font: 400 14px/2 "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font: 400 14px/2 "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--text-color);
   background-color: var(--background-color);
   -webkit-text-size-adjust: 100%;
@@ -564,7 +564,7 @@ table td {
 }
 
 .footer-heading {
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
@@ -577,7 +577,7 @@ table td {
 }
 
 .footer-col-wrapper {
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--text-color);
   margin-left: -20px;
 }
@@ -587,7 +587,7 @@ table td {
 }
 
 .footer-title {
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   font-size: 0.7em;
   color: var(--brand-color);
@@ -648,7 +648,7 @@ table td {
 
 .page-heading {
   font-size: 28px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
   margin-bottom: 40px;
@@ -656,7 +656,7 @@ table td {
 
 .post-list-heading {
   font-size: 24.5px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
 }
@@ -744,7 +744,7 @@ table td {
 .post-link {
   display: block;
   font-size: 19.6px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
   color: var(--text-color);
 }
@@ -864,22 +864,14 @@ table td {
 }
 
 .post-content {
-  flex: 1;
-  min-width: 700px;
   margin-bottom: 80px;
-}
-@media screen and (max-width: 800px) {
-  .post-content {
-    min-width: 0;
-    width: 100%;
-  }
 }
 .post-content > :first-child {
   margin-top: 0;
 }
 .post-content h2 {
   font-size: 22.4px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   margin-top: 60px;
   color: var(--text-color);
@@ -893,7 +885,7 @@ table td {
 }
 .post-content h3 {
   font-size: 18.2px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
   margin-top: 40px;
   color: var(--text-color);
@@ -905,7 +897,7 @@ table td {
 }
 .post-content h4 {
   font-size: 17.5px;
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 500;
   color: var(--text-color);
 }
@@ -913,6 +905,27 @@ table td {
   .post-content h4 {
     font-size: 15.75px;
   }
+}
+
+.post-layout-container > .post-content {
+  flex: 1;
+  min-width: 640px;
+  max-width: 640px;
+  font-size: 16px;
+  line-height: 1.8;
+}
+@media screen and (max-width: 800px) {
+  .post-layout-container > .post-content {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+}
+.post-layout-container > .post-content p {
+  margin-bottom: 1.25em;
+}
+.post-layout-container > .post-content p:last-child {
+  margin-bottom: 0;
 }
 
 .post-comments {
@@ -958,7 +971,7 @@ table td {
 }
 
 .related-post-link {
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 500;
   color: var(--text-color);
   text-decoration: none;
@@ -982,7 +995,7 @@ table td {
 }
 
 .rss-subscribe {
-  font-family: "Helvetica Neue", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
   color: var(--brand-color);
 }

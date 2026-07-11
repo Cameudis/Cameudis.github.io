@@ -56,7 +56,7 @@ asset_version: "friends-v2"
       <a class="friend-apply-button"
          href="https://github.com/Cameudis/Cameudis.github.io/issues/new?template=friend-link.yml"
          target="_blank" rel="noopener noreferrer">
-        在 GitHub 上申请 <span aria-hidden="true">-&gt;</span>
+        在 GitHub 上申请
       </a>
     </div>
   </section>

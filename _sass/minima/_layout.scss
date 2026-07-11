@@ -568,14 +568,7 @@
 }
 
 .post-content {
-  flex: 1;
-  min-width: $post-content-width; // Ensure minimum reading width on desktop
   margin-bottom: $spacing-unit * 2;
-
-  @include media-query($on-laptop) {
-    min-width: 0; // Allow shrinking on small screens
-    width: 100%;
-  }
 
   > :first-child {
     margin-top: 0;
@@ -615,6 +608,30 @@
 
     @include media-query($on-laptop) {
       @include relative-font-size(1.125);
+    }
+  }
+}
+
+// Long-form post typography. Page layouts also use `.post-content`, so keep
+// the reading measure scoped to the post-only flex container.
+.post-layout-container > .post-content {
+  flex: 1;
+  min-width: $post-content-width;
+  max-width: $post-content-width;
+  font-size: 16px;
+  line-height: 1.8;
+
+  @include media-query($on-laptop) {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  p {
+    margin-bottom: 1.25em;
+
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 }
