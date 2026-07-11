@@ -10,9 +10,8 @@ source "https://rubygems.org"
 gem "jekyll", "~> 4.4"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.5"
-# NOTE: GitHub Pages still builds this site server-side with its own pinned
-# `github-pages` stack. We use plain Jekyll locally because that gem set is
-# incompatible with Ruby 4.0 (commonmarker < 1.0 requires Ruby < 4.0).
+# GitHub Pages publishes the committed ./docs directory. It does not build this
+# repository server-side, so local and CI builds use this plain Jekyll stack.
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
@@ -35,4 +34,3 @@ gem "wdm", "~> 0.1", :platforms => [:mingw, :x64_mingw, :mswin]
 # Lock `http_parser.rb` gem to `v0.6.x` on JRuby builds since newer versions of the gem
 # do not have a Java counterpart.
 gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
-

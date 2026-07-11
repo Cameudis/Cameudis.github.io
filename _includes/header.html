@@ -81,5 +81,5 @@
     indexName: '{{ site.algolia.index_name }}'
   };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+<script src="{{ site.third_party.algolia_search_url }}"></script>
 <script src="{{ "/assets/js/search.js" | relative_url }}" defer></script>

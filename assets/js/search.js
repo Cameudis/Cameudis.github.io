@@ -21,7 +21,7 @@
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
 
-    if (!searchToggle || !searchOverlay) return;
+    if (!searchToggle || !searchOverlay || !searchClose || !searchInput || !searchResults) return;
 
     let searchTimeout;
 
@@ -33,7 +33,7 @@
     function closeSearch() {
       searchOverlay.classList.remove('active');
       searchInput.value = '';
-      searchResults.innerHTML = '';
+      searchResults.replaceChildren();
     }
 
     searchClose.addEventListener('click', closeSearch);
@@ -59,7 +59,7 @@
       clearTimeout(searchTimeout);
 
       if (query.length === 0) {
-        searchResults.innerHTML = '';
+        searchResults.replaceChildren();
         return;
       }
 
@@ -76,38 +76,77 @@
         highlightPreTag: '<span class="search-highlight">',
         highlightPostTag: '</span>'
       }).then(({ hits }) => {
-        displayResults(hits, query);
+        displayResults(hits);
       }).catch(error => {
         console.error('搜索错误:', error);
-        searchResults.innerHTML = '<div class="search-no-results">搜索出错，请稍后重试</div>';
+        displayMessage('搜索出错，请稍后重试');
       });
     }
 
-    function displayResults(hits, query) {
+    function displayMessage(message) {
+      const element = document.createElement('div');
+      element.className = 'search-no-results';
+      element.textContent = message;
+      searchResults.replaceChildren(element);
+    }
+
+    function normalizeResultUrl(value) {
+      if (typeof value !== 'string') return '#';
+
+      try {
+        const url = new URL(value, window.location.origin);
+        if (url.origin !== window.location.origin) return '#';
+        return `${url.pathname}${url.search}${url.hash}`;
+      } catch (error) {
+        return '#';
+      }
+    }
+
+    function plainText(value) {
+      const parser = new DOMParser();
+      const document = parser.parseFromString(String(value || ''), 'text/html');
+      return document.body.textContent || '';
+    }
+
+    function displayResults(hits) {
       if (hits.length === 0) {
-        searchResults.innerHTML = '<div class="search-no-results">没有找到相关内容</div>';
+        displayMessage('没有找到相关内容');
         return;
       }
 
-      const resultsHtml = hits.map(hit => {
-        const title = hit._highlightResult?.title?.value || hit.title || '无标题';
+      const fragment = document.createDocumentFragment();
+
+      hits.forEach(hit => {
+        const title = plainText(hit._highlightResult?.title?.value || hit.title || '无标题');
         const excerpt = hit._highlightResult?.content?.value || hit.excerpt || hit.content || '';
-        const url = hit.url || '#';
-        const date = hit.date || '';
+        const url = normalizeResultUrl(hit.url);
+        const date = plainText(hit.date);
+        const cleanExcerpt = plainText(excerpt).substring(0, 150);
 
-        // 截取摘要
-        const cleanExcerpt = excerpt.replace(/<[^>]*>/g, '').substring(0, 150);
+        const result = document.createElement('article');
+        result.className = 'search-result';
 
-        return `
-        <div class="search-result" onclick="window.location.href='${url}'">
-          <h3><a href="${url}">${title}</a></h3>
-          <p>${cleanExcerpt}${cleanExcerpt.length === 150 ? '...' : ''}</p>
-          ${date ? `<small>${date}</small>` : ''}
-        </div>
-      `;
-      }).join('');
+        const heading = document.createElement('h3');
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = title;
+        heading.appendChild(link);
+        result.appendChild(heading);
 
-      searchResults.innerHTML = resultsHtml;
+        const summary = document.createElement('p');
+        summary.textContent = `${cleanExcerpt}${cleanExcerpt.length === 150 ? '...' : ''}`;
+        result.appendChild(summary);
+
+        if (date) {
+          const timestamp = document.createElement('small');
+          timestamp.textContent = date;
+          result.appendChild(timestamp);
+        }
+
+        fragment.appendChild(result);
+      });
+
+      searchResults.replaceChildren(fragment);
     }
   }
 

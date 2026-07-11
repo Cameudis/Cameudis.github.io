@@ -2,10 +2,10 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="manifest" href="/images/site.webmanifest">
-  <link rel="shortcut icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ '/images/favicon-32x32.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ '/images/favicon-16x16.png' | relative_url }}">
+  <link rel="manifest" href="{{ '/images/site.webmanifest' | relative_url }}">
+  <link rel="shortcut icon" href="{{ '/images/favicon.ico' | relative_url }}">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script>
@@ -24,7 +24,7 @@
   {%- endif -%}
   {%- if page.use_math -%}
   <script type="text/javascript" async
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    src="{{ site.third_party.mathjax_url }}">
   </script>
   {%- endif -%}
   <script src="{{ "/assets/js/theme.js" | relative_url }}" defer></script>
