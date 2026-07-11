@@ -20,6 +20,7 @@
   --scanline-opacity: 0.18;
   --card-bg: rgba(46, 52, 64, 0.4);
   --page-background-image: none;
+  --page-background-attachment: fixed;
   /* Syntax Highlighting (Night) */
   --tok-comment: #616e88;
   --tok-keyword: #81a1c1;
@@ -81,6 +82,7 @@
   --page-background-image:
     linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
     url("../images/theme-blue-white-tile.png");
+  --page-background-attachment: scroll;
   /* Syntax Highlighting (Blue & White) */
   --tok-comment: #66869d;
   --tok-keyword: #176aab;
@@ -149,7 +151,7 @@ body {
   background-image: var(--page-background-image);
   background-repeat: repeat;
   background-size: 432px 432px;
-  background-attachment: fixed;
+  background-attachment: var(--page-background-attachment);
   -webkit-text-size-adjust: 100%;
   font-kerning: normal;
   display: flex;
