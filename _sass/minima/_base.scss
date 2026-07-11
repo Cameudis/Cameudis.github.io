@@ -39,6 +39,10 @@ body {
   font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
   color: $text-color;
   background-color: $background-color;
+  background-image: var(--page-background-image);
+  background-repeat: repeat;
+  background-size: 432px 432px;
+  background-attachment: fixed;
   -webkit-text-size-adjust: 100%;
   font-kerning: normal;
   display: flex;

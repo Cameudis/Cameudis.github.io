@@ -12,9 +12,11 @@
   <script>
     (function() {
       var savedTheme = localStorage.getItem('user-color-scheme');
-      if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
+      var validThemes = ['dark', 'light', 'blue-white'];
+      var theme = validThemes.indexOf(savedTheme) !== -1
+        ? savedTheme
+        : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
     })();
   </script><!-- Begin Jekyll SEO tag v2.9.0 -->
 <title>我恨 AI 写作 | Y²的博客</title>
@@ -42,35 +44,63 @@
       <div class="header-content-left">
         <a class="site-title" rel="author" href="/">Y²的博客</a>
 
-        <button class="search-button" id="search-toggle" aria-label="搜索">
+        <button class="search-button" id="search-toggle" type="button" aria-label="搜索">
           <svg width="20px" height="20px" viewBox="0 0 100 100" style="shape-rendering: crispEdges;">
-            <!-- Frame (Light Gray for dark theme visibility) -->
-            <rect x="30" y="10" width="10" height="10" fill="#eee" />
-            <rect x="40" y="10" width="10" height="10" fill="#eee" />
-            <rect x="50" y="10" width="10" height="10" fill="#eee" />
-            <rect x="20" y="20" width="10" height="10" fill="#eee" />
-            <rect x="60" y="20" width="10" height="10" fill="#eee" />
-            <rect x="10" y="30" width="10" height="10" fill="#eee" />
-            <rect x="70" y="30" width="10" height="10" fill="#eee" />
-            <rect x="10" y="40" width="10" height="10" fill="#eee" />
-            <rect x="70" y="40" width="10" height="10" fill="#eee" />
-            <rect x="10" y="50" width="10" height="10" fill="#eee" />
-            <rect x="70" y="50" width="10" height="10" fill="#eee" />
-            <rect x="20" y="60" width="10" height="10" fill="#eee" />
-            <rect x="60" y="60" width="10" height="10" fill="#eee" />
-            <rect x="30" y="70" width="10" height="10" fill="#eee" />
-            <rect x="40" y="70" width="10" height="10" fill="#eee" />
-            <rect x="50" y="70" width="10" height="10" fill="#eee" />
+            <!-- Frame -->
+            <rect x="30" y="10" width="10" height="10" />
+            <rect x="40" y="10" width="10" height="10" />
+            <rect x="50" y="10" width="10" height="10" />
+            <rect x="20" y="20" width="10" height="10" />
+            <rect x="60" y="20" width="10" height="10" />
+            <rect x="10" y="30" width="10" height="10" />
+            <rect x="70" y="30" width="10" height="10" />
+            <rect x="10" y="40" width="10" height="10" />
+            <rect x="70" y="40" width="10" height="10" />
+            <rect x="10" y="50" width="10" height="10" />
+            <rect x="70" y="50" width="10" height="10" />
+            <rect x="20" y="60" width="10" height="10" />
+            <rect x="60" y="60" width="10" height="10" />
+            <rect x="30" y="70" width="10" height="10" />
+            <rect x="40" y="70" width="10" height="10" />
+            <rect x="50" y="70" width="10" height="10" />
             <!-- Handle -->
-            <rect x="70" y="70" width="10" height="10" fill="#eee" />
-            <rect x="80" y="80" width="10" height="10" fill="#eee" />
-            <rect x="90" y="90" width="10" height="10" fill="#eee" />
+            <rect x="70" y="70" width="10" height="10" />
+            <rect x="80" y="80" width="10" height="10" />
+            <rect x="90" y="90" width="10" height="10" />
           </svg>
         </button>
 
-        <button id="theme-toggle" class="theme-toggle-btn" aria-label="切换主题">
-          [ DAY / NIGHT ]
-        </button>
+        <div class="theme-picker" id="theme-picker">
+          <button class="theme-picker-trigger" id="theme-picker-trigger" type="button"
+            aria-label="选择主题" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-picker-menu">
+            <span class="theme-picker-bracket" aria-hidden="true">[</span>
+            <span class="theme-picker-label">THEME</span>
+            <span class="theme-picker-divider" aria-hidden="true">//</span>
+            <span class="theme-picker-current">蓝白</span>
+            <span class="theme-picker-bracket" aria-hidden="true">]</span>
+            <span class="theme-picker-arrow" aria-hidden="true"></span>
+          </button>
+          <div class="theme-picker-menu" id="theme-picker-menu" role="menu" aria-label="主题选项" hidden>
+            <button type="button" role="menuitemradio" data-theme-value="dark" data-theme-label="夜间">
+              <span class="theme-option-index">01</span>
+              <span class="theme-option-swatch theme-option-swatch-dark" aria-hidden="true"></span>
+              <span class="theme-option-label">夜间</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+            <button type="button" role="menuitemradio" data-theme-value="light" data-theme-label="日间">
+              <span class="theme-option-index">02</span>
+              <span class="theme-option-swatch theme-option-swatch-light" aria-hidden="true"></span>
+              <span class="theme-option-label">日间</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+            <button type="button" role="menuitemradio" data-theme-value="blue-white" data-theme-label="蓝白">
+              <span class="theme-option-index">03</span>
+              <span class="theme-option-swatch theme-option-swatch-blue" aria-hidden="true"></span>
+              <span class="theme-option-label">蓝白</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+          </div>
+        </div>
       </div><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">

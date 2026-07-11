@@ -19,6 +19,7 @@
   --syntax-bg: #2e3440;
   --scanline-opacity: 0.18;
   --card-bg: rgba(46, 52, 64, 0.4);
+  --page-background-image: none;
   /* Syntax Highlighting (Night) */
   --tok-comment: #616e88;
   --tok-keyword: #81a1c1;
@@ -55,6 +56,38 @@
   --tok-number: #88398a;
   --tok-func: #005a5f;
   --tok-type: #8f5536;
+}
+
+[data-theme=blue-white] {
+  /* Blue & White Theme */
+  --background-color: #eaf6ff;
+  --text-color: #244563;
+  --brand-color: #1875b8;
+  --heading-color: #123f66;
+  --grey-color: #52758f;
+  --grey-color-light: #b9d9ef;
+  --grey-color-dark: #85b9dd;
+  --header-bg: rgba(239, 249, 255, 0.68);
+  --table-text: #244563;
+  --table-bg-even: rgba(218, 239, 253, 0.9);
+  --table-th-bg: rgba(196, 227, 248, 0.94);
+  --border-color: #a7cfe9;
+  --brand-dim: rgba(24, 117, 184, 0.12);
+  --accent-orange: #e9869c;
+  --nav-bg: rgba(239, 249, 255, 0.96);
+  --syntax-bg: rgba(235, 247, 255, 0.96);
+  --scanline-opacity: 0;
+  --card-bg: rgba(245, 251, 255, 0.9);
+  --page-background-image:
+    linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
+    url("../images/theme-blue-white-tile.png");
+  /* Syntax Highlighting (Blue & White) */
+  --tok-comment: #66869d;
+  --tok-keyword: #176aab;
+  --tok-string: #397c70;
+  --tok-number: #a54f84;
+  --tok-func: #006f91;
+  --tok-type: #906f22;
 }
 
 .highlight, h1,
@@ -113,6 +146,10 @@ body {
   font: 400 16px/1.75 "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   color: var(--text-color);
   background-color: var(--background-color);
+  background-image: var(--page-background-image);
+  background-repeat: repeat;
+  background-size: 432px 432px;
+  background-attachment: fixed;
   -webkit-text-size-adjust: 100%;
   font-kerning: normal;
   display: flex;
@@ -354,7 +391,8 @@ table td {
 .site-header {
   border-bottom: 1px dashed var(--grey-color);
   min-height: 80px;
-  position: relative;
+  position: sticky;
+  top: 0;
   background-color: var(--header-bg);
   backdrop-filter: blur(5px);
   z-index: 100;
@@ -646,6 +684,14 @@ table td {
   flex: 1;
 }
 
+[data-theme=blue-white] .page-content > .wrapper {
+  background: rgba(248, 252, 255, 0.92);
+  border: 1px solid rgba(126, 185, 226, 0.7);
+  box-shadow: 0 12px 36px rgba(48, 112, 155, 0.16);
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
 .page-heading {
   font-size: 32px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -823,7 +869,7 @@ table td {
   grid-row: 1;
   width: 200px;
   position: sticky;
-  top: 40px;
+  top: 100px;
   margin-top: 0;
   font-size: 13px;
   padding: 20px;
@@ -1009,8 +1055,7 @@ table td {
   gap: 5px;
 }
 
-.search-button,
-.theme-toggle-btn {
+.search-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -1024,17 +1069,150 @@ table td {
   color: var(--heading-color);
 }
 
-.theme-toggle-btn {
+.theme-picker {
+  position: relative;
+  float: left;
+  align-self: center;
   font-family: "FusionPixel10Prop", sans-serif;
   font-size: 12px;
   letter-spacing: 1px;
-  padding: 8px 12px;
 }
 
 .search-button:hover,
-.theme-toggle-btn:hover {
-  background-color: rgba(var(--brand-color), 0.1);
+.theme-picker-trigger:hover,
+.theme-picker-trigger:focus-visible {
   color: var(--brand-color);
+}
+
+.theme-picker-trigger {
+  min-height: 34px;
+  padding: 5px 9px;
+  border: 1px dashed var(--grey-color);
+  border-radius: 0;
+  color: var(--heading-color);
+  background: var(--card-bg);
+  box-shadow: 3px 3px 0 var(--brand-dim);
+  backdrop-filter: blur(8px);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 120ms ease, border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.theme-picker-trigger:hover,
+.theme-picker-trigger:focus-visible,
+.theme-picker.is-open .theme-picker-trigger {
+  border-color: var(--brand-color);
+  box-shadow: 3px 3px 0 var(--brand-dim), inset 0 -2px 0 var(--brand-color);
+}
+
+.theme-picker-trigger:focus-visible {
+  outline: 1px solid var(--brand-color);
+  outline-offset: 2px;
+}
+
+.theme-picker-bracket,
+.theme-picker-divider {
+  color: var(--brand-color);
+}
+
+.theme-picker-label {
+  white-space: nowrap;
+}
+
+.theme-picker-arrow {
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-top: 5px solid var(--brand-color);
+  pointer-events: none;
+  transition: transform 120ms ease;
+}
+
+.theme-picker.is-open .theme-picker-arrow {
+  transform: rotate(180deg);
+}
+
+.theme-picker-menu {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 0;
+  z-index: 200;
+  width: 190px;
+  padding: 6px;
+  border: 1px solid var(--brand-color);
+  background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(127, 127, 127, 0.04) 3px, rgba(127, 127, 127, 0.04) 4px), var(--nav-bg);
+  box-shadow: 6px 6px 0 var(--brand-dim);
+  backdrop-filter: blur(12px);
+}
+
+.theme-picker-menu[hidden] {
+  display: none;
+}
+
+.theme-picker-menu button {
+  width: 100%;
+  padding: 8px 6px;
+  border: 0;
+  color: var(--text-color);
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 24px 12px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.theme-picker-menu button:hover,
+.theme-picker-menu button:focus-visible {
+  color: var(--heading-color);
+  background: var(--brand-dim);
+  outline: 1px dashed var(--brand-color);
+}
+
+.theme-picker-menu button[aria-checked=true] {
+  color: var(--brand-color);
+  background: var(--brand-dim);
+}
+
+.theme-option-index,
+.theme-option-state {
+  color: var(--grey-color);
+  font-size: 0.82em;
+}
+
+.theme-picker-menu button[aria-checked=true] .theme-option-state {
+  color: var(--brand-color);
+}
+
+.theme-option-swatch {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--grey-color);
+}
+
+.theme-option-swatch-dark {
+  background: #121212;
+}
+
+.theme-option-swatch-light {
+  background: #ffffff;
+}
+
+.theme-option-swatch-blue {
+  background: #9bd3fa;
+}
+
+.theme-picker-menu button[aria-checked=true] .theme-option-label::before {
+  content: "> ";
 }
 
 .search-button:hover {
@@ -1179,6 +1357,17 @@ table td {
 }
 
 @media (max-width: 600px) {
+  .theme-picker-label {
+    display: none;
+  }
+  .theme-picker-trigger {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+  .theme-picker-menu {
+    left: auto;
+    right: 0;
+  }
   .search-overlay {
     padding-top: 50px;
   }

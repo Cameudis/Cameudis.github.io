@@ -9,7 +9,8 @@
 .site-header {
   border-bottom: 1px dashed $grey-color;
   min-height: $spacing-unit * 2;
-  position: relative;
+  position: sticky;
+  top: 0;
   background-color: var(--header-bg);
   backdrop-filter: blur(5px);
   z-index: 100;
@@ -332,6 +333,14 @@
   flex: 1;
 }
 
+[data-theme="blue-white"] .page-content > .wrapper {
+  background: rgba(248, 252, 255, 0.92);
+  border: 1px solid rgba(126, 185, 226, 0.7);
+  box-shadow: 0 12px 36px rgba(48, 112, 155, 0.16);
+  padding-top: $spacing-unit;
+  padding-bottom: $spacing-unit;
+}
+
 .page-heading {
   @include relative-font-size(2);
   font-family: $base-font-family;
@@ -520,7 +529,7 @@
   grid-row: 1;
   width: 200px;
   position: sticky;
-  top: $spacing-unit; // Align with content start
+  top: $spacing-unit * 2.5; // Clear the 80px sticky header with a 20px gap
   margin-top: 0; // Ensure no top offset
   font-size: $small-font-size;
   padding: math.div($spacing-unit, 2);

@@ -11,9 +11,11 @@
   <script>
     (function() {
       var savedTheme = localStorage.getItem('user-color-scheme');
-      if (savedTheme === 'light' || (!savedTheme && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
+      var validThemes = ['dark', 'light', 'blue-white'];
+      var theme = validThemes.indexOf(savedTheme) !== -1
+        ? savedTheme
+        : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
   {%- seo -%}

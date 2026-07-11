@@ -1,14 +1,29 @@
 (function() {
   const STORAGE_KEY = 'user-color-scheme';
-  const themeToggle = document.querySelector('#theme-toggle');
+  const THEMES = ['dark', 'light', 'blue-white'];
+  const themePicker = document.querySelector('#theme-picker');
+  const themeTrigger = document.querySelector('#theme-picker-trigger');
+  const themeMenu = document.querySelector('#theme-picker-menu');
+  const themeCurrent = document.querySelector('.theme-picker-current');
+  const themeOptions = Array.from(document.querySelectorAll('[data-theme-value]'));
+
+  function setMenuOpen(open) {
+    if (!themeTrigger || !themeMenu) return;
+    themeTrigger.setAttribute('aria-expanded', String(open));
+    themeMenu.hidden = !open;
+    themePicker.classList.toggle('is-open', open);
+  }
   
   function applyTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    localStorage.setItem(STORAGE_KEY, theme);
+    const selectedTheme = THEMES.includes(theme) ? theme : 'dark';
+    document.documentElement.setAttribute('data-theme', selectedTheme);
+    themeOptions.forEach((option) => {
+      const selected = option.dataset.themeValue === selectedTheme;
+      option.setAttribute('aria-checked', String(selected));
+      option.querySelector('.theme-option-state').textContent = selected ? 'ON' : 'OFF';
+      if (selected && themeCurrent) themeCurrent.textContent = option.dataset.themeLabel;
+    });
+    localStorage.setItem(STORAGE_KEY, selectedTheme);
   }
 
   // Get initial theme
@@ -20,12 +35,40 @@
   // Initial apply (already handled in head to prevent FOUC, but ensuring compatibility)
   applyTheme(savedTheme);
 
-  // Toggle listener
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      applyTheme(newTheme);
+  if (themeTrigger && themeMenu) {
+    themeTrigger.addEventListener('click', () => {
+      const open = themeTrigger.getAttribute('aria-expanded') !== 'true';
+      setMenuOpen(open);
+      if (open) {
+        const selectedOption = themeOptions.find((option) => option.getAttribute('aria-checked') === 'true');
+        (selectedOption || themeOptions[0]).focus();
+      }
+    });
+
+    themeOptions.forEach((option, index) => {
+      option.addEventListener('click', () => {
+        applyTheme(option.dataset.themeValue);
+        setMenuOpen(false);
+        themeTrigger.focus();
+      });
+
+      option.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+        event.preventDefault();
+        const offset = event.key === 'ArrowDown' ? 1 : -1;
+        themeOptions[(index + offset + themeOptions.length) % themeOptions.length].focus();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!themePicker.contains(event.target)) setMenuOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && themeTrigger.getAttribute('aria-expanded') === 'true') {
+        setMenuOpen(false);
+        themeTrigger.focus();
+      }
     });
   }
 })();

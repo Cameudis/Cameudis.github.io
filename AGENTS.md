@@ -23,6 +23,7 @@
 - 入口是本地 `assets/main.scss`（`@use "minima"`），覆盖 theme gem 那个含 `@import` 的版本——不要删这个文件。
 - 搜索弹窗的 JS/CSS 已外提：逻辑在 `assets/js/search.js`（通过 `window.BLOG_SEARCH_CONFIG` 接收 Algolia 配置），样式在 `_sass/minima/_search.scss`。
 - `link.md` 用 front matter 的 `asset_version` 给友链页主 CSS 做缓存破坏；修改友链页样式后同步递增该值，避免线上 CDN 继续返回旧 CSS。
+- 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
 
 ## 三方集成（随时可能挂，挂了表现为页面某块空白）
 

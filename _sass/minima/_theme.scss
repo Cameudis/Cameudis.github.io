@@ -18,6 +18,7 @@
   --syntax-bg: #2e3440;
   --scanline-opacity: 0.18;
   --card-bg: rgba(46, 52, 64, 0.4);
+  --page-background-image: none;
 
   /* Syntax Highlighting (Night) */
   --tok-comment: #616e88;
@@ -56,4 +57,37 @@
   --tok-number: #88398a;
   --tok-func: #005a5f;
   --tok-type: #8f5536;
+}
+
+[data-theme="blue-white"] {
+  /* Blue & White Theme */
+  --background-color: #eaf6ff;
+  --text-color: #244563;
+  --brand-color: #1875b8;
+  --heading-color: #123f66;
+  --grey-color: #52758f;
+  --grey-color-light: #b9d9ef;
+  --grey-color-dark: #85b9dd;
+  --header-bg: rgba(239, 249, 255, 0.68);
+  --table-text: #244563;
+  --table-bg-even: rgba(218, 239, 253, 0.9);
+  --table-th-bg: rgba(196, 227, 248, 0.94);
+  --border-color: #a7cfe9;
+  --brand-dim: rgba(24, 117, 184, 0.12);
+  --accent-orange: #e9869c;
+  --nav-bg: rgba(239, 249, 255, 0.96);
+  --syntax-bg: rgba(235, 247, 255, 0.96);
+  --scanline-opacity: 0;
+  --card-bg: rgba(245, 251, 255, 0.9);
+  --page-background-image:
+    linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
+    url("../images/theme-blue-white-tile.png");
+
+  /* Syntax Highlighting (Blue & White) */
+  --tok-comment: #66869d;
+  --tok-keyword: #176aab;
+  --tok-string: #397c70;
+  --tok-number: #a54f84;
+  --tok-func: #006f91;
+  --tok-type: #906f22;
 }
