@@ -1364,7 +1364,6 @@ table td {
 .diary-content ol > li:hover {
   border-color: var(--brand-color);
   background: rgba(var(--brand-color), 0.05);
-  transform: translateX(5px);
 }
 .diary-content ul {
   margin-top: 10px;
