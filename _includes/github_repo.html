@@ -1,0 +1,45 @@
+{%- assign github_repo = include.repo | strip -%}
+{%- assign github_repo_parts = github_repo | split: '/' -%}
+<aside class="github-repo-card" data-github-repo="{{ github_repo | escape }}" aria-busy="true">
+  <a class="github-repo-card__link"
+     href="https://github.com/{{ github_repo | escape }}"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="在 GitHub 查看 {{ github_repo | escape }} 仓库">
+    <header class="github-repo-card__header">
+      <svg class="github-repo-card__github-icon svg-icon" aria-hidden="true">
+        <use xlink:href="{{ '/assets/minima-social-icons.svg#github' | relative_url }}"></use>
+      </svg>
+      <span class="github-repo-card__owner">{{ github_repo_parts[0] | escape }}</span>
+      <span class="github-repo-card__slash" aria-hidden="true">/</span>
+      <strong class="github-repo-card__name">{{ github_repo_parts[1] | default: github_repo | escape }}</strong>
+      <span class="github-repo-card__visibility" hidden></span>
+    </header>
+
+    <p class="github-repo-card__description">正在读取仓库信息…</p>
+
+    <footer class="github-repo-card__meta" hidden>
+      <span class="github-repo-card__language" hidden>
+        <i class="github-repo-card__language-color" aria-hidden="true"></i>
+        <span class="github-repo-card__language-name"></span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__stars" title="Stars">
+        <span aria-hidden="true">★</span>
+        <span class="github-repo-card__stars-count"></span>
+        <span class="sr-only">Stars</span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__forks" title="Forks">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="5" cy="3" r="2"></circle>
+          <circle cx="11" cy="3" r="2"></circle>
+          <circle cx="8" cy="13" r="2"></circle>
+          <path d="M5 5v1.5A2.5 2.5 0 0 0 7.5 9h1A2.5 2.5 0 0 0 11 6.5V5M8 9v2"></path>
+        </svg>
+        <span class="github-repo-card__forks-count"></span>
+        <span class="sr-only">Forks</span>
+      </span>
+      <span class="github-repo-card__license" hidden></span>
+      <time class="github-repo-card__updated" hidden></time>
+    </footer>
+  </a>
+</aside>

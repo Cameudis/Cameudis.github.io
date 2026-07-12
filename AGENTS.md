@@ -24,11 +24,14 @@
 - 搜索弹窗的 JS/CSS 已外提：逻辑在 `assets/js/search.js`（通过 `window.BLOG_SEARCH_CONFIG` 接收 Algolia 配置），样式在 `_sass/minima/_search.scss`。
 - `link.md` 用 front matter 的 `asset_version` 给友链页主 CSS 做缓存破坏；修改友链页样式后同步递增该值，避免线上 CDN 继续返回旧 CSS。
 - 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
+- 正文可用 `{% include github_repo.html repo="owner/repository" %}` 插入 GitHub 仓库卡片。结构在 `_includes/github_repo.html`，数据与 6 小时浏览器缓存逻辑在 `assets/js/github-repo.js`，样式在 `_sass/minima/_github-repo.scss`；公开 API 失败时会降级为仓库链接。
+- 正文组件还包括 `{% include callout.html ... %}`、`{% include link_preview.html ... %}` 和 `{% include static_tweet.html ... %}`；写法见 `README.md`。结构在 `_includes/`，共用样式在 `_sass/minima/_embeds.scss`，链接元数据与 24 小时缓存逻辑在 `assets/js/link-preview.js`。
 
 ## 三方集成（随时可能挂，挂了表现为页面某块空白）
 
 - **评论**：Valine（LeanCloud），`_includes/valine_comments.html`，凭据走 `_config.yml` 的 `valine:` 段（`site.valine.*`）。该 include 只在 post layout 出现，Valine 的 `<script src=...>` 也搬到这里，**首页/about/404 不加载 Valine**。
 - **搜索**：Algolia，配置在 `_config.yml` 末尾，凭据通过 `window.BLOG_SEARCH_CONFIG` 注入 `assets/js/search.js`。push 索引用 `ALGOLIA_API_KEY=... bundle exec jekyll algolia`（key 在 gitignore 的 `_algolia_api_key`）。
+- **链接预览**：Microlink 公共元数据 API，由 `assets/js/link-preview.js` 调用；会把文章中指定的 URL 发送给 Microlink。失败或图片禁止外链时自动降级，不应出现空白卡片。
 - **访客地图**：`_includes/footer.html` 嵌 `mapmyvisitors.com/map.js`。
 - **MathJax**：`_includes/head.html` 里 **按 `page.use_math` 开关加载**，不是全局。写含数学公式的文章时，front matter 加 `use_math: true` 才会引入 MathJax CDN。
 

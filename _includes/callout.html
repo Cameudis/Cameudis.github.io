@@ -1,0 +1,11 @@
+{%- assign callout_type = include.type | default: "note" | downcase -%}
+{%- assign callout_title = include.title | default: callout_type | capitalize -%}
+<aside class="callout callout--{{ callout_type | escape }}" role="note">
+  <div class="callout__title">
+    <span class="callout__icon" aria-hidden="true"></span>
+    <strong>{{ callout_title | escape }}</strong>
+  </div>
+  <div class="callout__content">
+    {{ include.content | markdownify }}
+  </div>
+</aside>

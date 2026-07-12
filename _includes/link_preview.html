@@ -1,0 +1,27 @@
+{%- assign preview_url = include.url | strip -%}
+{%- assign preview_url_parts = preview_url | split: '/' -%}
+{%- assign preview_host = preview_url_parts[2] | default: preview_url -%}
+<aside class="link-preview"
+       data-link-preview="{{ preview_url | escape }}"
+       data-manual-title="{{ include.title | escape }}"
+       data-manual-description="{{ include.description | escape }}"
+       data-manual-image="{{ include.image | escape }}"
+       aria-busy="true">
+  <a class="link-preview__link"
+     href="{{ preview_url | escape }}"
+     target="_blank"
+     rel="noopener noreferrer">
+    <img class="link-preview__image" alt="" loading="lazy" hidden>
+    <span class="link-preview__body">
+      <strong class="link-preview__title">{{ include.title | default: preview_url | escape }}</strong>
+      <span class="link-preview__description">
+        {{- include.description | default: "正在读取链接信息…" | escape -}}
+      </span>
+      <span class="link-preview__site">
+        <img class="link-preview__favicon" alt="" width="16" height="16" loading="lazy" hidden>
+        <span class="link-preview__site-name">{{ preview_host | escape }}</span>
+        <span class="link-preview__arrow" aria-hidden="true">↗</span>
+      </span>
+    </span>
+  </a>
+</aside>

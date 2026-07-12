@@ -1,0 +1,35 @@
+{%- assign tweet_handle = include.handle | remove: '@' -%}
+<figure class="static-tweet">
+  <figcaption class="static-tweet__header">
+    <span class="static-tweet__author">
+      {%- if include.avatar -%}
+      <img class="static-tweet__avatar" src="{{ include.avatar | escape }}" alt="" width="44" height="44" loading="lazy">
+      {%- else -%}
+      <span class="static-tweet__avatar static-tweet__avatar--fallback" aria-hidden="true">
+        {{- include.username | default: tweet_handle | slice: 0 | upcase | escape -}}
+      </span>
+      {%- endif -%}
+      <span class="static-tweet__identity">
+        <strong>{{ include.username | default: tweet_handle | escape }}</strong>
+        <span>@{{ tweet_handle | escape }}</span>
+      </span>
+    </span>
+    {%- if include.url -%}
+    <a class="static-tweet__source" href="{{ include.url | escape }}" target="_blank" rel="noopener noreferrer" aria-label="在 X 查看原帖">𝕏</a>
+    {%- else -%}
+    <span class="static-tweet__source" aria-hidden="true">𝕏</span>
+    {%- endif -%}
+  </figcaption>
+
+  <blockquote class="static-tweet__text">
+    {{ include.text | markdownify }}
+  </blockquote>
+
+  {%- if include.image -%}
+  <img class="static-tweet__media" src="{{ include.image | escape }}" alt="{{ include.image_alt | default: '推文配图' | escape }}" loading="lazy">
+  {%- endif -%}
+
+  {%- if include.date -%}
+  <time class="static-tweet__date"{% if include.datetime %} datetime="{{ include.datetime | escape }}"{% endif %}>{{ include.date | escape }}</time>
+  {%- endif -%}
+</figure>

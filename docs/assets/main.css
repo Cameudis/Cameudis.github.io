@@ -1794,6 +1794,481 @@ table td {
     padding: 18px 0 0;
   }
 }
+.github-repo-card {
+  margin: 40px 0;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: 4px 4px 0 var(--brand-dim);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.github-repo-card:hover, .github-repo-card:focus-within {
+  border-color: var(--brand-color);
+  box-shadow: 6px 6px 0 var(--brand-dim);
+  transform: translate(-1px, -1px);
+}
+.github-repo-card.has-error {
+  border-style: dashed;
+}
+.github-repo-card [hidden] {
+  display: none;
+}
+.github-repo-card .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.github-repo-card__link {
+  display: block;
+  padding: 20px 22px;
+  color: var(--text-color);
+}
+.github-repo-card__link:hover, .github-repo-card__link:focus-visible {
+  color: var(--text-color);
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+.github-repo-card__link:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--brand-color);
+}
+.github-repo-card__link::after {
+  content: none !important;
+}
+
+.github-repo-card__header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.35;
+}
+
+.github-repo-card__github-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.github-repo-card__owner,
+.github-repo-card__slash {
+  color: var(--grey-color);
+}
+
+.github-repo-card__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--brand-color);
+  font-size: 1.05em;
+}
+
+.github-repo-card__visibility {
+  margin-left: auto;
+  padding: 1px 7px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--grey-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.github-repo-card__description {
+  min-height: 1.6em;
+  margin: 14px 0 16px !important;
+  color: var(--text-color);
+  opacity: 0.84;
+  font-size: 0.9375em;
+}
+
+.github-repo-card:not(.is-loaded):not(.has-error) .github-repo-card__description {
+  color: transparent;
+  background: linear-gradient(90deg, var(--brand-dim) 25%, var(--border-color) 50%, var(--brand-dim) 75%);
+  background-size: 200% 100%;
+  animation: github-repo-card-loading 1.4s ease infinite;
+}
+
+.github-repo-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px 16px;
+  color: var(--grey-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 13px;
+}
+
+.github-repo-card__language,
+.github-repo-card__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.github-repo-card__language-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--border-color);
+}
+
+.github-repo-card__stat svg {
+  width: 15px;
+  height: 15px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.4;
+}
+
+.github-repo-card__updated {
+  margin-left: auto;
+}
+
+@keyframes github-repo-card-loading {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .github-repo-card,
+  .github-repo-card__description {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media screen and (max-width: 600px) {
+  .github-repo-card__link {
+    padding: 17px 16px;
+  }
+  .github-repo-card__updated {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+.callout {
+  --callout-color: var(--brand-color);
+  margin: 40px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--callout-color);
+  background: var(--card-bg);
+}
+
+.callout--tip {
+  --callout-color: #6a9f58;
+}
+
+.callout--warning {
+  --callout-color: #d19a35;
+}
+
+.callout--danger {
+  --callout-color: #bf616a;
+}
+
+.callout--important {
+  --callout-color: #9b72cf;
+}
+
+.callout__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--callout-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.callout__icon::before {
+  content: "i";
+}
+
+.callout--tip .callout__icon::before {
+  content: "+";
+}
+
+.callout--warning .callout__icon::before {
+  content: "!";
+}
+
+.callout--danger .callout__icon::before {
+  content: "×";
+}
+
+.callout--important .callout__icon::before {
+  content: "◆";
+}
+
+.callout__icon {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid currentColor;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.callout__content > :last-child {
+  margin-bottom: 0;
+}
+
+.link-preview {
+  margin: 40px 0;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.link-preview:hover, .link-preview:focus-within {
+  border-color: var(--brand-color);
+  box-shadow: 5px 5px 0 var(--brand-dim);
+  transform: translate(-1px, -1px);
+}
+.link-preview.has-error {
+  border-style: dashed;
+}
+.link-preview [hidden] {
+  display: none;
+}
+
+.link-preview__link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  min-height: 138px;
+  color: var(--text-color);
+}
+.link-preview__link:hover, .link-preview__link:focus-visible {
+  color: var(--text-color);
+  background: transparent;
+  box-shadow: none;
+}
+.link-preview__link:focus-visible {
+  outline: 2px solid var(--brand-color);
+}
+.link-preview__link::after {
+  content: none !important;
+}
+
+.link-preview__body {
+  display: flex;
+  min-width: 0;
+  padding: 18px 20px;
+  flex-direction: column;
+  grid-column: 1;
+}
+
+.link-preview__image[hidden] + .link-preview__body {
+  grid-column: 1/3;
+}
+
+.link-preview__title {
+  overflow: hidden;
+  color: var(--heading-color);
+  font-size: 1.05em;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-preview__description {
+  display: -webkit-box;
+  margin: 8px 0 14px;
+  overflow: hidden;
+  color: var(--text-color);
+  font-size: 13px;
+  line-height: 1.55;
+  opacity: 0.78;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.link-preview:not(.is-loaded):not(.has-error) .link-preview__description {
+  color: transparent;
+  background: linear-gradient(90deg, var(--brand-dim) 25%, var(--border-color) 50%, var(--brand-dim) 75%);
+  background-size: 200% 100%;
+  animation: link-preview-loading 1.4s ease infinite;
+}
+
+.link-preview__site {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  color: var(--grey-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 12px;
+}
+
+.link-preview__favicon {
+  object-fit: contain;
+}
+
+.link-preview__site-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-preview__arrow {
+  margin-left: auto;
+  color: var(--brand-color);
+}
+
+.link-preview__image {
+  width: 180px;
+  height: 100%;
+  min-height: 138px;
+  object-fit: cover;
+  grid-column: 2;
+  grid-row: 1;
+  border-left: 1px solid var(--border-color);
+}
+
+@keyframes link-preview-loading {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.static-tweet {
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+}
+
+.static-tweet__header,
+.static-tweet__author {
+  display: flex;
+  align-items: center;
+}
+
+.static-tweet__header {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.static-tweet__author {
+  min-width: 0;
+  gap: 11px;
+}
+
+.static-tweet__avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.static-tweet__avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: var(--brand-dim);
+  color: var(--brand-color);
+  font-weight: 700;
+}
+
+.static-tweet__identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.35;
+}
+
+.static-tweet__identity strong {
+  color: var(--heading-color);
+}
+
+.static-tweet__identity span {
+  color: var(--grey-color);
+  font-size: 13px;
+}
+
+.static-tweet__source {
+  flex: 0 0 auto;
+  color: var(--text-color);
+  font-size: 1.35em;
+}
+.static-tweet__source::after {
+  content: none !important;
+}
+
+.static-tweet__text {
+  margin: 18px 0 14px;
+  padding: 0;
+  border: 0;
+  color: var(--text-color);
+  font-size: 1.05em;
+  font-style: normal;
+}
+.static-tweet__text > :last-child {
+  margin-bottom: 0;
+}
+
+.static-tweet__media {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  margin: 16px 0 0;
+  border: 1px solid var(--border-color);
+  object-fit: cover;
+}
+
+.static-tweet__date {
+  display: block;
+  margin-top: 16px;
+  color: var(--grey-color);
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-preview,
+  .link-preview__description {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media screen and (max-width: 600px) {
+  .link-preview__link {
+    grid-template-columns: minmax(0, 1fr) 105px;
+    min-height: 128px;
+  }
+  .link-preview__body {
+    padding: 15px 16px;
+  }
+  .link-preview__image {
+    width: 105px;
+    min-height: 128px;
+  }
+  .link-preview__description {
+    -webkit-line-clamp: 3;
+  }
+  .static-tweet {
+    padding: 16px;
+  }
+}
 @font-face {
   font-family: "FusionPixel10Prop";
   src: url("fonts/fusion-pixel-font-10px-proportional-otf.woff2-v2025.10.20/fusion-pixel-10px-proportional-zh_hans.otf.woff2") format("woff2");
