@@ -641,6 +641,16 @@
     margin-top: 0;
   }
 
+  // Keep anchored headings visible below the sticky site header.
+  h1[id],
+  h2[id],
+  h3[id],
+  h4[id],
+  h5[id],
+  h6[id] {
+    scroll-margin-top: $spacing-unit * 2 + 20px;
+  }
+
   h2 {
     @include relative-font-size(1.5);
     font-family: $base-font-family;
