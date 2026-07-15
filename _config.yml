@@ -14,6 +14,10 @@ theme: minima
 plugins:
   - jekyll-feed
 
+# Bump when changing a cacheable site asset referenced with this version.
+asset_versions:
+  footer: "20260715-1"
+
 # Build output for GitHub Pages (deployed from ./docs on the gh-pages branch)
 destination: ./docs
 include: ["CNAME"]
