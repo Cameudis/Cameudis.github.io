@@ -1,4 +1,4 @@
-/** Footer uptime and isolated visitor map loader. */
+/** Footer uptime and visitor map loader. */
 (function () {
   'use strict';
 
@@ -17,16 +17,6 @@
     output.textContent = `${years}y ${days}d ${hours}h ${mins}m ${secs}s`;
   }
 
-  function escapeAttribute(value) {
-    return value.replace(/[&<>"']/g, (character) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[character]);
-  }
-
   function initVisitorMap() {
     const container = document.querySelector('.footer-map-mini[data-map-src]');
     if (!container) return;
@@ -34,22 +24,27 @@
     let mapUrl;
     try {
       const parsed = new URL(container.dataset.mapSrc);
-      if (parsed.protocol !== 'https:') throw new Error('Only HTTPS is allowed');
+      if (parsed.protocol !== 'https:' || parsed.hostname !== 'mapmyvisitors.com') {
+        throw new Error('Unexpected visitor map URL');
+      }
       mapUrl = parsed.href;
     } catch (error) {
       container.textContent = 'VISITOR_MAP_UNAVAILABLE';
       return;
     }
 
-    const frame = document.createElement('iframe');
-    frame.className = 'footer-map-frame';
-    frame.title = 'Visitor map';
-    frame.loading = 'lazy';
-    frame.setAttribute('sandbox', 'allow-scripts allow-top-navigation-by-user-activation');
-    frame.width = '240';
-    frame.height = '150';
-    frame.srcdoc = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:transparent;color-scheme:dark}</style><script id="mapmyvisitors" src="${escapeAttribute(mapUrl)}"><\/script>`;
-    container.appendChild(frame);
+    // The legacy JSONP endpoint is blocked in third-party iframe contexts, even
+    // without sandboxing. Load it in the page like the vendor's original embed.
+    // The vendor script keeps its bundled jQuery private via noConflict(true).
+    const script = document.createElement('script');
+    script.id = 'mapmyvisitors';
+    script.src = mapUrl;
+    script.async = true;
+    script.referrerPolicy = 'strict-origin-when-cross-origin';
+    script.addEventListener('error', () => {
+      container.textContent = 'VISITOR_MAP_UNAVAILABLE';
+    }, { once: true });
+    container.appendChild(script);
   }
 
   updateUptime();

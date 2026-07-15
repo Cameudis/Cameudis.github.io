@@ -667,12 +667,6 @@ table td {
   opacity: 1;
 }
 
-.footer-map-frame {
-  display: block;
-  max-width: 100%;
-  border: 0;
-}
-
 .comments-load {
   color: var(--brand-color);
   background: transparent;
