@@ -1066,6 +1066,25 @@ table td {
 .post-content {
   margin-bottom: 80px;
 }
+.post-content .external-link-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 0.3em 0 0;
+  border-radius: 2px;
+  object-fit: contain;
+  vertical-align: -0.1em;
+  opacity: 0.82;
+  filter: saturate(0.78);
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+.post-content a:hover .external-link-icon {
+  opacity: 1;
+  filter: saturate(1);
+}
+.post-content a.has-external-link-icon::after {
+  content: none;
+}
 .post-content > :first-child {
   margin-top: 0;
 }

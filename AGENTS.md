@@ -7,6 +7,7 @@
 ## 构建
 
 - `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先执行 Jekyll，再生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
+- `bin/build` 在 Jekyll 之后运行 `bin/cache-external-link-icons`：扫描生成页面中的外链，按域名抓取 favicon，压成 32×32 PNG 缓存到 `assets/external-link-icons/`，并同步到 `docs/`。抓取会读取实际链接页的 icon 声明、尝试站点常见 favicon 路径，并仅在构建阶段用 Google favicon 服务兜底；读者始终只请求本站资源。已有缓存不会重复请求；失败只保留原有外链箭头且不阻塞构建。只重试缺失项用 `--retry-missing`，全部强制重抓用 `--refresh`。
 - 本地用原生 `jekyll ~> 4.4`，**不用** `github-pages` gem（Ruby 4.0 不兼容，见 `Gemfile` 注释）。第三方 Jekyll gem 插件只有 `jekyll-feed`；`_plugins/optimize_images.rb` 是本地 HTML filter，给正文图片补原生懒加载与异步解码；搜索使用构建后的 Pagefind 静态索引。
 - `_config.yml` 有 `exclude: [AGENTS.md, README.md]`——这两份根目录文件不会进 `docs/` 部署产物，别误删这条。
 - `sitemap.xml` 是无插件依赖的 Liquid 模板；构建时自动生成 `docs/sitemap.xml`，收录正式页面和已发布文章。不要用旧站遗留的静态 sitemap 覆盖它。
@@ -48,3 +49,5 @@
 ## 完工收尾
 
 任务完成后，**主动询问用户是否需要 git 提交**。如果用户同意，自行 `git add` 相关改动 → `git commit`（写清晰的 message）→ `git push`。当前在 `gh-pages` 默认分支，push 前确认改动范围，不要带上无关的脏文件。
+
+视觉相关更改完成并运行 `bin/build` 后，除询问是否需要 git 提交外，还要主动启动本地预览服务器（默认用 `ruby -run -e httpd docs -p 4001`），打开包含本次改动的代表性页面供用户预览，并告知访问地址；服务器保持运行，直到用户看完或要求停止。

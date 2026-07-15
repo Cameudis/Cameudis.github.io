@@ -17,7 +17,8 @@ plugins:
 # Bump when changing a cacheable site asset referenced with this version.
 asset_versions:
   footer: "20260715-3"
-  main_css: "20260715-rss-position"
+  main_css: "20260715-external-link-icons"
+  post: "20260716-external-link-icons-4"
 
 # Build output for GitHub Pages (deployed from ./docs on the gh-pages branch)
 destination: ./docs

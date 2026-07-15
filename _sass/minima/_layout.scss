@@ -730,6 +730,28 @@
 .post-content {
   margin-bottom: $spacing-unit * 2;
 
+  .external-link-icon {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin: 0 0.3em 0 0;
+    border-radius: 2px;
+    object-fit: contain;
+    vertical-align: -0.1em;
+    opacity: 0.82;
+    filter: saturate(0.78);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  a:hover .external-link-icon {
+    opacity: 1;
+    filter: saturate(1);
+  }
+
+  a.has-external-link-icon::after {
+    content: none;
+  }
+
   > :first-child {
     margin-top: 0;
   }

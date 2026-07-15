@@ -6,6 +6,9 @@
  * - Diary-specific "Most Recent" functionality
  */
 
+const postScript = document.currentScript;
+const externalIconManifestUrl = postScript?.dataset.externalIconManifest;
+
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Code block chrome and copy controls
   const codeBlocks = document.querySelectorAll('.post-content .highlight > pre > code');
@@ -80,7 +83,69 @@ document.addEventListener('DOMContentLoaded', () => {
     frame.insertBefore(toolbar, highlight);
   });
 
-  // 2. Table of Contents (TOC) Scroll-Spy
+  // 2. Locally cached favicons for ordinary external links
+  const decorateExternalLinks = async () => {
+    if (!externalIconManifestUrl) return;
+
+    const links = Array.from(document.querySelectorAll('.post-content a[href]')).filter(link => {
+      if (link.closest('.link-preview, .github-repo-card, .static-tweet')) return false;
+      if (link.querySelector('img, svg')) return false;
+
+      try {
+        const url = new URL(link.href, window.location.href);
+        return (url.protocol === 'http:' || url.protocol === 'https:') && url.origin !== window.location.origin;
+      } catch (_) {
+        return false;
+      }
+    });
+    if (links.length === 0) return;
+
+    try {
+      const response = await fetch(externalIconManifestUrl, { credentials: 'same-origin' });
+      if (!response.ok) return;
+
+      const manifest = await response.json();
+      const iconBaseUrl = new URL('./', new URL(externalIconManifestUrl, window.location.href));
+
+      links.forEach(link => {
+        const host = new URL(link.href, window.location.href).hostname.toLowerCase();
+        const filename = manifest.icons?.[host];
+        if (!filename) return;
+
+        const previous = link.previousSibling;
+        const previousText = previous?.textContent || '';
+        const needsLeadingSpace = previous && previous.nodeName !== 'BR' && !/\s$/.test(previousText);
+        const spacer = needsLeadingSpace ? document.createTextNode(' ') : null;
+        if (spacer) link.before(spacer);
+
+        const icon = document.createElement('img');
+        icon.className = 'external-link-icon';
+        icon.alt = '';
+        icon.width = 14;
+        icon.height = 14;
+        icon.decoding = 'async';
+        icon.fetchPriority = 'low';
+        icon.setAttribute('aria-hidden', 'true');
+        const markLoaded = () => link.classList.add('has-external-link-icon');
+        icon.addEventListener('load', markLoaded, { once: true });
+        icon.addEventListener('error', () => {
+          icon.remove();
+          spacer?.remove();
+        }, { once: true });
+        icon.src = new URL(filename, iconBaseUrl).href;
+        link.prepend(icon);
+
+        // A memory-cached image can finish before event delivery on some browsers.
+        if (icon.complete && icon.naturalWidth > 0) markLoaded();
+      });
+    } catch (_) {
+      // The existing external-link arrow remains the fallback.
+    }
+  };
+
+  decorateExternalLinks();
+
+  // 3. Table of Contents (TOC) Scroll-Spy
   const tocContainer = document.querySelector('.post-toc');
   const tocToggle = tocContainer?.querySelector('.toc-toggle');
   const tocLinks = document.querySelectorAll('.post-toc a[href^="#"]');
@@ -179,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     highlightToc();
   }
 
-  // 3. Diary-specific Features
+  // 4. Diary-specific Features
   const isDiaryPage = window.location.pathname.includes('/diary/');
 
   if (isDiaryPage && tocContainer) {

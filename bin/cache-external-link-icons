@@ -1,0 +1,417 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "cgi"
+require "digest"
+require "fileutils"
+require "ipaddr"
+require "json"
+require "net/http"
+require "open3"
+require "openssl"
+require "resolv"
+require "tempfile"
+require "time"
+require "uri"
+require "yaml"
+
+ICON_SIZE = 32
+MAX_HTML_BYTES = 2_097_152
+MAX_ICON_BYTES = 524_288
+RETRY_AFTER = 7 * 24 * 60 * 60
+WORKER_COUNT = 4
+USER_AGENT = "cameudis-blog-favicon-cache/1.0"
+
+ROOT = File.expand_path("..", __dir__)
+DESTINATION = File.join(ROOT, "docs")
+CACHE_DIR = File.join(ROOT, "assets", "external-link-icons")
+MANIFEST_PATH = File.join(CACHE_DIR, "manifest.json")
+STATE_PATH = File.join(ROOT, "_data", "external_link_icons_cache.json")
+DEPLOY_DIR = File.join(DESTINATION, "assets", "external-link-icons")
+
+class FetchError < StandardError; end
+
+PRIVATE_NETWORKS = %w[
+  0.0.0.0/8
+  10.0.0.0/8
+  100.64.0.0/10
+  127.0.0.0/8
+  169.254.0.0/16
+  172.16.0.0/12
+  192.0.0.0/24
+  192.0.2.0/24
+  192.168.0.0/16
+  198.51.100.0/24
+  203.0.113.0/24
+  224.0.0.0/4
+  240.0.0.0/4
+  ::/128
+  ::1/128
+  fc00::/7
+  fe80::/10
+  ff00::/8
+  2001:db8::/32
+].map { |range| IPAddr.new(range) }.freeze
+
+# 198.18.0.0/15 is intentionally absent above: Codex and some VPN/proxy
+# setups synthesize public DNS answers in this benchmarking range.
+
+def public_http_uri!(uri)
+  raise FetchError, "unsupported URL" unless uri.is_a?(URI::HTTP) && uri.host
+
+  addresses = Resolv.getaddresses(uri.host)
+  raise FetchError, "host did not resolve" if addresses.empty?
+
+  addresses.each do |address|
+    ip = IPAddr.new(address)
+    raise FetchError, "private address refused" if PRIVATE_NETWORKS.any? { |network| network.include?(ip) }
+  end
+
+  uri
+rescue Resolv::ResolvError, IPAddr::InvalidAddressError => error
+  raise FetchError, error.message
+end
+
+def fetch(uri, limit:, redirects: 4, accept: "image/avif,image/webp,image/png,image/*,*/*;q=0.5")
+  raise FetchError, "too many redirects" if redirects.negative?
+
+  public_http_uri!(uri)
+  request = Net::HTTP::Get.new(uri.request_uri.empty? ? "/" : uri.request_uri)
+  request["User-Agent"] = USER_AGENT
+  request["Accept"] = accept
+
+  response_data = nil
+  Net::HTTP.start(
+    uri.host,
+    uri.port,
+    use_ssl: uri.scheme == "https",
+    open_timeout: 5,
+    read_timeout: 8,
+    write_timeout: 5
+  ) do |http|
+    http.request(request) do |response|
+      case response
+      when Net::HTTPSuccess
+        content_length = response["content-length"].to_i
+        raise FetchError, "response is too large" if content_length > limit
+
+        body = +"".b
+        response.read_body do |chunk|
+          body << chunk
+          raise FetchError, "response is too large" if body.bytesize > limit
+        end
+        response_data = [body, uri, response["content-type"].to_s]
+      when Net::HTTPRedirection
+        location = response["location"]
+        raise FetchError, "redirect without a location" unless location
+
+        redirected = URI.join(uri, location)
+        return fetch(redirected, limit: limit, redirects: redirects - 1, accept: accept)
+      else
+        raise FetchError, "HTTP #{response.code}"
+      end
+    end
+  end
+
+  response_data
+rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError => error
+  raise FetchError, error.message
+end
+
+def html_attributes(tag)
+  tag.scan(/([:\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/).to_h do |name, double, single, bare|
+    [name.downcase, CGI.unescapeHTML(double || single || bare || "")]
+  end
+end
+
+def icon_candidates(page_uri, html)
+  links = html.scan(/<link\b[^>]*>/i).filter_map do |tag|
+    attributes = html_attributes(tag)
+    rel = attributes.fetch("rel", "").downcase.split
+    href = attributes["href"]
+    next unless href && rel.any? { |value| value == "icon" || value == "apple-touch-icon" }
+    next if href.start_with?("data:")
+
+    begin
+      candidate = URI.join(page_uri, href)
+      next unless candidate.is_a?(URI::HTTP)
+
+      sizes = attributes.fetch("sizes", "")
+      size_score = if sizes.match?(/(?:^|\s)32x32(?:\s|$)/i)
+                     0
+                   elsif sizes.match?(/(?:^|\s)(?:16x16|48x48|64x64|any)(?:\s|$)/i)
+                     1
+                   else
+                     2
+                   end
+      rel_score = rel.include?("icon") ? 0 : 1
+      [rel_score, size_score, candidate]
+    rescue URI::InvalidURIError
+      nil
+    end
+  end
+
+  links.sort_by { |rel_score, size_score, _| [rel_score, size_score] }.map(&:last).uniq
+end
+
+def raster_image?(body, content_type)
+  type = content_type.downcase
+  return false if type.include?("svg") || type.include?("html")
+
+  body.start_with?("\x89PNG".b, "\xFF\xD8".b, "GIF8".b, "\x00\x00\x01\x00".b, "BM".b) ||
+    (body.start_with?("RIFF".b) && body.byteslice(8, 4) == "WEBP") ||
+    (body.bytesize >= 12 && body.byteslice(4, 4) == "ftyp")
+end
+
+def convert_to_small_png(body, output_path)
+  Tempfile.create(["external-link-icon", ".img"]) do |input|
+    input.binmode
+    input.write(body)
+    input.flush
+
+    identify_output, identify_error, identify_status = Open3.capture3(
+      "magick", "identify", "-format", "%p|%w|%h|%m\\n", input.path
+    )
+    raise FetchError, identify_error.strip unless identify_status.success?
+
+    frames = identify_output.lines.filter_map do |line|
+      index, width, height, format = line.strip.split("|", 4)
+      next unless index && width && height && format
+      next unless %w[AVIF BMP GIF ICO JPEG JPG PNG WEBP].include?(format.upcase)
+
+      [index.to_i, width.to_i, height.to_i]
+    end
+    raise FetchError, "unsupported image format" if frames.empty?
+
+    frame = frames.min_by do |_, width, height|
+      dimension = [width, height].max
+      dimension >= ICON_SIZE ? dimension - ICON_SIZE : 10_000 - dimension
+    end
+    raise FetchError, "invalid image dimensions" if frame[1] <= 0 || frame[2] <= 0
+    raise FetchError, "image dimensions are too large" if frame[1] > 4096 || frame[2] > 4096
+
+    command = [
+      "magick", "#{input.path}[#{frame[0]}]",
+      "-thumbnail", "#{ICON_SIZE}x#{ICON_SIZE}>",
+      "-background", "none",
+      "-gravity", "center",
+      "-extent", "#{ICON_SIZE}x#{ICON_SIZE}",
+      "-strip",
+      "-colors", "64",
+      "-define", "png:compression-level=9",
+      output_path
+    ]
+    _, error, status = Open3.capture3(*command)
+    raise FetchError, error.strip unless status.success? && File.size?(output_path)
+  end
+end
+
+def cache_icon(host, page_uri)
+  origin_uri = page_uri.dup
+  origin_uri.path = "/"
+  origin_uri.query = nil
+  origin_uri.fragment = nil
+
+  candidates = []
+  errors = []
+
+  begin
+    page_body, resolved_page_uri, content_type = fetch(
+      page_uri,
+      limit: MAX_HTML_BYTES,
+      accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.5"
+    )
+    if content_type.downcase.include?("html") || page_body.lstrip.start_with?("<".b)
+      candidates.concat(icon_candidates(resolved_page_uri, page_body.force_encoding("UTF-8").scrub))
+    end
+  rescue FetchError => error
+    errors << error.message
+  end
+
+  candidates.concat(
+    [
+      URI.join(origin_uri, "/favicon.ico"),
+      URI.join(origin_uri, "/favicon.png"),
+      URI.join(origin_uri, "/apple-touch-icon.png")
+    ]
+  )
+
+  provider_uri = URI::HTTPS.build(
+    host: "www.google.com",
+    path: "/s2/favicons",
+    query: URI.encode_www_form("domain_url" => origin_uri.to_s, "sz" => ICON_SIZE)
+  )
+  candidates << provider_uri
+  candidates.uniq!
+
+  candidates.first(12).each do |candidate|
+    begin
+      body, resolved_icon_uri, icon_content_type = fetch(candidate, limit: MAX_ICON_BYTES)
+      raise FetchError, "not a supported raster icon" unless raster_image?(body, icon_content_type)
+
+      filename = "#{Digest::SHA256.hexdigest(host)[0, 16]}.png"
+      output_path = File.join(CACHE_DIR, filename)
+      convert_to_small_png(body, output_path)
+      return [filename, resolved_icon_uri.to_s]
+    rescue FetchError, URI::InvalidURIError => error
+      errors << error.message
+    end
+  end
+
+  raise FetchError, errors.last || "no favicon was declared"
+end
+
+def site_hosts
+  config = YAML.safe_load_file(File.join(ROOT, "_config.yml"), aliases: true) || {}
+  [config["url"], "https://cameudis.com", "https://www.cameudis.com"].filter_map do |value|
+    URI.parse(value).host&.downcase
+  rescue URI::InvalidURIError
+    nil
+  end.uniq
+end
+
+def external_hosts
+  internal_hosts = site_hosts
+  hosts = {}
+
+  Dir.glob(File.join(DESTINATION, "**", "*.html")).sort.each do |path|
+    File.read(path).scan(/<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)')/i).each do |double, single|
+      href = CGI.unescapeHTML(double || single || "")
+      begin
+        uri = URI.parse(href)
+        next unless uri.is_a?(URI::HTTP) && uri.host
+
+        host = uri.host.downcase
+        next if internal_hosts.include?(host)
+
+        page_uri = uri.dup
+        page_uri.fragment = nil
+        page_uri.userinfo = nil
+        hosts[host] = page_uri if !hosts.key?(host) || (hosts[host].scheme == "http" && uri.scheme == "https")
+      rescue URI::InvalidURIError, URI::InvalidComponentError
+        next
+      end
+    end
+  end
+
+  hosts
+end
+
+def load_manifest
+  source = if File.file?(STATE_PATH)
+             STATE_PATH
+           elsif File.file?(MANIFEST_PATH)
+             MANIFEST_PATH
+           end
+  return { "version" => 1, "size" => ICON_SIZE, "hosts" => {} } unless source
+
+  data = JSON.parse(File.read(source))
+  data["hosts"] ||= {}
+  data
+rescue JSON::ParserError
+  { "version" => 1, "size" => ICON_SIZE, "hosts" => {} }
+end
+
+def checked_recently?(entry)
+  checked_at = Time.iso8601(entry.fetch("checked_at"))
+  Time.now - checked_at < RETRY_AFTER
+rescue KeyError, ArgumentError
+  false
+end
+
+unless Dir.exist?(DESTINATION)
+  warn "External link icons: #{DESTINATION} does not exist; run Jekyll first."
+  exit 0
+end
+
+unless system("magick", "-version", out: File::NULL, err: File::NULL)
+  warn "External link icons: ImageMagick is unavailable; keeping the existing cache."
+  exit 0
+end
+
+FileUtils.mkdir_p(CACHE_DIR)
+manifest = load_manifest
+hosts = external_hosts
+refresh = ARGV.include?("--refresh")
+retry_missing = ARGV.include?("--retry-missing")
+queue = Queue.new
+
+hosts.each do |host, page_uri|
+  entry = manifest["hosts"][host]
+  cached_file = entry && entry["file"]
+  next if !refresh && cached_file && File.file?(File.join(CACHE_DIR, cached_file))
+  next if !refresh && !retry_missing && entry && entry["status"] == "missing" && checked_recently?(entry)
+
+  queue << [host, page_uri]
+end
+
+mutex = Mutex.new
+workers = [WORKER_COUNT, queue.length].min.times.map do
+  Thread.new do
+    loop do
+      host, page_uri = queue.pop(true)
+      checked_at = Time.now.utc.iso8601
+      begin
+        filename, source = cache_icon(host, page_uri)
+        mutex.synchronize do
+          manifest["hosts"][host] = {
+            "status" => "ok",
+            "file" => filename,
+            "checked_at" => checked_at
+          }
+          puts "External link icon: cached #{host} from #{URI.parse(source).host}"
+        end
+      rescue FetchError, URI::InvalidURIError => error
+        mutex.synchronize do
+          previous_file = manifest.dig("hosts", host, "file")
+          if previous_file && File.file?(File.join(CACHE_DIR, previous_file))
+            manifest["hosts"][host]["checked_at"] = checked_at
+            warn "External link icon: kept cached #{host} (#{error.message})"
+          else
+            manifest["hosts"][host] = {
+              "status" => "missing",
+              "checked_at" => checked_at
+            }
+            warn "External link icon: skipped #{host} (#{error.message})"
+          end
+        end
+      end
+    rescue ThreadError
+      break
+    rescue StandardError => error
+      warn "External link icon: unexpected error for #{host}: #{error.message}"
+    end
+  end
+end
+workers.each(&:join)
+
+manifest["version"] = 1
+manifest["size"] = ICON_SIZE
+manifest["hosts"] = manifest["hosts"].sort.to_h
+ordered_state = {
+  "version" => manifest["version"],
+  "size" => manifest["size"],
+  "hosts" => manifest["hosts"]
+}
+state_json = JSON.pretty_generate(ordered_state) + "\n"
+FileUtils.mkdir_p(File.dirname(STATE_PATH))
+File.write(STATE_PATH, state_json) unless File.file?(STATE_PATH) && File.read(STATE_PATH) == state_json
+
+public_icons = manifest["hosts"].filter_map do |host, entry|
+  [host, entry["file"]] if entry["status"] == "ok" && entry["file"]
+end.to_h
+public_manifest = {
+  "version" => manifest["version"],
+  "size" => manifest["size"],
+  "icons" => public_icons
+}
+manifest_json = JSON.pretty_generate(public_manifest) + "\n"
+File.write(MANIFEST_PATH, manifest_json) unless File.file?(MANIFEST_PATH) && File.read(MANIFEST_PATH) == manifest_json
+
+FileUtils.mkdir_p(DEPLOY_DIR)
+Dir.glob(File.join(CACHE_DIR, "*.{json,png}")).each do |path|
+  FileUtils.cp(path, File.join(DEPLOY_DIR, File.basename(path)))
+end
+
+cached_count = manifest["hosts"].count { |_, entry| entry["status"] == "ok" }
+puts "External link icons: #{cached_count} cached for #{hosts.length} current external hosts."

@@ -8,4 +8,5 @@ if [ ! -x node_modules/.bin/pagefind ]; then
 fi
 
 bundle exec jekyll build
+bin/cache-external-link-icons
 npm run search:index
