@@ -17,7 +17,7 @@ plugins:
 # Bump when changing a cacheable site asset referenced with this version.
 asset_versions:
   footer: "20260715-3"
-  main_css: "20260715-font-balance"
+  main_css: "20260715-rss-position"
 
 # Build output for GitHub Pages (deployed from ./docs on the gh-pages branch)
 destination: ./docs

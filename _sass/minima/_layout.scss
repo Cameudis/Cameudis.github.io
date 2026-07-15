@@ -908,7 +908,21 @@
 }
 
 .rss-subscribe {
-  font-family: $base-font-family;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.45em;
+  margin-top: $spacing-unit * 1.5;
+  margin-bottom: math.div(-$spacing-unit, 2);
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: $small-font-size;
   font-weight: 600;
   color: $brand-color;
+  text-align: right;
+  transform: translateY($spacing-unit * 1.5);
+
+  @include media-query($on-palm) {
+    margin-top: $spacing-unit;
+    margin-bottom: math.div(-$spacing-unit, 4);
+  }
 }

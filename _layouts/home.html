@@ -38,7 +38,9 @@ layout: default
   </div>
 
   <p class="rss-subscribe">
-    <span class="cursor">_</span> subscribe <a href="{{ "/feed.xml" | relative_url }}">RSS_FEED</a>
+    <span class="cursor" aria-hidden="true">_</span>
+    <span>subscribe</span>
+    <a href="{{ "/feed.xml" | relative_url }}">RSS_FEED</a>
   </p>
   {%- endif -%}
 </div>

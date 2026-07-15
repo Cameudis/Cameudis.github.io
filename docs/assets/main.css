@@ -1230,9 +1230,24 @@ table td {
 }
 
 .rss-subscribe {
-  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.45em;
+  margin-top: 60px;
+  margin-bottom: -20px;
+  font-family: "FusionPixel10Prop", sans-serif;
+  font-size: 13px;
   font-weight: 600;
   color: var(--brand-color);
+  text-align: right;
+  transform: translateY(60px);
+}
+@media screen and (max-width: 600px) {
+  .rss-subscribe {
+    margin-top: 40px;
+    margin-bottom: -10px;
+  }
 }
 
 .header-content {
