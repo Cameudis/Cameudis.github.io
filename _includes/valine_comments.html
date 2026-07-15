@@ -1,9 +1,8 @@
-<script src="{{ site.third_party.valine_url }}"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "{{ site.valine.app_id }}",
-    app_key: "{{ site.valine.app_key }}",
-    placeholder: "{{ site.valine.placeholder }}",
-  });
-</script>
+<div id="comments" class="post-comments"
+  data-valine-url="{{ site.third_party.valine_url }}"
+  data-app-id="{{ site.valine.app_id }}"
+  data-app-key="{{ site.valine.app_key }}"
+  data-placeholder="{{ site.valine.placeholder | escape }}">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="{{ "/assets/js/comments.js" | relative_url }}" defer></script>

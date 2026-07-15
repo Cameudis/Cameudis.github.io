@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#from-write-to-execute">From write to execute</a></li><li><a href="#from-write-to-read">From write to read</a></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#from-write-to-execute">From write to execute</a></li><li><a href="#from-write-to-read">From write to read</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -166,7 +170,7 @@
 
 <p>对于我们今天的主角——RISC-V 架构的玄铁处理器来说，情况则有所不同。直到去年的九月份，RISC-V 架构的 KASLR 支持才被合并进入 Linux 主线的 6.6 版本。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png" alt="Pasted image 20240813155119.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119483.png" alt="Pasted image 20240813155119.png" /></p>
 
 <p>熟悉 Linux 的小伙伴都知道，重视稳定性的发行版常常会绑定某个特定版本的内核，包括 Debian、Ubuntu、CentOS、RHEL 等等。因此，Linux 6.6 以及之后的版本并不会那么快地部署到各个发行版中。（就算新版采用了最新的内核，程序员或许还是喜欢使用老发行版）</p>
 
@@ -190,7 +194,7 @@
 
 <p>在大部分发行版上，由于 KASLR 不会开启，所以只需要通过本地调试或其他方法拿到 <code class="language-plaintext highlighter-rouge">getuid</code> 的地址就行了。至于小部分使用了 6.6 及以上内核版本的发行版，还需要结合进行物理内存的扫描来获取信息，关于物理内存读取的部分，会在后面进行介绍。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119426.png" alt="ad02993e5f8b310a48309b1835c64a11.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152119426.png" alt="ad02993e5f8b310a48309b1835c64a11.png" /></p>
 
 <p>如果你想要玩点更加花哨的，想在权限级别更高的 Machine Mode 执行代码，也可以使用类似的攻击手法，直接写入修改 Supervisor 代码。作者以 OpenSBI 这套 Supervisor 实现为例，说明了如何进行 Machine Mode 代码执行：</p>
 
@@ -216,7 +220,7 @@
 
 <p>下图是我基于自己 patch 过的 qemu，在 ubuntu 22.04 上进行攻击的 PoC。可以看到攻击者的用户态程序成功读出了物理地址 0x80400000 的值。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>
 
 <p>关于 qemu 的 patch 以及攻击代码，可以见下一篇博客。</p>
 
@@ -337,24 +341,22 @@
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2024/09/16/GhostWrite-1.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -363,25 +365,6 @@
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -402,8 +385,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -412,12 +395,13 @@
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

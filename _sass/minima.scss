@@ -15,20 +15,10 @@
 @use "minima/embeds";
 
 // Font faces used across the site.
-@font-face {
-  font-family: "FusionPixel10Prop";
-  src: url('fonts/fusion-pixel-font-10px-proportional-otf.woff2-v2025.10.20/fusion-pixel-10px-proportional-zh_hans.otf.woff2') format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "FusionPixel12Prop";
-  src: url('fonts/fusion-pixel-font-12px-proportional-otf.woff2-v2025.10.20/fusion-pixel-12px-proportional-zh_hans.otf.woff2') format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "FusionPixel12Mono";
-  src: url('fonts/fusion-pixel-font-12px-monospaced-otf.woff2-v2025.10.20/fusion-pixel-12px-monospaced-zh_hans.otf.woff2') format("woff2");
-  font-display: swap;
+@media screen and (min-width: 601px) {
+  @font-face {
+    font-family: "FusionPixel10Prop";
+    src: url('fonts/fusion-pixel-font-10px-proportional-otf.woff2-v2025.10.20/fusion-pixel-10px-proportional-zh_hans.otf.woff2') format("woff2");
+    font-display: optional;
+  }
 }

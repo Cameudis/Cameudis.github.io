@@ -551,25 +551,6 @@
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -590,8 +571,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -600,12 +581,13 @@
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#程序概况">程序概况</a></li><li><a href="#攻击思路概括">攻击思路概括</a></li><li><a href="#具体攻击流程解析">具体攻击流程解析</a><ul><li><a href="#信息泄漏">信息泄漏</a></li><li><a href="#smallbin-to-tcache本题关键">smallbin to tcache（本题关键）</a></li><li><a href="#tcache-poisoning--house-of-apple2">tcache poisoning &amp; House of Apple2</a></li></ul></li><li><a href="#exp-脚本">EXP 脚本</a></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#程序概况">程序概况</a></li><li><a href="#攻击思路概括">攻击思路概括</a></li><li><a href="#具体攻击流程解析">具体攻击流程解析</a><ul><li><a href="#信息泄漏">信息泄漏</a></li><li><a href="#smallbin-to-tcache本题关键">smallbin to tcache（本题关键）</a></li><li><a href="#tcache-poisoning--house-of-apple2">tcache poisoning &amp; House of Apple2</a></li></ul></li><li><a href="#exp-脚本">EXP 脚本</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -882,24 +886,22 @@ empty
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -908,25 +910,6 @@ empty
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -947,8 +930,8 @@ empty
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -957,12 +940,13 @@ empty
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

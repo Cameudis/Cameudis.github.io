@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#babytrace">babytrace</a><ul><li><a href="#ptrace-原理">ptrace 原理</a></li><li><a href="#ptrace-sandbox">ptrace sandbox</a></li><li><a href="#ptrace-bad-use">ptrace bad use</a></li><li><a href="#ptrace-good-use">ptrace good use</a></li><li><a href="#利用">利用</a></li></ul></li><li><a href="#vpwn">vpwn</a></li><li><a href="#heavens-door">Heaven’s door</a></li><li><a href="#一个相对完善的-ptrace-sandbox">一个相对完善的 ptrace sandbox</a></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#babytrace">babytrace</a><ul><li><a href="#ptrace-原理">ptrace 原理</a></li><li><a href="#ptrace-sandbox">ptrace sandbox</a></li><li><a href="#ptrace-bad-use">ptrace bad use</a></li><li><a href="#ptrace-good-use">ptrace good use</a></li><li><a href="#利用">利用</a></li></ul></li><li><a href="#vpwn">vpwn</a></li><li><a href="#heavens-door">Heaven’s door</a></li><li><a href="#一个相对完善的-ptrace-sandbox">一个相对完善的 ptrace sandbox</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -307,7 +311,7 @@ So, for PTRACE_SYSCALL, for example, the idea is to inspect the arguments to the
 
 <p>现在，子进程会在调用 system 函数前进入一段 10s 的睡眠时间。让我们趁着这个机会，给子进程发个随便什么信号试试：</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202501201356700.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202501201356700.png" alt="image.png" /></p>
 
 <p>BOOM！子进程逃出了沙盒，成功执行了 <code class="language-plaintext highlighter-rouge">system("echo 'Hello, World!'")</code>。这是因为，我们发送给子进程的 <code class="language-plaintext highlighter-rouge">SIGSTOP</code> 信号被捕捉，父进程以为此时子进程进入了 syscall entry。因此，后续子进程真正进入 syscall entry 时，父进程会将其当成 syscall exit，不进行检查。</p>
 
@@ -742,24 +746,22 @@ call qword ptr [rax + 0x28];
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2025/01/20/XHLJ-2025.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -768,25 +770,6 @@ call qword ptr [rax + 0x28];
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -807,8 +790,8 @@ call qword ptr [rax + 0x28];
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -817,12 +800,13 @@ call qword ptr [rax + 0x28];
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

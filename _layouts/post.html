@@ -23,28 +23,35 @@ layout: default
 
         <div class="post-layout-container">
           {%- assign h_max = page.toc_max_level | default: 3 -%}
-          {%- capture post_toc -%}{% include toc.html html=content h_max=h_max %}{%- endcapture -%}
+          {%- capture post_toc -%}{% include toc.html html=content h_max=h_max id="post-toc-list" %}{%- endcapture -%}
           {%- assign post_toc = post_toc | strip -%}
           {%- unless post_toc == empty %}
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
             {{ post_toc }}
           </aside>
           {%- endunless %}
 
           <div class="post-content e-content" itemprop="articleBody"{% unless page.search == false %} data-pagefind-body{% endunless %}>
-            {{ content }}
+            {{ content | optimize_images }}
           </div>
         </div>
 
         {% include related_posts.html %}
 
-        <div id="comments" class="post-comments"></div>
         {% include valine_comments.html %}
 
         <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
 
 <script src="{{ "/assets/js/post.js" | relative_url }}" defer></script>
+{% if content contains 'data-github-repo=' %}
 <script src="{{ "/assets/js/github-repo.js" | relative_url }}" defer></script>
+{% endif %}
+{% if content contains 'data-link-preview=' %}
 <script src="{{ "/assets/js/link-preview.js" | relative_url }}" defer></script>
+{% endif %}

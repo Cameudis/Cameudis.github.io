@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#协议的禁区非法构造">协议的禁区：非法构造</a><ul><li><a href="#vmware-与蓝牙">VMware 与蓝牙</a></li><li><a href="#cve-202320869-栈溢出">CVE-2023–20869 栈溢出</a></li></ul></li><li><a href="#协议的留白未定义行为">协议的留白：未定义行为</a><ul><li><a href="#cve-2023-20870-信息泄露">CVE-2023-20870 信息泄露</a></li></ul></li><li><a href="#总结">总结</a></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#协议的禁区非法构造">协议的禁区：非法构造</a><ul><li><a href="#vmware-与蓝牙">VMware 与蓝牙</a></li><li><a href="#cve-202320869-栈溢出">CVE-2023–20869 栈溢出</a></li></ul></li><li><a href="#协议的留白未定义行为">协议的留白：未定义行为</a><ul><li><a href="#cve-2023-20870-信息泄露">CVE-2023-20870 信息泄露</a></li></ul></li><li><a href="#总结">总结</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -164,7 +168,7 @@
 
 <p>蓝牙作为一种无线通信协议，它的整个协议栈架构由三层组成：Application、Host、Controller。App 只管用就行了；Host 层包括蓝牙最常用的那些概念，比如功能发现、配对等；Controller 层则负责链路层和物理层，通常是由硬件实现的。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052044252.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052044252.png" alt="image.png" /></p>
 
 <p>在 Host 层和 Controller 层之间有着软件和硬件的分水岭，换句话说通常都是由软件去提供 Host 侧的功能，然后通过设备 IO 向硬件发送指令，由硬件完成 Controller 的功能。在 Host 和 Controller 之间的接口格式也由蓝牙协议规定，就叫 HCI（Host Controller Interface）。诸如“开始扫描“、”建立连接”、“连接成功”以及数据的传输都遵循 HCI 格式。HCI 数据包需要通过真实的物理连接（CPU 和蓝牙芯片之间的连接）进行传输，这可以是嵌入式里比较常见的 UART、也可以是 USB，这就无所谓了。</p>
 
@@ -193,11 +197,11 @@
 
 <p>SDP（Service Discovery Protocol）是经典蓝牙中的服务发现协议，功能类似老黄页目录，允许设备相互告知能提供的服务类型及其属性。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052123033.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052123033.png" alt="image.png" /></p>
 
 <p>SDP 协议定义了一套自己的序列化机制，在 <a href="https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/host/service-discovery-protocol--sdp--specification.html#:~:text=Service%20browsing%20hierarchy-,3.%20Data%20representation,-Attribute%20values%20can">SDP 规范</a>中有详细的定义。下图展示了几种数据被表示成规范中 <em>Data Element</em> 的方式，我们可以看到这个规范是经典的 TLV 结构（Type-length-value，在通信协议的编码或者说序列化的领域中非常常见，类似的还有 Linux 内核的 Netlink 接口，见 <a href="https://docs.kernel.org/userspace-api/netlink/intro.html">官方文档</a>，或是 TLS Extension 的编码）。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052133019.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052133019.png" alt="image.png" /></p>
 
 <p>CVE-2023-20869 发生在 VMware 对 SDP 数据包进行反序列化的代码中。下面这个函数的功能是解析 uint 类型的 Data Element。逻辑很简单，先把目标数据用 <code class="language-plaintext highlighter-rouge">copy_out</code> 复制到 <code class="language-plaintext highlighter-rouge">buf</code> 中，然后进行大小端转换并放到参数提供的 <code class="language-plaintext highlighter-rouge">out</code> 指针中。</p>
 
@@ -231,11 +235,11 @@
 
 <p>规范中允许 uint 类型有 5 种不同长度，也就是下表中的 <code class="language-plaintext highlighter-rouge">0, 1, 2, 3, 4</code> 五种长度描述符：</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061009449.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061009449.png" alt="image.png" /></p>
 
 <p>长度描述符的具体含义见下表，0 到 5 分别对应 1 字节到 16 字节。注意，这里的 5 到 7 描述符是很灵活的，比如 5 就允许我们用一个 8 bits 的数来表示实际的大小。</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061013217.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602061013217.png" alt="image.png" /></p>
 
 <p>程序调用 <code class="language-plaintext highlighter-rouge">de_read_uint</code> 前，会用通用的长度描述符解析函数计算出 Data Element 的 Size，然后作为 <code class="language-plaintext highlighter-rouge">len</code> 传给这个函数。然而<strong>程序并没有对 “Valid Size Descriptor Values” 做校验</strong>，导致恶意的 SDP 包构建者可以对 uint 使用 5 到 7 号描述符，构造一个拥有巨大 <code class="language-plaintext highlighter-rouge">len</code> 的 uint。</p>
 
@@ -476,24 +480,22 @@
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2026/02/08/VMware-1.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -502,25 +504,6 @@
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -541,8 +524,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -551,12 +534,13 @@
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

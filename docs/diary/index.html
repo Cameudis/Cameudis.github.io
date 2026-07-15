@@ -144,7 +144,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li><li><a href="#2025-12">2025-12</a></li><li><a href="#2026-01">2026-01</a></li><li><a href="#2026-02">2026-02</a></li><li><a href="#2026-03">2026-03</a></li><li><a href="#2026-04">2026-04</a></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#2025-7">2025-7</a></li><li><a href="#2025-8">2025-8</a></li><li><a href="#2025-9">2025-9</a></li><li><a href="#2025-10">2025-10</a></li><li><a href="#2025-11">2025-11</a></li><li><a href="#2025-12">2025-12</a></li><li><a href="#2026-01">2026-01</a></li><li><a href="#2026-02">2026-02</a></li><li><a href="#2026-03">2026-03</a></li><li><a href="#2026-04">2026-04</a></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody">
@@ -311,7 +315,7 @@
     <ul>
       <li>有人在把 OPTEE 迁移到 RISC-V 上以支持 GP 标准的 TA（SiFive、芯来 Nuclei），有人在基于 CoVE 标准开发 TEE 架构（玄铁），Intel 在将他们的 x86 IoT 场景 hypervisor <a href="https://projectacrn.org/">ACRN™</a>迁移到 RISC-V CoVE 上（<a href="https://github.com/intel/acrn-riscv">acrn-riscv</a>）。当然还有知名的 Penglai，可惜时间冲突了没去听夏老师的分享。</li>
       <li>对于开发者和厂商来说，选项还挺多的；不过对于我们搞安全的来说，部署到什么系统上才是重点，毕竟攻击需要考虑攻击的收益。目前看来，RISC-V 的 TEE 并没有部署到什么现实中的应用上。但是我们可以简单估计一下它们的使用场景，其中嵌入式、健康计算、车控会比较多，其次是 AI、云计算领域。</li>
-      <li>尽管 RISC-V 目前主要推动的是 AI 主题，但我觉得 AI 的攻击面相比传统安全要少得多，TEE 用来保护 AI 目前来看更多还是噱头作用。而在云计算这块，或者说整个桌面和服务器领域，RISC-V 距离赶上 x86 差得不是一星半点，就不提了。下面这张图是今天超睿科技展示的“世界上第一颗桌面级 RISC-V CPU”：<img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202507182219227.png" alt="" />难道真的要赶上 x86 了吗！在交大 tcloud 实验室的校友对这颗 CPU 做的<a href="https://zhuanlan.zhihu.com/p/1923399170653398232">评测</a>中提到，UR-DP1000单核性能达到了SPECInt2006 10.4/GHz 和 SPECfp2006 12.0/GHz 的水平，ChatGPT 说这个成绩属于<em>极高的水平，远远超出大多数普通桌面处理器（即便是许多高端消费者级处理器）</em>。可惜，主频只有 2.23GHz 的话，乘上去之后还是离现在的 x86 桌面处理器有差距啊！</li>
+      <li>尽管 RISC-V 目前主要推动的是 AI 主题，但我觉得 AI 的攻击面相比传统安全要少得多，TEE 用来保护 AI 目前来看更多还是噱头作用。而在云计算这块，或者说整个桌面和服务器领域，RISC-V 距离赶上 x86 差得不是一星半点，就不提了。下面这张图是今天超睿科技展示的“世界上第一颗桌面级 RISC-V CPU”：<img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202507182219227.png" alt="" />难道真的要赶上 x86 了吗！在交大 tcloud 实验室的校友对这颗 CPU 做的<a href="https://zhuanlan.zhihu.com/p/1923399170653398232">评测</a>中提到，UR-DP1000单核性能达到了SPECInt2006 10.4/GHz 和 SPECfp2006 12.0/GHz 的水平，ChatGPT 说这个成绩属于<em>极高的水平，远远超出大多数普通桌面处理器（即便是许多高端消费者级处理器）</em>。可惜，主频只有 2.23GHz 的话，乘上去之后还是离现在的 x86 桌面处理器有差距啊！</li>
       <li>也有厂商在搞安全协处理器（<a href="https://www.rambus.com/security/root-of-trust/rt-6xx/">CryptoManager RT-6xx Root of Trust | Security IP - Rambus</a>）把安全攸关的任务交给协处理器完成，类似把矩阵计算交给 NPU 或者 GPU。不过这种架构也有天生的弱点，我们知道“一条链的强度取决于其最为脆弱的一环”，在安全协处理器的场景下，这一环就会变成 CPU 本身以及其与安全协处理器通信的链路。</li>
     </ul>
   </li>
@@ -1089,7 +1093,7 @@
       <li>在最简单的映射方案中，一个内存地址会从高位到低位，按顺序分流到不同的路径中（请读者回忆数字逻辑中的 Multiplexer）。内存连接的架构大致是 <code class="language-plaintext highlighter-rouge">Memory Controller -&gt; Channel -&gt; DIMM -&gt; Rank -&gt; BankGroup -&gt; Bank -&gt; Row -&gt; Column</code>，所以一个内存地址可以拆分成 <code class="language-plaintext highlighter-rouge">[MC][Channel][DIMM][Rank][BankGroup][Bank][Row][Column][CacheLine Offset]</code>，最终选择到一个字节。</li>
       <li>举例来说，如果系统中每个 BankGroup 都有 4 个 Bank，那么用于选择 Bank 的位宽就应该是 2。除了 CacheLine Offset（一个 Cache Line 是 64B，需要 8 个位表示偏移）之外，用于选择 Row 和 Column 的位宽比较大。在 DDR5 中，通常一个 bank 会有 64K rows，需要 16 个比特来表示；一个 row 中约有 128 个 Cache Line 大小的 Column，所以需要 7 个比特来表示。其他的分流选项通常只需要一两个 bit，比如 PC 里通常只有两个 Channel、一个 Channel 只有两个 DIMM 插槽。</li>
       <li>这样朴素的映射方法会带来性能问题。内存访问不是简单的 MUX 导通问题，每次访存时，器件都需要准备时间和善后时间。如果现在 CPU 发出了一连串顺序访存请求（这也是计算机最常见的访存模式），这些请求会全都落在同一个 Bank 上。我们有更好的方法：在一个 Bank 等待的时候，其他的 Bank 可以提供服务。只要我们把连续的访存请求“平摊”到各处，整体性能就会提升，如图所示：</li>
-      <li><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20260302163044144.png" alt="" /><a href="https://www.bilibili.com/video/BV1w94y1F7ML">图片来源：DRAM基本工作原理7_内存地址映射_Bilibili</a></li>
+      <li><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20260302163044144.png" alt="" /><a href="https://www.bilibili.com/video/BV1w94y1F7ML">图片来源：DRAM基本工作原理7_内存地址映射_Bilibili</a></li>
       <li>除了 Bank 外，Column 和其他层次也存在类似的机制，同样可以通过将连续的请求平摊开来，优化整体的带宽。这种交错访问不同路径的优化就是 Interleaving。</li>
     </ul>
   </li>
@@ -1144,24 +1148,22 @@
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/diary/" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -1170,25 +1172,6 @@
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -1209,8 +1192,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -1219,12 +1202,13 @@
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

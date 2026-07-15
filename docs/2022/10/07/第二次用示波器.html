@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#测量机通话信号">测量⼿机通话信号</a><ul><li><a href="#测量ipad屏幕电磁信号">测量Ipad屏幕电磁信号</a></li></ul></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#测量机通话信号">测量⼿机通话信号</a><ul><li><a href="#测量ipad屏幕电磁信号">测量Ipad屏幕电磁信号</a></li></ul></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -181,7 +185,7 @@
 <p>然后我们又测了Pro的电磁信号。
 当点击Auto后，示波器自动调整参数显示出图形，我们都吓了一跳，这个图形真的非常清晰。</p>
 
-<p><img src="/images/120p1.jpg" alt="Ipad Pro的波形图" /></p>
+<p><img src="/images/120p1.jpg" alt="Ipad Pro的波形图" width="480" height="234" loading="lazy" decoding="async" /></p>
 
 <p>我们使用光标功能，将两个光标放在两个刺的波峰上，正好测得这些“刺”的频率为120Hz。
 这不就是屏幕的刷新率吗？</p>
@@ -189,7 +193,7 @@
 <p>所以我们又测了测Air5的电磁信号，理论上应该会是60Hz的，因为Air5的屏幕刷新率是60Hz。
 但是当点击Auto（读起来像otto）后，示波器自动调整参数显示出波形图，我们又吓了一跳，这个图形史无前例的清楚。</p>
 
-<p><img src="/images/120p3.jpg" alt="Ipad Air5的波形图" /></p>
+<p><img src="/images/120p3.jpg" alt="Ipad Air5的波形图" width="1440" height="1078" loading="lazy" decoding="async" /></p>
 
 <p>我们激动地故技重施，把两个光标放在两个刺上，结果发现……相邻的“刺”之间频率居然也是120Hz？？
 我第一时间想起了一些厂商的传统操作，这会不会是因为Air和Pro的屏幕其实是同样的硬件参数，但是Air在软件层面屏蔽了屏幕的120Hz刷新率？
@@ -198,7 +202,7 @@
 <p>目前，我认为是air的120Hz信号很可能是屏幕的触控刷新率为120Hz。但是这种说法又会产生一个矛盾：这代Pro的触控刷新率是240Hz，为什么我们只测出来120Hz呢？
 至于后事如何，交给和我一起做实验的微电子的同学来探究啦~ 我只是一个搞软件的码农（至少逻辑门以下我都没有涉及了）</p>
 
-<p><img src="/images/120p2.jpg" alt="最后附上这一部分的实验示意图" /></p>
+<p><img src="/images/120p2.jpg" alt="最后附上这一部分的实验示意图" width="1432" height="1072" loading="lazy" decoding="async" /></p>
 
 <p>总之，这次经历还是十分有趣的，主要感谢助教大大的启发~
 要是每个基物实验都这么有意思，就算和我学的专业完全没关系，我也很乐意去上这门课的~
@@ -218,24 +222,22 @@
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2022/10/07/%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%94%A8%E7%A4%BA%E6%B3%A2%E5%99%A8.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -244,25 +246,6 @@
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -283,8 +266,8 @@
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -293,12 +276,13 @@
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

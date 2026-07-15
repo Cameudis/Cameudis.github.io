@@ -148,7 +148,11 @@
         <div class="post-layout-container">
           <aside class="post-toc">
             <div class="toc-title">TABLE_OF_CONTENTS</div>
-            <ul><li><a href="#qemu-patch">QEMU Patch</a></li><li><a href="#任意读攻击">任意读攻击</a><ul><li><a href="#准备文件">准备文件</a></li><li><a href="#映射文件">映射文件</a></li><li><a href="#随机覆写物理内存">随机覆写物理内存</a></li><li><a href="#搜索不一致映射">搜索不一致映射</a></li><li><a href="#达成物理地址任意读">达成物理地址任意读</a></li></ul></li></ul>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span>TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#qemu-patch">QEMU Patch</a></li><li><a href="#任意读攻击">任意读攻击</a><ul><li><a href="#准备文件">准备文件</a></li><li><a href="#映射文件">映射文件</a></li><li><a href="#随机覆写物理内存">随机覆写物理内存</a></li><li><a href="#搜索不一致映射">搜索不一致映射</a></li><li><a href="#达成物理地址任意读">达成物理地址任意读</a></li></ul></li></ul>
           </aside>
 
           <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
@@ -463,7 +467,7 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
 
 <p>最后再次放上攻击成功的截图，完结撒花🎉🎉</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>
+<p><img loading="lazy" decoding="async" src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>
 
 
           </div>
@@ -593,24 +597,22 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
 
 
 
-        <div id="comments" class="post-comments"></div>
-        <script src="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"></script>
-<script>
-  new Valine({
-    el: "#comments",
-    app_id: "Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz",
-    app_key: "6VqGye1352LX381YQDTOaiXs",
-    placeholder: "El Psy Congroo",
-  });
-</script>
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
 
 
         <a class="u-url" href="/2025/01/06/GhostWrite-2.html" hidden></a>
 </article>
 
 <script src="/assets/js/post.js" defer></script>
-<script src="/assets/js/github-repo.js" defer></script>
-<script src="/assets/js/link-preview.js" defer></script>
+
+
 
     </div>
   </main><footer class="site-footer h-card">
@@ -619,25 +621,6 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
     <div class="footer-header">
       <h2 class="footer-heading">[ Y²的博客 ]</h2>
       <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
-      <script>
-        (function () {
-          var start = new Date('2022-07-16T00:00:00');
-          function update() {
-            var now = new Date();
-            var diff = now - start;
-            if (diff < 0) { return; }
-            var years = Math.floor(diff / 31536000000);
-            var days = Math.floor((diff % 31536000000) / 86400000);
-            var hours = Math.floor((diff % 86400000) / 3600000);
-            var mins = Math.floor((diff % 3600000) / 60000);
-            var secs = Math.floor((diff % 60000) / 1000);
-            document.getElementById('site-uptime').textContent =
-              years + 'y ' + days + 'd ' + hours + 'h ' + mins + 'm ' + secs + 's';
-          }
-          update();
-          setInterval(update, 1000);
-        })();
-      </script>
     </div>
 
     <div class="footer-layout">
@@ -658,8 +641,8 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
       <div class="footer-col">
         <div class="footer-title">VISITOR_MAP</div>
         <div class="footer-map-mini">
-          <script type="text/javascript" id="mapmyvisitors"
-            src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"></script>
+          <button class="footer-map-load" type="button"
+            data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a">LOAD_VISITOR_MAP</button>
         </div>
       </div>
     </div>
@@ -668,12 +651,13 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
       <p class="quiet-humor">/* Free and useless. */</p>
       <div style="margin-bottom: 20px;">
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
-          height="31">
+          height="31" loading="lazy" decoding="async">
       </div>
       <p>&copy; 2026 Y² (aka.cameudis)</p>
     </div>
   </div>
 </footer>
+<script src="/assets/js/footer.js" defer></script>
 </body>
 
 </html>

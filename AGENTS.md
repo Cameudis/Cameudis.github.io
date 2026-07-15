@@ -7,7 +7,7 @@
 ## 构建
 
 - `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先执行 Jekyll，再生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
-- 本地用原生 `jekyll ~> 4.4`，**不用** `github-pages` gem（Ruby 4.0 不兼容，见 `Gemfile` 注释）。Jekyll 插件只有 `jekyll-feed`；搜索使用构建后的 Pagefind 静态索引。
+- 本地用原生 `jekyll ~> 4.4`，**不用** `github-pages` gem（Ruby 4.0 不兼容，见 `Gemfile` 注释）。第三方 Jekyll gem 插件只有 `jekyll-feed`；`_plugins/optimize_images.rb` 是本地 HTML filter，给正文图片补原生懒加载与异步解码；搜索使用构建后的 Pagefind 静态索引。
 - `_config.yml` 有 `exclude: [AGENTS.md, README.md]`——这两份根目录文件不会进 `docs/` 部署产物，别误删这条。
 - `sitemap.xml` 是无插件依赖的 Liquid 模板；构建时自动生成 `docs/sitemap.xml`，收录正式页面和已发布文章。不要用旧站遗留的静态 sitemap 覆盖它。
 
@@ -23,6 +23,7 @@
 - SCSS 用 `@use` 模块化：`$`变量在 `_variables.scss`、mixin 在 `_mixins.scss`、`%placeholder` 在 `_placeholders.scss`。新 partial 顶部 `@use "minima/variables" as *;`（用到 mixin/placeholder 再加对应行）。**不要用 `@import`**。
 - 入口是本地 `assets/main.scss`（`@use "minima"`），覆盖 theme gem 那个含 `@import` 的版本——不要删这个文件。
 - 搜索使用 Pagefind 1.5.2：`bin/build` 在 Jekyll 构建后扫描 `docs/`，生成并提交 `docs/pagefind/`；逻辑在 `assets/js/search.js`，样式在 `_sass/minima/_search.scss`。只有带 `data-pagefind-body` 的文章正文会进入索引，Pagefind 运行时在首次打开搜索时动态加载；使用 post layout 但不应进入搜索的页面加 `search: false`（Diary 即如此）。
+- 文章 TOC 在桌面侧边浮动、窄屏内联、手机端默认折叠；结构在 `_layouts/post.html`，交互在 `assets/js/post.js`，断点样式在 `_sass/minima/_layout.scss`。
 - `link.md` 用 front matter 的 `asset_version` 给友链页主 CSS 做缓存破坏；修改友链页样式后同步递增该值，避免线上 CDN 继续返回旧 CSS。
 - 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
 - 正文可用 `{% include github_repo.html repo="owner/repository" %}` 插入 GitHub 仓库卡片。结构在 `_includes/github_repo.html`，数据与 6 小时浏览器缓存逻辑在 `assets/js/github-repo.js`，样式在 `_sass/minima/_github-repo.scss`；公开 API 失败时会降级为仓库链接。
@@ -30,10 +31,10 @@
 
 ## 三方集成（随时可能挂，挂了表现为页面某块空白）
 
-- **评论**：Valine（LeanCloud），`_includes/valine_comments.html`，凭据走 `_config.yml` 的 `valine:` 段（`site.valine.*`）。该 include 只在 post layout 出现，Valine 的 `<script src=...>` 也搬到这里，**首页/about/404 不加载 Valine**。
+- **评论**：Valine（LeanCloud），`_includes/valine_comments.html`，凭据走 `_config.yml` 的 `valine:` 段（`site.valine.*`）。该 include 只在 post layout 出现，`assets/js/comments.js` 仅在读者接近评论区或点击按钮时加载 Valine，**首页/about/404 和未滚到文末的长文章不请求 Valine/LeanCloud**。
 - **搜索**：Pagefind，完全使用随站部署的静态索引，不依赖第三方搜索服务；缺少或陈旧的 `docs/pagefind/` 通常表示绕过了 `bin/build`、只执行了 Jekyll。
 - **链接预览**：Microlink 公共元数据 API，由 `assets/js/link-preview.js` 调用；会把文章中指定的 URL 发送给 Microlink。失败或图片禁止外链时自动降级，不应出现空白卡片。
-- **访客地图**：`_includes/footer.html` 嵌 `mapmyvisitors.com/map.js`。
+- **访客地图**：`_includes/footer.html` 默认只显示加载按钮；点击后由 `assets/js/footer.js` 在沙箱 iframe 中加载 `mapmyvisitors.com/map.js`，避免每个页面默认连带请求地图脚本和旧版 jQuery。
 - **MathJax**：`_includes/head.html` 里 **按 `page.use_math` 开关加载**，不是全局。写含数学公式的文章时，front matter 加 `use_math: true` 才会引入 MathJax CDN。
 
 页面某区域空白时，优先怀疑第三方服务，而非本地 CSS。

@@ -81,11 +81,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 2. Table of Contents (TOC) Scroll-Spy
+  const tocContainer = document.querySelector('.post-toc');
+  const tocToggle = tocContainer?.querySelector('.toc-toggle');
   const tocLinks = document.querySelectorAll('.post-toc a[href^="#"]');
   const contentHeadings = [];
 
-  if (tocLinks.length > 0) {
-    const tocContainer = document.querySelector('.post-toc');
+  if (tocContainer && tocToggle) {
+    const setTocOpen = (open) => {
+      tocContainer.classList.toggle('is-open', open);
+      tocToggle.setAttribute('aria-expanded', String(open));
+      const icon = tocToggle.querySelector('.toc-toggle-icon');
+      if (icon) icon.textContent = open ? '−' : '+';
+    };
+
+    tocToggle.addEventListener('click', () => {
+      setTocOpen(!tocContainer.classList.contains('is-open'));
+    });
+
+    tocLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 600px)').matches) setTocOpen(false);
+      });
+    });
+  }
+
+  if (tocLinks.length > 0 && tocContainer) {
     let currentActiveLink = null;
 
     // Collect headings and their corresponding TOC links
@@ -161,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Diary-specific Features
   const isDiaryPage = window.location.pathname.includes('/diary/');
-  const tocContainer = document.querySelector('.post-toc');
 
   if (isDiaryPage && tocContainer) {
     const tocList = tocContainer.querySelector('ul');

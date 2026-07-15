@@ -3,6 +3,8 @@
 // ============================================
 // Styles for the friends grid on /links/. Extracted from link.md.
 
+@use "minima/variables" as *;
+
 .friends-section {
   margin-top: 20px;
   margin-bottom: 40px;
@@ -82,7 +84,7 @@
   align-items: center;
   justify-content: center;
   color: var(--brand-color);
-  font-family: "FusionPixel12Mono", monospace;
+  font-family: $code-font-family;
   font-weight: bold;
   font-size: 1.5em;
 }
@@ -149,7 +151,7 @@
 
 .friend-apply-kicker {
   color: var(--brand-color);
-  font-family: "FusionPixel12Mono", monospace;
+  font-family: $code-font-family;
   font-size: 0.8em;
   letter-spacing: 0.08em;
 }
@@ -165,7 +167,7 @@
 
 .friend-site-info {
   margin: 0;
-  font-family: "FusionPixel12Mono", monospace;
+  font-family: $code-font-family;
   font-size: 0.85em;
 
   div {
