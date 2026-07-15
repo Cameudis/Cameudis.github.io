@@ -1,91 +1,48 @@
 /**
- * search.js - Algolia-powered search modal
+ * Pagefind-powered search modal.
  *
- * Expects the page to define `window.BLOG_SEARCH_CONFIG` with:
- *   { appId, apiKey, indexName }
- * and to contain the search overlay DOM (#search-toggle, #search-overlay,
- * #search-close, #search-input, #search-results).
+ * The Pagefind runtime and index are loaded only when search is opened. The
+ * generated bundle URL is provided by #search-overlay[data-pagefind-url].
  */
 (function () {
-  const cfg = window.BLOG_SEARCH_CONFIG;
-  if (!cfg) return;
+  'use strict';
 
-  // Defer until DOM is ready.
   function init() {
-    const searchClient = algoliasearch(cfg.appId, cfg.apiKey);
-    const index = searchClient.initIndex(cfg.indexName);
-
     const searchToggle = document.getElementById('search-toggle');
     const searchOverlay = document.getElementById('search-overlay');
+    const searchModal = searchOverlay?.querySelector('.search-modal');
     const searchClose = document.getElementById('search-close');
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
 
-    if (!searchToggle || !searchOverlay || !searchClose || !searchInput || !searchResults) return;
-
-    let searchTimeout;
-
-    searchToggle.addEventListener('click', function () {
-      searchOverlay.classList.add('active');
-      searchInput.focus();
-    });
-
-    function closeSearch() {
-      searchOverlay.classList.remove('active');
-      searchInput.value = '';
-      searchResults.replaceChildren();
+    if (!searchToggle || !searchOverlay || !searchModal || !searchClose || !searchInput || !searchResults) {
+      return;
     }
 
-    searchClose.addEventListener('click', closeSearch);
+    const pagefindUrl = searchOverlay.dataset.pagefindUrl;
+    let pagefindPromise;
+    let latestRequest = 0;
+    let previousFocus = null;
 
-    // 点击遮罩关闭
-    searchOverlay.addEventListener('click', function (e) {
-      if (e.target === searchOverlay) {
-        closeSearch();
+    function loadPagefind() {
+      if (!pagefindPromise) {
+        pagefindPromise = import(pagefindUrl)
+          .then(async (pagefind) => {
+            await pagefind.options({ excerptLength: 32 });
+            await pagefind.init();
+            return pagefind;
+          })
+          .catch((error) => {
+            pagefindPromise = null;
+            throw error;
+          });
       }
-    });
-
-    // ESC 键关闭
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
-        closeSearch();
-      }
-    });
-
-    // 搜索功能
-    searchInput.addEventListener('input', function () {
-      const query = this.value.trim();
-
-      clearTimeout(searchTimeout);
-
-      if (query.length === 0) {
-        searchResults.replaceChildren();
-        return;
-      }
-
-      // 防抖处理
-      searchTimeout = setTimeout(() => {
-        performSearch(query);
-      }, 300);
-    });
-
-    function performSearch(query) {
-      index.search(query, {
-        hitsPerPage: 10,
-        attributesToHighlight: ['title', 'content'],
-        highlightPreTag: '<span class="search-highlight">',
-        highlightPostTag: '</span>'
-      }).then(({ hits }) => {
-        displayResults(hits);
-      }).catch(error => {
-        console.error('搜索错误:', error);
-        displayMessage('搜索出错，请稍后重试');
-      });
+      return pagefindPromise;
     }
 
-    function displayMessage(message) {
+    function displayMessage(message, className = 'search-no-results') {
       const element = document.createElement('div');
-      element.className = 'search-no-results';
+      element.className = className;
       element.textContent = message;
       searchResults.replaceChildren(element);
     }
@@ -97,61 +54,189 @@
         const url = new URL(value, window.location.origin);
         if (url.origin !== window.location.origin) return '#';
         return `${url.pathname}${url.search}${url.hash}`;
-      } catch (error) {
+      } catch (_) {
         return '#';
       }
     }
 
-    function plainText(value) {
-      const parser = new DOMParser();
-      const document = parser.parseFromString(String(value || ''), 'text/html');
-      return document.body.textContent || '';
+    function appendExcerpt(target, excerpt, fallback) {
+      if (!excerpt) {
+        target.textContent = fallback || '';
+        return;
+      }
+
+      const template = document.createElement('template');
+      template.innerHTML = excerpt;
+
+      function appendNode(node, parent) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          parent.appendChild(document.createTextNode(node.textContent || ''));
+          return;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const nextParent = node.nodeName === 'MARK' ? document.createElement('mark') : parent;
+        if (nextParent !== parent) parent.appendChild(nextParent);
+        node.childNodes.forEach((child) => appendNode(child, nextParent));
+      }
+
+      template.content.childNodes.forEach((node) => appendNode(node, target));
     }
 
-    function displayResults(hits) {
-      if (hits.length === 0) {
+    function displayResults(results) {
+      if (results.length === 0) {
         displayMessage('没有找到相关内容');
         return;
       }
 
       const fragment = document.createDocumentFragment();
 
-      hits.forEach(hit => {
-        const title = plainText(hit._highlightResult?.title?.value || hit.title || '无标题');
-        const excerpt = hit._highlightResult?.content?.value || hit.excerpt || hit.content || '';
-        const url = normalizeResultUrl(hit.url);
-        const date = plainText(hit.date);
-        const cleanExcerpt = plainText(excerpt).substring(0, 150);
-
-        const result = document.createElement('article');
-        result.className = 'search-result';
+      results.forEach((result) => {
+        const article = document.createElement('article');
+        article.className = 'search-result';
 
         const heading = document.createElement('h3');
         const link = document.createElement('a');
-        link.href = url;
-        link.textContent = title;
+        link.href = normalizeResultUrl(result.url);
+        link.textContent = result.meta?.title || '无标题';
         heading.appendChild(link);
-        result.appendChild(heading);
+        article.appendChild(heading);
 
         const summary = document.createElement('p');
-        summary.textContent = `${cleanExcerpt}${cleanExcerpt.length === 150 ? '...' : ''}`;
-        result.appendChild(summary);
+        appendExcerpt(summary, result.excerpt, result.plain_excerpt);
+        article.appendChild(summary);
 
-        if (date) {
-          const timestamp = document.createElement('small');
-          timestamp.textContent = date;
-          result.appendChild(timestamp);
+        const metadata = [result.meta?.date, result.meta?.tags].filter(Boolean);
+        if (metadata.length > 0) {
+          const detail = document.createElement('small');
+          detail.textContent = metadata.join(' · ');
+          article.appendChild(detail);
         }
 
-        fragment.appendChild(result);
+        fragment.appendChild(article);
       });
 
       searchResults.replaceChildren(fragment);
     }
+
+    async function performSearch(query, requestId) {
+      try {
+        const pagefind = await loadPagefind();
+        const response = await pagefind.debouncedSearch(query, {}, 250);
+        if (!response || requestId !== latestRequest) return;
+
+        const results = await Promise.all(
+          response.results.slice(0, 10).map((result) => result.data())
+        );
+        if (requestId !== latestRequest) return;
+        displayResults(results);
+      } catch (error) {
+        if (requestId !== latestRequest) return;
+        console.error('搜索错误:', error);
+        displayMessage('搜索暂时不可用，请稍后重试');
+      }
+    }
+
+    function openSearch() {
+      previousFocus = document.activeElement;
+      searchOverlay.classList.add('active');
+      searchOverlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('search-open');
+      searchInput.focus();
+
+      loadPagefind().catch((error) => {
+        console.error('搜索索引加载错误:', error);
+        displayMessage('搜索索引加载失败，请稍后重试');
+      });
+    }
+
+    function closeSearch() {
+      latestRequest += 1;
+      searchOverlay.classList.remove('active');
+      searchOverlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('search-open');
+      searchInput.value = '';
+      searchResults.replaceChildren();
+
+      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+      previousFocus = null;
+    }
+
+    function isTypingTarget(target) {
+      return target instanceof HTMLElement && (
+        target.isContentEditable || target.matches('input, textarea, select')
+      );
+    }
+
+    searchToggle.addEventListener('click', openSearch);
+    searchClose.addEventListener('click', closeSearch);
+
+    searchOverlay.addEventListener('click', (event) => {
+      if (event.target === searchOverlay) closeSearch();
+    });
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      const requestId = ++latestRequest;
+
+      if (!query) {
+        searchResults.replaceChildren();
+        return;
+      }
+
+      displayMessage('正在搜索…', 'search-loading');
+      performSearch(query, requestId);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const isOpen = searchOverlay.classList.contains('active');
+      const shortcut = event.key === '/' || (
+        (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k'
+      );
+
+      if (!isOpen && shortcut && !isTypingTarget(event.target)) {
+        event.preventDefault();
+        openSearch();
+        return;
+      }
+
+      if (!isOpen) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeSearch();
+        return;
+      }
+
+      const resultLinks = Array.from(searchResults.querySelectorAll('a'));
+      if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && resultLinks.length > 0) {
+        const currentIndex = resultLinks.indexOf(document.activeElement);
+        const offset = event.key === 'ArrowDown' ? 1 : -1;
+        const nextIndex = currentIndex < 0
+          ? (offset > 0 ? 0 : resultLinks.length - 1)
+          : (currentIndex + offset + resultLinks.length) % resultLinks.length;
+        event.preventDefault();
+        resultLinks[nextIndex].focus();
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        const focusable = [searchInput, searchClose, ...resultLinks];
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }

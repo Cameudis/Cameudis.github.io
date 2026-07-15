@@ -117,42 +117,37 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">我恨 AI 写作</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2026-06-17">我恨 AI 写作</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="2026-06-17T00:00:00+08:00" itemprop="datePublished">[ 2026-06-17 ]
             </time>
             
-            <span class="post-tags">:: #杂记</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: #杂记</span>
             </div>
         </header>
 
         <div class="post-layout-container">
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
             <p>我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。</p>
 
 <p>我喜欢读博客，就像看其他的独立内容（美术、音乐、独立游戏、视频等）一样，看博客不仅仅是看文字本身，也是看背后的那个创作者；博客本身承载了那人的意志、趣味、喜好。尽管我看的常常是专业的技术领域博客，我也总是能在博客中找到共鸣，我知道这个作者一定觉得这个玩意很有意思，才会把它写下来。光是看博客，我就好像和作者一起做了一件很有意思的事情。</p>
@@ -187,14 +182,6 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
-    
-      
-        
-        
-        
-
-        
-      
     
       
     

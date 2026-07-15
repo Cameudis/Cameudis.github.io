@@ -117,36 +117,31 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">西湖论剑 2025 PWN Writeup</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2025-01-20">西湖论剑 2025 PWN Writeup</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="2025-01-20T00:00:00+08:00" itemprop="datePublished">[ 2025-01-20 ]
             </time>
             
-            <span class="post-tags">:: #pwn</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: #pwn</span>
             </div>
         </header>
 
@@ -156,7 +151,7 @@
             <ul><li><a href="#babytrace">babytrace</a><ul><li><a href="#ptrace-原理">ptrace 原理</a></li><li><a href="#ptrace-sandbox">ptrace sandbox</a></li><li><a href="#ptrace-bad-use">ptrace bad use</a></li><li><a href="#ptrace-good-use">ptrace good use</a></li><li><a href="#利用">利用</a></li></ul></li><li><a href="#vpwn">vpwn</a></li><li><a href="#heavens-door">Heaven’s door</a></li><li><a href="#一个相对完善的-ptrace-sandbox">一个相对完善的 ptrace sandbox</a></li></ul>
           </aside>
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
             <h2 id="babytrace">babytrace</h2>
 
 <p>本题基于 <code class="language-plaintext highlighter-rouge">ptrace</code> 实现了一个简易的 syscall 沙盒，由父进程检测子进程，子进程与用户交互。每次子进程进入 syscall 时，父进程会检测保存在 <code class="language-plaintext highlighter-rouge">orig_rax</code> 中的 syscall number，如果不在白名单内就将 <code class="language-plaintext highlighter-rouge">rax</code> 强制改为 <code class="language-plaintext highlighter-rouge">-1</code>。</p>
@@ -677,14 +672,6 @@ call qword ptr [rax + 0x28];
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
-    
-      
-        
-        
-        
-
-        
-      
     
       
         

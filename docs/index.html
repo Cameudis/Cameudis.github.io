@@ -115,24 +115,18 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
@@ -166,9 +160,7 @@
     <h2 class="post-list-heading">[ ARCHIVE ]</h2>
     <ul class="post-list"><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2026-06-17</span>
-          
           <span class="post-tags">:: #杂记</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html">
@@ -176,9 +168,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2026-05-26</span>
-          
           <span class="post-tags">:: #pwn</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2026/05/26/CTF-Dot.html">
@@ -186,9 +176,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2026-02-08</span>
-          
           <span class="post-tags">:: #vmware #parser</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2026/02/08/VMware-1.html">
@@ -196,9 +184,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-11-11</span>
-          
           <span class="post-tags">:: #pwn #qemu</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/11/11/QWB-Qual-2025-babybus.html">
@@ -206,9 +192,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-10-11</span>
-          
           <span class="post-tags">:: #pwn #kernel</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/10/11/MidnightSunFinal-2025-Flop.html">
@@ -216,9 +200,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-09-28</span>
-          
           <span class="post-tags">:: #kernel</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/09/28/Kernel-0.html">
@@ -226,9 +208,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-04-11</span>
-          
           <span class="post-tags">:: #pwn #parser</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/04/11/SJTUCTF-2025.html">
@@ -236,9 +216,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-01-20</span>
-          
           <span class="post-tags">:: #pwn</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/01/20/XHLJ-2025.html">
@@ -246,9 +224,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2025-01-06</span>
-          
           <span class="post-tags">:: #riscv #kernel #arch</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2025/01/06/GhostWrite-2.html">
@@ -256,9 +232,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2024-12-10</span>
-          
           <span class="post-tags">:: #杂记</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2024/12/10/Lies_Damned_Lies_And_Journalism.html">
@@ -266,9 +240,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2024-09-16</span>
-          
           <span class="post-tags">:: #riscv #kernel #arch</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2024/09/16/GhostWrite-1.html">
@@ -276,9 +248,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2024-07-24</span>
-          
           <span class="post-tags">:: #pwn</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2024/07/24/CISCN-Final-2024.html">
@@ -286,9 +256,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2024-04-18</span>
-          
           <span class="post-tags">:: #pwn #heap</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2024/04/18/BlackHatMEA2023-House-of-Minho.html">
@@ -296,9 +264,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2024-02-19</span>
-          
           <span class="post-tags">:: #pwn #qemu</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html">
@@ -306,9 +272,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2023-11-29</span>
-          
           <span class="post-tags">:: #pwn #riscv #kernel</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2023/11/29/HITCTF2023-xv6-Trusted.html">
@@ -316,9 +280,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2023-05-04</span>
-          
           <span class="post-tags">:: #pwn #rop</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html">
@@ -326,9 +288,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2023-04-04</span>
-          
           <span class="post-tags">:: #pwn #loongarch #rop</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2023/04/04/Bing-Chilling.html">
@@ -336,9 +296,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2022-10-07</span>
-          
           <span class="post-tags">:: #电子技术</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2022/10/07/%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%94%A8%E7%A4%BA%E6%B3%A2%E5%99%A8.html">
@@ -346,9 +304,7 @@
           </a>
         </h3></li><li class="post-item">
         <div class="post-meta-top"><span class="post-date">2022-07-16</span>
-          
           <span class="post-tags">:: #博客</span>
-          
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="/2022/07/16/Welcome.html">
@@ -360,6 +316,7 @@
   <p class="rss-subscribe">
     <span class="cursor">_</span> subscribe <a href="/feed.xml">RSS_FEED</a>
   </p></div>
+
     </div>
   </main><footer class="site-footer h-card">
   <data class="u-url" href="/%20/"></data>

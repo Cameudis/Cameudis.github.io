@@ -1,0 +1,10 @@
+{
+  "name": "cameudis-blog",
+  "private": true,
+  "scripts": {
+    "search:index": "pagefind --site docs"
+  },
+  "devDependencies": {
+    "pagefind": "1.5.2"
+  }
+}

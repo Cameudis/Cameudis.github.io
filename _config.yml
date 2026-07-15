@@ -27,13 +27,9 @@ exclude:
   - docs
   - AGENTS.md
   - README.md
-
-# Algolia search (search_only_api_key is safe to expose on the client)
-algolia:
-  application_id: 'YU3CCWYOVD'
-  index_name: 'blog-jekyll'
-  search_only_api_key: 'dec1d1e53d245f8fc3122fa9b41ab7ae'
-  powered_by: true
+  - bin
+  - package.json
+  - package-lock.json
 
 # Valine comments (LeanCloud)
 valine:
@@ -43,7 +39,6 @@ valine:
 
 # Version-pinned third-party browser assets.
 third_party:
-  algolia_search_url: "https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"
   valine_url: "https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
   mathjax_url: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"
   visitor_map_url: "https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&cl=ffffff&w=a"

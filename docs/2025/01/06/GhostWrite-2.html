@@ -117,36 +117,31 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">GhostWrite #2: 漏洞利用代码分析</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2025-01-06">GhostWrite #2: 漏洞利用代码分析</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="2025-01-06T00:00:00+08:00" itemprop="datePublished">[ 2025-01-06 ]
             </time>
             
-            <span class="post-tags">:: #riscv #kernel #arch</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: #riscv #kernel #arch</span>
             </div>
         </header>
 
@@ -156,7 +151,7 @@
             <ul><li><a href="#qemu-patch">QEMU Patch</a></li><li><a href="#任意读攻击">任意读攻击</a><ul><li><a href="#准备文件">准备文件</a></li><li><a href="#映射文件">映射文件</a></li><li><a href="#随机覆写物理内存">随机覆写物理内存</a></li><li><a href="#搜索不一致映射">搜索不一致映射</a></li><li><a href="#达成物理地址任意读">达成物理地址任意读</a></li></ul></li></ul>
           </aside>
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
             <h2 id="qemu-patch">QEMU Patch</h2>
 
 <p>为了复现 GhostWrite 环境，我们需要在 qemu 中添加 patch 来进行软件层面模拟。</p>
@@ -486,14 +481,6 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
-    
-      
-        
-        
-        
-
-        
-      
     
       
         

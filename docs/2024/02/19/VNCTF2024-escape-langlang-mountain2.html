@@ -117,36 +117,31 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">VNCTF 2024 escape_langlang_mountain2</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2024-02-19">VNCTF 2024 escape_langlang_mountain2</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="2024-02-19T05:23:25+08:00" itemprop="datePublished">[ 2024-02-19 ]
             </time>
             
-            <span class="post-tags">:: #pwn #qemu</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: #pwn #qemu</span>
             </div>
         </header>
 
@@ -156,7 +151,7 @@
             <ul><li><a href="#环境与调试">环境与调试</a></li><li><a href="#漏洞分析">漏洞分析</a></li><li><a href="#漏洞利用">漏洞利用</a><ul><li><a href="#地址泄露">地址泄露</a></li><li><a href="#控制流劫持">控制流劫持</a></li><li><a href="#exp-脚本">EXP 脚本</a></li></ul></li></ul>
           </aside>
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
             <p>第一次从qemu里面逃出来，但没有完全逃出来，远程没通比赛就结束了S.H.I.T</p>
 
 <p>题目链接：<a href="https://github.com/xtxtn/vnctf2024-escape_langlang_mountain2wp">xtxtn/vnctf2024-escape_langlang_mountain2wp (github.com)</a></p>
@@ -465,14 +460,6 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
-    
-      
-        
-        
-        
-
-        
-      
     
       
         

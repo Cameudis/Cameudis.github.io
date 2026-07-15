@@ -92,22 +92,16 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="{{ '/pagefind/pagefind.js' | relative_url }}">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: '{{ site.algolia.application_id }}',
-    apiKey: '{{ site.algolia.search_only_api_key }}',
-    indexName: '{{ site.algolia.index_name }}'
-  };
-</script>
-<script src="{{ site.third_party.algolia_search_url }}"></script>
 <script src="{{ "/assets/js/search.js" | relative_url }}" defer></script>

@@ -1,0 +1,27 @@
+---
+layout: null
+permalink: /sitemap.xml
+sitemap: false
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  {%- assign sitemap_pages = site.pages | where_exp: "item", "item.layout" -%}
+  {%- for item in sitemap_pages -%}
+    {%- unless item.url == "/404.html" or item.sitemap == false -%}
+  <url>
+    <loc>{{ item.url | absolute_url | escape }}</loc>
+    {%- if item.last_modified_at %}
+    <lastmod>{{ item.last_modified_at | date_to_xmlschema }}</lastmod>
+    {%- endif %}
+  </url>
+    {%- endunless -%}
+  {%- endfor -%}
+  {%- for post in site.posts -%}
+    {%- unless post.sitemap == false -%}
+  <url>
+    <loc>{{ post.url | absolute_url | escape }}</loc>
+    <lastmod>{{ post.last_modified_at | default: post.date | date_to_xmlschema }}</lastmod>
+  </url>
+    {%- endunless -%}
+  {%- endfor -%}
+</urlset>

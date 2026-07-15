@@ -3,6 +3,7 @@ layout: diary
 title: Diary
 permalink: /diary/
 toc_max_level: 2
+search: false
 ---
 
 碎碎念、摸鱼与拾贝日志。

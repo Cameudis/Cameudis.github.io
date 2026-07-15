@@ -4,14 +4,15 @@ layout: default
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:{{ page.date | date: '%Y-%m-%d' }}">{{ page.title | escape }}</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
               {%- assign date_format = site.minima.date_format | default: "[ %Y-%m-%d ]" -%}
               {{ page.date | date: date_format }}
             </time>
             {% if page.tags.size > 0 %}
-            <span class="post-tags">:: {{ page.tags | join: ' ' | prepend: '#' | replace: ' ', ' #' }}</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: {{ page.tags | join: ' ' | prepend: '#' | replace: ' ', ' #' }}</span>
             {% endif %}
             {%- if page.author -%}
             • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card"
@@ -31,7 +32,7 @@ layout: default
           </aside>
           {%- endunless %}
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody"{% unless page.search == false %} data-pagefind-body{% endunless %}>
             {{ content }}
           </div>
         </div>

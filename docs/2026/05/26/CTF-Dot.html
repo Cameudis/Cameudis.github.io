@@ -117,42 +117,37 @@
 </header>
 
 <!-- 搜索弹窗 -->
-<div class="search-overlay" id="search-overlay">
-  <div class="search-modal">
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
     <div class="search-header">
-      <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
-      <button class="search-close" id="search-close">&times;</button>
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
     </div>
-    <div class="search-results" id="search-results"></div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
 </div>
 
-<script>
-  window.BLOG_SEARCH_CONFIG = {
-    appId: 'YU3CCWYOVD',
-    apiKey: 'dec1d1e53d245f8fc3122fa9b41ab7ae',
-    indexName: 'blog-jekyll'
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.24.0/dist/algoliasearch-lite.umd.js"></script>
 <script src="/assets/js/search.js" defer></script>
 <main class="page-content" aria-label="Content">
     <div class="wrapper">
       <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post-header">
-          <h1 class="post-title p-name" itemprop="name headline">CTF 的句点</h1>
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2026-05-26">CTF 的句点</h1>
           <div class="post-meta">
             <time class="dt-published" datetime="2026-05-26T00:00:00+08:00" itemprop="datePublished">[ 2026-05-26 ]
             </time>
             
-            <span class="post-tags">:: #pwn</span>
+            <span class="post-tags" data-pagefind-meta="tags">:: #pwn</span>
             </div>
         </header>
 
         <div class="post-layout-container">
 
-          <div class="post-content e-content" itemprop="articleBody">
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
             <p>刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。</p>
 
 <p><a href="https://kabir.au/blog/the-ctf-scene-is-dead">The CTF scene is dead.</a> 这篇文章已经说了很多。就像游戏一样，参加 CTF 的过程类似一个反馈循环：我们学习知识，在比赛中验证知识，学习更多知识，取得更好的成绩……突然有一天，你发现自己在队伍中扮演了一个不可或缺的角色，你感觉到因为自己的技能而被队友们需要，你因自己的知识、技术还有比赛时那些灵光一现感到骄傲与自豪。</p>
@@ -185,14 +180,6 @@
       <h3 class="related-posts-title">RELATED POSTS</h3>
       <div class="related-posts-list">
         
-    
-      
-        
-        
-        
-
-        
-      
     
       
         

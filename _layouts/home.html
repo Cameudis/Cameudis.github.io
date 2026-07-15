@@ -18,9 +18,9 @@ layout: default
         <div class="post-meta-top">
           {%- assign date_format = site.minima.date_format | default: "%Y-%m-%d" -%}
           <span class="post-date">{{ post.date | date: date_format }}</span>
-          {% if post.tags.size > 0 %}
+          {%- if post.tags.size > 0 %}
           <span class="post-tags">:: {{ post.tags | join: ' ' | prepend: '#' | replace: ' ', ' #' }}</span>
-          {% endif %}
+          {%- endif %}
         </div>
         <h3 class="post-item-title">
           <a class="post-link" href="{{ post.url | relative_url }}">

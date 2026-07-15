@@ -15,11 +15,7 @@ gem "minima", "~> 2.5"
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
-  gem 'jekyll-algolia', '~> 1.0'
 end
-
-# ostruct was dropped from Ruby 4.0's default gems; jekyll-algolia still needs it.
-gem "ostruct"
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
 # and associated library.

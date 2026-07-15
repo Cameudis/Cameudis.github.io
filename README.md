@@ -1,5 +1,19 @@
 # Y2 Blog
 
+## 构建
+
+首次安装 Pagefind：
+
+```sh
+npm ci
+```
+
+之后统一通过构建脚本生成 Jekyll 页面和本地搜索索引：
+
+```sh
+bin/build
+```
+
 ## 快速创建推文
 
 用 `bin/new-post` 可以在 `_posts` 下生成新的 Jekyll 文章草稿：
