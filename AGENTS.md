@@ -34,7 +34,7 @@
 - **评论**：Valine（LeanCloud），`_includes/valine_comments.html`，凭据走 `_config.yml` 的 `valine:` 段（`site.valine.*`）。该 include 只在 post layout 出现，`assets/js/comments.js` 仅在读者接近评论区或点击按钮时加载 Valine，**首页/about/404 和未滚到文末的长文章不请求 Valine/LeanCloud**。
 - **搜索**：Pagefind，完全使用随站部署的静态索引，不依赖第三方搜索服务；缺少或陈旧的 `docs/pagefind/` 通常表示绕过了 `bin/build`、只执行了 Jekyll。
 - **链接预览**：Microlink 公共元数据 API，由 `assets/js/link-preview.js` 调用；会把文章中指定的 URL 发送给 Microlink。失败或图片禁止外链时自动降级，不应出现空白卡片。
-- **访客地图**：`_includes/footer.html` 由 `assets/js/footer.js` 自动在沙箱 iframe 中加载 `mapmyvisitors.com/map.js`；外观保持原来的灰度地图，iframe 用来隔离地图脚本连带的旧版 jQuery，不显示加载按钮。
+- **访客地图**：`_includes/footer.html` 由 `assets/js/footer.js` 自动在沙箱 iframe 中加载 `mapmyvisitors.com/map.js`；外观保持原来的灰度地图，iframe 用来隔离地图脚本连带的旧版 jQuery，不显示加载按钮。srcdoc 内的脚本必须保留 `id="mapmyvisitors"`，第三方脚本会用这个 ID 定位自身配置。
 - **MathJax**：`_includes/head.html` 里 **按 `page.use_math` 开关加载**，不是全局。写含数学公式的文章时，front matter 加 `use_math: true` 才会引入 MathJax CDN。
 
 页面某区域空白时，优先怀疑第三方服务，而非本地 CSS。

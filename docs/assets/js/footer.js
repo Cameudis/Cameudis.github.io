@@ -45,10 +45,10 @@
     frame.className = 'footer-map-frame';
     frame.title = 'Visitor map';
     frame.loading = 'lazy';
-    frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
+    frame.setAttribute('sandbox', 'allow-scripts allow-top-navigation-by-user-activation');
     frame.width = '240';
     frame.height = '150';
-    frame.srcdoc = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:transparent;color-scheme:dark}</style><script src="${escapeAttribute(mapUrl)}"><\/script>`;
+    frame.srcdoc = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:transparent;color-scheme:dark}</style><script id="mapmyvisitors" src="${escapeAttribute(mapUrl)}"><\/script>`;
     container.appendChild(frame);
   }
 
