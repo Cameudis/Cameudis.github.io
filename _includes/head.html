@@ -19,7 +19,8 @@
     })();
   </script>
   {%- seo -%}
-  <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}{% if page.asset_version %}?v={{ page.asset_version }}{% endif %}">
+  {%- assign main_css_version = page.asset_version | default: site.asset_versions.main_css -%}
+  <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}?v={{ main_css_version }}">
   {%- feed_meta -%}
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
     {%- include google-analytics.html -%}

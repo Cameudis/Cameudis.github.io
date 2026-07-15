@@ -14,11 +14,23 @@
 @use "minima/github-repo";
 @use "minima/embeds";
 
-// Font faces used across the site.
+// Small UI subset on every device: Latin, punctuation, arrows, and symbols.
+@font-face {
+  font-family: "FusionPixel10Prop";
+  src: url('fonts/fusion-pixel-10px-ui.woff2') format("woff2");
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0-00FF, U+2000-206F, U+2190-21FF,
+    U+2500-26FF, U+FF01-FF65;
+}
+
+// Desktop gets the complete CJK face for pixel-styled headings and navigation.
 @media screen and (min-width: 601px) {
   @font-face {
     font-family: "FusionPixel10Prop";
     src: url('fonts/fusion-pixel-font-10px-proportional-otf.woff2-v2025.10.20/fusion-pixel-10px-proportional-zh_hans.otf.woff2') format("woff2");
-    font-display: optional;
+    font-display: swap;
+    unicode-range: U+2E80-2EFF, U+2F00-2FDF, U+3000-318F, U+31A0-31BF,
+      U+31F0-31FF, U+3400-4DBF, U+4E00-9FFF, U+AC00-D7AF, U+F900-FAFF,
+      U+FE10-FE4F, U+FF66-FFEF;
   }
 }
