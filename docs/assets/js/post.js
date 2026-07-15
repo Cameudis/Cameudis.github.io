@@ -90,8 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const setTocOpen = (open) => {
       tocContainer.classList.toggle('is-open', open);
       tocToggle.setAttribute('aria-expanded', String(open));
-      const icon = tocToggle.querySelector('.toc-toggle-icon');
-      if (icon) icon.textContent = open ? '−' : '+';
     };
 
     tocToggle.addEventListener('click', () => {
@@ -100,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tocLinks.forEach((link) => {
       link.addEventListener('click', () => {
-        if (window.matchMedia('(max-width: 600px)').matches) setTocOpen(false);
+        if (window.matchMedia('(max-width: 600px) and (hover: none) and (pointer: coarse)').matches) {
+          setTocOpen(false);
+        }
       });
     });
   }

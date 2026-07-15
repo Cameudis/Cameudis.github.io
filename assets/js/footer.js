@@ -1,4 +1,4 @@
-/** Footer uptime and opt-in visitor map loader. */
+/** Footer uptime and isolated visitor map loader. */
 (function () {
   'use strict';
 
@@ -28,31 +28,28 @@
   }
 
   function initVisitorMap() {
-    const button = document.querySelector('.footer-map-load');
-    if (!button) return;
+    const container = document.querySelector('.footer-map-mini[data-map-src]');
+    if (!container) return;
 
-    button.addEventListener('click', () => {
-      let mapUrl;
-      try {
-        const parsed = new URL(button.dataset.mapSrc);
-        if (parsed.protocol !== 'https:') throw new Error('Only HTTPS is allowed');
-        mapUrl = parsed.href;
-      } catch (error) {
-        button.textContent = 'VISITOR_MAP_UNAVAILABLE';
-        button.disabled = true;
-        return;
-      }
+    let mapUrl;
+    try {
+      const parsed = new URL(container.dataset.mapSrc);
+      if (parsed.protocol !== 'https:') throw new Error('Only HTTPS is allowed');
+      mapUrl = parsed.href;
+    } catch (error) {
+      container.textContent = 'VISITOR_MAP_UNAVAILABLE';
+      return;
+    }
 
-      const frame = document.createElement('iframe');
-      frame.className = 'footer-map-frame';
-      frame.title = 'Visitor map';
-      frame.loading = 'lazy';
-      frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
-      frame.width = '240';
-      frame.height = '150';
-      frame.srcdoc = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:transparent;color-scheme:dark}</style><script src="${escapeAttribute(mapUrl)}"><\/script>`;
-      button.replaceWith(frame);
-    }, { once: true });
+    const frame = document.createElement('iframe');
+    frame.className = 'footer-map-frame';
+    frame.title = 'Visitor map';
+    frame.loading = 'lazy';
+    frame.setAttribute('sandbox', 'allow-scripts allow-popups allow-popups-to-escape-sandbox');
+    frame.width = '240';
+    frame.height = '150';
+    frame.srcdoc = `<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:transparent;color-scheme:dark}</style><script src="${escapeAttribute(mapUrl)}"><\/script>`;
+    container.appendChild(frame);
   }
 
   updateUptime();
