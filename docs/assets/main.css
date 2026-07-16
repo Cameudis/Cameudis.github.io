@@ -758,6 +758,12 @@ table td {
   max-width: calc(720px + 120px);
 }
 
+.home {
+  max-width: 720px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .page-heading {
   font-size: 32px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -768,13 +774,18 @@ table td {
 
 .post-list-heading {
   font-size: 28px;
-  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
+  margin-bottom: 30px;
 }
 
 .post-list-container {
   margin-top: 40px;
+}
+
+.home-intro {
+  font-family: "FusionPixel10Prop", sans-serif;
 }
 
 .post-item {

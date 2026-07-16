@@ -364,6 +364,12 @@
   max-width: calc(#{$post-content-width} + #{$spacing-unit * 3});
 }
 
+.home {
+  max-width: $post-content-width;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .page-heading {
   @include relative-font-size(2);
   font-family: $base-font-family;
@@ -374,13 +380,18 @@
 
 .post-list-heading {
   @include relative-font-size(1.75);
-  font-family: $base-font-family;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
+  margin-bottom: 30px;
 }
 
 .post-list-container {
   margin-top: $spacing-unit;
+}
+
+.home-intro {
+  font-family: "FusionPixel10Prop", sans-serif;
 }
 
 .post-item {

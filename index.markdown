@@ -7,7 +7,7 @@ layout: home
 
 <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
 
-<p style='font-family: "FusionPixel12Prop";'>
+<p class="home-intro">
 欢迎来到 <b>Y²</b> (a.k.a <b>cameudis</b>) 的博客！我是一个<span id="im"></span>
 <br>
 你可以在这里找到一些随机主题的技术相关或不相关文章，100% 人类生成。欢迎留言 （<ゝω・）☆>
