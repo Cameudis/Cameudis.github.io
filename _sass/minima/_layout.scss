@@ -486,7 +486,7 @@
  * Posts
  */
 .post-header {
-  margin-bottom: $spacing-unit * 2;
+  margin-bottom: $spacing-unit;
   text-align: center;
 }
 
@@ -772,28 +772,52 @@
     @include relative-font-size(1.5);
     font-family: $base-font-family;
     font-weight: 700;
-    margin-top: $spacing-unit * 1.5;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.4;
     color: var(--text-color);
     border-bottom: 1px solid $grey-color-light;
     padding-bottom: 5px;
-
   }
 
   h3 {
     @include relative-font-size(1.25);
     font-family: $base-font-family;
     font-weight: 600;
-    margin-top: $spacing-unit;
+    margin-top: 1.6em;
+    margin-bottom: 0.8em;
+    line-height: 1.5;
     color: var(--text-color);
-
   }
 
   h4 {
     @include relative-font-size(1.125);
     font-family: $base-font-family;
     font-weight: 500;
+    margin-top: 1.333em;
+    margin-bottom: 0.667em;
+    line-height: 1.5;
     color: var(--text-color);
+  }
 
+  h5 {
+    @include relative-font-size(1);
+    font-family: $base-font-family;
+    font-weight: 600;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+
+  h6 {
+    @include relative-font-size(0.875);
+    font-family: $base-font-family;
+    font-weight: 600;
+    margin-top: 1.4em;
+    margin-bottom: 0.6em;
+    line-height: 1.5;
+    color: var(--grey-color);
   }
 
   img {
@@ -809,12 +833,10 @@
 
     h2 {
       @include relative-font-size(1.3);
-      margin-top: $spacing-unit;
     }
 
     h3 {
       @include relative-font-size(1.15);
-      margin-top: math.div($spacing-unit, 1.5);
     }
 
     h4 {
@@ -854,6 +876,55 @@
     &:last-child {
       margin-bottom: 0;
     }
+  }
+
+  // The shared vertical-rhythm placeholder is emitted before the global
+  // reset, so top-level Markdown lists need an explicit post-only gap.
+  > ul,
+  > ol {
+    margin-bottom: 1.25em;
+  }
+
+  > ul > li + li,
+  > ol > li + li {
+    margin-top: 0.25em;
+  }
+
+  // Keep substantial Markdown blocks on one consistent 32px rhythm. These
+  // explicit post-scoped rules also avoid the shared placeholder/reset order.
+  > blockquote,
+  > table,
+  > figure,
+  > pre,
+  > .code-frame,
+  > .highlighter-rouge:not(.code-frame),
+  > .callout,
+  > .link-preview,
+  > .github-repo-card,
+  > .static-tweet,
+  > .mermaid-diagram,
+  > p:has(> img:only-child) {
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
+
+  > p:has(> img:only-child) > img {
+    margin: 0 auto;
+  }
+
+  > hr {
+    height: 0;
+    margin: 3em 0;
+    border: 0;
+    border-top: 1px dashed $grey-color-light;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
   }
 }
 
