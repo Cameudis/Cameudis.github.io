@@ -24,13 +24,14 @@
 - 样式源在 `_sass/minima.scss`（入口）和 `_sass/minima/_*.scss`，**不要改 `assets/main.css`**（产物）。
 - SCSS 用 `@use` 模块化：`$`变量在 `_variables.scss`、mixin 在 `_mixins.scss`、`%placeholder` 在 `_placeholders.scss`。新 partial 顶部 `@use "minima/variables" as *;`（用到 mixin/placeholder 再加对应行）。**不要用 `@import`**。
 - 入口是本地 `assets/main.scss`（`@use "minima"`），覆盖 theme gem 那个含 `@import` 的版本——不要删这个文件。
-- 搜索使用 Pagefind 1.5.2：`bin/build` 在 Jekyll 构建后扫描 `docs/`，生成并提交 `docs/pagefind/`；逻辑在 `assets/js/search.js`，样式在 `_sass/minima/_search.scss`。只有带 `data-pagefind-body` 的文章正文会进入索引，Pagefind 运行时在首次打开搜索时动态加载；使用 post layout 但不应进入搜索的页面加 `search: false`（Diary 即如此）。
+- 搜索使用 Pagefind 1.5.2：`bin/build` 在 Jekyll 构建后扫描 `docs/`，生成并提交 `docs/pagefind/`；`_config.yml` 的 `keep_files: [pagefind]` 用来避免不运行 Pagefind 的 `jekyll serve` 删掉已生成索引，不要移除。逻辑在 `assets/js/search.js`，样式在 `_sass/minima/_search.scss`。只有带 `data-pagefind-body` 的文章正文会进入索引，Pagefind 运行时在首次打开搜索时动态加载；使用 post layout 但不应进入搜索的页面加 `search: false`（Diary 即如此）。
 - 文章 TOC 在桌面侧边浮动、窄屏电脑内联完整显示，仅小屏触控设备默认折叠；结构在 `_layouts/post.html`，交互在 `assets/js/post.js`，断点样式在 `_sass/minima/_layout.scss`。
 - 主 CSS 用 `_config.yml` 的 `asset_versions.main_css` 做全站缓存破坏，修改全局样式后同步递增；`link.md` 的 front matter `asset_version` 会覆盖全站值，修改友链页样式时仍单独递增它。
 - 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
 - 像素字体采用分层加载：所有设备加载 `assets/fonts/fusion-pixel-10px-ui.woff2`（约 14 KB，只含拉丁、常用标点和界面符号），桌面端再加载完整简体中文字体；正文仍使用 `_variables.scss` 的系统中文字体栈。UI 子集由 FontTools 从 10px 简中字体生成，调整字符范围时需重新生成，不要用完整的 `*-latin.otf.woff2` 代替（该文件同样约 424 KB）。
-- 正文可用 `{% include github_repo.html repo="owner/repository" %}` 插入 GitHub 仓库卡片。结构在 `_includes/github_repo.html`，数据与 6 小时浏览器缓存逻辑在 `assets/js/github-repo.js`，样式在 `_sass/minima/_github-repo.scss`；公开 API 失败时会降级为仓库链接。
-- 正文组件还包括 `{% include callout.html ... %}`、`{% include link_preview.html ... %}` 和 `{% include static_tweet.html ... %}`；写法见 `README.md`。结构在 `_includes/`，共用样式在 `_sass/minima/_embeds.scss`，链接元数据与 24 小时缓存逻辑在 `assets/js/link-preview.js`。
+- 正文 Callout 优先写 Obsidian/GitHub 风格的 `> [!warning] 标题`；独占一行的 `<https://...>` 自动链接会生成链接卡片，其中精确的 `github.com/owner/repo` 地址自动生成 GitHub 仓库卡片。构建期转换在 `_plugins/content_components.rb`，写法见 `README.md`；旧的 `callout.html`、`link_preview.html` 和 `github_repo.html` include 仍作为高级/兼容接口。
+- GitHub 仓库卡片结构在 `_includes/github_repo.html`，数据与 6 小时浏览器缓存逻辑在 `assets/js/github-repo.js`，样式在 `_sass/minima/_github-repo.scss`；公开 API 失败时会降级为仓库链接。通用正文组件结构在 `_includes/`，共用样式在 `_sass/minima/_embeds.scss`，链接元数据与 24 小时缓存逻辑在 `assets/js/link-preview.js`。
+- 正文组件还包括 `{% include static_tweet.html ... %}`，写法见 `README.md`。
 
 ## 三方集成（随时可能挂，挂了表现为页面某块空白）
 

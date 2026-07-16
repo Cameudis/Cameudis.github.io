@@ -25,6 +25,10 @@ asset_versions:
 
 # Build output for GitHub Pages (deployed from ./docs on the gh-pages branch)
 destination: ./docs
+# `jekyll serve` does not run Pagefind; preserve the last generated index while
+# it rebuilds the rest of the preview destination. `bin/build` refreshes it.
+keep_files:
+  - pagefind
 include: ["CNAME"]
 
 port: 4001

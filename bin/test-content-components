@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "jekyll"
+require "liquid"
+require_relative "../_plugins/content_components"
+
+def assert(description)
+  raise "FAIL: #{description}" unless yield
+
+  puts "PASS: #{description}"
+end
+
+def transform(source)
+  Jekyll::ContentComponents::Transformer.new.transform(source)
+end
+
+callout = transform(<<~MARKDOWN)
+  > [!warning] 注意
+  > 这里可以写 **Markdown**。
+  >
+  > - 第一项
+  > - 第二项
+MARKDOWN
+
+assert("callout uses the existing include") do
+  callout.include?('{% include callout.html type="warning"') &&
+    callout.include?("title=__content_component_callout_title_1") &&
+    callout.include?("这里可以写 **Markdown**。")
+end
+
+assert("generated callout markup is valid Liquid") do
+  Liquid::Template.parse(callout)
+end
+
+generic_card = transform("<https://example.com/article>\n")
+assert("standalone autolink becomes a generic preview") do
+  generic_card.include?("{% include link_preview.html")
+end
+
+github_card = transform("<https://github.com/cameudis/SWOTS>\n")
+assert("GitHub repository autolink becomes a repository card") do
+  github_card.include?("cameudis/SWOTS") &&
+    github_card.include?("{% include github_repo.html")
+end
+
+github_subpage = transform("<https://github.com/cameudis/SWOTS/issues>\n")
+assert("GitHub subpages remain generic previews") do
+  github_subpage.include?("{% include link_preview.html")
+end
+
+inline_link = "正文中的 <https://example.com> 保持普通链接。\n"
+assert("inline autolinks are unchanged") do
+  transform(inline_link) == inline_link
+end
+
+named_link = "[Example](https://example.com)\n"
+assert("named Markdown links are unchanged") do
+  transform(named_link) == named_link
+end
+
+fenced_code = <<~MARKDOWN
+  ```markdown
+  > [!warning] 代码示例
+  > 不应转换。
+  <https://example.com>
+  ```
+MARKDOWN
+assert("fenced code is unchanged") do
+  transform(fenced_code) == fenced_code
+end
+
+raw_block = <<~LIQUID
+  {% raw %}
+  > [!warning] 原始示例
+  <https://example.com>
+  {% endraw %}
+LIQUID
+assert("Liquid raw blocks are unchanged") do
+  transform(raw_block) == raw_block
+end
+
+nested = transform(<<~MARKDOWN)
+  > [!note] 外层
+  > > [!tip] 内层
+  > > 内层正文。
+MARKDOWN
+assert("nested callouts use distinct internal variables") do
+  nested.include?("__content_component_callout_1") &&
+    nested.include?("__content_component_callout_2") &&
+    nested.include?("内层正文。") &&
+    !nested.include?("> 内层正文。")
+end
+
+puts "All content component tests passed."
