@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2026-07-16T00:02:18+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">我恨 AI 写作</title><link href="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html" rel="alternate" type="text/html" title="我恨 AI 写作" /><published>2026-06-17T00:00:00+08:00</published><updated>2026-06-17T00:00:00+08:00</updated><id>https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C</id><content type="html" xml:base="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html"><![CDATA[<p>我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2026-07-16T08:44:22+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">我恨 AI 写作</title><link href="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html" rel="alternate" type="text/html" title="我恨 AI 写作" /><published>2026-06-17T00:00:00+08:00</published><updated>2026-06-17T00:00:00+08:00</updated><id>https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C</id><content type="html" xml:base="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html"><![CDATA[<p>我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。</p>
 
 <p>我喜欢读博客，就像看其他的独立内容（美术、音乐、独立游戏、视频等）一样，看博客不仅仅是看文字本身，也是看背后的那个创作者；博客本身承载了那人的意志、趣味、喜好。尽管我看的常常是专业的技术领域博客，我也总是能在博客中找到共鸣，我知道这个作者一定觉得这个玩意很有意思，才会把它写下来。光是看博客，我就好像和作者一起做了一件很有意思的事情。</p>
 
@@ -71,7 +71,7 @@
 
 <p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052123033.png" alt="image.png" /></p>
 
-<p>SDP 协议定义了一套自己的序列化机制，在 <a href="https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/host/service-discovery-protocol--sdp--specification.html#:~:text=Service%20browsing%20hierarchy-,3.%20Data%20representation,-Attribute%20values%20can">SDP 规范</a>中有详细的定义。下图展示了几种数据被表示成规范中 <em>Data Element</em> 的方式，我们可以看到这个规范是经典的 TLV 结构（Type-length-value，在通信协议的编码或者说序列化的领域中非常常见，类似的还有 Linux 内核的 Netlink 接口，见 <a href="https://docs.kernel.org/userspace-api/netlink/intro.html">官方文档</a>，或是 TLS Extension 的编码）。</p>
+<p>SDP 协议定义了一套自己的序列化机制，在 <a href="https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/host/service-discovery-protocol--sdp--specification.html#:~:text=Service%20browsing%20hierarchy-,3.%20Data%20representation,-Attribute%20values%20can">SDP 规范</a> 中有详细的定义。下图展示了几种数据被表示成规范中 <em>Data Element</em> 的方式，我们可以看到这个规范是经典的 TLV 结构（Type-length-value，在通信协议的编码或者说序列化的领域中非常常见，类似的还有 Linux 内核的 Netlink 接口，见 <a href="https://docs.kernel.org/userspace-api/netlink/intro.html">官方文档</a>，或是 TLS Extension 的编码）。</p>
 
 <p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202602052133019.png" alt="image.png" /></p>
 
@@ -1009,7 +1009,7 @@ define va2pa
     printf "phy  : 0x%lx [0x%08x-0x%08x]\n", $result + ($target &amp; $res_mask), $result, $result + $res_mask
 end
 </code></pre>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="kernel" /><summary type="html"><![CDATA[题目分析]]></summary></entry><entry><title type="html">Kernel: 环境配置</title><link href="https://www.cameudis.com/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/09/28/Kernel-0</id><content type="html" xml:base="https://www.cameudis.com/2025/09/28/Kernel-0.html"><![CDATA[<ul>
-  <li>简易版环境： <a href="https://github.com/pwncollege/pwnkernel">pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com)</a></li>
+  <li>简易版环境：<a href="https://github.com/pwncollege/pwnkernel">pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com)</a></li>
   <li>高级版环境：<a href="https://github.com/cirosantilli/linux-kernel-module-cheat">cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)</a></li>
 </ul>
 
@@ -1248,7 +1248,7 @@ $(eval $(generic-package))
   <li><a href="https://www.nullbyte.cat/post/linux-kernel-exploit-development-environment/#environment-setup">Linux Kernel Exploit development - Environment — NullByte</a></li>
   <li><a href="https://www.kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst">kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst</a></li>
   <li><a href="https://r1ru.github.io/posts/0/">Linux Kernel Exploitation - Setup | r1ru</a></li>
-</ul>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="kernel" /><summary type="html"><![CDATA[简易版环境： pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)]]></summary></entry><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
+</ul>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="kernel" /><summary type="html"><![CDATA[简易版环境：pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)]]></summary></entry><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
 
 <p>虚拟机。首先逆向出指令格式：</p>
 
@@ -1744,7 +1744,7 @@ $(eval $(generic-package))
 </code></pre></div></div>
 
 <blockquote>
-  <p>TAKEAWAY: <a href="http://ref.x86asm.net/coder64.html">coder64 edition | X86 Opcode and Instruction Reference 1.12</a> 这个网站很好用。</p>
+  <p>TAKEAWAY:<a href="http://ref.x86asm.net/coder64.html">coder64 edition | X86 Opcode and Instruction Reference 1.12</a> 这个网站很好用。</p>
 </blockquote>
 
 <h2 id="happyos">HappyOS</h2>
@@ -2436,7 +2436,7 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
 
 <h2 id="任意读攻击">任意读攻击</h2>
 
-<p>在进行攻击时，我主要参考了 <a href="https://anonymous.4open.science/r/riscvuzz-artifacts-116D">GhostWrite作者发布的预发布版本代码</a>以及 <a href="https://googleprojectzero.blogspot.com/2015/03/exploiting-dram-rowhammer-bug-to-gain.html">Mark Seaborn 发表在 Project Zero 的 rowhammer 利用博客</a>。</p>
+<p>在进行攻击时，我主要参考了 <a href="https://anonymous.4open.science/r/riscvuzz-artifacts-116D">GhostWrite作者发布的预发布版本代码</a> 以及 <a href="https://googleprojectzero.blogspot.com/2015/03/exploiting-dram-rowhammer-bug-to-gain.html">Mark Seaborn 发表在 Project Zero 的 rowhammer 利用博客</a>。</p>
 
 <p>威胁模型是一个可以执行任意代码的普通用户，目标环境是运行于 patched qemu-system-riscv64 的 ubuntu 22.04 server 发行版。启动脚本如下：</p>
 
@@ -2698,7 +2698,7 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
 
 <p>41% 这个数字实在是太震撼了，有一种“医学不存在了”的感觉。我想知道这个数据的出处，于是开始了调查。</p>
 
-<p>首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇<a href="https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf">杂志文章</a>。</p>
+<p>首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇 <a href="https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf">杂志文章</a>。</p>
 
 <p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102231949.png" alt="image.png" /></p>
 

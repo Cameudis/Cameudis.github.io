@@ -24,10 +24,10 @@ tags: pwnable.tw
 
 ### 解决
 
-参考[利用ida pro的flare功能识别静态链接函数签名_Anciety的博客](https://blog.csdn.net/qq_29343201/article/details/74656456)
+参考 [利用ida pro的flare功能识别静态链接函数签名_Anciety的博客](https://blog.csdn.net/qq_29343201/article/details/74656456)
 
 IDA支持给特定库生成一个签名，然后用这个签名识别库函数的名称！
-有人已经生成过很多签名了，可以直接去[push0ebp/sig-database: IDA FLIRT Signature Database (github.com)](https://github.com/push0ebp/sig-database)下载。
+有人已经生成过很多签名了，可以直接去 [push0ebp/sig-database: IDA FLIRT Signature Database (github.com)](https://github.com/push0ebp/sig-database) 下载。
 
 那么问题来了，下哪个libc版本呢？
 pwnable.tw的官网首页说，题目都运行在ubuntu16.04或18.04上，所以我先去把这两个系统对应的libc都下了下来，发现只识别了五十几个库函数……
@@ -46,7 +46,7 @@ main函数干了四件事：
 4. read一个0x18长度的字符串，地址是刚刚输入的数。
 
 然后就ret了。可以发现，我们没有任何泄露栈地址的方法，没办法进行简单的ret2xxx系列攻击。
-（然后我就放弃了，这题大概又是超出我知识水平范围的，所以去网上找writeup：[和媳妇一起学Pwn 之 3x17 | Clang裁缝店](https://xuanxuanblingbling.github.io/ctf/pwn/2019/09/06/317/)看了）
+（然后我就放弃了，这题大概又是超出我知识水平范围的，所以去网上找writeup：[和媳妇一起学Pwn 之 3x17 | Clang裁缝店](https://xuanxuanblingbling.github.io/ctf/pwn/2019/09/06/317/) 看了）
 
 ## Part2 main函数的启动过程
 

@@ -6,7 +6,7 @@
 
 ## 构建
 
-- `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先执行 Jekyll，再生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
+- `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先规范化 Markdown 链接间距，再执行 Jekyll 和生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
 - `bin/build` 在 Jekyll 之后运行 `bin/cache-external-link-icons`：扫描生成页面中的外链，按域名抓取 favicon，压成 32×32 PNG 缓存到 `assets/external-link-icons/`，并同步到 `docs/`。抓取会读取实际链接页的 icon 声明、尝试站点常见 favicon 路径，并仅在构建阶段用 Google favicon 服务兜底；读者始终只请求本站资源。已有缓存不会重复请求；失败只保留原有外链箭头且不阻塞构建。只重试缺失项用 `--retry-missing`，全部强制重抓用 `--refresh`。
 - 本地用原生 `jekyll ~> 4.4`，**不用** `github-pages` gem（Ruby 4.0 不兼容，见 `Gemfile` 注释）。第三方 Jekyll gem 插件只有 `jekyll-feed`；`_plugins/optimize_images.rb` 是本地 HTML filter，给正文图片补原生懒加载与异步解码；搜索使用构建后的 Pagefind 静态索引。
 - `_config.yml` 有 `exclude: [AGENTS.md, README.md]`——这两份根目录文件不会进 `docs/` 部署产物，别误删这条。
@@ -15,6 +15,7 @@
 ## 文章
 
 - 新文章用 `bin/new-post "标题"`（支持 `-c/-d/-t/-s/-e`），**不要手写** front matter 或文件名。脚本保证 slug 规则（含 CJK）和目录归类统一。
+- `bin/normalize-link-spacing` 会由 `bin/build` 自动运行：普通 Markdown 链接和自动链接的两侧若紧邻文字或数字，就各补一个半角空格；若与 Unicode 标点/符号（包括中文全角标点）之间已有空格或 Markdown 软换行，则删掉间隔。脚本会保留硬换行以及列表、引用、标题的结构空格，并跳过 front matter、代码块、行内代码、图片和链接定义；可用 `--check` 只检查而不改文件。
 - `_posts/` 按类型分子目录：`ctf/`、`binary/`、`pwnable.tw/`、`unclassified/`。`category` 由目录路径决定，不是 front matter 字段。
 - front matter 极简：`layout: post` + `title` + `tags`（空格分隔的英文短词，如 `pwn kernel`）。
 

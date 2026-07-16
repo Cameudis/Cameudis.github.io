@@ -7,6 +7,7 @@ if [ ! -x node_modules/.bin/pagefind ]; then
   exit 1
 fi
 
+bin/normalize-link-spacing
 bundle exec jekyll build
 bin/cache-external-link-icons
 npm run search:index

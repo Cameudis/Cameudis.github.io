@@ -8,7 +8,7 @@ tags: pwn rop
 当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 `leave; ret` 或是 `xchg eax, esp` 等方法完成栈迁移。
 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 `sub rsp, 0x18; call vul` 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。
 
-比赛时和前辈两人看这题看了几个小时，找gadget找了很久也没做出来。比赛结束后发现了两个版本的做法，分别是[官方的](https://github.com/tamuctf/tamuctf-2023/tree/master/pwn/pwnme)和[Chovid99师傅的](https://chovid99.github.io/posts/tamuctf-2023/#pwnme)的。官方的做法比较一般，并且和我们比赛时的思路完全一致（只是我们傻了没发现那个关键gadget），因此本文主要分析官方的做法。
+比赛时和前辈两人看这题看了几个小时，找gadget找了很久也没做出来。比赛结束后发现了两个版本的做法，分别是 [官方的](https://github.com/tamuctf/tamuctf-2023/tree/master/pwn/pwnme) 和 [Chovid99师傅的](https://chovid99.github.io/posts/tamuctf-2023/#pwnme) 的。官方的做法比较一般，并且和我们比赛时的思路完全一致（只是我们傻了没发现那个关键gadget），因此本文主要分析官方的做法。
 
 <!-- more -->
 

@@ -297,4 +297,4 @@ def pwn():
     io.interactive()
 ```
 
-后记：后来发现其实根本不用ROP，由于调用vtable中的函数时，参数就是自己的file pointer，所以只要在flag字段后面加上";/bin/sh;"，然后把 `__finish` 设置成system地址，就可以直接get shell。见[R4bb1t师傅的博客](https://n0va-scy.github.io/2019/07/03/pwnable.tw/#seethefile)
+后记：后来发现其实根本不用ROP，由于调用vtable中的函数时，参数就是自己的file pointer，所以只要在flag字段后面加上";/bin/sh;"，然后把 `__finish` 设置成system地址，就可以直接get shell。见 [R4bb1t师傅的博客](https://n0va-scy.github.io/2019/07/03/pwnable.tw/#seethefile)

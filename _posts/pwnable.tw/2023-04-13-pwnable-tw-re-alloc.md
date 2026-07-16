@@ -85,7 +85,7 @@ alloc(1, 0x18, pack(elf.plt["puts"])+pack(0)+pack(0x4015DC))
 
 *这里需要提一嘴，我使用了匿名区块来解决这一问题：非0的栏位无法进行alloc。不过在复盘时，从网上的大佬那边发现可以通过一种非常巧妙的方式来将栏位置零，同时又不干扰已经位于tcache中的atoll地址，从而将后续利用流程也变得直观一些。
 可以通过realloc将区块变大，然后再free。这样就可以free到别的大小的tcache中，并且根本不用关注key的检查，也不会将atoll的地址覆盖，一举两得。
-参考地址见[Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits](https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/)*
+参考地址见 [Binary Exploitation [pwnable.tw] - Realloc - Tainted Bits](https://www.taintedbits.com/2020/07/05/binary-exploitation-pwnable-tw-realloc/)*
 
 接下来泄露libc地址，由于buffer+8就有，因此简简单单就可以泄露了：
 

@@ -332,7 +332,7 @@
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>在 bss 段有一个数组 <code class="language-plaintext highlighter-rouge">main_loop_tlg[4]</code>，保存了一些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 结构体指针，每个 <code class="language-plaintext highlighter-rouge">active_timers</code> 都指向一个由 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 结构体组成的链表。qemu 会遍历这些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 来检查所有 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 有没有超时并调用它们的 callback 函数（也就是调用 <code class="language-plaintext highlighter-rouge">timer-&gt;cb(timer-&gt;opaque)</code>，相关源码见<a href="https://elixir.bootlin.com/qemu/v4.2.1/source/util/qemu-timer.c#L588">qemu-timer.c - util/qemu-timer.c - Qemu source code (v4.2.1) - Bootlin</a>）。</p>
+<p>在 bss 段有一个数组 <code class="language-plaintext highlighter-rouge">main_loop_tlg[4]</code>，保存了一些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 结构体指针，每个 <code class="language-plaintext highlighter-rouge">active_timers</code> 都指向一个由 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 结构体组成的链表。qemu 会遍历这些 <code class="language-plaintext highlighter-rouge">QEMUTimerList</code> 来检查所有 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 有没有超时并调用它们的 callback 函数（也就是调用 <code class="language-plaintext highlighter-rouge">timer-&gt;cb(timer-&gt;opaque)</code>，相关源码见 <a href="https://elixir.bootlin.com/qemu/v4.2.1/source/util/qemu-timer.c#L588">qemu-timer.c - util/qemu-timer.c - Qemu source code (v4.2.1) - Bootlin</a>）。</p>
 
 <p>因此，我们可以在通过 <code class="language-plaintext highlighter-rouge">main_loop_tlg</code> 泄露某个 timerlist 的地址后，劫持它的 <code class="language-plaintext highlighter-rouge">active_timers</code> 指针并伪造一个 <code class="language-plaintext highlighter-rouge">QEMUTimer</code> 结构体，从而控制程序调用函数以及参数。</p>
 
@@ -547,7 +547,7 @@
         <a class="u-url" href="/2024/02/19/VNCTF2024-escape-langlang-mountain2.html" hidden></a>
 </article>
 
-<script src="/assets/js/post.js?v=20260716-external-link-icons-4"
+<script src="/assets/js/post.js?v=20260716-source-link-spacing"
         data-external-icon-manifest="/assets/external-link-icons/manifest.json"
         defer></script>
 

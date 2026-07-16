@@ -112,12 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const filename = manifest.icons?.[host];
         if (!filename) return;
 
-        const previous = link.previousSibling;
-        const previousText = previous?.textContent || '';
-        const needsLeadingSpace = previous && previous.nodeName !== 'BR' && !/\s$/.test(previousText);
-        const spacer = needsLeadingSpace ? document.createTextNode(' ') : null;
-        if (spacer) link.before(spacer);
-
         const icon = document.createElement('img');
         icon.className = 'external-link-icon';
         icon.alt = '';
@@ -128,10 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.setAttribute('aria-hidden', 'true');
         const markLoaded = () => link.classList.add('has-external-link-icon');
         icon.addEventListener('load', markLoaded, { once: true });
-        icon.addEventListener('error', () => {
-          icon.remove();
-          spacer?.remove();
-        }, { once: true });
+        icon.addEventListener('error', () => icon.remove(), { once: true });
         icon.src = new URL(filename, iconBaseUrl).href;
         link.prepend(icon);
 

@@ -1,0 +1,369 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+
+module LinkSpacing
+  ROOT = File.expand_path("..", __dir__)
+
+  module_function
+
+  def escaped?(characters, index)
+    slashes = 0
+    cursor = index - 1
+    while cursor >= 0 && characters[cursor] == "\\"
+      slashes += 1
+      cursor -= 1
+    end
+    slashes.odd?
+  end
+
+  def matching_delimiter(characters, start_index, opening, closing)
+    depth = 0
+    characters.each_index do |index|
+      next if index < start_index || escaped?(characters, index)
+
+      depth += 1 if characters[index] == opening
+      next unless characters[index] == closing
+
+      depth -= 1
+      return index if depth.zero?
+    end
+    nil
+  end
+
+  def code_span_ranges(characters)
+    ranges = []
+    index = 0
+
+    while index < characters.length
+      unless characters[index] == "`" && !escaped?(characters, index)
+        index += 1
+        next
+      end
+
+      opening = index
+      index += 1
+      index += 1 while characters[index] == "`"
+      delimiter_length = index - opening
+      closing = nil
+
+      while index < characters.length
+        if characters[index] == "`" && !escaped?(characters, index)
+          run_start = index
+          index += 1
+          index += 1 while characters[index] == "`"
+          if index - run_start == delimiter_length
+            closing = index
+            break
+          end
+        else
+          index += 1
+        end
+      end
+
+      ranges << [opening, closing || characters.length]
+      index = closing || characters.length
+    end
+
+    ranges
+  end
+
+  def inside_range?(index, ranges)
+    ranges.any? { |start_index, end_index| index >= start_index && index < end_index }
+  end
+
+  def normalize_reference_label(label)
+    label.downcase.gsub(/\s+/, " ").strip
+  end
+
+  def link_ranges(line, reference_labels)
+    characters = line.each_char.to_a
+    protected_ranges = code_span_ranges(characters)
+    ranges = []
+    index = 0
+
+    while index < characters.length
+      if inside_range?(index, protected_ranges)
+        range = protected_ranges.find { |start_index, end_index| index >= start_index && index < end_index }
+        index = range[1]
+        next
+      end
+
+      if characters[index] == "<" && !escaped?(characters, index)
+        closing = ((index + 1)...characters.length).find { |cursor| characters[cursor] == ">" }
+        if closing
+          destination = characters[(index + 1)...closing].join
+          if destination.match?(/\A(?:https?:\/\/|mailto:)[^\s<>]+\z/i)
+            ranges << [index, closing + 1]
+            index = closing + 1
+            next
+          end
+        end
+      end
+
+      previous_character = index.positive? ? characters[index - 1] : nil
+      unless characters[index] == "[" && !escaped?(characters, index) && previous_character != "!"
+        index += 1
+        next
+      end
+
+      label_end = matching_delimiter(characters, index, "[", "]")
+      unless label_end
+        index += 1
+        next
+      end
+
+      label = characters[(index + 1)...label_end].join
+      link_end = nil
+      following = label_end + 1
+
+      if characters[following] == "("
+        destination_end = matching_delimiter(characters, following, "(", ")")
+        link_end = destination_end + 1 if destination_end
+      elsif characters[following] == "["
+        reference_end = matching_delimiter(characters, following, "[", "]")
+        link_end = reference_end + 1 if reference_end
+      elsif !label.start_with?("^") && reference_labels.include?(normalize_reference_label(label))
+        link_end = label_end + 1
+      end
+
+      if link_end
+        ranges << [index, link_end]
+        index = link_end
+      else
+        index = label_end + 1
+      end
+    end
+
+    ranges
+  end
+
+  def punctuation_or_symbol?(character)
+    character&.match?(/\A[\p{P}\p{S}]\z/u)
+  end
+
+  def separator_needed?(character)
+    character && !character.match?(/\A\s\z/u) && !punctuation_or_symbol?(character)
+  end
+
+  def horizontal_whitespace?(character)
+    character == " " || character == "\t"
+  end
+
+  def structural_prefix?(characters, gap_start)
+    prefix = characters[0...gap_start].join
+    prefix.match?(/\A {0,3}(?:>\s*)+\z/) ||
+      prefix.match?(/\A {0,3}(?:>\s*)*(?:(?:[-+*]|\d+[.)])|\#{1,6})\z/)
+  end
+
+  def normalize_line(line, reference_labels)
+    characters = line.each_char.to_a
+    ranges = link_ranges(line, reference_labels)
+    return [line, 0] if ranges.empty?
+
+    insertions = {}
+    deletions = {}
+    ranges.each_with_index do |(start_index, end_index), range_index|
+      previous_range = range_index.positive? ? ranges[range_index - 1] : nil
+      next_range = ranges[range_index + 1]
+      previous_character = start_index.positive? ? characters[start_index - 1] : nil
+
+      gap_start = start_index
+      gap_start -= 1 while gap_start.positive? && horizontal_whitespace?(characters[gap_start - 1])
+      character_before_gap = gap_start.positive? ? characters[gap_start - 1] : nil
+      previous_link_across_gap = previous_range && previous_range[1] == gap_start
+
+      if gap_start < start_index && punctuation_or_symbol?(character_before_gap) &&
+         !previous_link_across_gap && !structural_prefix?(characters, gap_start)
+        (gap_start...start_index).each { |index| deletions[index] = true }
+      elsif (previous_range && previous_range[1] == start_index) || separator_needed?(previous_character)
+        insertions[start_index] = true
+      end
+
+      gap_end = end_index
+      gap_end += 1 while gap_end < characters.length && horizontal_whitespace?(characters[gap_end])
+      character_after_gap = characters[gap_end]
+      next_link_across_gap = next_range && next_range[0] == gap_end
+
+      if gap_end > end_index && punctuation_or_symbol?(character_after_gap) && !next_link_across_gap
+        (end_index...gap_end).each { |index| deletions[index] = true }
+      elsif (next_range && next_range[0] == end_index) || separator_needed?(characters[end_index])
+        insertions[end_index] = true
+      end
+    end
+
+    return [line, 0] if insertions.empty? && deletions.empty?
+
+    normalized = +""
+    (0..characters.length).each do |index|
+      normalized << " " if insertions[index]
+      normalized << characters[index] if index < characters.length && !deletions[index]
+    end
+    [normalized, insertions.length + deletions.length]
+  end
+
+  def structural_block_line?(line)
+    stripped = line.sub(/\A {0,3}/, "")
+    return true if stripped.match?(/\A(?:\#{1,6}\s|>|[-+*]\s|\d+[.)]\s|\||\{%)/)
+    return true if stripped.match?(/\A(?:(?:[-*_]\s*){3,}|={2,})\s*\z/)
+    return false if stripped.match?(/\A<(?i:https?:\/\/|mailto:)/)
+
+    stripped.match?(/\A<(?:[A-Za-z][A-Za-z0-9-]*\b|\/|!|\?)/)
+  end
+
+  def soft_line_join?(left_line, right_line, reference_labels)
+    return false unless left_line.end_with?("\n")
+    return false if left_line.match?(/(?: {2,}|\\)\r?\n\z/)
+    return false if structural_block_line?(left_line) || structural_block_line?(right_line)
+
+    left = left_line.sub(/\r?\n\z/, "")
+    right_indent = right_line[/\A {0,3}/].length
+    right = right_line[right_indent..]
+    return false if left.empty? || right.empty?
+
+    right_ranges = link_ranges(right, reference_labels)
+    link_starts_right_line = right_ranges.first&.first == 0
+    return true if link_starts_right_line && punctuation_or_symbol?(left.each_char.to_a.last)
+
+    left_ranges = link_ranges(left, reference_labels)
+    link_ends_left_line = left_ranges.last&.last == left.length
+    first_right_character = right.each_char.first
+    link_ends_left_line && punctuation_or_symbol?(first_right_character)
+  end
+
+  def normalize_soft_line_boundaries(lines, eligible_lines, reference_labels)
+    normalized = lines.dup
+    eligible = eligible_lines.dup
+    edit_count = 0
+    index = 0
+
+    while index + 1 < normalized.length
+      unless eligible[index] && eligible[index + 1] &&
+             soft_line_join?(normalized[index], normalized[index + 1], reference_labels)
+        index += 1
+        next
+      end
+
+      left = normalized[index].sub(/\r?\n\z/, "")
+      right = normalized[index + 1].sub(/\A {0,3}/, "")
+      normalized[index] = left + right
+      normalized.delete_at(index + 1)
+      eligible.delete_at(index + 1)
+      edit_count += 1
+    end
+
+    [normalized, edit_count]
+  end
+
+  def reference_labels(lines)
+    lines.filter_map do |line|
+      match = line.match(/\A {0,3}\[([^\]]+)\]:/)
+      normalize_reference_label(match[1]) if match && !match[1].start_with?("^")
+    end.to_h { |label| [label, true] }
+  end
+
+  def normalize_document(source)
+    lines = source.lines
+    references = reference_labels(lines)
+    in_front_matter = lines.first&.match?(/\A---\s*\z/)
+    in_fence = nil
+    in_highlight = false
+    insertion_count = 0
+    eligible_lines = Array.new(lines.length, false)
+
+    normalized_lines = lines.each_with_index.map do |line, line_index|
+      if in_front_matter
+        in_front_matter = false if line_index.positive? && line.match?(/\A(?:---|\.\.\.)\s*\z/)
+        next line
+      end
+
+      if in_highlight
+        in_highlight = false if line.match?(/\{%\s*endhighlight\s*%\}/)
+        next line
+      elsif line.match?(/\{%\s*highlight\b/)
+        in_highlight = true
+        next line
+      end
+
+      fence = line.match(/\A {0,3}(`{3,}|~{3,})/)
+      if in_fence
+        marker, length = in_fence
+        in_fence = nil if line.match?(/\A {0,3}#{Regexp.escape(marker)}{#{length},}\s*\z/)
+        next line
+      elsif fence
+        in_fence = [fence[1][0], fence[1].length]
+        next line
+      end
+
+      next line if line.match?(/\A(?: {4}|\t)/)
+      next line if line.match?(/\A {0,3}\[[^\]]+\]:/)
+
+      eligible_lines[line_index] = true
+      normalized, count = normalize_line(line, references)
+      insertion_count += count
+      normalized
+    end
+
+    normalized_lines, soft_line_edits = normalize_soft_line_boundaries(normalized_lines, eligible_lines, references)
+    [normalized_lines.join, insertion_count + soft_line_edits]
+  end
+
+  def default_paths
+    posts = Dir.glob(File.join(ROOT, "_posts", "**", "*.md"))
+    pages = Dir.glob(File.join(ROOT, "*.md")).select do |path|
+      !%w[AGENTS.md README.md].include?(File.basename(path)) && File.open(path, &:readline).match?(/\A---\s*\z/)
+    rescue EOFError
+      false
+    end
+    (posts + pages).sort
+  end
+
+  def expand_paths(arguments)
+    return default_paths if arguments.empty?
+
+    arguments.flat_map do |argument|
+      path = File.expand_path(argument, Dir.pwd)
+      File.directory?(path) ? Dir.glob(File.join(path, "**", "*.md")) : path
+    end.select { |path| File.file?(path) && File.extname(path).downcase == ".md" }.uniq.sort
+  end
+end
+
+def run(arguments)
+  options = { check: false }
+  parser = OptionParser.new do |option_parser|
+    option_parser.banner = "Usage: bin/normalize-link-spacing [--check] [FILE_OR_DIRECTORY ...]"
+    option_parser.on("--check", "Report files that need normalization without changing them") do
+      options[:check] = true
+    end
+  end
+  parser.parse!(arguments)
+
+  changed_files = 0
+  spacing_edits = 0
+
+  LinkSpacing.expand_paths(arguments).each do |path|
+    source = File.binread(path).force_encoding(Encoding::UTF_8)
+    normalized, count = LinkSpacing.normalize_document(source)
+    next if count.zero?
+
+    changed_files += 1
+    spacing_edits += count
+    relative_path = path.delete_prefix("#{LinkSpacing::ROOT}/")
+    puts "#{options[:check] ? "needs normalization" : "normalized"}: #{relative_path} (#{count})"
+    File.binwrite(path, normalized) unless options[:check]
+  end
+
+  if changed_files.zero?
+    puts "Markdown link spacing is already normalized."
+  elsif options[:check]
+    warn "#{changed_files} file(s) need #{spacing_edits} spacing edit(s)."
+    return 1
+  else
+    puts "Normalized #{spacing_edits} spacing character(s) in #{changed_files} file(s)."
+  end
+
+  0
+end
+
+exit run(ARGV) if $PROGRAM_NAME == __FILE__

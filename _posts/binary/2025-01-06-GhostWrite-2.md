@@ -66,7 +66,7 @@ void HELPER(ghostwrite)(CPURISCVState *env, target_ulong addr,
 
 ## 任意读攻击
 
-在进行攻击时，我主要参考了 [GhostWrite作者发布的预发布版本代码](https://anonymous.4open.science/r/riscvuzz-artifacts-116D)以及 [Mark Seaborn 发表在 Project Zero 的 rowhammer 利用博客](https://googleprojectzero.blogspot.com/2015/03/exploiting-dram-rowhammer-bug-to-gain.html)。
+在进行攻击时，我主要参考了 [GhostWrite作者发布的预发布版本代码](https://anonymous.4open.science/r/riscvuzz-artifacts-116D) 以及 [Mark Seaborn 发表在 Project Zero 的 rowhammer 利用博客](https://googleprojectzero.blogspot.com/2015/03/exploiting-dram-rowhammer-bug-to-gain.html)。
 
 威胁模型是一个可以执行任意代码的普通用户，目标环境是运行于 patched qemu-system-riscv64 的 ubuntu 22.04 server 发行版。启动脚本如下：
 

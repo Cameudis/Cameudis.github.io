@@ -17,7 +17,7 @@ search: false
 2. CVE-2025-32463：sudo 在不加检查地 chroot 后，触发了 Name Service Switch（NSS）操作，导致攻击者可以构造恶意的 NSS 配置文件（/etc/nsswitch.conf）达成提权。[博客原文](https://www.stratascale.com/vulnerability-alert-CVE-2025-32463-sudo-chroot)
 -  `chroot` 实在是太危险了，尤其不能允许用户随意chroot到他具有任意写权限的目录下！利用时和配置文件劫持打组合拳有奇效。
 - 怀疑这些人每天就关注 `sudo` 这种有 SUID 的 Binary 更新了什么新功能参数，然后研究它们有什么问题。
-3. 学习了 [OpenC910](https://github.com/XUANTIE-RV/openc910/) 中的 AXI 总线接口，[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/)写得非常通俗易懂。
+3. 学习了 [OpenC910](https://github.com/XUANTIE-RV/openc910/) 中的 AXI 总线接口，[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/) 写得非常通俗易懂。
 4. 大致了解了下 Android 上的 BootLoader 锁和 ARMv8 安全启动的关系：
 - BootLoader 锁（OEM锁）是厂商为了防止用户刷入非自家的镜像，在 recovery 模式程序中实现的一个“功能”。
 - ARMv8 安全启动（Secure Boot）是一套标准，力求实现标准化的、基于密码学的信任链。ARM 官方提供了 [Trusted Firmware-A (TF-A)](https://www.trustedfirmware.org/projects/tf-a/) 作为 ARMv8-A Secure Boot 的参考实现。（在 ARMv7 中不存在标准化的 Secure Boot，通常由厂商自行实现启动信任链，但也可以使用 TF-A 作为启动软件。）（在 ARMv8-M 中使用的是 Trusted Firmware-M）
@@ -29,8 +29,8 @@ search: false
 - SELinux 的粒度比 Linux 原有的权限系统（用户、用户组）细很多，可以对同一个用户的不同进程做不同的权限设置，甚至可以对 root 用户（uid=0，gid=0）的进程做限制。这是通过在策略中将进程划分为不同的 type 完成的，比如在安卓上定义了以下这些 Type：[app.te - platform/external/sepolicy - Git at Google](https://android.googlesource.com/platform/external/sepolicy/+/jb-mr1-dev/app.te)。
 - 在 Android 中，即使已经拿到了 root 用户权限，由于安卓自带 SELinux 策略的设置，也是残血的 root 用户。安卓源码中自带的 SELinux 策略会在编译成内核可加载的二进制格式后，集成到内核的 boot image 中或嵌入到 ramdisk 中，受到安全启动链的保护。Android 启动时，init 进程将查找并加载策略文件。
 - 因此，Magisk 这种 ROOT 工具会在启动时对 SELinux 的策略进行 patch，见 [awsome-magisk/重读Magisk内部实现细节.md at main · tcc0lin/awsome-magisk · GitHub](https://github.com/tcc0lin/awsome-magisk/blob/main/%E9%87%8D%E8%AF%BBMagisk%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82.md)。
-1. 调整了博客的字体、字体大小和行距。字体设置参考了[博客字体设置方案 \| Daniel’s Blog](https://moecm.com/the-blog-font-setting-scheme/)；字体大小设置为 15 px，行距设置为 2，更适合中文排版了（方块字比较密，行距应该设置得比英文大一些）。
-2. 看了[发现外星生命痕迹，确定度99.7%！——等等，这是怎么算出来的？](https://mp.weixin.qq.com/s/Ku9v3mf76TpxQW2Y1rj2LQ)，一篇关于统计学和概率的科普文。即使一项研究的确定度非常高，达到了5σ的黄金标准（置信度约为99.99994%），也有可能是受到干扰因素影响导致的结果，可能会被推翻。
+1. 调整了博客的字体、字体大小和行距。字体设置参考了 [博客字体设置方案 \| Daniel’s Blog](https://moecm.com/the-blog-font-setting-scheme/)；字体大小设置为 15 px，行距设置为 2，更适合中文排版了（方块字比较密，行距应该设置得比英文大一些）。
+2. 看了 [发现外星生命痕迹，确定度99.7%！——等等，这是怎么算出来的？](https://mp.weixin.qq.com/s/Ku9v3mf76TpxQW2Y1rj2LQ)，一篇关于统计学和概率的科普文。即使一项研究的确定度非常高，达到了5σ的黄金标准（置信度约为99.99994%），也有可能是受到干扰因素影响导致的结果，可能会被推翻。
 3. 把 OpenC910 的仿真跑通了，并且安装了 vcs、verdi、scl 工具，学会了用 verdi 看 vcs 仿真的波形。
 - Vcs、Verdi 安装和使用参考 [ubuntu 18.04 安装 vcs、verdi 2018](https://blog.csdn.net/qq_24287711/article/details/130017583)、[记一次VCS报错：/usr/bin/ld: undefined reference to `pthread_yield`](https://blog.csdn.net/m0_50662459/article/details/130565406)。但不得不说前面那个教程写得特么有点太烂了。验证服务器会跑在 27000 端口，需要确保这个端口可以访问。这篇教程写了如何配置防火墙规则开放 27000 端口，然后说“firewall 没有安装的需要用 apt 进行安装”——我都没有安装防火墙当然不用开放 27000 端口啊！
 
@@ -43,7 +43,7 @@ search: false
    - 在 Linux 上许多系统框架都会根据绝对路径找配置文件，把这些路径直接硬编码到代码中，并且在 `man` 手册中进行说明；攻击者可以 `chroot` 就意味着他可以控制根目录位置，进而控制这些配置文件。
    - 而在 Windows 上，这里利用的是系统查找可执行文件/动态链接库的顺序；攻击者可以控制工作目录就意味着他可以劫持 DLL、甚至劫持可执行文件（也就是这个 CVE 的利用手法，攻击者的 `.url` 文件中直接指向的 `iediagcmd.exe` 会使用系统 API 调用 `route.exe print`，触发远程服务器上的恶意 `route.exe` 调用）。
    - 关于 DLL 劫持网上已经有很多写得非常好的资料了，像 CVE-2025-33053 这样的漏洞感觉已经研究地非常充分了：[DLL劫持漏洞 \| Yang Hao's blog](https://yanghaoi.github.io/2021/11/18/dll-jie-chi-lou-dong/)、[Automating DLL Hijack Discovery. A dive into Windows DLLs, DLL… \| by Justin Bui \| Posts By SpecterOps Team Members](https://posts.specterops.io/automating-dll-hijack-discovery-81c4295904b0)。
-1. 看[有知有行投资第一课](https://youzhiyouxing.cn/curriculum/lessons)。
+1. 看 [有知有行投资第一课](https://youzhiyouxing.cn/curriculum/lessons)。
 - 钱本身不是财富，货币本质上是用来交换的中间物，由于其通用性也常被大家伙当作衡量财富的标准。如果以货币量衡量，现代人类社会的财富一直在不断地增长，然而不能仅仅凭借货币量来衡量人类社会的财富——货币背后的资源、产品、服务才是最重要的。
 - 如果我们以资源、产品、服务这些实际价值来衡量的话，大多数人也会认同现代（包括近现代）是一个所谓财富大跃迁的时代，科学的进步、工业化、信息化大大增长了财富增加的速度。在这种背景下，我等一般人能够通过投资来赚钱才成为一种可能的事。否则就是经济学家的那个笑话了：看到地上有十块钱不捡，因为如果有赚钱的机会话，前人一定已经赚过了。在总量不变的情况下有赚必有亏，而亏的大概率是我等没什么知识的普通人。当然，也有人认为现代财富增长的速度并没有那么快——许多我们以为的价值可能只不过是吹出来的泡沫。
 - 不管怎么说，在创造财富的过程中，很大一部分的财富是以公司（具体来说，现代股份制公司）的形式生产和创造出来的。从荷兰的东印度公司（1602 年）开始，公司就开始通过售卖自己的股权来筹集资金，而股东则可以享受公司的分红。一个公司的股价是随着市场波动变化的——投资者既按照自己对公司价值的预期（即公司给他回报的分红多少）而购入他的股票，也可以根据市场对公司价值的预期而选择购入或抛出股票（即赚其他投资人的钱）。
@@ -53,9 +53,9 @@ search: false
 ### 2025-7-7
 1. 看完了《摇滚乃是淑女的爱好》，看到最后主角乐队薄纱了现充乐队，用执着的东西打败了浅薄的东西，还是挺感动的。
 2. 学习了 Linux 的 Buddy 内存管理机制，现在终于看得懂了。
-- 最好的资料是官方文档：[Memory Management — The Linux Kernel documentation](https://docs.kernel.org/admin-guide/mm/index.html)，我也对照着 [Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging 这篇论文](https://comsec-files.ethz.ch/papers/rubicon_eurosp25.pdf) 以及 [CVE-2022-27666: Exploit esp6 modules in Linux kernel 这篇博客](https://etenal.me/archives/1825)学习。
+- 最好的资料是官方文档：[Memory Management — The Linux Kernel documentation](https://docs.kernel.org/admin-guide/mm/index.html)，我也对照着 [Rubicon: Precise Microarchitectural Attacks with Page-Granular Massaging 这篇论文](https://comsec-files.ethz.ch/papers/rubicon_eurosp25.pdf) 以及 [CVE-2022-27666: Exploit esp6 modules in Linux kernel 这篇博客](https://etenal.me/archives/1825) 学习。
 3. 继续学习 OpenC910 中的 smart_run SoC，基本搞懂了总线互联的拓扑，原来 SRAM 才是主角。
-4. 更新了博客的[友链界面](/links/)，现在可以自动parse YAML格式的数据变成友链卡片了。
+4. 更新了博客的 [友链界面](/links/)，现在可以自动parse YAML格式的数据变成友链卡片了。
 
 ### 2025-7-8
 1. 学习了 Single Error Correcting 和 Double Error Detecting Code 的原理，当年的图灵奖，太天才了。
@@ -70,8 +70,8 @@ search: false
 - 用的是 [Algolia](https://www.algolia.com/) 的服务，需要先注册账号，然后把博客内容上传到自己的数据库中，最后在博客的前端中实现一个搜索框，向 Algolia 后端发送请求。
 - 将博客内容上传到服务器可以使用 [GitHub - algolia/jekyll-algolia: Add fast and relevant search to your Jekyll site](https://github.com/algolia/jekyll-algolia) 这个插件（别的静态网页生成框架应该也有类似的插件可以用），虽然已经停止维护了，但 jekyll 本身并不经常大更新所以这个插件现在和未来一段时间应该还是可用的。插件的官方文档和教程已经挂了，可以访问 [Algolia for Jekyll \| Add fast and relevant search to your Jekyll site](https://deepakmahakale.com/jekyll-algolia/) 这个网友自己搭的镜像站阅读。
 - 集成到前端中还是比较繁琐的，我拜托 claude 帮我写了一下，简单用用还是足够的。
-1. 继续学习 OpenC 910 中的 smart_run SoC。发现了[玄铁处理器的Linux移植](https://zhuanlan.zhihu.com/p/655723549)这个系列博客，是母校智能体系架构与开源芯片实验室的，实在是太有技术了，目前只看了第一章，后面技术细节太丰富了有机会再看吧。
-2. 读了[关于财务自由若干问题的实践与思考 - 纯牛马的救赎](https://mp.weixin.qq.com/s/iM4AGQ5vLYGdf2cfNdwmiQ)，觉得作者对财务自由的理解还是很有启发性的。作者追求的财富自由并不仅仅是财富，而是建立在对自己的了解基础上的、一种自己适合和喜欢的生活状态，或者说是一种逐渐探索志趣，逐渐探索自在愉悦的生活方式。作者关于开源节流两方面的论述也挺有道理的。
+1. 继续学习 OpenC 910 中的 smart_run SoC。发现了 [玄铁处理器的Linux移植](https://zhuanlan.zhihu.com/p/655723549) 这个系列博客，是母校智能体系架构与开源芯片实验室的，实在是太有技术了，目前只看了第一章，后面技术细节太丰富了有机会再看吧。
+2. 读了 [关于财务自由若干问题的实践与思考 - 纯牛马的救赎](https://mp.weixin.qq.com/s/iM4AGQ5vLYGdf2cfNdwmiQ)，觉得作者对财务自由的理解还是很有启发性的。作者追求的财富自由并不仅仅是财富，而是建立在对自己的了解基础上的、一种自己适合和喜欢的生活状态，或者说是一种逐渐探索志趣，逐渐探索自在愉悦的生活方式。作者关于开源节流两方面的论述也挺有道理的。
 3. 基于 [GitHub - allejo/jekyll-toc: A GitHub Pages compatible Table of Contents generator without a plugin or JavaScript :octocat:](https://github.com/allejo/jekyll-toc) 给博客文章加了目录。前端也是靠 Claude 写的，我爱 AI。
 
 ### 2025-7-10
@@ -82,7 +82,7 @@ search: false
 1. 把要设计的加密模块的功能和流程拆分了一下，分出了几个子模块来。似乎设计整个模块也不像想象中的那么难了。
 2. 继续看 Buddy System 源码，感觉内核这种项目也不是很恐怖了，毕竟也是人类维护的。网上相关的代码解读还挺多的，比如 [Memory Management \| What is the Utopian World!](https://utopianfuture.github.io/kernel/Memory-Management.html)、[3.2.4 Buddy System(伙伴系统) \| Linux核心概念详解](https://s3.shizhz.me/linux-mm/3.2-wu-li-nei-cun/3.2.4-buddy-system-huo-ban-xi-tong)，不过我感觉在了解了大致的机制以后自己结合 AI 看源码比阅读这些写好的博客要好，理解速度更快，而且可以自己发掘感兴趣的细节。
 3. 搭了一个简单的 Folo Webhook to Telegram 服务，可以收集安全新闻和博客推送了。
-4. 发现 [《东方幼灵梦》](https://www.bilibili.com/video/BV1r3411j7Qe)和[《东方灵灵梦》](https://www.bilibili.com/video/BV1Hm4y1d7e4)都有人做了高清重置版，看了一集就又眼泪水哒哒滴了😢
+4. 发现 [《东方幼灵梦》](https://www.bilibili.com/video/BV1r3411j7Qe) 和 [《东方灵灵梦》](https://www.bilibili.com/video/BV1Hm4y1d7e4) 都有人做了高清重置版，看了一集就又眼泪水哒哒滴了😢
 
 ### 2025-7-12
 1. 学习 Linux 音频软件栈，看到这篇博客讲得还可以（有的地方讲得很浅，在 AI 辅助之下阅读会好一些）：[Making Sense of The Audio Stack On Unix](https://venam.net/blog/unix/2021/02/07/audio-stack.html)。但是还是没有搞懂为什么我的 Thinkpad X1C gen13 Fedora 没办法正常使用耳机，我已经使用了最新的内核和 SoF 固件版本了。
@@ -90,7 +90,7 @@ search: false
 
 ### 2025-7-13
 1. 继续研究为什么笔记本 Linux 没办法用耳机，失败。一直以来俺的理想都是理解计算机这个黑盒在背后是如何工作的。现在在以 Linux 为契机学习音频系统的时候，真的有感觉到抽象层的伟大，将无数复杂的细节都隐藏了起来。物理的声卡提供了各种配置寄存器，在固件驱动下，变成 Linux 内核音频模块 ALSA 所提供的抽象的声卡接口。在用户空间，各种声音服务器（PulseAudio、PipeWure）又基于 ALSA 提供的接口，为 Linux 桌面提供了统一管理的功能。应用开发者只需要基于一些接口库，向这些音频服务器发赛音频，就可以简单地完成音频播放的功能。这其中有着一般路人难以想象的工程量，也因此我不得不佩服程序员们合作的力量。但我还是不知道我的耳机为什么不能用，感觉是固件的问题。
-2. 昨天和今天一通乱搞把 PulseAudio 搞爆炸了，还好按照[reddit上的教程](https://www.reddit.com/r/pop_os/comments/n82egy/pulseaudio_failed_to_create_sink_input_sink_is/)修好了。Average Linux User...
+2. 昨天和今天一通乱搞把 PulseAudio 搞爆炸了，还好按照 [reddit上的教程](https://www.reddit.com/r/pop_os/comments/n82egy/pulseaudio_failed_to_create_sink_input_sink_is/) 修好了。Average Linux User...
 
 ### 2025-7-14~15
 1. 和溴化锂一起装了台机。
@@ -106,9 +106,9 @@ search: false
 
 ### 2025-7-18
 1. 在 RISC-V 中国峰会的各个场之间来回窜，把和安全相关的都听了下。目前的 RISC-V 的 TEE 还在推进生态的过程中，标准和技术都还在不断更新，比如 [smmtt](https://github.com/riscv/riscv-smmtt) 还刚刚出了一个新版（指今年二月更新了 v0.3.0）。
-- 有人在把 OPTEE 迁移到 RISC-V 上以支持 GP 标准的 TA（SiFive、芯来 Nuclei），有人在基于 CoVE 标准开发 TEE 架构（玄铁），Intel 在将他们的 x86 IoT 场景 hypervisor [ACRN™](https://projectacrn.org/)迁移到 RISC-V CoVE 上（[acrn-riscv](https://github.com/intel/acrn-riscv)）。当然还有知名的 Penglai，可惜时间冲突了没去听夏老师的分享。
+- 有人在把 OPTEE 迁移到 RISC-V 上以支持 GP 标准的 TA（SiFive、芯来 Nuclei），有人在基于 CoVE 标准开发 TEE 架构（玄铁），Intel 在将他们的 x86 IoT 场景 hypervisor [ACRN™](https://projectacrn.org/) 迁移到 RISC-V CoVE 上（[acrn-riscv](https://github.com/intel/acrn-riscv)）。当然还有知名的 Penglai，可惜时间冲突了没去听夏老师的分享。
 - 对于开发者和厂商来说，选项还挺多的；不过对于我们搞安全的来说，部署到什么系统上才是重点，毕竟攻击需要考虑攻击的收益。目前看来，RISC-V 的 TEE 并没有部署到什么现实中的应用上。但是我们可以简单估计一下它们的使用场景，其中嵌入式、健康计算、车控会比较多，其次是 AI、云计算领域。
-- 尽管 RISC-V 目前主要推动的是 AI 主题，但我觉得 AI 的攻击面相比传统安全要少得多，TEE 用来保护 AI 目前来看更多还是噱头作用。而在云计算这块，或者说整个桌面和服务器领域，RISC-V 距离赶上 x86 差得不是一星半点，就不提了。下面这张图是今天超睿科技展示的“世界上第一颗桌面级 RISC-V CPU”：![](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202507182219227.png)难道真的要赶上 x86 了吗！在交大 tcloud 实验室的校友对这颗 CPU 做的[评测](https://zhuanlan.zhihu.com/p/1923399170653398232)中提到，UR-DP1000单核性能达到了SPECInt2006 10.4/GHz 和 SPECfp2006 12.0/GHz 的水平，ChatGPT 说这个成绩属于*极高的水平，远远超出大多数普通桌面处理器（即便是许多高端消费者级处理器）*。可惜，主频只有 2.23GHz 的话，乘上去之后还是离现在的 x86 桌面处理器有差距啊！
+- 尽管 RISC-V 目前主要推动的是 AI 主题，但我觉得 AI 的攻击面相比传统安全要少得多，TEE 用来保护 AI 目前来看更多还是噱头作用。而在云计算这块，或者说整个桌面和服务器领域，RISC-V 距离赶上 x86 差得不是一星半点，就不提了。下面这张图是今天超睿科技展示的“世界上第一颗桌面级 RISC-V CPU”：![](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202507182219227.png)难道真的要赶上 x86 了吗！在交大 tcloud 实验室的校友对这颗 CPU 做的 [评测](https://zhuanlan.zhihu.com/p/1923399170653398232) 中提到，UR-DP1000单核性能达到了SPECInt2006 10.4/GHz 和 SPECfp2006 12.0/GHz 的水平，ChatGPT 说这个成绩属于*极高的水平，远远超出大多数普通桌面处理器（即便是许多高端消费者级处理器）*。可惜，主频只有 2.23GHz 的话，乘上去之后还是离现在的 x86 桌面处理器有差距啊！
 - 也有厂商在搞安全协处理器（[CryptoManager RT-6xx Root of Trust \| Security IP - Rambus](https://www.rambus.com/security/root-of-trust/rt-6xx/)）把安全攸关的任务交给协处理器完成，类似把矩阵计算交给 NPU 或者 GPU。不过这种架构也有天生的弱点，我们知道“一条链的强度取决于其最为脆弱的一环”，在安全协处理器的场景下，这一环就会变成 CPU 本身以及其与安全协处理器通信的链路。
 1. 巴别塔圣歌真好玩。SHENZHEN I/O 太好玩了。
 
@@ -124,7 +124,7 @@ search: false
 ### 2025-7-22
 1. 又和溴化锂和 LoboQ1ng 和 M1aoo0bin 装了台机。
 2. 继续复现 Rubicon（都这么多天了，疑似效率有点太低了），发现 block merge 这一部分作者根本都没在代码里实现... 哥们有点太偷懒了！
-3. 读了[安全隔区 - 官方 Apple 支持 (中国)](https://support.apple.com/zh-cn/guide/security/sec59b0b31ff/web)，是《Apple 平台安全保护》的一章。发现基于完整性树的内存完整性保护在现在的苹果设备当中还是非常广泛地部署了的，于是为自己的内存加密项目感到欣慰。有空可以找一些逆向分析苹果设备安全机制的论文看看，有点感兴趣。
+3. 读了 [安全隔区 - 官方 Apple 支持 (中国)](https://support.apple.com/zh-cn/guide/security/sec59b0b31ff/web)，是《Apple 平台安全保护》的一章。发现基于完整性树的内存完整性保护在现在的苹果设备当中还是非常广泛地部署了的，于是为自己的内存加密项目感到欣慰。有空可以找一些逆向分析苹果设备安全机制的论文看看，有点感兴趣。
 4. 学习了 arch 上打软件包的方法，学会把 AUR 上的仓库 clone 下来自己改改安装了。
 
 ### 2025-7-23
@@ -176,7 +176,7 @@ search: false
 
 接下来一长段时间要专心做项目，不得不放弃一些自由探索的时间了，要把主要的精力放在硬件设计领域。
 
-1. 学习了 Ascon-128 算法，是一个基于海绵结构的加密认证（或者哈希）块密码算法，在硬件领域非常适合实现，而且很方便就可以支持抗侧信道的特性。[轻量级密码算法Ascon原理详解 - 知乎](https://zhuanlan.zhihu.com/p/576265874)这篇文章写得还不错。
+1. 学习了 Ascon-128 算法，是一个基于海绵结构的加密认证（或者哈希）块密码算法，在硬件领域非常适合实现，而且很方便就可以支持抗侧信道的特性。[轻量级密码算法Ascon原理详解 - 知乎](https://zhuanlan.zhihu.com/p/576265874) 这篇文章写得还不错。
 
 ### 2025-8-6
 1. 给 VSCode 配置了 Vim 插件，而且支持自动输入法切换（[这个项目有说明如何开启这个功能](https://github.com/daipeihust/im-select)），挺好用的。
@@ -206,19 +206,19 @@ search: false
 2. 终于，切实地推进了一点项目，并感到之后的部分也没有我想象得那么难了。
 
 ### 2025-8-13
-1. LLM 告诉我项目可能会涉及多时钟域，所以我学习了[【高级数字电路】跨时钟域/CDC设计方法总结](https://zhuanlan.zhihu.com/p/598631863)。
+1. LLM 告诉我项目可能会涉及多时钟域，所以我学习了 [【高级数字电路】跨时钟域/CDC设计方法总结](https://zhuanlan.zhihu.com/p/598631863)。
 - 多时钟域最头疼的问题就是，如果时钟并非是倍数关系，那么输入输出更新时，在各自时钟内的相位差是不确定的。这会导致亚稳态（在接收方处于上升沿更新数据的区间内时，发送方恰好正在更新数据，使得接受方接收不稳定的数据）、数据漏采（慢速接收者采集快信号）、同步失序（发送方的一组信号先后 available，导致接收方先后接收更新）的问题。对于亚稳态，只能通过在路径上增加几个缓冲寄存器来使数据稳定下来（处于亚稳态的寄存器会在一段时间后恢复稳定），但可惜的是这些缓冲寄存器只能使其稳定而不能确保其正确。对于数据漏采，要么采用Open-Loop方法，强行使输出的数据保持多个周期；要么采用Close-Loop方法，使用握手信号来确保数据被接收。对于同步失序，可以使用同步、异步 FIFO 等各种方法，百花齐放（具体看文章细节）。
 - 如果时钟分频得到的倍数关系，那么慢速的一方在上升沿时快速的一方肯定也处于上升沿，他们之间只需要简单的握手协议以防止漏采就可以了。
 
 ### 2025-8-14
-1. 在[一生一芯的AXI协议介绍](https://ysyx.oscc.cc/docs/2407/b/1.html#%E4%B8%9A%E7%95%8C%E4%B8%AD%E5%B9%BF%E6%B3%9B%E4%BD%BF%E7%94%A8%E7%9A%84%E6%80%BB%E7%BA%BF-axi%E5%8D%8F%E8%AE%AE%E5%AE%B6%E6%97%8F)中，介绍了握手的死锁和活锁问题。[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/) 里面对握手涉及的信号进行了规范，以防止锁的出现：
+1. 在 [一生一芯的AXI协议介绍](https://ysyx.oscc.cc/docs/2407/b/1.html#%E4%B8%9A%E7%95%8C%E4%B8%AD%E5%B9%BF%E6%B3%9B%E4%BD%BF%E7%94%A8%E7%9A%84%E6%80%BB%E7%BA%BF-axi%E5%8D%8F%E8%AE%AE%E5%AE%B6%E6%97%8F) 中，介绍了握手的死锁和活锁问题。[ARM IHI0022 手册](https://developer.arm.com/documentation/ihi0022/latest/) 里面对握手涉及的信号进行了规范，以防止锁的出现：
 - 对于死锁，在 A3.5 Dependencies between channel handshake signals 中，要求只有数据的接收方能够等待发送方置 valid 信号而置 ready，反之则不行。因此在一生一芯文档的例子中，“master 在等 slave 将 ready 置 1 后, 才将 valid 置 1” 这一行为是不允许的。
 - 对于活锁，在 A3.3 中对各个 valid 信号的说明中，都有说明 "VALID must remain asserted until the rising clock edge after the Subordinate asserts the READY signal"，因此例子中 “因为上一个周期握手失败, master 在这个周期将 valid 置 0”这一行为是不允许的。
 2. 知道了 git 的 `stash` 功能，可以暂存现在没有 staged 的修改，然后使用 `git stash pop` 恢复，非常适合临时 checkout 到一个以前的分支、或者在以前的 commit 上对代码做了 fix 想同步到最新 commit 的场景。
 
 ### 2025-8-15
 1. 在硬件设计领域差分测试真的非常有用，在设计加密引擎的时候可以用波形图快速比对实现是否正确。
-2. 之前在 RISC-V 峰会和两个哥们聊天，听他们说计算所做了一个内存监听卡，终于给我找到资里料了：[HMTT v4.3： The latest HMTT version for DDR4](https://asg.ict.ac.cn/hmtt/design/hmtt_v4/202504/t20250412_524222.html)、还有[关于HMTT的声明-包云岗](https://zhuanlan.zhihu.com/p/8760007689)。现在这张卡只能监听并记录总线上的地址信息，还没有实现数据的监听和记录，因此距离被拿来作外挂还是有点远。但是这种设备的存在就说明了也可以有监听数据的设备存在，所以内存加密真的是有场景的！
+2. 之前在 RISC-V 峰会和两个哥们聊天，听他们说计算所做了一个内存监听卡，终于给我找到资里料了：[HMTT v4.3： The latest HMTT version for DDR4](https://asg.ict.ac.cn/hmtt/design/hmtt_v4/202504/t20250412_524222.html)、还有 [关于HMTT的声明-包云岗](https://zhuanlan.zhihu.com/p/8760007689)。现在这张卡只能监听并记录总线上的地址信息，还没有实现数据的监听和记录，因此距离被拿来作外挂还是有点远。但是这种设备的存在就说明了也可以有监听数据的设备存在，所以内存加密真的是有场景的！
 3. Synopsys 家的学习版软件，如果想要在非他们官方支持的系统（RedHat Linux、CentOS）上装，实在是太麻烦了。。。
 
 ### 2025-8-16~17
@@ -243,7 +243,7 @@ search: false
 
 ### 2025-9-18~25
 1. 刚刚开学，事情比较多！买了辆电动车（九号A2Z 40，解锁方式特别高级，只要蓝牙连上的情况下坐上车就自动解锁了。感觉可以有时间试试蓝牙中继攻击）、买了学校游泳馆年卡（1500一年还挺贵的，每个教学周游泳2.5次才能回本）等等。
-2. 加入了 0ops，准备近期先学习基础的内核 PWN 知识。主要是跟着[A3的内核利用基础](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I)进行复现，下面简单记录一下：
+2. 加入了 0ops，准备近期先学习基础的内核 PWN 知识。主要是跟着 [A3的内核利用基础](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I) 进行复现，下面简单记录一下：
 - 内核利用的一种基础模式：先在内核态进行提权（执行 `commit_creds(init_cred)`），然后回到用户态拿shell。
 - 在正常通过 `int3` 指令进入内核时（老式系统调用），硬件会在切换到内核栈以后自动 push 一些寄存器上去，包括`cs`、`ss`、`rflags`、`rsp`、`rip`等；与之对应，在 iretq 指令返回用户态时，硬件会自动 pop 这些寄存器。通常在内核态执行完提权代码后，可以构造一组栈上的寄存器状态让 `iretq` 去返回，这些状态的合法值可以通过在用户态时进行 `save_status` 拿到。（另外，现代的系统调用 `syscall` 指令就不会把一堆寄存器压栈（甚至都不切换栈），只是把状态保存在寄存器中（RIP->RCX, RFLAGS->R11），因此更轻量、更快；与其对应的是 `sysret` 指令。由于 `sysret` 依赖的状态控制起来不方便（涉及到很多通用和非通用寄存器，而 `iretq` 只需要控制栈就好了），所以一般 PWN 不使用 `sysret` 返回用户态）。
 - 为了缓解 meltdown 漏洞，现代内核普遍开启了 KPTI 保护，对用户态和内核态分开使用不同的页表，使用户态无法访问内核态的内存空间（反之还是可以的，但是存在 SMEP 和 SMAP 保护）。Linux 内核对于 KPTI 的实现非常巧妙，两张页表的顶层节点在物理内存中是相邻的（内核页表在低地址处、用户页表在高地址处），因此切换页表时只需要将 CR3 寄存器（负责存储页表指针）的第13位取反即可。对于开启了 KPTI 的系统，攻击者想要返回用户态时，必须先切换到用户页表（将 CR3 的第13位取反），然后才能执行 `iretq` 返回用户态，否则会因为页表不对而导致内核 panic。这里需要用到 `swapgs_restore_regs_and_return_to_usermode` 作为 gadget，他会帮我们切换页表并执行 `iretq`。具体来说，需要布置出以下这个栈布局：
@@ -257,7 +257,7 @@ search: false
     user_sp
     user_ss
   ```
-- 有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见[这个commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14)），可以利用栈上的 `pt_regs` 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 `0xffff888000000000`。具体见我 kgadget 的 exp（还没传到网上）。
+- 有这样一种场景：你已经找到了内核中的漏洞，但无法在内核空间布置你的数据。在古早的linux版本（2021年以前，见 [这个commit](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=eea2647e74cd7bd5d04861ce55fa502de165de14)），可以利用栈上的 `pt_regs` 结构体来布置数据，但已经被修了。ret2dir 是指在用户空间用 mmap 进行喷射，比如喷射 ROP 链，然后在内核态盲狙线性映射区虚拟地址的中后半部分。线性映射区的地址在开启 KASLR 以后也会随机变化，如果开了 KASLR 就需要提前泄漏地址（这个区域和 kernel text 偏移大概应该是需要分开泄漏的？不过我还没有确认过），但没有随机化时就是 `0xffff888000000000`。具体见我 kgadget 的 exp（还没传到网上）。
 
 ### 2025-9-26~28
 1. 我又研究了一下怎么用 buildroot 搭内核题环境（踩了巨多坑），见 [Kernel #0: 环境配置](https://www.cameudis.com/2025/09/28/Kernel-0.html)。
@@ -268,8 +268,8 @@ search: false
 
 ### 2025-9-30
 
-1. 了解了一下内存的具体机制（作为PWN手终于补齐了一点相关知识吗）。参考了[这个视频 from Branch Education](https://www.bilibili.com/video/BV1vP411c7pt)。
-- DDR5 内存条通常在主板上是双通道的（channel），每个通道有两个 DIMM 插槽（slot）。一个通道上除了有两对 32bits 的数据线（共同组成 64bits 的内存读写大小基本单位）（两个 sub-channel）外，还有许多其他的线负责元信息的传递，比如有地址和命令通路的 CA Bus（Address & Command Bus）（指定行、列、bank、bank group、rank、行列选通、写使能）、时钟和同步相关的线、错误报告的线、功耗管理线（PMIC，管理电压调节和功耗）、SPD线（Serial Presence Detect，每一颗 DIMM 都会带 EEPROM 存储芯片负责保存内存条的基础参数，包括大小、频率、时序、厂商、序列号等信息）等。在 DDR5 中，SPD 进化成了 SPD Hub，集成了温度传感器、功耗管理，就类似于一个元数据管理接口了。[BadRAM 攻击](https://badram.eu/)就利用了这个 SPD 芯片，通过修改里面的内存大小信息欺骗 CPU 造成 Memory Alias 从而攻破了 TEE。这种修改除了可以进行物理攻击达成外，也可以通过软件攻击：如果内存条的 SPD 芯片没有写保护（厂商没有将其锁定）的话，root 权限用户就可以直接修改 SPD 芯片中的内容。
+1. 了解了一下内存的具体机制（作为PWN手终于补齐了一点相关知识吗）。参考了 [这个视频 from Branch Education](https://www.bilibili.com/video/BV1vP411c7pt)。
+- DDR5 内存条通常在主板上是双通道的（channel），每个通道有两个 DIMM 插槽（slot）。一个通道上除了有两对 32bits 的数据线（共同组成 64bits 的内存读写大小基本单位）（两个 sub-channel）外，还有许多其他的线负责元信息的传递，比如有地址和命令通路的 CA Bus（Address & Command Bus）（指定行、列、bank、bank group、rank、行列选通、写使能）、时钟和同步相关的线、错误报告的线、功耗管理线（PMIC，管理电压调节和功耗）、SPD线（Serial Presence Detect，每一颗 DIMM 都会带 EEPROM 存储芯片负责保存内存条的基础参数，包括大小、频率、时序、厂商、序列号等信息）等。在 DDR5 中，SPD 进化成了 SPD Hub，集成了温度传感器、功耗管理，就类似于一个元数据管理接口了。[BadRAM 攻击](https://badram.eu/) 就利用了这个 SPD 芯片，通过修改里面的内存大小信息欺骗 CPU 造成 Memory Alias 从而攻破了 TEE。这种修改除了可以进行物理攻击达成外，也可以通过软件攻击：如果内存条的 SPD 芯片没有写保护（厂商没有将其锁定）的话，root 权限用户就可以直接修改 SPD 芯片中的内容。
 - DRAM 的底层是电容器，通过充放电来存储数据。多个电容（最小单位，也称为 cell）组成一行（row），多个行组成一个 bank。当我们读写数据时，首先目标行的 wordline 会被激活（行选通），使电容与位线（bitline）间的晶体管导通，这样数据（电压）就会传递出来；在这个过程中，感应放大器（sense amplifier）会检测位线的电压并放大，将整根位线的电压拉高/拉低到标准值，从而顺便完成电容的电荷补充（这也就是刷新的原理）。电容需要定期刷新，利用一些统计学方法可以得到我们应该隔多久刷新一个 bank 的数据（比如 64ms）。一行其实是很大的，一个示例的大小是 8192 bits (2^13)，但我们一次只会用到其中的很小一部分（8 bits），这是通过将地址的最低几位作为列地址来实现的（列选通）（其实就是一个多路复用器）。同属于一个 sub-channel 的多个 chip 共享了地址和指令线，但有自己独立的数据线，4 个 8 bits 的数据线共同组成了完整的 32 bits 数据线。另：在上述提到的一些数据中，bank group、bitline、wordline 的数量都会随着世代和总容量的不同产生很大的差异。
 
 ## 2025-10
@@ -389,15 +389,15 @@ search: false
 
 ### 2025-10-31
 
-1. 学习了 SLUB 分配器的基础，主要参考 [Linux 内核内存管理浅析 III - Slub Allocator](https://arttnba3.cn/2023/02/24/OS-0X04-LINUX-KERNEL-MEMORY-6.2-PART-III/) 。
+1. 学习了 SLUB 分配器的基础，主要参考 [Linux 内核内存管理浅析 III - Slub Allocator](https://arttnba3.cn/2023/02/24/OS-0X04-LINUX-KERNEL-MEMORY-6.2-PART-III/)。
 - Linux 的主要的内存分配系统是 Buddy System，最小的分配单元是页；slub 分配器是小对象的分配系统，和 ptmalloc 的差异是 slub 分配器为分配“某种特定大小”的结构体做了特化。在 ptmalloc 中，所有大小的堆块都处于同一个堆里面，因此有了复杂的堆块寻址和 size 记录机制，需要在每个堆块前面记录 metadata；在 slub 分配器中，一个 slub（对应一个页或多个连续页，或者说一个 `folio`）只用来分配一种特定大小、甚至一种特定结构体的内存，因此在堆块处不用记录什么 size metadata，也不需要什么复杂的双链表机制，只需要用一个单链表把 freelist 串起来就行了。
-- 一个 slub 对应 $$2^n$$ 个连续页，对应的 `struct slab` 结构体[复用了 `folio` 结构体](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L122)，因此内核中可以方便地从一个 slub 中对象得到地址计算出其所属的 slab 结构体的地址（比如说借助 [`virt_to_slab`](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L211)）。之所以 slub 分配器的却使用 `struct slab` 作为结构体名，是因为本来这套分配器就叫做 slab，现在的 slub 分配器是改进/优化版本的 slab 分配器，所以结构体还是复用了以前的名字。（[这个 Robert Love 的 quora 回答](https://www.quora.com/Linux-Kernel/What-are-the-factors-in-choosing-among-the-different-memory-allocators-in-the-Linux-kernel)简单地介绍了 slab、slob 和 slub 分配器的不同）
-- 之前提到 slub 分配器会为某个大小甚至某个特定结构体维护独立的分配器，[`kmem_cache` 结构体](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slub_def.h#L98)就承担了这个重任。一个 `kmem_cache` 用来分配一种特定的对象，`struct kmem_cache` 中就记录了 `size`、`object_size`、`allocflags`、`ctor`（初始化函数）等对象相关信息；同时，`kmem_cache` 也会记录自己的所有 slab 们（以及他们的信息，比如 `struct kmem_cache_order_objects oo` 描述了一张 slab 上的对象数量和 slab 的 order），但这些 slab 会分成两部分，一部分是 per-cpu 的（放在 `kmem_cache_cpu` 结构体中），另一部分是各种核都可以用的（放在 `kmem_cache_node` 结构体中，又分为不同的 node，这里的 node 指的是 NUMA node，见 [What is NUMA?](https://www.kernel.org/doc/html/latest/mm/numa.html)）。
+- 一个 slub 对应 $$2^n$$ 个连续页，对应的 `struct slab` 结构体 [复用了 `folio` 结构体](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L122)，因此内核中可以方便地从一个 slub 中对象得到地址计算出其所属的 slab 结构体的地址（比如说借助 [`virt_to_slab`](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L211)）。之所以 slub 分配器的却使用 `struct slab` 作为结构体名，是因为本来这套分配器就叫做 slab，现在的 slub 分配器是改进/优化版本的 slab 分配器，所以结构体还是复用了以前的名字。（[这个 Robert Love 的 quora 回答](https://www.quora.com/Linux-Kernel/What-are-the-factors-in-choosing-among-the-different-memory-allocators-in-the-Linux-kernel) 简单地介绍了 slab、slob 和 slub 分配器的不同）
+- 之前提到 slub 分配器会为某个大小甚至某个特定结构体维护独立的分配器，[`kmem_cache` 结构体](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slub_def.h#L98) 就承担了这个重任。一个 `kmem_cache` 用来分配一种特定的对象，`struct kmem_cache` 中就记录了 `size`、`object_size`、`allocflags`、`ctor`（初始化函数）等对象相关信息；同时，`kmem_cache` 也会记录自己的所有 slab 们（以及他们的信息，比如 `struct kmem_cache_order_objects oo` 描述了一张 slab 上的对象数量和 slab 的 order），但这些 slab 会分成两部分，一部分是 per-cpu 的（放在 `kmem_cache_cpu` 结构体中），另一部分是各种核都可以用的（放在 `kmem_cache_node` 结构体中，又分为不同的 node，这里的 node 指的是 NUMA node，见 [What is NUMA?](https://www.kernel.org/doc/html/latest/mm/numa.html)）。
 - [`kmem_cache_cpu`](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slub_def.h#L50) 是“快速分配通道”，因为是 per-cpu 的所以支持无锁分配。里面几个关键域包括：`freelist` 指向下一个可用的 object、`slab` 指向所属的 slab 实例、`partial` 是当前 cpu 拥有的半空 slab 组成的链表。当 `freelist` 是一个 null ptr，分配器就知道该换一个 slab 了，于是会从 `partial` 再找一个；如果 `partial` 也空了，那就需要从后备内存池 `kmem_cache_node` 拿 slab。
 - [`kmem_cache_node`](https://elixir.bootlin.com/linux/v6.6/source/mm/slab.h#L776) 是一个 node 拥有的后备 slab 池，里面一些关键域包括：`list_lock` 锁、`partial` 和 `nr_partial` 记录半空 slab、`full` 记录已满的 slab、`nr_slabs` 记录总 slab 数量等等。
-- 内核会出厂自带一些 `kmem_cache`，他们都分为不同的类型（类型 enum 见[这里](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slab.h#L363)）。比如分配 flag 为 `GFP_NORMAL` 的通用内存池 `kmalloc-*`、用于 DMA 的内存池 `kmem-dma-*`等；cgroups 为了限制资源，也会创建自己的内存池 `kmalloc-cg-*`。通过 `ls /sys/kernel/slab/` 可以看到系统上所有活跃的 `kmem_cache` 的具体信息、触发一些操作（比如可以用 `echo 1 > /sys/kernel/slab/dentry/shrink` 强制释放空闲的 slab），也可以用 `cat /proc/slabinfo` 打开汇总的大表格。
+- 内核会出厂自带一些 `kmem_cache`，他们都分为不同的类型（类型 enum 见 [这里](https://elixir.bootlin.com/linux/v6.6/source/include/linux/slab.h#L363)）。比如分配 flag 为 `GFP_NORMAL` 的通用内存池 `kmalloc-*`、用于 DMA 的内存池 `kmem-dma-*`等；cgroups 为了限制资源，也会创建自己的内存池 `kmalloc-cg-*`。通过 `ls /sys/kernel/slab/` 可以看到系统上所有活跃的 `kmem_cache` 的具体信息、触发一些操作（比如可以用 `echo 1 > /sys/kernel/slab/dentry/shrink` 强制释放空闲的 slab），也可以用 `cat /proc/slabinfo` 打开汇总的大表格。
 - `kmem_cache` 复用机制：许多时候内核代码会新建自己的 `kmem_cache`，但如果内核发现可以复用已有的 `kmem_cache`，就会直接将其返回。
-- 内核中有一些关于 SLUB 的加强，相关配置见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L193)。`CONFIG_SLAB_FREELIST_HARDENED` 会将 freelist 指针变成 `ptr ^ ptr_addr ^ kmem_cache->random`，代码见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/slub.c#L494)；`CONFIG_SLAB_FREELIST_RANDOM` 会在初始化 slab 的 freelist 时将顺序打乱（但运行时还是典型的单链表先入先出操作）（说明见[这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L229)）；`CONFIG_RANDOM_KMALLOC_CACHES`（默认不开启）会为同一个类型的对象准备多个 `kmem_cache` ，在分配内存时基于代码地址（没错是 code address）选择其中一个 `kmem_cache` 进行分配，这样可以让攻击者堆喷难度加强一大截（不仅要选对 size 和 flag，还要喷到目标 `kmem_cache` 里去）。
+- 内核中有一些关于 SLUB 的加强，相关配置见 [这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L193)。`CONFIG_SLAB_FREELIST_HARDENED` 会将 freelist 指针变成 `ptr ^ ptr_addr ^ kmem_cache->random`，代码见 [这里](https://elixir.bootlin.com/linux/v6.17/source/mm/slub.c#L494)；`CONFIG_SLAB_FREELIST_RANDOM` 会在初始化 slab 的 freelist 时将顺序打乱（但运行时还是典型的单链表先入先出操作）（说明见 [这里](https://elixir.bootlin.com/linux/v6.17/source/mm/Kconfig#L229)）；`CONFIG_RANDOM_KMALLOC_CACHES`（默认不开启）会为同一个类型的对象准备多个 `kmem_cache` ，在分配内存时基于代码地址（没错是 code address）选择其中一个 `kmem_cache` 进行分配，这样可以让攻击者堆喷难度加强一大截（不仅要选对 size 和 flag，还要喷到目标 `kmem_cache` 里去）。
 2. 调了调 RWCTF2022 Digging into kernel 这道题，主要参考 [Kernel Heap - Arbitrary-Address Allocation](https://arttnba3.cn/2021/03/03/PWN-0X00-LINUX-KERNEL-PWN-PART-I/#0x07-Kernel-Heap-Arbitrary-Address-Allocation)。
 - 内存分配到某个全局变量（或者多个线程可能同时访问）的时候要注意有没有加锁，这样的 Race Condition 很常见。
 - 在内核“堆基址” `page_offset_base + 0x9d000` 处存放着 `secondary_startup_64` 函数的地址，可以用于泄漏出堆基址后泄漏内核基址。
@@ -443,10 +443,10 @@ search: false
 
 ### 2025-11-14
 
-1. 看了谷歌的博客 [Private AI Compute advances AI privacy](https://blog.google/technology/ai/google-private-ai-compute/) ，介绍了谷歌最新推出的Private AI Compute（PAC）的 AI 基础设施框架。这套框架是软硬件结合的安全机制，威胁模型是 Google 自己都不能访问云计算中的用户数据。这种需求在今天是比较关键的，因为用户显然不能在自己的终端设备上运行大模型。
+1. 看了谷歌的博客 [Private AI Compute advances AI privacy](https://blog.google/technology/ai/google-private-ai-compute/)，介绍了谷歌最新推出的Private AI Compute（PAC）的 AI 基础设施框架。这套框架是软硬件结合的安全机制，威胁模型是 Google 自己都不能访问云计算中的用户数据。这种需求在今天是比较关键的，因为用户显然不能在自己的终端设备上运行大模型。
 - 整个 AI 计算流涉及四个主体，互相都通过 [ATLS](http://docs.cloud.google.com/docs/security/encryption-in-transit/application-layer-transport-security?hl=zh-cn) 进行连接（这个协议一般是用来保护谷歌内部设施的 RPC 调用的），包括客户端（手机）、前端服务器、Scalable inference pipeline（运行于 CPU Secure enclave 中，负责调度与分发任务）、Scalable model serving（运行在 Hardened TPU platform 中，负责张量计算）。
 - CPU 上使用的是 TEE 技术（AMD SEV 系列）；TPU（Tensor Processing Unit）上的 hardened TPU platform 机制和传统 TEE 类似，实现了内存逻辑隔离、传统硬件安全防护（可信固件启动）、远端鉴证（Attestation）这些常见机制。Titan 安全芯片会负责安全启动的部分，验证 TPU 上的保护是否开启、固件是否签名等安全要素。这套基础设施是谷歌自己实现的，名为 [Titanium](https://cloud.google.com/blog/products/compute/titanium-underpins-googles-workload-optimized-infrastructure?e=48754805)，从第六代 [Trillium](https://cloud.google.com/blog/products/compute/introducing-trillium-6th-gen-tpus) 开始实现了上述这些安全功能。
-2. 苹果也有过一篇类似的博客 [Private Cloud Compute: A new frontier for AI privacy in the cloud](https://security.apple.com/blog/private-cloud-compute/)，有着相似的威胁模型：保护用户数据不被 Apple 公司的任何员工获取。他们的私有云计算系统命名为Private Cloud Compute (PCC)，其中的节点“使用了与 iphone 相同的硬件安全技术”，包括 [Secure Enclave](https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web) 和 [Secure Boot](https://support.apple.com/guide/security/boot-process-for-iphone-and-ipad-devices-secb3000f149/web)。软件上使用“[Swift on Server](https://www.swift.org/documentation/server/)构建了一个全新的机器学习堆栈，专门用于托管[我们的云端基础模型](https://machinelearning.apple.com/research/introducing-apple-foundation-models)”。用户（手机客户端上的 Apple Intelligence，经过 PCC 客户端包装）的推理请求会采用非对称的端到端加密直接和“已验证有效且经过加密认证的 PCC 节点”进行通信，即直接使用目标 PCC节点的公钥加密数据，因此也只有目标 PCC 节点才能解密数据。
+2. 苹果也有过一篇类似的博客 [Private Cloud Compute: A new frontier for AI privacy in the cloud](https://security.apple.com/blog/private-cloud-compute/)，有着相似的威胁模型：保护用户数据不被 Apple 公司的任何员工获取。他们的私有云计算系统命名为Private Cloud Compute (PCC)，其中的节点“使用了与 iphone 相同的硬件安全技术”，包括 [Secure Enclave](https://support.apple.com/guide/security/secure-enclave-sec59b0b31ff/web) 和 [Secure Boot](https://support.apple.com/guide/security/boot-process-for-iphone-and-ipad-devices-secb3000f149/web)。软件上使用“[Swift on Server](https://www.swift.org/documentation/server/) 构建了一个全新的机器学习堆栈，专门用于托管 [我们的云端基础模型](https://machinelearning.apple.com/research/introducing-apple-foundation-models)”。用户（手机客户端上的 Apple Intelligence，经过 PCC 客户端包装）的推理请求会采用非对称的端到端加密直接和“已验证有效且经过加密认证的 PCC 节点”进行通信，即直接使用目标 PCC节点的公钥加密数据，因此也只有目标 PCC 节点才能解密数据。
 3. 另外还看到了一个该种威胁模型的开源安全框架 [GitHub - openpcc/openpcc: An open-source framework for verifiably private AI inference](https://github.com/openpcc/openpcc)，感觉挺有意思的。
 
 ### 2025-11-15~16
@@ -582,7 +582,7 @@ search: false
 ### 2026-02-04
 
 1. 最近玩了玩 [google/syzkaller](https://github.com/google/syzkaller)，用来 fuzz Linux 内核。Syzkaller 内置了大量 Linux 内核接口（包括系统调用、设备接口如 [/dev/kvm](https://github.com/google/syzkaller/blob/master/sys/linux/dev_kvm.txt)、Netlink 接口如 [NETLINK_XFRM](https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_xfrm.txt) 等）的*描述*，syz-manager 作为中控管理的角色会启动多个 VM，根据这些描述文件变异生成 corpus，从中取出用户态程序在 VM 内部编译运行，并通过 Linux 为用户态 fuzzer 提供的 [KCOV](https://docs.kernel.org/dev-tools/kcov.html) 接口读取覆盖率信息。
-- Syzkaller 的描述依赖人工分析和手写，可能不完整，于是 ChatGPT 给我推了 [f0rm2l1n](https://f0rm2l1n.github.io/) 的论文：[_NLSaber_: Enhancing Netlink Family Fuzzing via Automated Syscall Description Generation](https://link.springer.com/chapter/10.1007/978-3-032-07894-0_19)。Netlink 接口传递的是 TLV 格式（Type, Length, Value）的二进制数据，内核某个子模块的开发者在向用户态提供 Netlink 接口时，会约定好接口需要哪些字段，然后解析发来的二进制数据。读者可以想象成序列化和反序列化。论文对各模块的 Netlink message parsing 部分进行了静态污点分析，通过自动化的方法能更全面地提取出这些模块都通过 Netlink 提供了哪些功能，从而给 kernel fuzzer 提供更多内核接口描述。作者用这些自动生成的描述进行 fuzzing，拿到了 12 个 CVE 编号，其中有五个是可以让攻击者拿到写原语的。作者在 artifacts 中给了其中一个类型混淆漏洞（CVE-2025-22056）的[提权 exp](https://github.com/TroySysSec/NLSaber/tree/main/proof-of-concepts/16_type-confusion_nft_tunnel_obj_geneve_init)。
+- Syzkaller 的描述依赖人工分析和手写，可能不完整，于是 ChatGPT 给我推了 [f0rm2l1n](https://f0rm2l1n.github.io/) 的论文：[_NLSaber_: Enhancing Netlink Family Fuzzing via Automated Syscall Description Generation](https://link.springer.com/chapter/10.1007/978-3-032-07894-0_19)。Netlink 接口传递的是 TLV 格式（Type, Length, Value）的二进制数据，内核某个子模块的开发者在向用户态提供 Netlink 接口时，会约定好接口需要哪些字段，然后解析发来的二进制数据。读者可以想象成序列化和反序列化。论文对各模块的 Netlink message parsing 部分进行了静态污点分析，通过自动化的方法能更全面地提取出这些模块都通过 Netlink 提供了哪些功能，从而给 kernel fuzzer 提供更多内核接口描述。作者用这些自动生成的描述进行 fuzzing，拿到了 12 个 CVE 编号，其中有五个是可以让攻击者拿到写原语的。作者在 artifacts 中给了其中一个类型混淆漏洞（CVE-2025-22056）的 [提权 exp](https://github.com/TroySysSec/NLSaber/tree/main/proof-of-concepts/16_type-confusion_nft_tunnel_obj_geneve_init)。
 - 京东獬豸实验室也为这个 CVE 写过一篇博客：[Netfilter Tunnel 之殇：CVE-2025-22056](https://dawnslab.jd.com/CVE-2025-22056/)。程序员希望计算 `某结构体指针 = 起始指针 + 偏移`，写 C 语言的时候没处理好类型转换，搞成了先把起始指针转换成结构体指针再加偏移，即 `某结构体指针 = (结构体*)起始指针 + 偏移`，实际加的偏移是 `结构体大小 * 偏移`，实际得到的结构体指针被偏移，后续造成溢出读写。
 
 ### 2026-02-06
@@ -637,8 +637,8 @@ search: false
 - 首先是代码签名绕过。苹果有一套用户态代码的签名验证机制叫做 AMFI（AppleMobileFileIntegrity），每次 `execve` （以及 page fault 加载新的代码）时，都会触发内核 AMFI 模块（`AppleMobileFileIntegrity.kext`）对代码进行校验，看看这段代码是否通过某个证书注册过。来自 App Store 的 App 会在安装时将它的 [CDHash](https://developer.apple.com/documentation/endpointsecurity/es_process_t/cdhash)（SHA256 哈希）注册到本地，自行安装的 App 也会通过企业证书或者开发者证书进行签名……但所有没有注册过、被修改过的代码，在默认策略下都会被拒绝执行。实际的校验会由一个系统进程 `/usr/libexec/amfid` 进行，内核模块会向这个 daemon 发起查询请求。为了性能考虑（规避大量的内核用户态切换），在内核侧也会维护一个 TrustCache 存储可信的 CDHash。因此，对于一个越狱工具来说，尤其重要的一点就是绕过或关闭 AMFI，这可以通过攻击 `amfid` 或 amfi.kext 来完成。只有在绕过 AMFI 以后，安装第三方应用和实现 tweak（app hook）才具有讨论空间。
 - 其次是持久化。在通常的安卓 root 中不存在“越狱持久化”的问题，因为大部分时候越狱本来就是通过厂商开放的接口直接解锁 bootloader（也就是关闭签名校验），刷一个 patch 过的内核镜像到硬盘里。iOS 越狱想要做到持久化，不得不面对一整个不可关闭的可信启动链，从 BootRom 到 iboot（bootloader）到内核再到文件系统中的 System 卷（包括系统 framework、daemon 和 launchd 配置等），每一步都有签名校验保护。古早时期 System 卷没有签名保护，可以有所谓的完美越狱（Untethered Jailbreak），即通过修改 System 卷达成持久化，重启之后越狱状态仍然可以保留；有了 SSV（Signed System Volume）保护后，大多越狱方案都只能做到半完美越狱（Semi-untethered Jailbreak）（重启后需要使用设备上的越狱 App 重新越狱）或半不完美越狱（Semi-tethered Jailbreak）（重启后需要连接电脑越狱）了。
 - 再者是内核内部的纵深防护，即 PAC（Pointer Authentication）以及 PPL（Page Protection Layer），使得攻击者极难完全操控内核。PAC 限制了 ROP/JOP、函数指针替换、shellcode 注入这些手法，而 PPL 作为内核中通过硬件拓展隔离出来的一套额外的页表管理系统，也使得攻击者无法通过简单的任意读写原语篡改页表权限。因此，在 iOS 上，“提权”（或者说获取系统服务的权限）比起在内核执行任意代码要简单得多，最近史诗级的 [DarkSword](https://cloud.google.com/blog/topics/threat-intelligence/darksword-ios-exploit-chain) 利用链使用了 7 个 0day，最终也只是做到了 LPE（Local Privilege Escape），通过向一些重要的特权服务注入 js payload 来以它们的权限收集和窃取各种敏感信息。对于越狱而言，DarkSword 这些漏洞还不够。
-- 苹果的 BootROM 是越狱的一个关键战场，如果能够发现它的漏洞、绕过它对后续启动链的校验，就能和安卓一样刷一个 patch 过的内核进去，也可以做到真正的持久化（BootROM 出厂时就完全固化，无法进行修改或修复）。一个经典的漏洞是 A5-A11 芯片的 checkm8，由 [axi0mX](https://github.com/axi0mX) 在 2019 年发现：攻击者可以在 DFU 模式下触发 USB 协议栈漏洞，注入 shellcode 去做一些 patch，然后就能得到一个 pwned DFU mode，可以加载任意 ramdisk 了，这里还有他写的 [checkm8 exp](https://github.com/axi0mX/ipwndfu/blob/master/checkm8.py)。当然，BootROM 的防护也是越来越强，它的固件并不像后续阶段的固件一样有着官方公开[公开下载](https://ipsw.me/)，不过研究员们自己也提取出了[非常多 ROM 固件](https://securerom.fun/)（里面的 SecureROM 就是 BootROM，只是苹果官方喜欢把它叫做 SecureROM）。
-- 最近出的 [vphone-cli](https://github.com/Lakr233/vphone-cli) ，实现流程就和越狱有点像，见 [Building virtual iPhone using VPHONE600AP component of recently released PCC firmware](https://github.com/wh1te4ever/super-tart-vphone-writeup)。
+- 苹果的 BootROM 是越狱的一个关键战场，如果能够发现它的漏洞、绕过它对后续启动链的校验，就能和安卓一样刷一个 patch 过的内核进去，也可以做到真正的持久化（BootROM 出厂时就完全固化，无法进行修改或修复）。一个经典的漏洞是 A5-A11 芯片的 checkm8，由 [axi0mX](https://github.com/axi0mX) 在 2019 年发现：攻击者可以在 DFU 模式下触发 USB 协议栈漏洞，注入 shellcode 去做一些 patch，然后就能得到一个 pwned DFU mode，可以加载任意 ramdisk 了，这里还有他写的 [checkm8 exp](https://github.com/axi0mX/ipwndfu/blob/master/checkm8.py)。当然，BootROM 的防护也是越来越强，它的固件并不像后续阶段的固件一样有着官方公开 [公开下载](https://ipsw.me/)，不过研究员们自己也提取出了 [非常多 ROM 固件](https://securerom.fun/)（里面的 SecureROM 就是 BootROM，只是苹果官方喜欢把它叫做 SecureROM）。
+- 最近出的 [vphone-cli](https://github.com/Lakr233/vphone-cli)，实现流程就和越狱有点像，见 [Building virtual iPhone using VPHONE600AP component of recently released PCC firmware](https://github.com/wh1te4ever/super-tart-vphone-writeup)。
 
 ### 2026-04-10
 
@@ -646,4 +646,4 @@ search: false
 - 联想 Thinkplus FU100 加密 U 盘：根本没加密，拆开后里面是一张存储着明文的 SD 卡。口令（以及指纹）只用来解锁 USB 连接。
 - Netac NetacLockFile 加密软件：只加密了三分之一的文件内容（入选最令人费解的程序大赏），且密钥硬编码。
 - 联想 Thinkplus TSD303 加密 SSD：在校验用户口令时，SSD 会向软件驱动直接发送口令明文，在软件侧完成口令校验。第一次修复后，变成传输一个加密的口令，但密钥是固定的，还是会在软件侧解锁得到口令明文。关键：口令明文不应该出现在内存中！
-- TTD 调试是预先使用工具记录程序的 Trace，然后在这个 Trace 上进行调试（前进或后退），最大的好处是完全不用担心跑飞，而且可以在不重启程序的情况下追踪某个地址的上一次写入（甚至是所有的写入）。记录 Trace 通常有成熟的工具可以做到（比如微软就给 Windows 开发了 [WinDbg TTD](https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/time-travel-debugging-overview)），Binary Ninja 自己的 debugger 给 WinDbg TTD [内置了支持](https://docs.binary.ninja/guide/debugger/dbgeng-ttd.html)（就是用 WinDbg TTD 作为后端），用户可以使用美丽的 Binary Ninja UI 来进行 Windows TTD（也支持 Linux，使用 [rr](https://rr-project.org/) 作为后端，使用方法见[文档](https://docs.binary.ninja/guide/debugger/gdbrsp-ttd.html)）
+- TTD 调试是预先使用工具记录程序的 Trace，然后在这个 Trace 上进行调试（前进或后退），最大的好处是完全不用担心跑飞，而且可以在不重启程序的情况下追踪某个地址的上一次写入（甚至是所有的写入）。记录 Trace 通常有成熟的工具可以做到（比如微软就给 Windows 开发了 [WinDbg TTD](https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/time-travel-debugging-overview)），Binary Ninja 自己的 debugger 给 WinDbg TTD [内置了支持](https://docs.binary.ninja/guide/debugger/dbgeng-ttd.html)（就是用 WinDbg TTD 作为后端），用户可以使用美丽的 Binary Ninja UI 来进行 Windows TTD（也支持 Linux，使用 [rr](https://rr-project.org/) 作为后端，使用方法见 [文档](https://docs.binary.ninja/guide/debugger/gdbrsp-ttd.html)）

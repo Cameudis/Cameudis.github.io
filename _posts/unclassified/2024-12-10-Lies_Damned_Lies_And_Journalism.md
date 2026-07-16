@@ -15,7 +15,7 @@ tags: 杂记
 
 41% 这个数字实在是太震撼了，有一种“医学不存在了”的感觉。我想知道这个数据的出处，于是开始了调查。
 
-首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇[杂志文章](https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf)。
+首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇 [杂志文章](https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf)。
 
 ![image.png](https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102231949.png)
 

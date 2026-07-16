@@ -175,7 +175,7 @@ struct QEMUTimerList {
 };
 ```
 
-在 bss 段有一个数组 `main_loop_tlg[4]`，保存了一些 `QEMUTimerList` 结构体指针，每个 `active_timers` 都指向一个由 `QEMUTimer` 结构体组成的链表。qemu 会遍历这些 `QEMUTimerList` 来检查所有 `QEMUTimer` 有没有超时并调用它们的 callback 函数（也就是调用 `timer->cb(timer->opaque)`，相关源码见[qemu-timer.c - util/qemu-timer.c - Qemu source code (v4.2.1) - Bootlin](https://elixir.bootlin.com/qemu/v4.2.1/source/util/qemu-timer.c#L588)）。
+在 bss 段有一个数组 `main_loop_tlg[4]`，保存了一些 `QEMUTimerList` 结构体指针，每个 `active_timers` 都指向一个由 `QEMUTimer` 结构体组成的链表。qemu 会遍历这些 `QEMUTimerList` 来检查所有 `QEMUTimer` 有没有超时并调用它们的 callback 函数（也就是调用 `timer->cb(timer->opaque)`，相关源码见 [qemu-timer.c - util/qemu-timer.c - Qemu source code (v4.2.1) - Bootlin](https://elixir.bootlin.com/qemu/v4.2.1/source/util/qemu-timer.c#L588)）。
 
 因此，我们可以在通过 `main_loop_tlg` 泄露某个 timerlist 的地址后，劫持它的 `active_timers` 指针并伪造一个 `QEMUTimer` 结构体，从而控制程序调用函数以及参数。
 
