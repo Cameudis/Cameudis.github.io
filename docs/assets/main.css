@@ -2234,11 +2234,9 @@ table td {
 }
 
 .callout__icon {
-  display: inline-grid;
-  width: 20px;
-  height: 20px;
-  place-items: center;
-  border: 1px solid currentColor;
+  display: inline-block;
+  width: 1em;
+  text-align: center;
   font-weight: 700;
   line-height: 1;
 }
