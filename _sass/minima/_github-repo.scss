@@ -4,13 +4,13 @@
   margin: $spacing-unit 0;
   border: 1px solid var(--border-color);
   background: var(--card-bg);
-  box-shadow: 4px 4px 0 var(--brand-dim);
+  box-shadow: 6px 6px 0 var(--brand-dim);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover,
   &:focus-within {
     border-color: var(--brand-color);
-    box-shadow: 6px 6px 0 var(--brand-dim);
+    box-shadow: 8px 8px 0 var(--brand-dim);
     transform: translate(-1px, -1px);
   }
 
@@ -62,6 +62,7 @@
   min-width: 0;
   align-items: center;
   gap: 5px;
+  font-family: "FusionPixel10Prop", sans-serif;
   line-height: 1.35;
 }
 

@@ -133,7 +133,21 @@
   }
 
   function init() {
-    document.querySelectorAll('[data-github-repo]').forEach(load);
+    var cards = document.querySelectorAll('[data-github-repo]');
+    if (!('IntersectionObserver' in window)) {
+      cards.forEach(load);
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        load(entry.target);
+      });
+    }, { rootMargin: '320px 0px' });
+
+    cards.forEach(function (card) { observer.observe(card); });
   }
 
   if (document.readyState === 'loading') {

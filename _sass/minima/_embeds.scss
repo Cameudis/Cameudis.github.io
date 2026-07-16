@@ -48,12 +48,13 @@
   margin: $spacing-unit 0;
   border: 1px solid var(--border-color);
   background: var(--card-bg);
+  box-shadow: 6px 6px 0 var(--brand-dim);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover,
   &:focus-within {
     border-color: var(--brand-color);
-    box-shadow: 5px 5px 0 var(--brand-dim);
+    box-shadow: 8px 8px 0 var(--brand-dim);
     transform: translate(-1px, -1px);
   }
 
@@ -92,6 +93,7 @@
 .link-preview__title {
   overflow: hidden;
   color: var(--heading-color);
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: 1.05em;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -128,14 +130,19 @@
   font-size: $micro-font-size;
 }
 
-.link-preview__favicon { object-fit: contain; }
+.link-preview__site .link-preview__favicon {
+  margin: 0;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
 .link-preview__site-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .link-preview__arrow { margin-left: auto; color: var(--brand-color); }
 
-.link-preview__image {
+.link-preview .link-preview__image {
   width: 180px;
   height: 100%;
   min-height: 138px;
+  margin: 0;
   object-fit: cover;
   grid-column: 2;
   grid-row: 1;

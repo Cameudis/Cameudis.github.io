@@ -3,6 +3,7 @@
 {%- assign preview_host = preview_url_parts[2] | default: preview_url -%}
 <aside class="link-preview"
        data-link-preview="{{ preview_url | escape }}"
+       data-site-url="{{ site.canonical_origin | default: site.url | escape }}"
        data-manual-title="{{ include.title | escape }}"
        data-manual-description="{{ include.description | escape }}"
        data-manual-image="{{ include.image | escape }}"

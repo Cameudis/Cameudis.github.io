@@ -6,6 +6,7 @@ description: >-  # this means to ignore newlines until "baseurl:"
   计算机、安全和其他
 baseurl: ""  # the subpath of your site, e.g. /blog
 url: "https://www.cameudis.com"  # the base hostname & protocol for your site
+canonical_origin: "https://www.cameudis.com"  # stable origin for runtime same-site checks
 twitter_username: cameudis
 github_username:  cameudis
 
@@ -17,7 +18,9 @@ plugins:
 # Bump when changing a cacheable site asset referenced with this version.
 asset_versions:
   footer: "20260715-3"
-  main_css: "20260716-post-footer-width"
+  github_repo: "20260716-lazy-load"
+  link_preview: "20260716-local-metadata-3"
+  main_css: "20260716-card-shadow"
   post: "20260716-source-link-spacing"
 
 # Build output for GitHub Pages (deployed from ./docs on the gh-pages branch)

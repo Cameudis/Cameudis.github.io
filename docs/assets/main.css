@@ -2015,12 +2015,12 @@ table td {
   margin: 40px 0;
   border: 1px solid var(--border-color);
   background: var(--card-bg);
-  box-shadow: 4px 4px 0 var(--brand-dim);
+  box-shadow: 6px 6px 0 var(--brand-dim);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .github-repo-card:hover, .github-repo-card:focus-within {
   border-color: var(--brand-color);
-  box-shadow: 6px 6px 0 var(--brand-dim);
+  box-shadow: 8px 8px 0 var(--brand-dim);
   transform: translate(-1px, -1px);
 }
 .github-repo-card.has-error {
@@ -2064,6 +2064,7 @@ table td {
   min-width: 0;
   align-items: center;
   gap: 5px;
+  font-family: "FusionPixel10Prop", sans-serif;
   line-height: 1.35;
 }
 
@@ -2250,11 +2251,12 @@ table td {
   margin: 40px 0;
   border: 1px solid var(--border-color);
   background: var(--card-bg);
+  box-shadow: 6px 6px 0 var(--brand-dim);
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .link-preview:hover, .link-preview:focus-within {
   border-color: var(--brand-color);
-  box-shadow: 5px 5px 0 var(--brand-dim);
+  box-shadow: 8px 8px 0 var(--brand-dim);
   transform: translate(-1px, -1px);
 }
 .link-preview.has-error {
@@ -2297,6 +2299,7 @@ table td {
 .link-preview__title {
   overflow: hidden;
   color: var(--heading-color);
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: 1.05em;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -2333,7 +2336,9 @@ table td {
   font-size: 12px;
 }
 
-.link-preview__favicon {
+.link-preview__site .link-preview__favicon {
+  margin: 0;
+  flex: 0 0 auto;
   object-fit: contain;
 }
 
@@ -2348,10 +2353,11 @@ table td {
   color: var(--brand-color);
 }
 
-.link-preview__image {
+.link-preview .link-preview__image {
   width: 180px;
   height: 100%;
   min-height: 138px;
+  margin: 0;
   object-fit: cover;
   grid-column: 2;
   grid-row: 1;

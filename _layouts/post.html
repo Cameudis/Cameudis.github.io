@@ -52,8 +52,8 @@ layout: default
         data-external-icon-manifest="{{ "/assets/external-link-icons/manifest.json" | relative_url }}"
         defer></script>
 {% if content contains 'data-github-repo=' %}
-<script src="{{ "/assets/js/github-repo.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/github-repo.js" | relative_url }}?v={{ site.asset_versions.github_repo }}" defer></script>
 {% endif %}
 {% if content contains 'data-link-preview=' %}
-<script src="{{ "/assets/js/link-preview.js" | relative_url }}" defer></script>
+<script src="{{ "/assets/js/link-preview.js" | relative_url }}?v={{ site.asset_versions.link_preview }}" defer></script>
 {% endif %}
