@@ -62,7 +62,7 @@
   min-width: 0;
   align-items: center;
   gap: 5px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
   line-height: 1.35;
 }
 
@@ -93,7 +93,7 @@
   border: 1px solid var(--border-color);
   border-radius: 999px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $micro-font-size;
   text-transform: capitalize;
 }
@@ -119,7 +119,7 @@
   align-items: center;
   gap: 9px 16px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
 }
 

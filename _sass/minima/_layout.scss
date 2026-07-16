@@ -18,7 +18,7 @@
 
 .site-title {
   @include relative-font-size(1.375);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   line-height: $spacing-unit * 2;
   letter-spacing: 1px;
@@ -56,7 +56,7 @@
 
   .page-link {
     color: var(--text-color);
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: "FusionPixelUI", sans-serif;
     line-height: $base-line-height;
 
     &:hover {
@@ -191,7 +191,7 @@
 .footer-status {
   display: flex;
   align-items: center;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
   color: #a3be8c; // Nord green
   margin-bottom: 0; // Remove margin pushing it up
@@ -230,7 +230,7 @@
   margin-top: $spacing-unit;
   border-top: 1px dashed $grey-color-light;
   padding-top: math.div($spacing-unit, 2);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
 }
 
@@ -241,7 +241,7 @@
 }
 
 .footer-heading {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
@@ -265,7 +265,7 @@
 }
 
 .footer-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   font-size: $micro-font-size;
   color: $brand-color;
@@ -380,7 +380,7 @@
 
 .post-list-heading {
   @include relative-font-size(1.75);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
   margin-bottom: 30px;
@@ -391,7 +391,7 @@
 }
 
 .home-intro {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
 }
 
 .post-item {
@@ -407,7 +407,7 @@
 .post-meta-top {
   display: flex;
   justify-content: space-between;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
   color: $grey-color;
   margin-bottom: 5px;
@@ -474,7 +474,7 @@
 
 .post-meta {
   font-size: $small-font-size;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   color: $grey-color;
 }
 
@@ -503,7 +503,7 @@
 
 .post-title, .page-heading {
   @include relative-font-size(1.875);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
   font-weight: 700;
   color: var(--heading-color);
   margin-top: $spacing-unit;
@@ -517,12 +517,14 @@
 
   &::before {
     content: "[ ";
+    font-family: "FusionPixelUI", sans-serif;
     color: $brand-color;
     margin-right: 10px;
   }
 
   &::after {
     content: " ]";
+    font-family: "FusionPixelUI", sans-serif;
     color: $brand-color;
     margin-left: 10px;
   }
@@ -671,7 +673,7 @@
 }
 
 .toc-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   color: $brand-color;
   margin-bottom: 10px;
@@ -701,7 +703,7 @@
     background: linear-gradient(90deg, var(--brand-dim), transparent 72%);
     border: 0;
     border-left: 3px solid var(--brand-color);
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: "FusionPixelUI", sans-serif;
     font-size: $small-font-size;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -966,7 +968,7 @@
 }
 
 .related-posts-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 0.9em;
   color: $brand-color;
   margin-bottom: math.div($spacing-unit, 2);
@@ -1024,7 +1026,7 @@
   gap: 0.45em;
   margin-top: $spacing-unit * 1.5;
   margin-bottom: math.div(-$spacing-unit, 2);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
   font-weight: 600;
   color: $brand-color;

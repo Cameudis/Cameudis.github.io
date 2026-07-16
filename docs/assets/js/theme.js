@@ -4,7 +4,6 @@
   const themePicker = document.querySelector('#theme-picker');
   const themeTrigger = document.querySelector('#theme-picker-trigger');
   const themeMenu = document.querySelector('#theme-picker-menu');
-  const themeCurrent = document.querySelector('.theme-picker-current');
   const themeOptions = Array.from(document.querySelectorAll('[data-theme-value]'));
 
   function setMenuOpen(open) {
@@ -22,7 +21,6 @@
       const selected = option.dataset.themeValue === selectedTheme;
       option.setAttribute('aria-checked', String(selected));
       option.querySelector('.theme-option-state').textContent = selected ? 'ON' : 'OFF';
-      if (selected && themeCurrent) themeCurrent.textContent = option.dataset.themeLabel;
     });
     localStorage.setItem(STORAGE_KEY, selectedTheme);
     if (selectedTheme !== previousTheme) {

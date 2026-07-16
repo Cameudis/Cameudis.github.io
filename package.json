@@ -2,6 +2,8 @@
   "name": "cameudis-blog",
   "private": true,
   "scripts": {
+    "font:subset": "node bin/subset-pixel-ui-font.mjs",
+    "font:check": "node bin/subset-pixel-ui-font.mjs --check",
     "mermaid:check": "node bin/check-mermaid.mjs",
     "mermaid:vendor": "node bin/vendor-mermaid.mjs",
     "search:index": "pagefind --site docs --exclude-selectors \".language-mermaid\""

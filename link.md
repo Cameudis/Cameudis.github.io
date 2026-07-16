@@ -2,7 +2,7 @@
 layout: page
 title: Links
 permalink: /links/
-asset_version: "friends-v2"
+asset_version: "friends-v3-font-roles"
 ---
 
 <section class="friends-section">

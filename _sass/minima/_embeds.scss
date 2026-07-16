@@ -21,7 +21,7 @@
   gap: 8px;
   margin-bottom: 8px;
   color: var(--callout-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
   letter-spacing: 0.04em;
 }
 
@@ -37,6 +37,7 @@
   text-align: center;
   font-weight: 700;
   line-height: 1;
+  font-family: "FusionPixelUI", sans-serif;
 }
 
 .callout__content > :last-child { margin-bottom: 0; }
@@ -91,7 +92,7 @@
 .link-preview__title {
   overflow: hidden;
   color: var(--heading-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
   font-size: 1.05em;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -124,7 +125,7 @@
   gap: 7px;
   margin-top: auto;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: $base-font-family;
   font-size: $micro-font-size;
 }
 
@@ -222,7 +223,7 @@
   display: block;
   margin-top: 16px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $small-font-size;
 }
 

@@ -47,7 +47,7 @@
     position: absolute;
     top: 5px;
     right: 10px;
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: "FusionPixelUI", sans-serif;
     font-size: 0.8em;
     color: var(--brand-color);
     opacity: 0.3;
@@ -96,7 +96,7 @@
   h3 {
     margin: 0 0 5px 0;
     color: var(--heading-color);
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: $base-font-family;
     font-size: 1.2em;
     letter-spacing: 1px;
   }
@@ -136,7 +136,7 @@
   h2 {
     margin: 4px 0 12px;
     color: var(--heading-color);
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: "FusionPixelUI", sans-serif;
   }
 
   p {
@@ -196,7 +196,7 @@
   border: 1px solid var(--brand-color);
   color: var(--heading-color);
   background: var(--brand-dim);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
 

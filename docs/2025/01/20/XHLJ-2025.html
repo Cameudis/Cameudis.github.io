@@ -9,6 +9,8 @@
   <link rel="shortcut icon" href="/images/favicon.ico">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preload" href="/assets/fonts/fusion-pixel-10px-ui.woff2?v=ae79dac36dcb"
+    as="font" type="font/woff2" crossorigin>
   <script>
     (function() {
       var savedTheme = localStorage.getItem('user-color-scheme');
@@ -26,8 +28,8 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="babytrace" />
 <meta name="twitter:description" property="og:description" content="babytrace" />
-<link rel="canonical" href="http://localhost:4002/2025/01/20/XHLJ-2025.html" />
-<meta property="og:url" content="http://localhost:4002/2025/01/20/XHLJ-2025.html" />
+<link rel="canonical" href="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" />
+<meta property="og:url" content="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2025-01-20T00:00:00+08:00" />
@@ -35,9 +37,9 @@
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="西湖论剑 2025 PWN Writeup" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-01-20T00:00:00+08:00","datePublished":"2025-01-20T00:00:00+08:00","description":"babytrace","headline":"西湖论剑 2025 PWN Writeup","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4002/2025/01/20/XHLJ-2025.html"},"url":"http://localhost:4002/2025/01/20/XHLJ-2025.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2025-01-20T00:00:00+08:00","datePublished":"2025-01-20T00:00:00+08:00","description":"babytrace","headline":"西湖论剑 2025 PWN Writeup","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2025/01/20/XHLJ-2025.html"},"url":"https://www.cameudis.com/2025/01/20/XHLJ-2025.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css?v=20260716-home-layout"><link type="application/atom+xml" rel="alternate" href="http://localhost:4002/feed.xml" title="Y²的博客" /><script src="/assets/js/theme.js?v=20260716-mermaid" defer></script>
+<link rel="stylesheet" href="/assets/main.css?v=20260717-font-roles"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script src="/assets/js/theme.js?v=20260717-theme-label" defer></script>
 </head>
 <body class="layout-post"><header class="site-header" role="banner">
   <div class="wrapper"><div class="header-content">
@@ -76,7 +78,11 @@
             <span class="theme-picker-bracket" aria-hidden="true">[</span>
             <span class="theme-picker-label">THEME</span>
             <span class="theme-picker-divider" aria-hidden="true">//</span>
-            <span class="theme-picker-current">蓝白</span>
+            <span class="theme-picker-current" aria-live="polite">
+              <span data-theme-label="dark">夜间</span>
+              <span data-theme-label="light">日间</span>
+              <span data-theme-label="blue-white">蓝白</span>
+            </span>
             <span class="theme-picker-bracket" aria-hidden="true">]</span>
             <span class="theme-picker-arrow" aria-hidden="true"></span>
           </button>

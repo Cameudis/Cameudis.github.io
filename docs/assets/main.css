@@ -122,6 +122,11 @@
   --tok-type: #906f22;
 }
 
+@font-face {
+  font-family: "FusionPixelUI";
+  src: url("fonts/fusion-pixel-10px-ui.woff2?v=ae79dac36dcb") format("woff2");
+  font-display: swap;
+}
 .highlight, h1,
 h2,
 h3,
@@ -446,7 +451,7 @@ table td {
 
 .site-title {
   font-size: 22px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   line-height: 80px;
   letter-spacing: 1px;
@@ -478,7 +483,7 @@ table td {
 }
 .site-nav .page-link {
   color: var(--text-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   line-height: 1.75;
 }
 .site-nav .page-link:hover {
@@ -603,7 +608,7 @@ table td {
 .footer-status {
   display: flex;
   align-items: center;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
   color: #a3be8c;
   margin-bottom: 0;
@@ -639,7 +644,7 @@ table td {
   margin-top: 40px;
   border-top: 1px dashed var(--grey-color-light);
   padding-top: 20px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
 }
 
@@ -650,7 +655,7 @@ table td {
 }
 
 .footer-heading {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
@@ -673,7 +678,7 @@ table td {
 }
 
 .footer-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   font-size: 12px;
   color: var(--brand-color);
@@ -774,7 +779,7 @@ table td {
 
 .post-list-heading {
   font-size: 28px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
   margin-bottom: 30px;
@@ -785,7 +790,7 @@ table td {
 }
 
 .home-intro {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 .post-item {
@@ -800,7 +805,7 @@ table td {
 .post-meta-top {
   display: flex;
   justify-content: space-between;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
   color: var(--grey-color);
   margin-bottom: 5px;
@@ -860,7 +865,7 @@ table td {
 
 .post-meta {
   font-size: 13px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   color: var(--grey-color);
 }
 
@@ -886,7 +891,7 @@ table td {
 
 .post-title, .page-heading {
   font-size: 30px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
   color: var(--heading-color);
   margin-top: 40px;
@@ -900,11 +905,13 @@ table td {
 }
 .post-title::before, .page-heading::before {
   content: "[ ";
+  font-family: "FusionPixelUI", sans-serif;
   color: var(--brand-color);
   margin-right: 10px;
 }
 .post-title::after, .page-heading::after {
   content: " ]";
+  font-family: "FusionPixelUI", sans-serif;
   color: var(--brand-color);
   margin-left: 10px;
 }
@@ -1036,7 +1043,7 @@ table td {
 }
 
 .toc-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-weight: 700;
   color: var(--brand-color);
   margin-bottom: 10px;
@@ -1069,7 +1076,7 @@ table td {
     background: linear-gradient(90deg, var(--brand-dim), transparent 72%);
     border: 0;
     border-left: 3px solid var(--brand-color);
-    font-family: "FusionPixel10Prop", sans-serif;
+    font-family: "FusionPixelUI", sans-serif;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -1304,7 +1311,7 @@ table td {
 }
 
 .related-posts-title {
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 0.9em;
   color: var(--brand-color);
   margin-bottom: 20px;
@@ -1363,7 +1370,7 @@ table td {
   gap: 0.45em;
   margin-top: 60px;
   margin-bottom: -20px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--brand-color);
@@ -1406,7 +1413,7 @@ table td {
   position: relative;
   float: left;
   align-self: center;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 12px;
   letter-spacing: 1px;
 }
@@ -1454,6 +1461,16 @@ table td {
 
 .theme-picker-label {
   white-space: nowrap;
+}
+
+.theme-picker-current [data-theme-label] {
+  display: none;
+}
+
+[data-theme=dark] .theme-picker-current [data-theme-label=dark],
+[data-theme=light] .theme-picker-current [data-theme-label=light],
+[data-theme=blue-white] .theme-picker-current [data-theme-label=blue-white] {
+  display: inline;
 }
 
 .theme-picker-arrow {
@@ -1701,7 +1718,7 @@ table td {
   padding: 40px 20px;
   text-align: center;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
 }
 
 .search-loading::before {
@@ -1944,7 +1961,7 @@ table td {
   position: absolute;
   top: 5px;
   right: 10px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 0.8em;
   color: var(--brand-color);
   opacity: 0.3;
@@ -1990,7 +2007,7 @@ table td {
 .friend-info h3 {
   margin: 0 0 5px 0;
   color: var(--heading-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 1.2em;
   letter-spacing: 1px;
 }
@@ -2028,7 +2045,7 @@ table td {
 .friend-apply h2 {
   margin: 4px 0 12px;
   color: var(--heading-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
 }
 .friend-apply p {
   margin: 0 0 12px;
@@ -2082,7 +2099,7 @@ table td {
   border: 1px solid var(--brand-color);
   color: var(--heading-color);
   background: var(--brand-dim);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -2166,7 +2183,7 @@ table td {
   min-width: 0;
   align-items: center;
   gap: 5px;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   line-height: 1.35;
 }
 
@@ -2197,7 +2214,7 @@ table td {
   border: 1px solid var(--border-color);
   border-radius: 999px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 12px;
   text-transform: capitalize;
 }
@@ -2223,7 +2240,7 @@ table td {
   align-items: center;
   gap: 9px 16px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
 }
 
@@ -2311,7 +2328,7 @@ table td {
   gap: 8px;
   margin-bottom: 8px;
   color: var(--callout-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   letter-spacing: 0.04em;
 }
 
@@ -2341,6 +2358,7 @@ table td {
   text-align: center;
   font-weight: 700;
   line-height: 1;
+  font-family: "FusionPixelUI", sans-serif;
 }
 
 .callout__content > :last-child {
@@ -2399,7 +2417,7 @@ table td {
 .link-preview__title {
   overflow: hidden;
   color: var(--heading-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 1.05em;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -2432,7 +2450,7 @@ table td {
   gap: 7px;
   margin-top: auto;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 12px;
 }
 
@@ -2562,7 +2580,7 @@ table td {
   display: block;
   margin-top: 16px;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: 13px;
 }
 
@@ -2648,20 +2666,6 @@ table td {
     width: var(--mermaid-wide-width) !important;
     min-width: var(--mermaid-wide-width);
     max-width: none !important;
-  }
-}
-@font-face {
-  font-family: "FusionPixel10Prop";
-  src: url("fonts/fusion-pixel-10px-ui.woff2") format("woff2");
-  font-display: swap;
-  unicode-range: U+0020-007E, U+00A0-00FF, U+2000-206F, U+2190-21FF, U+2500-26FF, U+FF01-FF65;
-}
-@media screen and (min-width: 601px) {
-  @font-face {
-    font-family: "FusionPixel10Prop";
-    src: url("fonts/fusion-pixel-font-10px-proportional-otf.woff2-v2025.10.20/fusion-pixel-10px-proportional-zh_hans.otf.woff2") format("woff2");
-    font-display: swap;
-    unicode-range: U+2E80-2EFF, U+2F00-2FDF, U+3000-318F, U+31A0-31BF, U+31F0-31FF, U+3400-4DBF, U+4E00-9FFF, U+AC00-D7AF, U+F900-FAFF, U+FE10-FE4F, U+FF66-FFEF;
   }
 }
 

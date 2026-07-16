@@ -36,7 +36,7 @@
   position: relative;
   float: left;
   align-self: center;
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
   font-size: $micro-font-size;
   letter-spacing: 1px;
 }
@@ -84,6 +84,16 @@
 
 .theme-picker-label {
   white-space: nowrap;
+}
+
+.theme-picker-current [data-theme-label] {
+  display: none;
+}
+
+[data-theme="dark"] .theme-picker-current [data-theme-label="dark"],
+[data-theme="light"] .theme-picker-current [data-theme-label="light"],
+[data-theme="blue-white"] .theme-picker-current [data-theme-label="blue-white"] {
+  display: inline;
 }
 
 .theme-picker-arrow {
@@ -328,7 +338,7 @@
   padding: 40px 20px;
   text-align: center;
   color: var(--grey-color);
-  font-family: "FusionPixel10Prop", sans-serif;
+  font-family: "FusionPixelUI", sans-serif;
 }
 
 .search-loading::before {
