@@ -4,5 +4,11 @@
 .bundle
 .obsidian/workspace.json
 vendor
+!assets/vendor/
+!assets/vendor/mermaid/
+!assets/vendor/mermaid/**
+!docs/assets/vendor/
+!docs/assets/vendor/mermaid/
+!docs/assets/vendor/mermaid/**
 node_modules/
 _algolia_api_key

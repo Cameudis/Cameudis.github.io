@@ -26,8 +26,8 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
 <meta name="twitter:description" property="og:description" content="当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。" />
-<link rel="canonical" href="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
-<meta property="og:url" content="https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<link rel="canonical" href="http://localhost:4002/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
+<meta property="og:url" content="http://localhost:4002/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" />
 <meta property="og:site_name" content="Y²的博客" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2023-05-04T15:55:01+08:00" />
@@ -35,9 +35,9 @@
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="TAMUctf 2023 Pwnme - linked ROP chain" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2023-05-04T15:55:01+08:00","datePublished":"2023-05-04T15:55:01+08:00","description":"当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。","headline":"TAMUctf 2023 Pwnme - linked ROP chain","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"},"url":"https://www.cameudis.com/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2023-05-04T15:55:01+08:00","datePublished":"2023-05-04T15:55:01+08:00","description":"当溢出长度过短无法完成完整的ROP时，一般会想到stack pivot，也就是在某个固定的、可控的地址处提前布置好ROP链，然后通过 leave; ret 或是 xchg eax, esp 等方法完成栈迁移。 但在本题中，我们没有机会往已知地址写入数据，溢出大小又有限制。官方给出的方法是：通过 sub rsp, 0x18; call vul 这个非常规gadget，将提前布置好的ROP chain放在栈的高位，从而完成ROP chain的链接，我管它叫linked ROP chain。","headline":"TAMUctf 2023 Pwnme - linked ROP chain","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4002/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"},"url":"http://localhost:4002/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css?v=20260716-callout-icon"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script src="/assets/js/theme.js" defer></script>
+<link rel="stylesheet" href="/assets/main.css?v=20260716-mermaid-colors"><link type="application/atom+xml" rel="alternate" href="http://localhost:4002/feed.xml" title="Y²的博客" /><script src="/assets/js/theme.js?v=20260716-mermaid" defer></script>
 </head>
 <body class="layout-post"><header class="site-header" role="banner">
   <div class="wrapper"><div class="header-content">
@@ -301,6 +301,14 @@ stack ├────────┤    │        │
         
 
         
+      
+    
+      
+        
+        
+        
+
+        
           <div class="related-post-item">
             <span class="related-post-date">[ 2026-05-26 ]</span>
             <a href="/2026/05/26/CTF-Dot.html" class="related-post-link">CTF 的句点</a>
@@ -369,7 +377,7 @@ stack ├────────┤    │        │
         <a class="u-url" href="/2023/05/04/TAMUctf-2023-Pwnme-linked-ROP-chain.html" hidden></a>
 </article>
 
-<script src="/assets/js/post.js?v=20260716-source-link-spacing"
+<script src="/assets/js/post.js?v=20260716-mermaid"
         data-external-icon-manifest="/assets/external-link-icons/manifest.json"
         defer></script>
 

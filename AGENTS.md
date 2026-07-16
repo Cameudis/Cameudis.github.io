@@ -6,7 +6,7 @@
 
 ## 构建
 
-- `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先规范化 Markdown 链接间距，再执行 Jekyll 和生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
+- `_config.yml` 里 `destination: ./docs` —— **`docs/` 是 build 产物且提交进 git，Pages 直接从这个目录部署**。首次安装依赖运行 `npm ci`；改完源码后统一运行 `bin/build`（先规范化 Markdown 链接间距、检查 Mermaid 语法并同步其本地运行库，再执行 Jekyll 和生成 Pagefind 索引），再连同 `docs/` 一起提交。工作区常有一堆 `M docs/*.html` 是正常的，不要手动编辑 `docs/*.html`，会被覆盖。
 - `bin/build` 在 Jekyll 之后运行 `bin/cache-external-link-icons`：扫描生成页面中的外链，按域名抓取 favicon，压成 32×32 PNG 缓存到 `assets/external-link-icons/`，并同步到 `docs/`。抓取会读取实际链接页的 icon 声明、尝试站点常见 favicon 路径，并仅在构建阶段用 Google favicon 服务兜底；读者始终只请求本站资源。已有缓存不会重复请求；失败只保留原有外链箭头且不阻塞构建。只重试缺失项用 `--retry-missing`，全部强制重抓用 `--refresh`。
 - 本地用原生 `jekyll ~> 4.4`，**不用** `github-pages` gem（Ruby 4.0 不兼容，见 `Gemfile` 注释）。第三方 Jekyll gem 插件只有 `jekyll-feed`；`_plugins/optimize_images.rb` 是本地 HTML filter，给正文图片补原生懒加载与异步解码；搜索使用构建后的 Pagefind 静态索引。
 - `_config.yml` 有 `exclude: [AGENTS.md, README.md]`——这两份根目录文件不会进 `docs/` 部署产物，别误删这条。
@@ -27,9 +27,10 @@
 - 搜索使用 Pagefind 1.5.2：`bin/build` 在 Jekyll 构建后扫描 `docs/`，生成并提交 `docs/pagefind/`；`_config.yml` 的 `keep_files: [pagefind]` 用来避免不运行 Pagefind 的 `jekyll serve` 删掉已生成索引，不要移除。逻辑在 `assets/js/search.js`，样式在 `_sass/minima/_search.scss`。只有带 `data-pagefind-body` 的文章正文会进入索引，Pagefind 运行时在首次打开搜索时动态加载；使用 post layout 但不应进入搜索的页面加 `search: false`（Diary 即如此）。
 - 文章 TOC 在桌面侧边浮动、窄屏电脑内联完整显示，仅小屏触控设备默认折叠；结构在 `_layouts/post.html`，交互在 `assets/js/post.js`，断点样式在 `_sass/minima/_layout.scss`。
 - 主 CSS 用 `_config.yml` 的 `asset_versions.main_css` 做全站缓存破坏，修改全局样式后同步递增；`link.md` 的 front matter `asset_version` 会覆盖全站值，修改友链页样式时仍单独递增它。
-- 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
+- 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`；修改 `theme.js` 后同步递增 `_config.yml` 的 `asset_versions.theme`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
 - 像素字体采用分层加载：所有设备加载 `assets/fonts/fusion-pixel-10px-ui.woff2`（约 14 KB，只含拉丁、常用标点和界面符号），桌面端再加载完整简体中文字体；正文仍使用 `_variables.scss` 的系统中文字体栈。UI 子集由 FontTools 从 10px 简中字体生成，调整字符范围时需重新生成，不要用完整的 `*-latin.otf.woff2` 代替（该文件同样约 424 KB）。
 - 正文 Callout 优先写 Obsidian/GitHub 风格的 `> [!warning] 标题`；独占一行的 `<https://...>` 自动链接会生成链接卡片，其中精确的 `github.com/owner/repo` 地址自动生成 GitHub 仓库卡片。构建期转换在 `_plugins/content_components.rb`，写法见 `README.md`；旧的 `callout.html`、`link_preview.html` 和 `github_repo.html` include 仍作为高级/兼容接口。
+- Mermaid 使用标准的 ```` ```mermaid ```` code block，不需要 front matter 开关；写法与无障碍字段约定见 `README.md`。`assets/js/mermaid-loader.js` 只在含图表的页面加载，并在图接近视口时导入本站托管的 Mermaid；图表使用 `securityLevel: strict`，随三套站点主题重绘，加载或渲染失败时保留源码。`bin/check-mermaid.mjs` 在构建期校验语法，Pagefind 排除 `.language-mermaid` 源码。版本锁在 `package.json`，`bin/vendor-mermaid.mjs` 生成 `assets/vendor/mermaid/`，不要手工编辑该目录；升级后同步递增 `_config.yml` 的 `asset_versions.mermaid`。
 - GitHub 仓库卡片结构在 `_includes/github_repo.html`，数据与 6 小时浏览器缓存逻辑在 `assets/js/github-repo.js`，样式在 `_sass/minima/_github-repo.scss`；公开 API 失败时会降级为仓库链接。通用正文组件结构在 `_includes/`，共用样式在 `_sass/minima/_embeds.scss`，链接元数据与 24 小时缓存逻辑在 `assets/js/link-preview.js`。
 - 正文组件还包括 `{% include static_tweet.html ... %}`，写法见 `README.md`。
 

@@ -1,0 +1,65 @@
+@use "minima/variables" as *;
+
+.mermaid-diagram {
+  position: relative;
+  margin: $spacing-unit 0;
+  padding: $spacing-unit * 0.5;
+  overflow-x: auto;
+  color: var(--mermaid-primary-text);
+  background: var(--mermaid-background);
+  border: 1px dashed var(--mermaid-primary-border);
+  border-radius: 3px;
+
+  &.is-rendering {
+    cursor: progress;
+  }
+
+  &.has-error {
+    border-color: var(--accent-orange);
+  }
+}
+
+.mermaid-diagram__canvas {
+  min-width: 0;
+
+  &:empty {
+    display: none;
+  }
+
+  svg {
+    display: block;
+    max-width: 100% !important;
+    height: auto;
+    margin: 0 auto;
+  }
+}
+
+.mermaid-diagram__source {
+  margin: 0 !important;
+}
+
+.mermaid-diagram__error,
+.mermaid-load-error {
+  margin: 0 0 ($spacing-unit * 0.25);
+  color: var(--accent-orange);
+  font-family: $code-font-family;
+  font-size: $small-font-size;
+}
+
+.mermaid-load-error {
+  margin-top: -($spacing-unit * 0.5);
+  margin-bottom: $spacing-unit;
+}
+
+@media screen and (max-width: $on-palm) {
+  .mermaid-diagram {
+    margin: $spacing-unit * 0.75 0;
+    padding: $spacing-unit * 0.3;
+  }
+
+  .mermaid-diagram__canvas.is-wide svg {
+    width: var(--mermaid-wide-width) !important;
+    min-width: var(--mermaid-wide-width);
+    max-width: none !important;
+  }
+}

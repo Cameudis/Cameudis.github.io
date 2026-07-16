@@ -11,7 +11,9 @@ const externalIconManifestUrl = postScript?.dataset.externalIconManifest;
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Code block chrome and copy controls
-  const codeBlocks = document.querySelectorAll('.post-content .highlight > pre > code');
+  const codeBlocks = Array.from(
+    document.querySelectorAll('.post-content .highlight > pre > code')
+  ).filter(code => !code.classList.contains('language-mermaid') && !code.closest('.language-mermaid'));
   const copyText = async text => {
     if (navigator.clipboard && window.isSecureContext) {
       try {

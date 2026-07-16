@@ -167,6 +167,10 @@
       "file": "adaafd8d68331238.png",
       "checked_at": "2026-07-15T15:45:50Z"
     },
+    "devkitpro.org": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
+    },
     "docs.binary.ninja": {
       "status": "ok",
       "file": "cc383b594700be57.png",
@@ -298,6 +302,10 @@
       "status": "missing",
       "checked_at": "2026-07-15T15:56:09Z"
     },
+    "icoa2026.au": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
+    },
     "ipsw.me": {
       "status": "ok",
       "file": "c0eeffbb3bbab081.png",
@@ -397,6 +405,10 @@
       "status": "missing",
       "checked_at": "2026-07-15T15:56:23Z"
     },
+    "ollama.com": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
+    },
     "optee.readthedocs.io": {
       "status": "ok",
       "file": "b32e99e6898b10da.png",
@@ -409,6 +421,10 @@
     "picture.iczhiku.com": {
       "status": "missing",
       "checked_at": "2026-07-15T15:56:15Z"
+    },
+    "play.google.com": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
     },
     "posts.specterops.io": {
       "status": "ok",
@@ -491,6 +507,10 @@
       "status": "ok",
       "file": "f26c64266c17810a.png",
       "checked_at": "2026-07-15T15:56:00Z"
+    },
+    "switchbrew.org": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
     },
     "techdocs.broadcom.com": {
       "status": "ok",
@@ -714,6 +734,10 @@
       "status": "ok",
       "file": "a4270747176cb32a.png",
       "checked_at": "2026-07-15T15:45:35Z"
+    },
+    "zcode.z.ai": {
+      "status": "missing",
+      "checked_at": "2026-07-16T07:38:16Z"
     },
     "zenaxu.cn": {
       "status": "ok",

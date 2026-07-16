@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+  <link rel="shortcut icon" href="/images/favicon.ico">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (function() {
+      var savedTheme = localStorage.getItem('user-color-scheme');
+      var validThemes = ['dark', 'light', 'blue-white'];
+      var theme = validThemes.indexOf(savedTheme) !== -1
+        ? savedTheme
+        : (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script><!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>写一个switch防晕动症插件 #1 | Y²的博客</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="写一个switch防晕动症插件 #1" />
+<meta name="author" content="Y² (aka.cameudis)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。" />
+<meta name="twitter:description" property="og:description" content="我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。" />
+<link rel="canonical" href="http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html" />
+<meta property="og:url" content="http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html" />
+<meta property="og:site_name" content="Y²的博客" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-07-12T00:00:00+08:00" />
+<meta property="article:modified_time" content="2026-07-12T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="写一个switch防晕动症插件 #1" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2026-07-12T00:00:00+08:00","datePublished":"2026-07-12T00:00:00+08:00","description":"我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。","headline":"写一个switch防晕动症插件 #1","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html"},"url":"http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css?v=20260716-mermaid-colors"><link type="application/atom+xml" rel="alternate" href="http://localhost:4002/feed.xml" title="Y²的博客" /><script type="text/javascript" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js">
+  </script><script src="/assets/js/theme.js?v=20260716-mermaid" defer></script>
+</head>
+<body class="layout-post"><header class="site-header" role="banner">
+  <div class="wrapper"><div class="header-content">
+      <div class="header-content-left">
+        <a class="site-title" rel="author" href="/">Y²的博客</a>
+
+        <button class="search-button" id="search-toggle" type="button" aria-label="搜索">
+          <svg width="20px" height="20px" viewBox="0 0 100 100" style="shape-rendering: crispEdges;">
+            <!-- Frame -->
+            <rect x="30" y="10" width="10" height="10" />
+            <rect x="40" y="10" width="10" height="10" />
+            <rect x="50" y="10" width="10" height="10" />
+            <rect x="20" y="20" width="10" height="10" />
+            <rect x="60" y="20" width="10" height="10" />
+            <rect x="10" y="30" width="10" height="10" />
+            <rect x="70" y="30" width="10" height="10" />
+            <rect x="10" y="40" width="10" height="10" />
+            <rect x="70" y="40" width="10" height="10" />
+            <rect x="10" y="50" width="10" height="10" />
+            <rect x="70" y="50" width="10" height="10" />
+            <rect x="20" y="60" width="10" height="10" />
+            <rect x="60" y="60" width="10" height="10" />
+            <rect x="30" y="70" width="10" height="10" />
+            <rect x="40" y="70" width="10" height="10" />
+            <rect x="50" y="70" width="10" height="10" />
+            <!-- Handle -->
+            <rect x="70" y="70" width="10" height="10" />
+            <rect x="80" y="80" width="10" height="10" />
+            <rect x="90" y="90" width="10" height="10" />
+          </svg>
+        </button>
+
+        <div class="theme-picker" id="theme-picker">
+          <button class="theme-picker-trigger" id="theme-picker-trigger" type="button"
+            aria-label="选择主题" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-picker-menu">
+            <span class="theme-picker-bracket" aria-hidden="true">[</span>
+            <span class="theme-picker-label">THEME</span>
+            <span class="theme-picker-divider" aria-hidden="true">//</span>
+            <span class="theme-picker-current">蓝白</span>
+            <span class="theme-picker-bracket" aria-hidden="true">]</span>
+            <span class="theme-picker-arrow" aria-hidden="true"></span>
+          </button>
+          <div class="theme-picker-menu" id="theme-picker-menu" role="menu" aria-label="主题选项" hidden>
+            <button type="button" role="menuitemradio" data-theme-value="dark" data-theme-label="夜间">
+              <span class="theme-option-index">01</span>
+              <span class="theme-option-swatch theme-option-swatch-dark" aria-hidden="true"></span>
+              <span class="theme-option-label">夜间</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+            <button type="button" role="menuitemradio" data-theme-value="light" data-theme-label="日间">
+              <span class="theme-option-index">02</span>
+              <span class="theme-option-swatch theme-option-swatch-light" aria-hidden="true"></span>
+              <span class="theme-option-label">日间</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+            <button type="button" role="menuitemradio" data-theme-value="blue-white" data-theme-label="蓝白">
+              <span class="theme-option-index">03</span>
+              <span class="theme-option-swatch theme-option-swatch-blue" aria-hidden="true"></span>
+              <span class="theme-option-label">蓝白</span>
+              <span class="theme-option-state">OFF</span>
+            </button>
+          </div>
+        </div>
+      </div><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path
+                d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+            </svg>
+          </span>
+        </label>
+        <div class="trigger"><a class="page-link" href="/about/">About</a><a class="page-link" href="/diary/">Diary</a><a class="page-link" href="/links/">Links</a><a class="page-link" href="/readings/">Readings</a></div>
+      </nav></div>
+  </div>
+</header>
+
+<!-- 搜索弹窗 -->
+<div class="search-overlay" id="search-overlay" aria-hidden="true"
+  data-pagefind-url="/pagefind/pagefind.js">
+  <div class="search-modal" role="dialog" aria-modal="true" aria-label="文章搜索">
+    <div class="search-header">
+      <input type="search" id="search-input" placeholder="搜索文章..." autocomplete="off"
+        aria-label="搜索文章" aria-controls="search-results">
+      <button class="search-close" id="search-close" type="button" aria-label="关闭搜索">&times;</button>
+    </div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="/assets/js/search.js" defer></script>
+<main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+        <header class="post-header">
+          <h1 class="post-title p-name" itemprop="name headline"
+            data-pagefind-meta="title, date:2026-07-12">写一个switch防晕动症插件 #1</h1>
+          <div class="post-meta">
+            <time class="dt-published" datetime="2026-07-12T00:00:00+08:00" itemprop="datePublished">[ 2026-07-12 ]
+            </time>
+            
+            <span class="post-tags" data-pagefind-meta="tags">:: #switch</span>
+            </div>
+        </header>
+
+        <div class="post-layout-container">
+          <aside class="post-toc">
+            <div class="toc-title">TABLE_OF_CONTENTS</div>
+            <button class="toc-toggle" type="button" aria-expanded="false" aria-controls="post-toc-list">
+              <span class="toc-toggle-label">TABLE_OF_CONTENTS</span>
+              <span class="toc-toggle-icon" aria-hidden="true"></span>
+            </button>
+            <ul id="post-toc-list"><li><a href="#晕车与防晕车原理">晕车与防晕车原理</a><ul><li><a href="#防晕车软件">防晕车软件</a></li></ul></li><li><a href="#switch-大气层开发背景">Switch 大气层开发背景</a></li><li><a href="#开发与测试">开发与测试</a></li><li><a href="#软件架构">软件架构</a></li></ul>
+          </aside>
+
+          <div class="post-content e-content" itemprop="articleBody" data-pagefind-body>
+            <p>我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。</p>
+
+<p>好在现在是 AI 时代，就算只有我一个人有这种需求，我也可以花一天时间和 AI 对话写出一个基于大气层的防晕动症后台服务。</p>
+
+<aside class="github-repo-card" data-github-repo="cameudis/SWOTS" aria-busy="true">
+  <a class="github-repo-card__link" href="https://github.com/cameudis/SWOTS" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看 cameudis/SWOTS 仓库">
+    <header class="github-repo-card__header">
+      <svg class="github-repo-card__github-icon svg-icon" aria-hidden="true">
+        <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+      </svg>
+      <span class="github-repo-card__owner">cameudis</span>
+      <span class="github-repo-card__slash" aria-hidden="true">/</span>
+      <strong class="github-repo-card__name">SWOTS</strong>
+      <span class="github-repo-card__visibility" hidden=""></span>
+    </header>
+
+    <p class="github-repo-card__description">正在读取仓库信息…</p>
+
+    <footer class="github-repo-card__meta" hidden="">
+      <span class="github-repo-card__language" hidden="">
+        <i class="github-repo-card__language-color" aria-hidden="true"></i>
+        <span class="github-repo-card__language-name"></span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__stars" title="Stars">
+        <span aria-hidden="true">★</span>
+        <span class="github-repo-card__stars-count"></span>
+        <span class="sr-only">Stars</span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__forks" title="Forks">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="5" cy="3" r="2"></circle>
+          <circle cx="11" cy="3" r="2"></circle>
+          <circle cx="8" cy="13" r="2"></circle>
+          <path d="M5 5v1.5A2.5 2.5 0 0 0 7.5 9h1A2.5 2.5 0 0 0 11 6.5V5M8 9v2"></path>
+        </svg>
+        <span class="github-repo-card__forks-count"></span>
+        <span class="sr-only">Forks</span>
+      </span>
+      <span class="github-repo-card__license" hidden=""></span>
+      <time class="github-repo-card__updated" hidden=""></time>
+    </footer>
+  </a>
+</aside>
+
+<h2 id="晕车与防晕车原理">晕车与防晕车原理</h2>
+
+<p>晕车的原理是我们耳朵里感受平衡的器官在物理层面感受到“身体正在经历加速度/振动”，但是眼睛看到的信息是“身体和周围的物体保持静止”，这两种信息在发送给我们的大脑后，它很难不认为自己是吃菌子中毒了，于是开始头晕催促人去休息+催吐让人把有毒的东西都吐出来。</p>
+
+<p>3D 眩晕的原理其实也是这样的：耳蜗感受到“身体静止”，但眼睛看到“身体在移动”，所以以一种与晕车正好相反的方式实现了头晕（太棒了）。</p>
+
+<aside class="callout callout--note" role="note">
+  <div class="callout__title">
+    <span class="callout__icon" aria-hidden="true"></span>
+    <strong>另外</strong>
+  </div>
+  <div class="callout__content">
+    
+<p>不得不提起笔者小时候玩过的 \(xD (x\ge 4)\) 影院，虽然耳蜗和眼睛都感受到身体在动，但可能是因为动得太不自然了，导致笔者一下来就巨晕想吐，有没有懂的。</p>
+
+  </div>
+</aside>
+
+<p>所以，只要眼睛和耳蜗同步感受到“身体在经历加速度/振动”，大脑就不会认为我们中毒了。</p>
+
+<h3 id="防晕车软件">防晕车软件</h3>
+
+<p>现在市面上最常用的防晕车软件都采用类似的动态视觉提示方法，在屏幕上显示多个半透明圆点，根据手机传感器信息移动，来让用户得到移动的视觉信息。</p>
+
+<p>在 iOS 系统上，这个 <a href="https://support.apple.com/zh-cn/guide/iphone/iph55564cb22/ios">车辆运动提示</a> 功能是自带的，而且 iOS 26 更新了个性化！可惜我不用 iPhone。</p>
+
+<blockquote>
+  <p>如果在作为乘客乘坐轿车或其他道路车辆且使用 iPhone 时感到不适，你可以打开车辆运动提示，即可能有助于缓解晕动症的屏幕提示。车辆运动提示在屏幕边缘显示为动态圆点，它们代表车辆移动的方式并且不会干扰你在 iPhone 上执行的操作。</p>
+</blockquote>
+
+<p>安卓也有一两个著名的防晕车应用（出得还比 iOS 的这个功能早）叫 <a href="https://play.google.com/store/apps/details?id=com.urbandroid.kinestop">KineStop</a>（这个开发团队还开发过其他许多著名的安卓软件，比如下载次数已破千万的 <a href="https://play.google.com/store/apps/details?id=com.urbandroid.sleep">Sleep as Android</a>）。这个软件让我突破了从零到一的限制：我从完全不能在车上用手机，变成了<em>可以</em>在车上用手机。</p>
+
+<p>软件的效果也受限于设备提供的性能，因为如果手机在省电模式下，就会因为帧率、芯片降频等原因导致软件显示效果“不跟手”，防晕车大打折扣。所以我在车上还是能不用手机就不用手机！</p>
+
+<p>当然也存在许多其他的方案，比如 <a href="https://arxiv.org/abs/2402.00565">这篇综述</a> 不仅介绍了晕车的原理，还介绍了除了圆点以外的好多种缓解晕车的方法。笔者目前还没有阅读这篇论文，但之后肯定会继续研究，为了我能在地铁上玩游戏。</p>
+
+<h2 id="switch-大气层开发背景">Switch 大气层开发背景</h2>
+
+<p>显然普通的 switch 是不允许我开发一个覆盖全屏的软件并放上去跑的！我的 switch 经过了神秘力量的魔改，可以运行自定义的固件 <a href="https://github.com/Atmosphere-NX/Atmosphere">Atmosphère</a>，这套固件对 switch 原生的 Secure Monitor、Horizon 内核和用户态系统服务等组件都做了 patch，从而允许用户安装自制软件（以及关闭游戏签名校验、金手指等邪恶操作）。</p>
+
+<p>在 switch 上开发自制软件（homebrew）之所以成为可能，真是要好好感谢那些逆向哥们了。他们维护了一个网站 <a href="https://switchbrew.org/">Nintendo Switch Brew</a>，记录了关于 switch 的公开/逆向得来的各种资料，比如有关于 <a href="https://switchbrew.org/wiki/Kernel">Horizon/NX 内核</a> 的、关于 <a href="https://switchbrew.org/wiki/Joy-Con">JoyCon 手柄</a> 的、关于 <a href="https://switchbrew.org/wiki/Secure_Monitor">TrustZone Secure Monitor</a> 的……</p>
+
+<p>在这些<del>黑魔法</del>资料之上，诞生了 switch 自制软件的生态：用户态系统编程库 <a href="https://github.com/switchbrew/libnx">libnx</a> 允许开发者方便地调用到内核提供的多种接口，包括进程资源管理、IPC、文件系统、各种 I/O 设备如手柄、陀螺仪、触摸屏、图形显示和 GPU、音频、网络、USB、蓝牙……另外，<a href="https://devkitpro.org/">devkitPro</a> 这个组织为 Nintendo wii、gamecube、ds、gba、gamepark gp 32 以及 Switch 这些游戏机都维护了自制软件的开发工具链。</p>
+
+<p>I mean，看到大家都这么努力，哪个开发者不想急头白脸哼哧哼哧开发点软件上去？</p>
+
+<h2 id="开发与测试">开发与测试</h2>
+
+<p>我感到在现代，以前那些配环境问题、程序骨架、API 调用方法这些所有的东西都已经不需要人类参与了。当然我还是可以放一个如何配好开发环境的链接在这里：<a href="https://switchbrew.org/wiki/Setting_up_Development_Environment">Setting up Development Environment - Nintendo Switch Brew</a>。</p>
+
+<p>国产模型的巅峰水平似乎还无法 handle 这个 task。我使用 GLM 5.2 + 官方的 GUI Agent <a href="https://zcode.z.ai/cn">ZCode</a> 尝试进行骨架的开发，花了两个小时还无法做到真机运行。然后我使用 GPT 5.6 Sol 进行开发，果然一下子就发现了 GLM 5.2 代码中的问题，两三个来回就跑通了，真棒👍。</p>
+
+<blockquote>
+  <p>你可能会问我如何抢到 GLM 5.2 套餐的，答案是我根本就没有抢。推荐大家可以试试 <a href="https://ollama.com/pricing">Ollama Pro</a>，一个月二十刀略贵、但真的可以用上流畅的 GLM 5.2 等开源模型。
+ 另外我不得不强调一下我是智谱的忠实粉丝，他们的 ZCode 似乎是全世界唯一一款原生支持 Linux 的 GUI Agent 软件。当我在 ZCode 官网上看到 Tux🐧的瞬间，我知道智谱已经遥遥领先，成为 Anthropic 最严厉的父亲。</p>
+</blockquote>
+
+<p>我通过 DBI + USB 将 Switch 接入电脑，这样 Agent 可以直接部署程序，不用我每次把 SD 卡拔下来插电脑上。当然这种方法的缺点就是，每次都要去相册里面开这个文件服务器有点烦，不知道有没有更方便的做法。</p>
+
+<h2 id="软件架构">软件架构</h2>
+
+<p>Switch 上面有一个生态里非常著名的 Tesla Menu，是一个可以任意时刻呼出的侧栏菜单，可以通过这个菜单快捷调用程序，比如超频、金手指、系统状态、帧率显示等。SWOTS 项目也选择 Tesla Menu 作为交互入口，软件整体分为两个部分：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code>：基于 <a href="https://github.com/WerWolv/libtesla">libtesla</a> 开发的 Tesla Menu 入口，实现了设置与开关的界面</li>
+  <li><code class="language-plaintext highlighter-rouge">SWOTS.nsp</code>：后台运行的 Renderer 服务，读取传感器数据并实现晕动提示渲染</li>
+</ul>
+
+<p>两者之间通过 Switch 上的 IPC 机制通信，文档见 <a href="https://switchbrew.org/wiki/HIPC">HIPC - Nintendo Switch Brew</a>。具体来说，HIPC (Horizon Inter-Process Communication) 是 switch 内核的 IPC 实现，在用户态有两套上层协议，分别是这个项目使用的 CMIF（全称可能是 Command Interface）和 TIPC（Tiny IPC）。</p>
+
+<p>Renerder 会在启动时注册一个 CMIF 服务 <code class="language-plaintext highlighter-rouge">swots:u</code>，用以接受 IPC 通信：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smRegisterServiceCmif</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">,</span> <span class="p">...);</span>
+</code></pre></div></div>
+
+<p>入口进程 <code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 会按照这个名字找到服务并连接：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smGetService</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 包括一个 UI 相关线程（主线程 / HID 线程）和 IPC Worker 线程，这种设计是为了防止 IPC Worker 卡住导致 UI 也同步卡住、使用户无法操作。</p>
+
+<p>当用户和菜单进行交互、按下启动 SWOTS 时，IPC Worker 会通过 Process Manager 系统服务启动一个 Renderer 进程并连上它注册的 CMIF 服务，开始通信。</p>
+
+<p>由于 Tesla Menu 和 SWOTS 的悬浮显示是冲突的，所以当 <code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 检测到用户退出 Tesla 菜单的时候，它会给 Renderer 发送 <code class="language-plaintext highlighter-rouge">Resume</code> 命令，此时 Renderer 才正式开始渲染工作。</p>
+
+<p>两者的具体交互可以看下面这个图：</p>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    accTitle: SWOTS 组件通信时序
+    accDescr: SWOTS.ovl 通过 swots:u 服务控制 renderer 的配置、暂停、恢复和退出，renderer 负责 VI 图层与传感器资源。
+    participant O as SWOTS.ovl
+    participant R as Renderer / swots:u
+    participant V as VI + Motion
+
+	Note over O: 在 Tesla 菜单中开启 SWOTS
+    O-&gt;&gt;R: 启动进程并连接
+    O-&gt;&gt;R: SetConfig
+    R--&gt;&gt;O: 配置已应用
+
+    Note over O: 关闭 Tesla 菜单
+    O-&gt;&gt;R: Resume
+    R-&gt;&gt;V: 创建 VI 图层并启动传感器
+    R--&gt;&gt;O: Running 事件确认
+
+    Note over O: 打开 Tesla 菜单
+    O-&gt;&gt;R: ClaimAndSuspend
+    R-&gt;&gt;V: 停止传感器并销毁 VI 图层
+    R--&gt;&gt;O: Suspended 事件确认
+
+    Note over O: 关闭 SWOTS
+    O-&gt;&gt;R: RequestStop
+    R-&gt;&gt;V: 确认资源已释放
+    R--&gt;&gt;O: 退出进程
+</code></pre>
+
+<hr />
+
+<p>在下一篇博客中，我将会介绍软件的核心部分算法，未完待续。</p>
+
+          </div>
+        </div>
+
+        
+
+
+
+
+  
+
+  
+
+
+
+        <div id="comments" class="post-comments"
+  data-valine-url="https://unpkg.com/valine@1.5.3/dist/Valine.min.js"
+  data-app-id="Ji5y9HTOlb2QGDO0XFlWXNRy-gzGzoHsz"
+  data-app-key="6VqGye1352LX381YQDTOaiXs"
+  data-placeholder="El Psy Congroo">
+  <button class="comments-load" type="button">LOAD_COMMENTS</button>
+</div>
+<script src="/assets/js/comments.js" defer></script>
+
+
+        <a class="u-url" href="/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html" hidden></a>
+</article>
+
+<script src="/assets/js/post.js?v=20260716-mermaid"
+        data-external-icon-manifest="/assets/external-link-icons/manifest.json"
+        defer></script>
+
+<script src="/assets/js/github-repo.js?v=20260716-lazy-load" defer></script>
+
+
+
+    </div>
+  </main><footer class="site-footer h-card">
+  <data class="u-url" href="/%20/"></data>
+  <div class="wrapper">
+    <div class="footer-header">
+      <h2 class="footer-heading">[ Y²的博客 ]</h2>
+      <p class="footer-status">STATUS: ONLINE / UPTIME: <span id="site-uptime">∞</span></p>
+    </div>
+
+    <div class="footer-layout">
+      <!-- Col 1: Contact -->
+      <div class="footer-col">
+        <div class="footer-title">CONTACT_INFO</div>
+        <div class="footer-content">
+          <p class="p-name">Y² (aka.cameudis)</p><a class="u-email" href="mailto:cameudis@gmail.com">cameudis@gmail.com</a></div>
+      </div>
+
+      <!-- Col 2: Social Links -->
+      <div class="footer-col">
+        <div class="footer-title">SOCIAL_NETWORKS</div>
+        <div class="footer-content"><ul class="social-media-list"><li><a href="https://github.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">cameudis</span></a></li><li><a href="https://twitter.com/cameudis"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">cameudis</span></a></li></ul></div>
+      </div>
+
+      <!-- Col 3: Visitor Map -->
+      <div class="footer-col">
+        <div class="footer-title">VISITOR_MAP</div>
+        <div class="footer-map-mini"
+          data-map-src="https://mapmyvisitors.com/map.js?d=VEk4VYKnI9sCCEXCgdKor_rhcYKrCEm6C9mIRceo1og&amp;cl=ffffff&amp;w=a"></div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="quiet-humor">/* Free and useless. */</p>
+      <div style="margin-bottom: 20px;">
+        <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
+          height="31" loading="lazy" decoding="async">
+      </div>
+      <p>&copy; 2026 Y² (aka.cameudis)</p>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/footer.js?v=20260715-3" defer></script>
+<script type="module" src="/assets/js/mermaid-loader.js?v=11.16.0-3"></script></body>
+
+</html>

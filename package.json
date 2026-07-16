@@ -2,9 +2,13 @@
   "name": "cameudis-blog",
   "private": true,
   "scripts": {
-    "search:index": "pagefind --site docs"
+    "mermaid:check": "node bin/check-mermaid.mjs",
+    "mermaid:vendor": "node bin/vendor-mermaid.mjs",
+    "search:index": "pagefind --site docs --exclude-selectors \".language-mermaid\""
   },
   "devDependencies": {
+    "jsdom": "26.1.0",
+    "mermaid": "11.16.0",
     "pagefind": "1.5.2"
   }
 }

@@ -1,4 +1,166 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://www.cameudis.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.cameudis.com/" rel="alternate" type="text/html" /><updated>2026-07-16T08:54:46+08:00</updated><id>https://www.cameudis.com/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">我恨 AI 写作</title><link href="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html" rel="alternate" type="text/html" title="我恨 AI 写作" /><published>2026-06-17T00:00:00+08:00</published><updated>2026-06-17T00:00:00+08:00</updated><id>https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C</id><content type="html" xml:base="https://www.cameudis.com/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html"><![CDATA[<p>我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4002/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4002/" rel="alternate" type="text/html" /><updated>2026-07-16T23:48:50+08:00</updated><id>http://localhost:4002/feed.xml</id><title type="html">Y²的博客</title><subtitle>计算机、安全和其他</subtitle><author><name>Y² (aka.cameudis)</name></author><entry><title type="html">写一个switch防晕动症插件 #1</title><link href="http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html" rel="alternate" type="text/html" title="写一个switch防晕动症插件 #1" /><published>2026-07-12T00:00:00+08:00</published><updated>2026-07-12T00:00:00+08:00</updated><id>http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1</id><content type="html" xml:base="http://localhost:4002/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html"><![CDATA[<p>我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。</p>
+
+<p>好在现在是 AI 时代，就算只有我一个人有这种需求，我也可以花一天时间和 AI 对话写出一个基于大气层的防晕动症后台服务。</p>
+
+<aside class="github-repo-card" data-github-repo="cameudis/SWOTS" aria-busy="true">
+  <a class="github-repo-card__link" href="https://github.com/cameudis/SWOTS" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看 cameudis/SWOTS 仓库">
+    <header class="github-repo-card__header">
+      <svg class="github-repo-card__github-icon svg-icon" aria-hidden="true">
+        <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+      </svg>
+      <span class="github-repo-card__owner">cameudis</span>
+      <span class="github-repo-card__slash" aria-hidden="true">/</span>
+      <strong class="github-repo-card__name">SWOTS</strong>
+      <span class="github-repo-card__visibility" hidden=""></span>
+    </header>
+
+    <p class="github-repo-card__description">正在读取仓库信息…</p>
+
+    <footer class="github-repo-card__meta" hidden="">
+      <span class="github-repo-card__language" hidden="">
+        <i class="github-repo-card__language-color" aria-hidden="true"></i>
+        <span class="github-repo-card__language-name"></span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__stars" title="Stars">
+        <span aria-hidden="true">★</span>
+        <span class="github-repo-card__stars-count"></span>
+        <span class="sr-only">Stars</span>
+      </span>
+      <span class="github-repo-card__stat github-repo-card__forks" title="Forks">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="5" cy="3" r="2"></circle>
+          <circle cx="11" cy="3" r="2"></circle>
+          <circle cx="8" cy="13" r="2"></circle>
+          <path d="M5 5v1.5A2.5 2.5 0 0 0 7.5 9h1A2.5 2.5 0 0 0 11 6.5V5M8 9v2"></path>
+        </svg>
+        <span class="github-repo-card__forks-count"></span>
+        <span class="sr-only">Forks</span>
+      </span>
+      <span class="github-repo-card__license" hidden=""></span>
+      <time class="github-repo-card__updated" hidden=""></time>
+    </footer>
+  </a>
+</aside>
+
+<h2 id="晕车与防晕车原理">晕车与防晕车原理</h2>
+
+<p>晕车的原理是我们耳朵里感受平衡的器官在物理层面感受到“身体正在经历加速度/振动”，但是眼睛看到的信息是“身体和周围的物体保持静止”，这两种信息在发送给我们的大脑后，它很难不认为自己是吃菌子中毒了，于是开始头晕催促人去休息+催吐让人把有毒的东西都吐出来。</p>
+
+<p>3D 眩晕的原理其实也是这样的：耳蜗感受到“身体静止”，但眼睛看到“身体在移动”，所以以一种与晕车正好相反的方式实现了头晕（太棒了）。</p>
+
+<aside class="callout callout--note" role="note">
+  <div class="callout__title">
+    <span class="callout__icon" aria-hidden="true"></span>
+    <strong>另外</strong>
+  </div>
+  <div class="callout__content">
+    
+<p>不得不提起笔者小时候玩过的 \(xD (x\ge 4)\) 影院，虽然耳蜗和眼睛都感受到身体在动，但可能是因为动得太不自然了，导致笔者一下来就巨晕想吐，有没有懂的。</p>
+
+  </div>
+</aside>
+
+<p>所以，只要眼睛和耳蜗同步感受到“身体在经历加速度/振动”，大脑就不会认为我们中毒了。</p>
+
+<h3 id="防晕车软件">防晕车软件</h3>
+
+<p>现在市面上最常用的防晕车软件都采用类似的动态视觉提示方法，在屏幕上显示多个半透明圆点，根据手机传感器信息移动，来让用户得到移动的视觉信息。</p>
+
+<p>在 iOS 系统上，这个 <a href="https://support.apple.com/zh-cn/guide/iphone/iph55564cb22/ios">车辆运动提示</a> 功能是自带的，而且 iOS 26 更新了个性化！可惜我不用 iPhone。</p>
+
+<blockquote>
+  <p>如果在作为乘客乘坐轿车或其他道路车辆且使用 iPhone 时感到不适，你可以打开车辆运动提示，即可能有助于缓解晕动症的屏幕提示。车辆运动提示在屏幕边缘显示为动态圆点，它们代表车辆移动的方式并且不会干扰你在 iPhone 上执行的操作。</p>
+</blockquote>
+
+<p>安卓也有一两个著名的防晕车应用（出得还比 iOS 的这个功能早）叫 <a href="https://play.google.com/store/apps/details?id=com.urbandroid.kinestop">KineStop</a>（这个开发团队还开发过其他许多著名的安卓软件，比如下载次数已破千万的 <a href="https://play.google.com/store/apps/details?id=com.urbandroid.sleep">Sleep as Android</a>）。这个软件让我突破了从零到一的限制：我从完全不能在车上用手机，变成了<em>可以</em>在车上用手机。</p>
+
+<p>软件的效果也受限于设备提供的性能，因为如果手机在省电模式下，就会因为帧率、芯片降频等原因导致软件显示效果“不跟手”，防晕车大打折扣。所以我在车上还是能不用手机就不用手机！</p>
+
+<p>当然也存在许多其他的方案，比如 <a href="https://arxiv.org/abs/2402.00565">这篇综述</a> 不仅介绍了晕车的原理，还介绍了除了圆点以外的好多种缓解晕车的方法。笔者目前还没有阅读这篇论文，但之后肯定会继续研究，为了我能在地铁上玩游戏。</p>
+
+<h2 id="switch-大气层开发背景">Switch 大气层开发背景</h2>
+
+<p>显然普通的 switch 是不允许我开发一个覆盖全屏的软件并放上去跑的！我的 switch 经过了神秘力量的魔改，可以运行自定义的固件 <a href="https://github.com/Atmosphere-NX/Atmosphere">Atmosphère</a>，这套固件对 switch 原生的 Secure Monitor、Horizon 内核和用户态系统服务等组件都做了 patch，从而允许用户安装自制软件（以及关闭游戏签名校验、金手指等邪恶操作）。</p>
+
+<p>在 switch 上开发自制软件（homebrew）之所以成为可能，真是要好好感谢那些逆向哥们了。他们维护了一个网站 <a href="https://switchbrew.org/">Nintendo Switch Brew</a>，记录了关于 switch 的公开/逆向得来的各种资料，比如有关于 <a href="https://switchbrew.org/wiki/Kernel">Horizon/NX 内核</a> 的、关于 <a href="https://switchbrew.org/wiki/Joy-Con">JoyCon 手柄</a> 的、关于 <a href="https://switchbrew.org/wiki/Secure_Monitor">TrustZone Secure Monitor</a> 的……</p>
+
+<p>在这些<del>黑魔法</del>资料之上，诞生了 switch 自制软件的生态：用户态系统编程库 <a href="https://github.com/switchbrew/libnx">libnx</a> 允许开发者方便地调用到内核提供的多种接口，包括进程资源管理、IPC、文件系统、各种 I/O 设备如手柄、陀螺仪、触摸屏、图形显示和 GPU、音频、网络、USB、蓝牙……另外，<a href="https://devkitpro.org/">devkitPro</a> 这个组织为 Nintendo wii、gamecube、ds、gba、gamepark gp 32 以及 Switch 这些游戏机都维护了自制软件的开发工具链。</p>
+
+<p>I mean，看到大家都这么努力，哪个开发者不想急头白脸哼哧哼哧开发点软件上去？</p>
+
+<h2 id="开发与测试">开发与测试</h2>
+
+<p>我感到在现代，以前那些配环境问题、程序骨架、API 调用方法这些所有的东西都已经不需要人类参与了。当然我还是可以放一个如何配好开发环境的链接在这里：<a href="https://switchbrew.org/wiki/Setting_up_Development_Environment">Setting up Development Environment - Nintendo Switch Brew</a>。</p>
+
+<p>国产模型的巅峰水平似乎还无法 handle 这个 task。我使用 GLM 5.2 + 官方的 GUI Agent <a href="https://zcode.z.ai/cn">ZCode</a> 尝试进行骨架的开发，花了两个小时还无法做到真机运行。然后我使用 GPT 5.6 Sol 进行开发，果然一下子就发现了 GLM 5.2 代码中的问题，两三个来回就跑通了，真棒👍。</p>
+
+<blockquote>
+  <p>你可能会问我如何抢到 GLM 5.2 套餐的，答案是我根本就没有抢。推荐大家可以试试 <a href="https://ollama.com/pricing">Ollama Pro</a>，一个月二十刀略贵、但真的可以用上流畅的 GLM 5.2 等开源模型。
+ 另外我不得不强调一下我是智谱的忠实粉丝，他们的 ZCode 似乎是全世界唯一一款原生支持 Linux 的 GUI Agent 软件。当我在 ZCode 官网上看到 Tux🐧的瞬间，我知道智谱已经遥遥领先，成为 Anthropic 最严厉的父亲。</p>
+</blockquote>
+
+<p>我通过 DBI + USB 将 Switch 接入电脑，这样 Agent 可以直接部署程序，不用我每次把 SD 卡拔下来插电脑上。当然这种方法的缺点就是，每次都要去相册里面开这个文件服务器有点烦，不知道有没有更方便的做法。</p>
+
+<h2 id="软件架构">软件架构</h2>
+
+<p>Switch 上面有一个生态里非常著名的 Tesla Menu，是一个可以任意时刻呼出的侧栏菜单，可以通过这个菜单快捷调用程序，比如超频、金手指、系统状态、帧率显示等。SWOTS 项目也选择 Tesla Menu 作为交互入口，软件整体分为两个部分：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code>：基于 <a href="https://github.com/WerWolv/libtesla">libtesla</a> 开发的 Tesla Menu 入口，实现了设置与开关的界面</li>
+  <li><code class="language-plaintext highlighter-rouge">SWOTS.nsp</code>：后台运行的 Renderer 服务，读取传感器数据并实现晕动提示渲染</li>
+</ul>
+
+<p>两者之间通过 Switch 上的 IPC 机制通信，文档见 <a href="https://switchbrew.org/wiki/HIPC">HIPC - Nintendo Switch Brew</a>。具体来说，HIPC (Horizon Inter-Process Communication) 是 switch 内核的 IPC 实现，在用户态有两套上层协议，分别是这个项目使用的 CMIF（全称可能是 Command Interface）和 TIPC（Tiny IPC）。</p>
+
+<p>Renerder 会在启动时注册一个 CMIF 服务 <code class="language-plaintext highlighter-rouge">swots:u</code>，用以接受 IPC 通信：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smRegisterServiceCmif</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">,</span> <span class="p">...);</span>
+</code></pre></div></div>
+
+<p>入口进程 <code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 会按照这个名字找到服务并连接：</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smGetService</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 包括一个 UI 相关线程（主线程 / HID 线程）和 IPC Worker 线程，这种设计是为了防止 IPC Worker 卡住导致 UI 也同步卡住、使用户无法操作。</p>
+
+<p>当用户和菜单进行交互、按下启动 SWOTS 时，IPC Worker 会通过 Process Manager 系统服务启动一个 Renderer 进程并连上它注册的 CMIF 服务，开始通信。</p>
+
+<p>由于 Tesla Menu 和 SWOTS 的悬浮显示是冲突的，所以当 <code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 检测到用户退出 Tesla 菜单的时候，它会给 Renderer 发送 <code class="language-plaintext highlighter-rouge">Resume</code> 命令，此时 Renderer 才正式开始渲染工作。</p>
+
+<p>两者的具体交互可以看下面这个图：</p>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    accTitle: SWOTS 组件通信时序
+    accDescr: SWOTS.ovl 通过 swots:u 服务控制 renderer 的配置、暂停、恢复和退出，renderer 负责 VI 图层与传感器资源。
+    participant O as SWOTS.ovl
+    participant R as Renderer / swots:u
+    participant V as VI + Motion
+
+	Note over O: 在 Tesla 菜单中开启 SWOTS
+    O-&gt;&gt;R: 启动进程并连接
+    O-&gt;&gt;R: SetConfig
+    R--&gt;&gt;O: 配置已应用
+
+    Note over O: 关闭 Tesla 菜单
+    O-&gt;&gt;R: Resume
+    R-&gt;&gt;V: 创建 VI 图层并启动传感器
+    R--&gt;&gt;O: Running 事件确认
+
+    Note over O: 打开 Tesla 菜单
+    O-&gt;&gt;R: ClaimAndSuspend
+    R-&gt;&gt;V: 停止传感器并销毁 VI 图层
+    R--&gt;&gt;O: Suspended 事件确认
+
+    Note over O: 关闭 SWOTS
+    O-&gt;&gt;R: RequestStop
+    R-&gt;&gt;V: 确认资源已释放
+    R--&gt;&gt;O: 退出进程
+</code></pre>
+
+<hr />
+
+<p>在下一篇博客中，我将会介绍软件的核心部分算法，未完待续。</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="switch" /><summary type="html"><![CDATA[我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。]]></summary></entry><entry><title type="html">我恨 AI 写作</title><link href="http://localhost:4002/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html" rel="alternate" type="text/html" title="我恨 AI 写作" /><published>2026-06-17T00:00:00+08:00</published><updated>2026-06-17T00:00:00+08:00</updated><id>http://localhost:4002/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C</id><content type="html" xml:base="http://localhost:4002/2026/06/17/%E6%88%91%E6%81%A8ai%E5%86%99%E4%BD%9C.html"><![CDATA[<p>我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。</p>
 
 <p>我喜欢读博客，就像看其他的独立内容（美术、音乐、独立游戏、视频等）一样，看博客不仅仅是看文字本身，也是看背后的那个创作者；博客本身承载了那人的意志、趣味、喜好。尽管我看的常常是专业的技术领域博客，我也总是能在博客中找到共鸣，我知道这个作者一定觉得这个玩意很有意思，才会把它写下来。光是看博客，我就好像和作者一起做了一件很有意思的事情。</p>
 
@@ -14,7 +176,7 @@
 
 <p>这时有人会说：我的写作 AI 可是接了我的知识库的，他就是比普通的聊天 AI 懂得多、写出来的东西也牛逼。我想说每个独特的想法置于世界的尺度都不算独特，和我们有相似经历的人往往也会和我们有相同的“原创”想法。我不会因为担心错过某个很好的原创想法而去读 AI Slop 的，总会有像我一样讨厌 AI 写作的人自己组织语言把一个东西写出来的。</p>
 
-<p>以上是我讨厌 AI 写作的原因。类似地我也讨厌 AI 图、AI 音乐，除非能在作品质量高的同时、创作者能让我透过作品形式看到他想表达的东西和他的精雕细琢。好在这样的作品现在越来越多了，坏在我讨厌的那种 Slop 更是越来越多了。</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="杂记" /><summary type="html"><![CDATA[我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。]]></summary></entry><entry><title type="html">CTF 的句点</title><link href="https://www.cameudis.com/2026/05/26/CTF-Dot.html" rel="alternate" type="text/html" title="CTF 的句点" /><published>2026-05-26T00:00:00+08:00</published><updated>2026-05-26T00:00:00+08:00</updated><id>https://www.cameudis.com/2026/05/26/CTF-Dot</id><content type="html" xml:base="https://www.cameudis.com/2026/05/26/CTF-Dot.html"><![CDATA[<p>刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。</p>
+<p>以上是我讨厌 AI 写作的原因。类似地我也讨厌 AI 图、AI 音乐，除非能在作品质量高的同时、创作者能让我透过作品形式看到他想表达的东西和他的精雕细琢。好在这样的作品现在越来越多了，坏在我讨厌的那种 Slop 更是越来越多了。</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="杂记" /><summary type="html"><![CDATA[我恨 AI 写作，尤其是专业和兴趣爱好领域。以前不具有足够表达能力和表达自信的人，现在也可以用AI生成文章了，这是一种好事吗？作为一个阅读者，我只觉得阅读体验一直在下降。]]></summary></entry><entry><title type="html">CTF 的句点</title><link href="http://localhost:4002/2026/05/26/CTF-Dot.html" rel="alternate" type="text/html" title="CTF 的句点" /><published>2026-05-26T00:00:00+08:00</published><updated>2026-05-26T00:00:00+08:00</updated><id>http://localhost:4002/2026/05/26/CTF-Dot</id><content type="html" xml:base="http://localhost:4002/2026/05/26/CTF-Dot.html"><![CDATA[<p>刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。</p>
 
 <p><a href="https://kabir.au/blog/the-ctf-scene-is-dead">The CTF scene is dead.</a> 这篇文章已经说了很多。就像游戏一样，参加 CTF 的过程类似一个反馈循环：我们学习知识，在比赛中验证知识，学习更多知识，取得更好的成绩……突然有一天，你发现自己在队伍中扮演了一个不可或缺的角色，你感觉到因为自己的技能而被队友们需要，你因自己的知识、技术还有比赛时那些灵光一现感到骄傲与自豪。</p>
 
@@ -28,7 +190,7 @@
 
 <p>好吧，还有没有安全研究的人类净土，或者说我们喜欢的那种很有意思又不会撞车，还能让发现者自我感觉良好的领域？当然！但这些领域和 CTF 本就关系不大，不是 CTF 战场的主角。CTF 已经迎来了句点。“AI handles the fun tasks you trained for and enjoy.”</p>
 
-<p>任何事都有落幕的时候，曾经的 CTF 也一样。但有趣的事情永远不会消失，随着 AI 的进步我已经看到了许多以前不存在的有趣的玩法。在 22 年我第一次接触 CTF 时，****** 的前辈们已经告诉我了答案：”Hacking for fun!”。相信作为 CTF 选手退役的大家，退役的理由和当初决定打 CTF 的初衷其实都是相同的：整点有意思的东西玩～</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><summary type="html"><![CDATA[刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。]]></summary></entry><entry><title type="html">协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）</title><link href="https://www.cameudis.com/2026/02/08/VMware-1.html" rel="alternate" type="text/html" title="协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）" /><published>2026-02-08T00:00:00+08:00</published><updated>2026-02-08T00:00:00+08:00</updated><id>https://www.cameudis.com/2026/02/08/VMware-1</id><content type="html" xml:base="https://www.cameudis.com/2026/02/08/VMware-1.html"><![CDATA[<p>小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。</p>
+<p>任何事都有落幕的时候，曾经的 CTF 也一样。但有趣的事情永远不会消失，随着 AI 的进步我已经看到了许多以前不存在的有趣的玩法。在 22 年我第一次接触 CTF 时，****** 的前辈们已经告诉我了答案：”Hacking for fun!”。相信作为 CTF 选手退役的大家，退役的理由和当初决定打 CTF 的初衷其实都是相同的：整点有意思的东西玩～</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><summary type="html"><![CDATA[刚刚过去的 DEFCON CTF Qual 26 好像引爆了 CTF 圈子的存在主义危机：我们说不清拿到一个 flag 到底是 AI 大人的功劳还是自己的功劳。做题方式的转变极大地反应在了人类选手的感受上，我们过去在 CTF 中所独有的那些体验正在被彻底重组。我不太想那么武断地下一个结论，但过去的 CTF 确实已经死了，取而代之的是一种新的竞赛；对许多过去的选手而言，这种新的竞赛已经不像曾经的 CTF 那样具有吸引力。在这样一种时间点，我想很适合写一篇小文分享一下自己的感受，毕竟这个博客站曾经的主要定位是一个 CTF writeup 分享站点（但以后估计不会有任何 writeup 了！）。]]></summary></entry><entry><title type="html">协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）</title><link href="http://localhost:4002/2026/02/08/VMware-1.html" rel="alternate" type="text/html" title="协议的原罪：VMware 虚拟机逃逸漏洞分析（CVE-2023-20869+20870）" /><published>2026-02-08T00:00:00+08:00</published><updated>2026-02-08T00:00:00+08:00</updated><id>http://localhost:4002/2026/02/08/VMware-1</id><content type="html" xml:base="http://localhost:4002/2026/02/08/VMware-1.html"><![CDATA[<p>小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。</p>
 
 <p>2023 年，新加坡 STAR Labs 研究员 Nguyễn Hoàng Thạch（<a href="https://twitter.com/hi_im_d4rkn3ss"><em>@hi_im_d4rkn3ss</em></a>）在 Pwn2Own Vancouver 通过一条 VMware Workstation Escape 利用链拿下了 <a href="https://www.zerodayinitiative.com/blog/2023/5/17/cve-2023-2086920870-exploiting-vmware-workstation-at-pwn2own-vancouver">八万美刀和 8 个 Master of PWN 点数</a>。他所用到的两个漏洞 CVE-2023-20869、CVE-2023-20870 非常适合拿来作为解析类漏洞的例子，let’s dive in。</p>
 
@@ -173,7 +335,7 @@
 
 <h2 id="总结">总结</h2>
 
-<p>在这篇水文里，我们看到了不管是协议规定的非法构造，还是协议留白的未定义行为，都很容易导向实现中的漏洞。或许在下一篇博客中，我们将具体复现这两个漏洞，顺便带领读者（其实是笔者）领略一下 Windows PWN 的神秘领域。</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="vmware" /><category term="parser" /><summary type="html"><![CDATA[小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。]]></summary></entry><entry><title type="html">强网杯线上赛 2025 babybus</title><link href="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html" rel="alternate" type="text/html" title="强网杯线上赛 2025 babybus" /><published>2025-11-11T00:00:00+08:00</published><updated>2025-11-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus</id><content type="html" xml:base="https://www.cameudis.com/2025/11/11/QWB-Qual-2025-babybus.html"><![CDATA[<h2 id="题目简介">题目简介</h2>
+<p>在这篇水文里，我们看到了不管是协议规定的非法构造，还是协议留白的未定义行为，都很容易导向实现中的漏洞。或许在下一篇博客中，我们将具体复现这两个漏洞，顺便带领读者（其实是笔者）领略一下 Windows PWN 的神秘领域。</p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="vmware" /><category term="parser" /><summary type="html"><![CDATA[小时候，奶奶总是告诉我，什么复杂协议的解析、文件格式的解析，这种地方最容易写错代码了。长大后我开始学习内存漏洞，发现这类漏洞不仅容易被写出来，而且攻击者也容易 fuzz 出来，属实是内存安全的重灾区。今天我们就来看看协议解析的实现中容易出现的两类问题。]]></summary></entry><entry><title type="html">强网杯线上赛 2025 babybus</title><link href="http://localhost:4002/2025/11/11/QWB-Qual-2025-babybus.html" rel="alternate" type="text/html" title="强网杯线上赛 2025 babybus" /><published>2025-11-11T00:00:00+08:00</published><updated>2025-11-11T00:00:00+08:00</updated><id>http://localhost:4002/2025/11/11/QWB-Qual-2025-babybus</id><content type="html" xml:base="http://localhost:4002/2025/11/11/QWB-Qual-2025-babybus.html"><![CDATA[<h2 id="题目简介">题目简介</h2>
 
 <p>拿到附件是一个 <code class="language-plaintext highlighter-rouge">qemu-system-x86_64</code> binary 和 Dockerfile、entry script，里面这样启动了 qemu：</p>
 
@@ -683,7 +845,7 @@
     <span class="n">io</span> <span class="o">=</span> <span class="nf">remote</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
     <span class="nf">pwn</span><span class="p">()</span>
 
-</code></pre></div></div>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="qemu" /><summary type="html"><![CDATA[题目简介]]></summary></entry><entry><title type="html">Midnight Sun CTF 2025 Final - flop</title><link href="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html" rel="alternate" type="text/html" title="Midnight Sun CTF 2025 Final - flop" /><published>2025-10-11T00:00:00+08:00</published><updated>2025-10-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop</id><content type="html" xml:base="https://www.cameudis.com/2025/10/11/MidnightSunFinal-2025-Flop.html"><![CDATA[<h2 id="题目分析">题目分析</h2>
+</code></pre></div></div>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="qemu" /><summary type="html"><![CDATA[题目简介]]></summary></entry><entry><title type="html">Midnight Sun CTF 2025 Final - flop</title><link href="http://localhost:4002/2025/10/11/MidnightSunFinal-2025-Flop.html" rel="alternate" type="text/html" title="Midnight Sun CTF 2025 Final - flop" /><published>2025-10-11T00:00:00+08:00</published><updated>2025-10-11T00:00:00+08:00</updated><id>http://localhost:4002/2025/10/11/MidnightSunFinal-2025-Flop</id><content type="html" xml:base="http://localhost:4002/2025/10/11/MidnightSunFinal-2025-Flop.html"><![CDATA[<h2 id="题目分析">题目分析</h2>
 
 <p>由于在网上搜不到题目附件，不得不手动搭了一个环境，内核版本为 <code class="language-plaintext highlighter-rouge">6.12.27</code>，关闭 <code class="language-plaintext highlighter-rouge">KASLR</code>、<code class="language-plaintext highlighter-rouge">KPTI</code> 保护。</p>
 
@@ -1008,7 +1170,7 @@ define va2pa
 
     printf "phy  : 0x%lx [0x%08x-0x%08x]\n", $result + ($target &amp; $res_mask), $result, $result + $res_mask
 end
-</code></pre>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="kernel" /><summary type="html"><![CDATA[题目分析]]></summary></entry><entry><title type="html">Kernel: 环境配置</title><link href="https://www.cameudis.com/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/09/28/Kernel-0</id><content type="html" xml:base="https://www.cameudis.com/2025/09/28/Kernel-0.html"><![CDATA[<ul>
+</code></pre>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="kernel" /><summary type="html"><![CDATA[题目分析]]></summary></entry><entry><title type="html">Kernel: 环境配置</title><link href="http://localhost:4002/2025/09/28/Kernel-0.html" rel="alternate" type="text/html" title="Kernel: 环境配置" /><published>2025-09-28T00:00:00+08:00</published><updated>2025-09-28T00:00:00+08:00</updated><id>http://localhost:4002/2025/09/28/Kernel-0</id><content type="html" xml:base="http://localhost:4002/2025/09/28/Kernel-0.html"><![CDATA[<ul>
   <li>简易版环境：<a href="https://github.com/pwncollege/pwnkernel">pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com)</a></li>
   <li>高级版环境：<a href="https://github.com/cirosantilli/linux-kernel-module-cheat">cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)</a></li>
 </ul>
@@ -1248,7 +1410,7 @@ $(eval $(generic-package))
   <li><a href="https://www.nullbyte.cat/post/linux-kernel-exploit-development-environment/#environment-setup">Linux Kernel Exploit development - Environment — NullByte</a></li>
   <li><a href="https://www.kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst">kernel.org/doc/Documentation/dev-tools/gdb-kernel-debugging.rst</a></li>
   <li><a href="https://r1ru.github.io/posts/0/">Linux Kernel Exploitation - Setup | r1ru</a></li>
-</ul>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="kernel" /><summary type="html"><![CDATA[简易版环境：pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)]]></summary></entry><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
+</ul>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="kernel" /><summary type="html"><![CDATA[简易版环境：pwncollege/pwnkernel: Kernel development &amp; exploitation practice environment. (github.com) 高级版环境：cirosantilli/linux-kernel-module-cheat: The perfect emulation setup to study and develop the Linux kernel v5.4.3, kernel modules, QEMU, gem5 and x86_64, ARMv7 and ARMv8 userland and baremetal assembly, ANSI C, C++ and POSIX. (github.com)]]></summary></entry><entry><title type="html">SJTU CTF 2025 PWN Writeup</title><link href="http://localhost:4002/2025/04/11/SJTUCTF-2025.html" rel="alternate" type="text/html" title="SJTU CTF 2025 PWN Writeup" /><published>2025-04-11T00:00:00+08:00</published><updated>2025-04-11T00:00:00+08:00</updated><id>http://localhost:4002/2025/04/11/SJTUCTF-2025</id><content type="html" xml:base="http://localhost:4002/2025/04/11/SJTUCTF-2025.html"><![CDATA[<h2 id="ret2vmcode">ret2vmcode</h2>
 
 <p>虚拟机。首先逆向出指令格式：</p>
 
@@ -1875,7 +2037,7 @@ $(eval $(generic-package))
 
 <blockquote>
   <p>TAKEAWAY：在进行 C 风格字符串处理时，关于 NULL Byte 的处理非常关键。如果直接将 <code class="language-plaintext highlighter-rouge">strlen</code> 的结果作为 <code class="language-plaintext highlighter-rouge">memcpy</code> 的 size，就会发生没有合适截断的问题。</p>
-</blockquote>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="parser" /><summary type="html"><![CDATA[ret2vmcode]]></summary></entry><entry><title type="html">西湖论剑 2025 PWN Writeup</title><link href="https://www.cameudis.com/2025/01/20/XHLJ-2025.html" rel="alternate" type="text/html" title="西湖论剑 2025 PWN Writeup" /><published>2025-01-20T00:00:00+08:00</published><updated>2025-01-20T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/01/20/XHLJ-2025</id><content type="html" xml:base="https://www.cameudis.com/2025/01/20/XHLJ-2025.html"><![CDATA[<h2 id="babytrace">babytrace</h2>
+</blockquote>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><category term="parser" /><summary type="html"><![CDATA[ret2vmcode]]></summary></entry><entry><title type="html">西湖论剑 2025 PWN Writeup</title><link href="http://localhost:4002/2025/01/20/XHLJ-2025.html" rel="alternate" type="text/html" title="西湖论剑 2025 PWN Writeup" /><published>2025-01-20T00:00:00+08:00</published><updated>2025-01-20T00:00:00+08:00</updated><id>http://localhost:4002/2025/01/20/XHLJ-2025</id><content type="html" xml:base="http://localhost:4002/2025/01/20/XHLJ-2025.html"><![CDATA[<h2 id="babytrace">babytrace</h2>
 
 <p>本题基于 <code class="language-plaintext highlighter-rouge">ptrace</code> 实现了一个简易的 syscall 沙盒，由父进程检测子进程，子进程与用户交互。每次子进程进入 syscall 时，父进程会检测保存在 <code class="language-plaintext highlighter-rouge">orig_rax</code> 中的 syscall number，如果不在白名单内就将 <code class="language-plaintext highlighter-rouge">rax</code> 强制改为 <code class="language-plaintext highlighter-rouge">-1</code>。</p>
 
@@ -2377,7 +2539,7 @@ call qword ptr [rax + 0x28];
   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 
-</code></pre></div></div>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><summary type="html"><![CDATA[babytrace]]></summary></entry><entry><title type="html">GhostWrite #2: 漏洞利用代码分析</title><link href="https://www.cameudis.com/2025/01/06/GhostWrite-2.html" rel="alternate" type="text/html" title="GhostWrite #2: 漏洞利用代码分析" /><published>2025-01-06T00:00:00+08:00</published><updated>2025-01-06T00:00:00+08:00</updated><id>https://www.cameudis.com/2025/01/06/GhostWrite-2</id><content type="html" xml:base="https://www.cameudis.com/2025/01/06/GhostWrite-2.html"><![CDATA[<h2 id="qemu-patch">QEMU Patch</h2>
+</code></pre></div></div>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="pwn" /><summary type="html"><![CDATA[babytrace]]></summary></entry><entry><title type="html">GhostWrite #2: 漏洞利用代码分析</title><link href="http://localhost:4002/2025/01/06/GhostWrite-2.html" rel="alternate" type="text/html" title="GhostWrite #2: 漏洞利用代码分析" /><published>2025-01-06T00:00:00+08:00</published><updated>2025-01-06T00:00:00+08:00</updated><id>http://localhost:4002/2025/01/06/GhostWrite-2</id><content type="html" xml:base="http://localhost:4002/2025/01/06/GhostWrite-2.html"><![CDATA[<h2 id="qemu-patch">QEMU Patch</h2>
 
 <p>为了复现 GhostWrite 环境，我们需要在 qemu 中添加 patch 来进行软件层面模拟。</p>
 
@@ -2688,46 +2850,4 @@ vse1024_v  ... 100 . 00000 ..... 111 ..... 0100111 @r2_nfvm
 
 <p>最后再次放上攻击成功的截图，完结撒花🎉🎉</p>
 
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="riscv" /><category term="kernel" /><category term="arch" /><summary type="html"><![CDATA[QEMU Patch]]></summary></entry><entry><title type="html">Lies, Damned lies, and Journalism</title><link href="https://www.cameudis.com/2024/12/10/Lies_Damned_Lies_And_Journalism.html" rel="alternate" type="text/html" title="Lies, Damned lies, and Journalism" /><published>2024-12-10T23:00:00+08:00</published><updated>2024-12-10T23:00:00+08:00</updated><id>https://www.cameudis.com/2024/12/10/Lies_Damned_Lies_And_Journalism</id><content type="html" xml:base="https://www.cameudis.com/2024/12/10/Lies_Damned_Lies_And_Journalism.html"><![CDATA[<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102135042.png" alt="学会提问" /></p>
-
-<p>在这个 gossip 满天飞的时代，选择相信什么、选择质疑什么好像变成了每天不得不面对的问题！最近正在读《学会提问（原书 12 版）》，是关于如何判断一个论证是否可信的一本简短教程。这篇博客分享一下我捉到书中 bug 的小趣事。</p>
-
-<p>在介绍研究成果的证明效力时，作者提到了一项研究：“结果令人信服地表明，原来的断言中有 41% 都是错误的或被极大地夸大的。”（下图的 “WTF!” 左边的内容）</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102142045.png" alt="学会提问截图" /></p>
-
-<p>41% 这个数字实在是太震撼了，有一种“医学不存在了”的感觉。我想知道这个数据的出处，于是开始了调查。</p>
-
-<p>首先，根据书中的“Lies, Damned Lies, and Medical Science” November 2010, Atlantic Magaizne，我们可以找到书中引用的原文——一篇 <a href="https://dsp.domains.trincoll.edu/fake-news/fake-news/media/lies%20damned%20lies%20medical%20science.pdf">杂志文章</a>。</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102231949.png" alt="image.png" /></p>
-
-<p>这篇文章并不是数据的出处，而只是介绍了 Dr. John Ioannidis 的研究成果。这个数字作为他开展的一项研究的结论出现在文章中：</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102233822.png" alt="image.png" /></p>
-
-<p>我有一个很奇怪的想法，总是觉得“阅读其他领域的论文”是一个很有趣的事。这个想法可能来自 <a href="https://l0tus.vip/cn/5.19/">l0tus</a>，他说：“但很巧也不幸的是，我喜欢看论文。”我尝试继续搜索原论文。</p>
-
-<p>根据期刊名 “Journal of the American Medical Association” 以及作者名 “Dr. John Ioannidis” 继续搜索，我们可以找到原论文《Contradicted and Initially Stronger Effects in Highly Cited Clinical Research》（<a href="https://files.givewell.org/files/methods/Ioannidis%202005-Contradicted%20and%20Initially%20Stronger%20Effects%20in%20Highly%20Cited%20Clinical%20Research.pdf">PDF链接</a>），引用量高达 1830 次。</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102237321.png" alt="image.png" /></p>
-
-<p>可惜的是，在这篇文章中，我并没有找到 41% 这个数字。Results 部分中作者说道：在 49 篇高被引原始临床研究中，45 篇声称干预有效。其中，<strong>7 篇( 16% )与后续研究相矛盾，7 篇( 16% )发现了比后续研究更强的效应</strong>，20 篇( 44% )被复现，11 篇( 24% )基本没有受到挑战。</p>
-
-<p>相比杂志的错误说法，我们应该重新将结果归纳为：在 45 个声称干预有效的研究中，有 14 个与后续研究矛盾或可能存在夸大，该比例达到了 <strong>31%</strong>。<strong>这个数据和杂志文章《Lies, Damned Lies, and Medical Science》中的 41% 有着 10% 的巨大差距。</strong></p>
-
-<p>根据我的不负责任猜测，可能是杂志文章作者在计算 $14/45$ 时错误地把 $31\%$ 看成了 $41\%$，从而导致了一连串的错误，最终反映到了和医学完全无关的一本批判性思维科普书籍上。</p>
-
-<p>此外，杂志中所用到的措辞 “had been convincingly shown wrong or significantly exaggerated” 也有些太夸张了。一个科研工作者不会动不动就使用“convincingly”和“significantly”这样带有煽动性的词汇。更何况，这篇杂志文章本来就注重于研究医学研究中的夸大现象，更不应该产生这样的不严谨描述。</p>
-
-<p>有趣的是，在原版的论文中 “significant” 一次被使用了 33 次，然而，大多数的使用都位于否定句中，其余的都是对样本研究结论的引用。这就和杂志报道形成了反差。</p>
-
-<p>当翻到《学会提问》的下一页时，我们发现了这样一段话：</p>
-
-<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202412102156367.png" alt="学会提问下一页截图" /></p>
-
-<p>发言者和写作者常常歪曲或者简化研究结论，此时我默默在上面标记了“科普者”以及“新闻作者”。最终，《学会提问》完成了自指——漂亮地攻击到了自己，于是就有了这篇神奇的博客。</p>
-
-<blockquote>
-  <p>There are three kinds of lies: Lies, Damned Lies, and Journalism. ——鲁迅说他没说过</p>
-</blockquote>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="杂记" /><summary type="html"><![CDATA[]]></summary></entry></feed>
+<p><img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/202409152153850.png" alt="image.png" /></p>]]></content><author><name>Y² (aka.cameudis)</name></author><category term="riscv" /><category term="kernel" /><category term="arch" /><summary type="html"><![CDATA[QEMU Patch]]></summary></entry></feed>

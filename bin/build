@@ -2,12 +2,14 @@
 
 set -eu
 
-if [ ! -x node_modules/.bin/pagefind ]; then
-  echo "Pagefind is not installed. Run 'npm ci' first." >&2
+if [ ! -x node_modules/.bin/pagefind ] || [ ! -f node_modules/mermaid/package.json ]; then
+  echo "Frontend dependencies are not installed. Run 'npm ci' first." >&2
   exit 1
 fi
 
 bin/normalize-link-spacing
+npm run mermaid:check
+npm run mermaid:vendor
 bundle exec jekyll build
 bin/cache-external-link-icons
 npm run search:index

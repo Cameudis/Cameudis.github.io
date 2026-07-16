@@ -21,6 +21,16 @@
   --card-bg: rgba(46, 52, 64, 0.4);
   --page-background-image: none;
   --page-background-attachment: fixed;
+  --mermaid-background: #1c1c1c;
+  --mermaid-primary: #2e3440;
+  --mermaid-primary-text: #eceff4;
+  --mermaid-primary-border: #5e81ac;
+  --mermaid-secondary: #3b4252;
+  --mermaid-tertiary: #242933;
+  --mermaid-line: #88c0d0;
+  --mermaid-note: #3b4252;
+  --mermaid-note-text: #eceff4;
+  --mermaid-note-border: #5e81ac;
   /* Syntax Highlighting (Night) */
   --tok-comment: #616e88;
   --tok-keyword: #81a1c1;
@@ -50,6 +60,16 @@
   --brand-dim: rgba(208, 135, 112, 0.1);
   --accent-orange: #d08770;
   --nav-bg: #f8f8f8;
+  --mermaid-background: #ffffff;
+  --mermaid-primary: #f7f9fb;
+  --mermaid-primary-text: #2e3440;
+  --mermaid-primary-border: #d08770;
+  --mermaid-secondary: #e8edf3;
+  --mermaid-tertiary: #f8f1ee;
+  --mermaid-line: #5b7897;
+  --mermaid-note: #fff6f2;
+  --mermaid-note-text: #2e3440;
+  --mermaid-note-border: #d08770;
   /* Syntax Highlighting (Day - softened Nord) */
   --tok-comment: #4c566a;
   --tok-keyword: #5e81ac;
@@ -83,6 +103,16 @@
     linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
     url("../images/theme-blue-white-tile.png");
   --page-background-attachment: scroll;
+  --mermaid-background: #f5fbff;
+  --mermaid-primary: #cfe8f8;
+  --mermaid-primary-text: #123f66;
+  --mermaid-primary-border: #1875b8;
+  --mermaid-secondary: #b7dcf3;
+  --mermaid-tertiary: #eff9ff;
+  --mermaid-line: #1875b8;
+  --mermaid-note: #fff7fa;
+  --mermaid-note-text: #244563;
+  --mermaid-note-border: #e9869c;
   /* Syntax Highlighting (Blue & White) */
   --tok-comment: #66869d;
   --tok-keyword: #176aab;
@@ -839,7 +869,7 @@ table td {
  * Posts
  */
 .post-header {
-  margin-bottom: 80px;
+  margin-bottom: 40px;
   text-align: center;
 }
 
@@ -1102,7 +1132,9 @@ table td {
   font-size: 24px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 700;
-  margin-top: 60px;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.4;
   color: var(--text-color);
   border-bottom: 1px solid var(--grey-color-light);
   padding-bottom: 5px;
@@ -1111,14 +1143,37 @@ table td {
   font-size: 20px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 600;
-  margin-top: 40px;
+  margin-top: 1.6em;
+  margin-bottom: 0.8em;
+  line-height: 1.5;
   color: var(--text-color);
 }
 .post-content h4 {
   font-size: 18px;
   font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-weight: 500;
+  margin-top: 1.333em;
+  margin-bottom: 0.667em;
+  line-height: 1.5;
   color: var(--text-color);
+}
+.post-content h5 {
+  font-size: 16px;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+.post-content h6 {
+  font-size: 14px;
+  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-weight: 600;
+  margin-top: 1.4em;
+  margin-bottom: 0.6em;
+  line-height: 1.5;
+  color: var(--grey-color);
 }
 .post-content img {
   display: block;
@@ -1133,11 +1188,9 @@ table td {
   }
   .post-content h2 {
     font-size: 20.8px;
-    margin-top: 40px;
   }
   .post-content h3 {
     font-size: 18.4px;
-    margin-top: 26.6666666667px;
   }
   .post-content h4 {
     font-size: 16.8px;
@@ -1172,6 +1225,44 @@ table td {
   margin-bottom: 1.25em;
 }
 .post-layout-container > .post-content p:last-child {
+  margin-bottom: 0;
+}
+.post-layout-container > .post-content > ul,
+.post-layout-container > .post-content > ol {
+  margin-bottom: 1.25em;
+}
+.post-layout-container > .post-content > ul > li + li,
+.post-layout-container > .post-content > ol > li + li {
+  margin-top: 0.25em;
+}
+.post-layout-container > .post-content > blockquote,
+.post-layout-container > .post-content > table,
+.post-layout-container > .post-content > figure,
+.post-layout-container > .post-content > pre,
+.post-layout-container > .post-content > .code-frame,
+.post-layout-container > .post-content > .highlighter-rouge:not(.code-frame),
+.post-layout-container > .post-content > .callout,
+.post-layout-container > .post-content > .link-preview,
+.post-layout-container > .post-content > .github-repo-card,
+.post-layout-container > .post-content > .static-tweet,
+.post-layout-container > .post-content > .mermaid-diagram,
+.post-layout-container > .post-content > p:has(> img:only-child) {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+.post-layout-container > .post-content > p:has(> img:only-child) > img {
+  margin: 0 auto;
+}
+.post-layout-container > .post-content > hr {
+  height: 0;
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px dashed var(--grey-color-light);
+}
+.post-layout-container > .post-content > :first-child {
+  margin-top: 0;
+}
+.post-layout-container > .post-content > :last-child {
   margin-bottom: 0;
 }
 
@@ -2488,6 +2579,64 @@ table td {
   }
   .static-tweet {
     padding: 16px;
+  }
+}
+.mermaid-diagram {
+  position: relative;
+  margin: 40px 0;
+  padding: 20px;
+  overflow-x: auto;
+  color: var(--mermaid-primary-text);
+  background: var(--mermaid-background);
+  border: 1px dashed var(--mermaid-primary-border);
+  border-radius: 3px;
+}
+.mermaid-diagram.is-rendering {
+  cursor: progress;
+}
+.mermaid-diagram.has-error {
+  border-color: var(--accent-orange);
+}
+
+.mermaid-diagram__canvas {
+  min-width: 0;
+}
+.mermaid-diagram__canvas:empty {
+  display: none;
+}
+.mermaid-diagram__canvas svg {
+  display: block;
+  max-width: 100% !important;
+  height: auto;
+  margin: 0 auto;
+}
+
+.mermaid-diagram__source {
+  margin: 0 !important;
+}
+
+.mermaid-diagram__error,
+.mermaid-load-error {
+  margin: 0 0 10px;
+  color: var(--accent-orange);
+  font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+  font-size: 13px;
+}
+
+.mermaid-load-error {
+  margin-top: -20px;
+  margin-bottom: 40px;
+}
+
+@media screen and (max-width: 600px) {
+  .mermaid-diagram {
+    margin: 30px 0;
+    padding: 12px;
+  }
+  .mermaid-diagram__canvas.is-wide svg {
+    width: var(--mermaid-wide-width) !important;
+    min-width: var(--mermaid-wide-width);
+    max-width: none !important;
   }
 }
 @font-face {

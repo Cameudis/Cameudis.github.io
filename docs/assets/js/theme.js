@@ -16,6 +16,7 @@
   
   function applyTheme(theme) {
     const selectedTheme = THEMES.includes(theme) ? theme : 'dark';
+    const previousTheme = document.documentElement.getAttribute('data-theme');
     document.documentElement.setAttribute('data-theme', selectedTheme);
     themeOptions.forEach((option) => {
       const selected = option.dataset.themeValue === selectedTheme;
@@ -24,6 +25,11 @@
       if (selected && themeCurrent) themeCurrent.textContent = option.dataset.themeLabel;
     });
     localStorage.setItem(STORAGE_KEY, selectedTheme);
+    if (selectedTheme !== previousTheme) {
+      document.dispatchEvent(new CustomEvent('themechange', {
+        detail: { theme: selectedTheme }
+      }));
+    }
   }
 
   // Get initial theme

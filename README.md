@@ -2,7 +2,7 @@
 
 ## 构建
 
-首次安装 Pagefind：
+首次安装前端构建依赖：
 
 ```sh
 npm ci
@@ -66,6 +66,22 @@ Callout 使用 Obsidian/GitHub 风格的 Markdown 语法，支持 `note`、`tip`
 ```
 
 自动预览会把该 URL 发送给 Microlink 获取公开元数据，并在浏览器本地缓存 24 小时；接口或预览图不可用时会自动降级为纯文字链接。旧的 `callout.html`、`github_repo.html` 和 `link_preview.html` include 写法仍然兼容。
+
+## Mermaid 图表
+
+使用标准的 `mermaid` fenced code block，无需在文章 front matter 中增加开关。只有包含图表的页面才会按需加载本站托管的 Mermaid：
+
+````markdown
+```mermaid
+flowchart LR
+  accTitle: 博客构建流程
+  accDescr: Markdown 经 Jekyll 和 Pagefind 处理后部署到 GitHub Pages
+
+  Markdown --> Jekyll --> Pagefind --> GitHubPages[GitHub Pages]
+```
+````
+
+正式文章中的图表至少填写一行 `accTitle`；复杂图表再使用 `accDescr` 描述图中表达的关系。`bin/build` 会在生成站点前检查所有 Mermaid code block 的语法，并提示缺少 `accTitle` 的图表。渲染失败或浏览器禁用 JavaScript 时，页面会保留可读的图表源码。
 
 静态推文不加载 X 的第三方脚本，头像和配图均为可选项：
 

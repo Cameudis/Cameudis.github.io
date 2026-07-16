@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "4ddc001677170880",
+        "id": "a37ac8ff56a33a49",
         "type": "tabs",
         "children": [
           {
-            "id": "0fe3e3a546eb37e3",
+            "id": "0d2965718319a76c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/ctf/2026-05-26-CTF-Dot.md",
+                "file": "_posts/unclassified/2026-07-12-写一个switch防晕动症插件-1.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-05-26-CTF-Dot"
+              "title": "2026-07-12-写一个switch防晕动症插件-1"
             }
           }
         ]
@@ -61,7 +61,7 @@
                 "sortOrder": "alphabetical"
               },
               "icon": "lucide-search",
-              "title": "Search"
+              "title": "搜索"
             }
           },
           {
@@ -94,8 +94,8 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "diary.md",
-                "collapseAll": false,
+                "file": "_posts/unclassified/2026-07-12-写一个switch防晕动症插件-1.md",
+                "collapseAll": true,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
                 "showSearch": false,
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for diary"
+              "title": "2026-07-12-写一个switch防晕动症插件-1 的反向链接列表"
             }
           },
           {
@@ -133,7 +133,7 @@
                 "searchQuery": ""
               },
               "icon": "lucide-tags",
-              "title": "Tags"
+              "title": "标签"
             }
           },
           {
@@ -142,21 +142,21 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "diary.md",
+                "file": "_posts/unclassified/2026-07-12-写一个switch防晕动症插件-1.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of diary"
+              "title": "2026-07-12-写一个switch防晕动症插件-1 的大纲"
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -169,34 +169,53 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "0fe3e3a546eb37e3",
+  "active": "0d2965718319a76c",
   "lastOpenFiles": [
-    "_posts/ctf/2025-11-11-QWB-Qual-2025-babybus.md",
-    "_posts/ctf/2026-05-26-CTF-Dot.md",
-    "diary.md",
-    "docs/2026/02/08/VMware-1.html",
-    "docs/2026/02/08",
-    "docs/2026/02",
-    "docs/2026",
-    "_posts/binary/2026-02-08-VMware-1.md",
-    "link.md",
-    "作业.md",
-    "diary.md~",
-    "docs/assets/js/post.js",
-    "docs/assets/js",
-    "assets/js/post.js",
-    "assets/js",
-    "assets",
-    "docs/images/favicon-32x32.png",
-    "docs/images/favicon-16x16.png",
-    "docs/images/ava1.jpg",
-    "docs/images/applestore_2.png",
-    "docs/images/applestore_1.png",
-    "docs/images/apple-touch-icon.png",
-    "docs/images/android-chrome-512x512.png",
-    "docs/images/android-chrome-192x192.png",
-    "docs/images/about.webp",
-    "docs/images/3x17_3.jpg",
-    "readings.md"
+    "docs/pagefind/index/zh-cn_7bf4bd8.pf_index",
+    "docs/pagefind/index/zh-cn_285f2f4.pf_index",
+    "docs/pagefind/index/zh-cn_8d52f7e.pf_index",
+    "docs/pagefind/pagefind.zh-cn_451e514f6b148.pf_meta",
+    "docs/pagefind/fragment/zh-cn_3ae0707.pf_fragment",
+    "docs/2026/07/12/写一个switch防晕动症插件-1.html",
+    "docs/2026/07/12/写一个switch防晕车插件-1.html",
+    "docs/2026/07/12/写一个switch大气层防晕车软件-1.html",
+    "docs/pagefind/index/zh-cn_2225944.pf_index",
+    "docs/pagefind/index/zh-cn_a7e143c.pf_index",
+    "docs/pagefind/index/zh-cn_287ac9c.pf_index",
+    "_posts/binary/2024-09-15-GhostWrite-1.md",
+    "_posts/unclassified/2026-07-12-写一个switch防晕动症插件-1.md",
+    "node_modules/jsdom/README.md",
+    "node_modules/cssstyle/README.md",
+    "node_modules/@asamuzakjp/css-color/README.md",
+    "node_modules/entities/readme.md",
+    "node_modules/tldts-core/README.md",
+    "node_modules/tldts/README.md",
+    "node_modules/parse5/README.md",
+    "node_modules/ws/README.md",
+    "node_modules/lru-cache/README.md",
+    "node_modules/tough-cookie/README.md",
+    "node_modules/whatwg-url/README.md",
+    "node_modules/xmlchars/README.md",
+    "node_modules/agent-base/README.md",
+    "node_modules/https-proxy-agent/README.md",
+    "node_modules/tr46/README.md",
+    "node_modules/tr46/LICENSE.md",
+    "node_modules/nwsapi/README.md",
+    "node_modules/http-proxy-agent/README.md",
+    "node_modules/whatwg-mimetype/README.md",
+    "node_modules/debug/README.md",
+    "node_modules/w3c-xmlserializer/README.md",
+    "node_modules/decimal.js/README.md",
+    "node_modules/w3c-xmlserializer/LICENSE.md",
+    "node_modules/cytoscape-fcose/node_modules/layout-base/layout-schema.png",
+    "node_modules/cytoscape-fcose/demo/incrementalConstraints.gif",
+    "node_modules/cytoscape-fcose/demo/demo.gif",
+    "node_modules/layout-base/layout-schema.png",
+    "docs/assets/external-link-icons/f77e5f354a1b1f84.png",
+    "docs/assets/external-link-icons/f26c64266c17810a.png",
+    "docs/assets/external-link-icons/f1ff994a1d1ce1ca.png",
+    "docs/assets/external-link-icons/ee2d0d76ac1ae0a5.png",
+    "docs/assets/external-link-icons/ed1c8bb2004a2daf.png",
+    "docs/assets/external-link-icons/e89245eeff4455a5.png"
   ]
 }

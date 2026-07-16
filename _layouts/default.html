@@ -15,6 +15,10 @@
 
   {%- include footer.html -%}
 
+  {%- if content contains 'language-mermaid' -%}
+  <script type="module" src="{{ "/assets/js/mermaid-loader.js" | relative_url }}?v={{ site.asset_versions.mermaid }}"></script>
+  {%- endif -%}
+
 </body>
 
 </html>
