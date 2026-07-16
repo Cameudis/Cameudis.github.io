@@ -191,6 +191,7 @@
 .footer-status {
   display: flex;
   align-items: center;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: $small-font-size;
   color: #a3be8c; // Nord green
   margin-bottom: 0; // Remove margin pushing it up
@@ -229,6 +230,7 @@
   margin-top: $spacing-unit;
   border-top: 1px dashed $grey-color-light;
   padding-top: math.div($spacing-unit, 2);
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: $small-font-size;
 }
 
@@ -239,7 +241,7 @@
 }
 
 .footer-heading {
-  font-family: $base-font-family;
+  font-family: "FusionPixel10Prop", sans-serif;
   color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
@@ -263,7 +265,7 @@
 }
 
 .footer-title {
-  font-family: $base-font-family;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 700;
   font-size: $micro-font-size;
   color: $brand-color;
@@ -871,6 +873,10 @@
 }
 
 .related-posts {
+  width: 100%;
+  max-width: $post-content-width;
+  margin-right: auto;
+  margin-left: auto;
   margin-top: $spacing-unit * 2;
   padding: math.div($spacing-unit, 2);
   border: 1px dashed $grey-color-light;

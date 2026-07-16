@@ -573,6 +573,7 @@ table td {
 .footer-status {
   display: flex;
   align-items: center;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: 13px;
   color: #a3be8c;
   margin-bottom: 0;
@@ -608,6 +609,7 @@ table td {
   margin-top: 40px;
   border-top: 1px dashed var(--grey-color-light);
   padding-top: 20px;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-size: 13px;
 }
 
@@ -618,7 +620,7 @@ table td {
 }
 
 .footer-heading {
-  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "FusionPixel10Prop", sans-serif;
   color: var(--heading-color);
   margin-bottom: 0;
   font-size: 1.4em;
@@ -641,7 +643,7 @@ table td {
 }
 
 .footer-title {
-  font-family: "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: "FusionPixel10Prop", sans-serif;
   font-weight: 700;
   font-size: 12px;
   color: var(--brand-color);
@@ -1189,6 +1191,10 @@ table td {
 }
 
 .related-posts {
+  width: 100%;
+  max-width: 720px;
+  margin-right: auto;
+  margin-left: auto;
   margin-top: 80px;
   padding: 20px;
   border: 1px dashed var(--grey-color-light);
