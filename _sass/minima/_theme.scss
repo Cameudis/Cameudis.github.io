@@ -20,6 +20,16 @@
   --card-bg: rgba(46, 52, 64, 0.4);
   --page-background-image: none;
   --page-background-attachment: fixed;
+  --mermaid-background: #1c1c1c;
+  --mermaid-primary: #2e3440;
+  --mermaid-primary-text: #eceff4;
+  --mermaid-primary-border: #5e81ac;
+  --mermaid-secondary: #3b4252;
+  --mermaid-tertiary: #242933;
+  --mermaid-line: #88c0d0;
+  --mermaid-note: #3b4252;
+  --mermaid-note-text: #eceff4;
+  --mermaid-note-border: #5e81ac;
 
   /* Syntax Highlighting (Night) */
   --tok-comment: #616e88;
@@ -50,6 +60,16 @@
   --brand-dim: rgba(208, 135, 112, 0.1);
   --accent-orange: #d08770;
   --nav-bg: #f8f8f8;
+  --mermaid-background: #ffffff;
+  --mermaid-primary: #f7f9fb;
+  --mermaid-primary-text: #2e3440;
+  --mermaid-primary-border: #d08770;
+  --mermaid-secondary: #e8edf3;
+  --mermaid-tertiary: #f8f1ee;
+  --mermaid-line: #5b7897;
+  --mermaid-note: #fff6f2;
+  --mermaid-note-text: #2e3440;
+  --mermaid-note-border: #d08770;
 
   /* Syntax Highlighting (Day - softened Nord) */
   --tok-comment: #4c566a;
@@ -84,6 +104,16 @@
     linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)),
     url("../images/theme-blue-white-tile.png");
   --page-background-attachment: scroll;
+  --mermaid-background: #f5fbff;
+  --mermaid-primary: #cfe8f8;
+  --mermaid-primary-text: #123f66;
+  --mermaid-primary-border: #1875b8;
+  --mermaid-secondary: #b7dcf3;
+  --mermaid-tertiary: #eff9ff;
+  --mermaid-line: #1875b8;
+  --mermaid-note: #fff7fa;
+  --mermaid-note-text: #244563;
+  --mermaid-note-border: #e9869c;
 
   /* Syntax Highlighting (Blue & White) */
   --tok-comment: #66869d;
