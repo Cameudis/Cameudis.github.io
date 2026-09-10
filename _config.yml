@@ -9,6 +9,8 @@ url: "https://www.cameudis.com"  # the base hostname & protocol for your site
 canonical_origin: "https://www.cameudis.com"  # stable origin for runtime same-site checks
 twitter_username: cameudis
 github_username:  cameudis
+icp_filing: "沪ICP备2026044721号-1"
+icp_filing_url: "https://beian.miit.gov.cn/"
 
 # Build settings
 theme: minima
@@ -19,8 +21,9 @@ plugins:
 asset_versions:
   footer: "20260715-3"
   github_repo: "20260716-lazy-load"
+  hover_notes: "20260810-1"
   link_preview: "20260716-local-metadata-3"
-  main_css: "20260717-font-roles"
+  main_css: "20260910-hover-notes"
   mermaid: "11.16.0-3"
   post: "20260716-mermaid"
   theme: "20260717-theme-label"

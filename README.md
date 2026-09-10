@@ -50,6 +50,14 @@ bin/new-post -e "随手记"
 
 ## 正文组件
 
+需要给普通行内文字补一段悬停故事时，使用 `[显示文字]{悬停内容}`。它可以出现在任何 Markdown 段落或列表中；桌面端悬停、键盘聚焦或移动端点按显示内容：
+
+```markdown
+我是一个 [连环画爱好者]{在课程报告、演讲 slides 中过少使用文字。}。
+```
+
+显示文字和悬停内容目前只接受纯文本；需要写出字面量的 `]`、`}`、`<` 或 `>` 时，在它前面加反斜杠。行内代码、代码块、HTML 标签和 Liquid 标签中的相同写法不会转换。
+
 Callout 使用 Obsidian/GitHub 风格的 Markdown 语法，支持 `note`、`tip`、`warning`、`danger` 和 `important`：
 
 ```markdown

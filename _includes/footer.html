@@ -40,7 +40,13 @@
         <img src="https://blog-1308958542.cos.ap-shanghai.myqcloud.com/20251230224502598.gif" alt="badge" width="88"
           height="31" loading="lazy" decoding="async">
       </div>
-      <p>&copy; {{ site.time | date: '%Y' }} {{ site.author }}</p>
+      <p>
+        &copy; {{ site.time | date: '%Y' }} {{ site.author }}
+        {%- if site.icp_filing and site.icp_filing_url -%}
+        <span aria-hidden="true"> · </span>
+        <a href="{{ site.icp_filing_url | escape }}" target="_blank" rel="noopener noreferrer">{{ site.icp_filing | escape }}</a>
+        {%- endif -%}
+      </p>
     </div>
   </div>
 </footer>

@@ -1,5 +1,87 @@
 @use "minima/variables" as *;
 
+// Inline hover notes
+.hover-note {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  color: inherit;
+  line-height: inherit;
+  cursor: help;
+  outline: none;
+}
+
+.hover-note__label {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--brand-color);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.hover-note__story {
+  position: absolute;
+  z-index: 10000;
+  bottom: calc(100% + 0.65rem);
+  left: 50%;
+  width: max-content;
+  max-width: min(22rem, calc(100vw - 32px));
+  padding: 10px 13px;
+  visibility: hidden;
+  border: 1px solid var(--brand-color);
+  background: var(--nav-bg);
+  box-shadow: 5px 5px 0 var(--brand-dim);
+  color: var(--text-color);
+  font-family: $base-font-family;
+  font-size: $small-font-size;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+}
+
+.hover-note:hover > .hover-note__story,
+.hover-note:focus > .hover-note__story {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.hover-note:focus-visible > .hover-note__label {
+  border-radius: 2px;
+  outline: 2px solid var(--brand-color);
+  outline-offset: 3px;
+}
+
+.has-hover-notes .hover-note__story {
+  position: fixed;
+  top: var(--hover-note-y, 50vh);
+  bottom: auto;
+  left: var(--hover-note-x, 50vw);
+}
+
+.has-hover-notes .hover-note[data-hover-note-placement="top"] > .hover-note__story {
+  transform: translate(-50%, calc(-100% + 4px));
+}
+
+.has-hover-notes .hover-note[data-hover-note-placement="top"]:hover > .hover-note__story,
+.has-hover-notes .hover-note[data-hover-note-placement="top"]:focus > .hover-note__story {
+  transform: translate(-50%, -100%);
+}
+
+.has-hover-notes .hover-note[data-hover-note-placement="bottom"] > .hover-note__story {
+  transform: translate(-50%, -4px);
+}
+
+.has-hover-notes .hover-note[data-hover-note-placement="bottom"]:hover > .hover-note__story,
+.has-hover-notes .hover-note[data-hover-note-placement="bottom"]:focus > .hover-note__story {
+  transform: translate(-50%, 0);
+}
+
 // Callouts
 .callout {
   --callout-color: var(--brand-color);
@@ -228,6 +310,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hover-note__story,
   .link-preview,
   .link-preview__description { animation: none !important; transition: none !important; }
 }

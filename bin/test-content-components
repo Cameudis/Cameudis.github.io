@@ -33,6 +33,27 @@ assert("generated callout markup is valid Liquid") do
   Liquid::Template.parse(callout)
 end
 
+inline_note = transform("这里有一个 [连环画爱好者]{在课程报告、演讲 slides 中过少使用文字。}。\n")
+assert("inline note becomes an accessible hover note") do
+  inline_note.include?('class="hover-note"') &&
+    inline_note.include?('tabindex="0"') &&
+    inline_note.include?('role="tooltip"') &&
+    inline_note.include?("连环画爱好者") &&
+    inline_note.include?("在课程报告、演讲 slides 中过少使用文字。")
+end
+
+escaped_inline_note = transform("[\\<称号\\>]{故事里有 & 和 \"引号\"。}")
+assert("inline note text is HTML-escaped") do
+  escaped_inline_note.include?("&lt;称号&gt;") &&
+    escaped_inline_note.include?("故事里有 &amp; 和 &quot;引号&quot;。")
+end
+
+multiple_inline_notes = transform("[称号一]{故事一} 和 [称号二]{故事二}\n")
+assert("multiple inline notes receive distinct descriptions") do
+  multiple_inline_notes.include?('aria-describedby="hover-note-1"') &&
+    multiple_inline_notes.include?('aria-describedby="hover-note-2"')
+end
+
 generic_card = transform("<https://example.com/article>\n")
 assert("standalone autolink becomes a generic preview") do
   generic_card.include?("{% include link_preview.html")
@@ -57,6 +78,16 @@ end
 named_link = "[Example](https://example.com)\n"
 assert("named Markdown links are unchanged") do
   transform(named_link) == named_link
+end
+
+inline_code = "正文中的 `[称号]{故事}` 保持代码。\n"
+assert("inline note syntax in inline code is unchanged") do
+  transform(inline_code) == inline_code
+end
+
+escaped_inline_note_syntax = "\\[称号]{故事}\n"
+assert("escaped inline note syntax is unchanged") do
+  transform(escaped_inline_note_syntax) == escaped_inline_note_syntax
 end
 
 fenced_code = <<~MARKDOWN

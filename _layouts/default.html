@@ -15,6 +15,10 @@
 
   {%- include footer.html -%}
 
+  {%- if content contains 'class="hover-note"' -%}
+  <script src="{{ "/assets/js/hover-notes.js" | relative_url }}?v={{ site.asset_versions.hover_notes }}" defer></script>
+  {%- endif -%}
+
   {%- if content contains 'language-mermaid' -%}
   <script type="module" src="{{ "/assets/js/mermaid-loader.js" | relative_url }}?v={{ site.asset_versions.mermaid }}"></script>
   {%- endif -%}

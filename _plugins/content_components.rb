@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "cgi"
 require "uri"
 
 module Jekyll
@@ -10,6 +11,7 @@ module Jekyll
     class Transformer
       CALLOUT_START = /\A(?<indent> {0,3})>\s*\[!(?<type>[A-Za-z][A-Za-z0-9_-]*)\](?:[ \t]+(?<title>.*?))?[ \t]*(?:\r?\n)?\z/
       AUTOLINK = /\A {0,3}<(?<url>https?:\/\/[^<>\s]+)>[ \t]*(?:\r?\n)?\z/i
+      INLINE_NOTE = /(?<![!\\])\[(?<label>(?:\\.|[^\[\]\r\n])+)\]\{(?<story>(?:\\.|[^{}\r\n])+)\}/
       FENCE_START = /\A {0,3}(?<fence>`{3,}|~{3,})/
       LIQUID_LITERAL_START = /\A\s*\{%\s*(?<name>raw|comment|highlight)\b/
       LIQUID_LITERAL_END = /\A\s*\{%\s*end(?<name>raw|comment|highlight)\s*%\}/
@@ -78,7 +80,7 @@ module Jekyll
             next
           end
 
-          output << line
+          output << transform_inline_notes(line)
           index += 1
         end
 
@@ -136,6 +138,64 @@ module Jekyll
           {% capture #{value_variable} %}#{repo || url}{% endcapture %}
           #{include_markup}
         LIQUID
+      end
+
+      def transform_inline_notes(line)
+        output = +""
+        cursor = 0
+
+        while cursor < line.length
+          protected_start = line.match(/`+|(?<!\\)<|\{%|\{\{/, cursor)
+          unless protected_start
+            output << replace_inline_notes(line[cursor..])
+            break
+          end
+
+          output << replace_inline_notes(line[cursor...protected_start.begin(0)])
+          protected_end = inline_protected_end(line, protected_start)
+
+          unless protected_end
+            output << line[protected_start.begin(0)..]
+            break
+          end
+
+          output << line[protected_start.begin(0)...protected_end]
+          cursor = protected_end
+        end
+
+        output
+      end
+
+      def replace_inline_notes(text)
+        text.gsub(INLINE_NOTE) do
+          label = unescape_inline_note(Regexp.last_match[:label].strip)
+          story = unescape_inline_note(Regexp.last_match[:story].strip)
+          render_inline_note(label, story)
+        end
+      end
+
+      def render_inline_note(label, story)
+        note_id = "hover-note-#{next_component_id}"
+
+        <<~HTML.chomp
+          <span class="hover-note" tabindex="0" aria-describedby="#{note_id}"><span class="hover-note__label">#{CGI.escapeHTML(label)}</span><span class="hover-note__story" id="#{note_id}" role="tooltip">#{CGI.escapeHTML(story)}</span></span>
+        HTML
+      end
+
+      def unescape_inline_note(text)
+        text.gsub(/\\([\[\]{}<>\\])/, "\\1")
+      end
+
+      def inline_protected_end(line, match)
+        token = match[0]
+        closing = case token
+                  when "<" then ">"
+                  when "{%" then "%}"
+                  when "{{" then "}}"
+                  else token
+                  end
+        closing_start = line.index(closing, match.end(0))
+        closing_start + closing.length if closing_start
       end
 
       def github_repository(url)
