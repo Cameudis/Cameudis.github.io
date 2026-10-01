@@ -39,7 +39,14 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Y² (aka.cameudis)"},"dateModified":"2026-07-12T00:00:00+08:00","datePublished":"2026-07-12T00:00:00+08:00","description":"我不知道有没有人和我一样在地铁上都™会晕车。但是呢我又很想在地铁上打游戏。","headline":"写一个switch防晕动症插件 #1","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.cameudis.com/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html"},"url":"https://www.cameudis.com/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css?v=20260910-hover-notes"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script type="text/javascript" async
+<link rel="stylesheet" href="/assets/main.css?v=20261001-table-style"><link type="application/atom+xml" rel="alternate" href="https://www.cameudis.com/feed.xml" title="Y²的博客" /><script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script type="text/javascript" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js">
   </script><script src="/assets/js/theme.js?v=20260717-theme-label" defer></script>
 </head>
@@ -248,11 +255,28 @@
 
 <p>显然普通的 switch 是不允许我开发一个覆盖全屏的软件并放上去跑的！我的 switch 经过了神秘力量的魔改，可以运行自定义的固件 <a href="https://github.com/Atmosphere-NX/Atmosphere">Atmosphère</a>，这套固件对 switch 原生的 Secure Monitor、Horizon 内核和用户态系统服务等组件都做了 patch，从而允许用户安装自制软件（以及关闭游戏签名校验、金手指等邪恶操作）。</p>
 
-<p>在 switch 上开发自制软件（homebrew）之所以成为可能，真是要好好感谢那些逆向哥们了。他们维护了一个网站 <a href="https://switchbrew.org/">Nintendo Switch Brew</a>，记录了关于 switch 的公开/逆向得来的各种资料，比如有关于 <a href="https://switchbrew.org/wiki/Kernel">Horizon/NX 内核</a> 的、关于 <a href="https://switchbrew.org/wiki/Joy-Con">JoyCon 手柄</a> 的、关于 <a href="https://switchbrew.org/wiki/Secure_Monitor">TrustZone Secure Monitor</a> 的……</p>
+<p>在 switch 上开发自制软件（homebrew）之所以成为可能，真是要好好感谢那些逆向哥们。</p>
+
+<aside class="link-preview" data-link-preview="https://switchbrew.org/" data-site-url="https://www.cameudis.com" data-manual-title="" data-manual-description="" data-manual-image="" aria-busy="true">
+  <a class="link-preview__link" href="https://switchbrew.org/" target="_blank" rel="noopener noreferrer">
+    <img decoding="async" class="link-preview__image" alt="" loading="lazy" hidden="" />
+    <span class="link-preview__body">
+      <strong class="link-preview__title">https://switchbrew.org/</strong>
+      <span class="link-preview__description">正在读取链接信息…</span>
+      <span class="link-preview__site">
+        <img decoding="async" class="link-preview__favicon" alt="" width="16" height="16" loading="lazy" hidden="" />
+        <span class="link-preview__site-name">switchbrew.org</span>
+        <span class="link-preview__arrow" aria-hidden="true">↗</span>
+      </span>
+    </span>
+  </a>
+</aside>
+
+<p>他们维护的这个网站记录了关于 switch 的公开/逆向得来的各种资料，比如有关于 <a href="https://switchbrew.org/wiki/Kernel">Horizon/NX 内核</a> 的、关于 <a href="https://switchbrew.org/wiki/Joy-Con">JoyCon 手柄</a> 的、关于 <a href="https://switchbrew.org/wiki/Secure_Monitor">TrustZone Secure Monitor</a> 的……下文提到的“文档”默认就指这个第三方文档。</p>
 
 <p>在这些<del>黑魔法</del>资料之上，诞生了 switch 自制软件的生态：用户态系统编程库 <a href="https://github.com/switchbrew/libnx">libnx</a> 允许开发者方便地调用到内核提供的多种接口，包括进程资源管理、IPC、文件系统、各种 I/O 设备如手柄、陀螺仪、触摸屏、图形显示和 GPU、音频、网络、USB、蓝牙……另外，<a href="https://devkitpro.org/">devkitPro</a> 这个组织为 Nintendo wii、gamecube、ds、gba、gamepark gp 32 以及 Switch 这些游戏机都维护了自制软件的开发工具链。</p>
 
-<p>I mean，看到大家都这么努力，哪个开发者不想急头白脸哼哧哼哧开发点软件上去？</p>
+<p>I mean，看到大家做了这么多工作，哪个程序员不想急头白脸开发点软件上去？</p>
 
 <h2 id="开发与测试">开发与测试</h2>
 
@@ -265,20 +289,20 @@
  另外我不得不强调一下我是智谱的忠实粉丝，他们的 ZCode 似乎是全世界唯一一款原生支持 Linux 的 GUI Agent 软件。当我在 ZCode 官网上看到 Tux🐧的瞬间，我知道智谱已经遥遥领先，成为 Anthropic 最严厉的父亲。</p>
 </blockquote>
 
-<p>我通过 DBI + USB 将 Switch 接入电脑，这样 Agent 可以直接部署程序，不用我每次把 SD 卡拔下来插电脑上。当然这种方法的缺点就是，每次都要去相册里面开这个文件服务器有点烦，不知道有没有更方便的做法。</p>
+<p>我通过 <a href="https://github.com/ELY3M/sys-ftpd">ELY3M/sys-ftpd</a> 来局域网连接 Switch 和电脑，这样 Agent 可以直接部署程序，不用我每次把 SD 卡拔下来插电脑上。其实我还让 Agent 写了一个开发用测试接口，允许他自己重启 Switch，不过还没有很成熟就不讲了。</p>
 
 <h2 id="软件架构">软件架构</h2>
 
-<p>Switch 上面有一个生态里非常著名的 Tesla Menu，是一个可以任意时刻呼出的侧栏菜单，可以通过这个菜单快捷调用程序，比如超频、金手指、系统状态、帧率显示等。SWOTS 项目也选择 Tesla Menu 作为交互入口，软件整体分为两个部分：</p>
+<p>在 Switch Homebrew 生态中，一个可以任意时刻呼出的侧栏菜单是非常重要的，大家调整超频、金手指、系统状态、帧率显示等都会用到这个侧栏菜单，这就是大名鼎鼎的 <a href="https://github.com/WerWolv/Tesla-Menu">Tesla-Menu</a>。可惜的是，这个项目已经停更三年了，好在 <a href="https://github.com/ppkantorski/Ultrahand-Overlay">Ultrahand-Overlay</a> 项目接过了接力棒。SWOTS 项目也选择侧栏作为交互入口，软件整体分为两个部分：</p>
 
 <ul>
-  <li><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code>：基于 <a href="https://github.com/WerWolv/libtesla">libtesla</a> 开发的 Tesla Menu 入口，实现了设置与开关的界面</li>
-  <li><code class="language-plaintext highlighter-rouge">SWOTS.nsp</code>：后台运行的 Renderer 服务，读取传感器数据并实现晕动提示渲染</li>
+  <li><code class="language-plaintext highlighter-rouge">.ovl</code>：基于 <a href="https://github.com/WerWolv/libtesla">libtesla</a> 开发的 overlay 入口（overlay 就是侧栏菜单中的小组件），实现了设置与开关的界面；同时兼容 Tesla-Menu 和 Ultrahand</li>
+  <li><code class="language-plaintext highlighter-rouge">.nsp</code>：后台运行的 Renderer 服务，一个动态启动的 Atmosphère sysmodule，读取传感器数据并实现晕动提示渲染</li>
 </ul>
 
 <p>两者之间通过 Switch 上的 IPC 机制通信，文档见 <a href="https://switchbrew.org/wiki/HIPC">HIPC - Nintendo Switch Brew</a>。具体来说，HIPC (Horizon Inter-Process Communication) 是 switch 内核的 IPC 实现，在用户态有两套上层协议，分别是这个项目使用的 CMIF（全称可能是 Command Interface）和 TIPC（Tiny IPC）。</p>
 
-<p>Renerder 会在启动时注册一个 CMIF 服务 <code class="language-plaintext highlighter-rouge">swots:u</code>，用以接受 IPC 通信：</p>
+<p>Renderer 会在启动时注册一个 CMIF 服务 <code class="language-plaintext highlighter-rouge">swots:u</code>，用以接受 IPC 通信：</p>
 
 <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smRegisterServiceCmif</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">,</span> <span class="p">...);</span>
 </code></pre></div></div>
@@ -288,40 +312,17 @@
 <div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">smGetService</span><span class="p">(...,</span> <span class="s">"swots:u"</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 包括一个 UI 相关线程（主线程 / HID 线程）和 IPC Worker 线程，这种设计是为了防止 IPC Worker 卡住导致 UI 也同步卡住、使用户无法操作。</p>
+<p><code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 包括一个 UI 相关线程（HID 线程）和 IPC Worker 线程，这种设计是为了防止无限阻塞的同步 CMIF 调用把 UI 也卡住。</p>
 
-<p>当用户和菜单进行交互、按下启动 SWOTS 时，IPC Worker 会通过 Process Manager 系统服务启动一个 Renderer 进程并连上它注册的 CMIF 服务，开始通信。</p>
+<p>当用户和菜单进行交互、按下启动 SWOTS 时，<code class="language-plaintext highlighter-rouge">.ovl</code> 会通过 Process Manager 系统服务启动一个 Renderer 进程并连上它注册的 CMIF 服务，开始通信。</p>
 
-<p>由于 Tesla Menu 和 SWOTS 的悬浮显示是冲突的，所以当 <code class="language-plaintext highlighter-rouge">SWOTS.ovl</code> 检测到用户退出 Tesla 菜单的时候，它会给 Renderer 发送 <code class="language-plaintext highlighter-rouge">Resume</code> 命令，此时 Renderer 才正式开始渲染工作。</p>
+<p>由于底层限制，switch 上同时只能有一个实体占用悬浮层（VI 透明提示层），所以侧栏和 SWOTS 的显示会产生冲突。当 <code class="language-plaintext highlighter-rouge">.ovl</code> 检测到用户退出 Tesla 菜单的时候，它会给 Renderer 发送 <code class="language-plaintext highlighter-rouge">Resume</code> 命令，此时 Renderer 才正式开始渲染工作。</p>
 
-<p>两者的具体交互可以看下面这个图：</p>
-
-<pre><code class="language-mermaid">sequenceDiagram
-    accTitle: SWOTS 组件通信时序
-    accDescr: SWOTS.ovl 通过 swots:u 服务控制 renderer 的配置、暂停、恢复和退出，renderer 负责 VI 图层与传感器资源。
-    participant O as SWOTS.ovl
-    participant R as Renderer / swots:u
-    participant V as VI + Motion
-
-	Note over O: 在 Tesla 菜单中开启 SWOTS
-    O-&gt;&gt;R: 启动进程并连接
-    O-&gt;&gt;R: SetConfig
-    R--&gt;&gt;O: 配置已应用
-
-    Note over O: 关闭 Tesla 菜单
-    O-&gt;&gt;R: Resume
-    R-&gt;&gt;V: 创建 VI 图层并启动传感器
-    R--&gt;&gt;O: Running 事件确认
-
-    Note over O: 打开 Tesla 菜单
-    O-&gt;&gt;R: ClaimAndSuspend
-    R-&gt;&gt;V: 停止传感器并销毁 VI 图层
-    R--&gt;&gt;O: Suspended 事件确认
-
-    Note over O: 关闭 SWOTS
-    O-&gt;&gt;R: RequestStop
-    R-&gt;&gt;V: 确认资源已释放
-    R--&gt;&gt;O: 退出进程
+<pre><code class="language-mermaid">flowchart LR
+    M["Ultrahand / Tesla 菜单"] --&gt; F["SWOTS.ovl&lt;br/&gt;设置与开关"]
+    F &lt;--&gt;|"IPC 控制"| R["Renderer sysmodule"]
+    R --&gt; S["六轴传感器"]
+    R --&gt; V["VI 透明提示层"]
 </code></pre>
 
 <hr />
@@ -355,12 +356,15 @@
         <a class="u-url" href="/2026/07/12/%E5%86%99%E4%B8%80%E4%B8%AAswitch%E9%98%B2%E6%99%95%E5%8A%A8%E7%97%87%E6%8F%92%E4%BB%B6-1.html" hidden></a>
 </article>
 
-<script src="/assets/js/post.js?v=20260716-mermaid"
+<script src="/assets/js/post.js?v=20260801-external-tabs"
         data-external-icon-manifest="/assets/external-link-icons/manifest.json"
+        data-site-url="https://www.cameudis.com"
         defer></script>
 
 <script src="/assets/js/github-repo.js?v=20260716-lazy-load" defer></script>
 
+
+<script src="/assets/js/link-preview.js?v=20260716-local-metadata-3" defer></script>
 
 
     </div>

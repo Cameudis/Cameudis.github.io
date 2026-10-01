@@ -50,6 +50,7 @@ layout: default
 
 <script src="{{ "/assets/js/post.js" | relative_url }}?v={{ site.asset_versions.post }}"
         data-external-icon-manifest="{{ "/assets/external-link-icons/manifest.json" | relative_url }}"
+        data-site-url="{{ site.canonical_origin | default: site.url | escape }}"
         defer></script>
 {% if content contains 'data-github-repo=' %}
 <script src="{{ "/assets/js/github-repo.js" | relative_url }}?v={{ site.asset_versions.github_repo }}" defer></script>

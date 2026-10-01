@@ -11,4 +11,6 @@ vendor
 !docs/assets/vendor/mermaid/
 !docs/assets/vendor/mermaid/**
 node_modules/
+# Local Codex sandbox preferences.
+/.codex/config.toml
 _algolia_api_key

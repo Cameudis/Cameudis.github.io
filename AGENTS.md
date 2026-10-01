@@ -26,6 +26,7 @@
 - 入口是本地 `assets/main.scss`（`@use "minima"`），覆盖 theme gem 那个含 `@import` 的版本——不要删这个文件。
 - 搜索使用 Pagefind 1.5.2：`bin/build` 在 Jekyll 构建后扫描 `docs/`，生成并提交 `docs/pagefind/`；`_config.yml` 的 `keep_files: [pagefind]` 用来避免不运行 Pagefind 的 `jekyll serve` 删掉已生成索引，不要移除。逻辑在 `assets/js/search.js`，样式在 `_sass/minima/_search.scss`。只有带 `data-pagefind-body` 的文章正文会进入索引，Pagefind 运行时在首次打开搜索时动态加载；使用 post layout 但不应进入搜索的页面加 `search: false`（Diary 即如此）。
 - 文章 TOC 在桌面侧边浮动、窄屏电脑内联完整显示，仅小屏触控设备默认折叠；结构在 `_layouts/post.html`，交互在 `assets/js/post.js`，断点样式在 `_sass/minima/_layout.scss`。
+- 博文正文中的 HTTP(S) 站外链接由 `assets/js/post.js` 在加载后统一补上 `target="_blank"` 和 `rel="noopener noreferrer"`；站外判定同时把当前预览 hostname 与 `_config.yml` 的 `canonical_origin` 视为站内，避免本地预览误伤指向正式站点的绝对链接。修改这段逻辑后同步递增 `_config.yml` 的 `asset_versions.post`。
 - 主 CSS 用 `_config.yml` 的 `asset_versions.main_css` 做全站缓存破坏，修改全局样式后同步递增；`link.md` 的 front matter `asset_version` 会覆盖全站值，修改友链页样式时仍单独递增它。
 - 站点主题由 `assets/js/theme.js` 的选择器管理，主题 token 在 `_sass/minima/_theme.scss`；修改 `theme.js` 后同步递增 `_config.yml` 的 `asset_versions.theme`。蓝白主题的平铺背景源自用户提供的 PDF，部署资产是 `images/theme-blue-white-tile.png`；不要直接编辑该 PNG。
 - 像素字体只用于固定 UI 和装饰，字体家族名为 `FusionPixelUI`；文章标题、卡片标题、友链名称等动态中文使用 `_variables.scss` 的系统字体栈。`npm run font:subset` 会从固定 UI 源码自动生成 `assets/fonts/fusion-pixel-10px-ui.woff2`、`_sass/minima/_pixel-ui-font.scss` 和 `_data/pixel_ui_font.yml`，`bin/build` 已自动调用；不要手工编辑这些生成物，也不要让完整的 422 KB 简体中文字体进入关键加载路径。

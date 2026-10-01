@@ -2,12 +2,31 @@
  * post.js - Interactivity for Retro-Modern Blog Posts
  * 
  * Features:
+ * - External links open in a new tab
  * - Table of Contents (TOC) Scroll-Spy (Refined)
  * - Diary-specific "Most Recent" functionality
  */
 
 const postScript = document.currentScript;
 const externalIconManifestUrl = postScript?.dataset.externalIconManifest;
+const canonicalSiteUrl = postScript?.dataset.siteUrl;
+
+const isExternalHttpLink = link => {
+  try {
+    const url = new URL(link.href, window.location.href);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+    if (url.hostname === window.location.hostname) return false;
+
+    if (canonicalSiteUrl) {
+      const canonicalUrl = new URL(canonicalSiteUrl);
+      if (url.hostname === canonicalUrl.hostname) return false;
+    }
+
+    return true;
+  } catch (_) {
+    return false;
+  }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Code block chrome and copy controls
@@ -85,20 +104,25 @@ document.addEventListener('DOMContentLoaded', () => {
     frame.insertBefore(toolbar, highlight);
   });
 
-  // 2. Locally cached favicons for ordinary external links
+  // 2. Open external links in a new tab and isolate their browsing context
+  const externalLinks = Array.from(
+    document.querySelectorAll('.post-content a[href]')
+  ).filter(isExternalHttpLink);
+
+  externalLinks.forEach(link => {
+    link.target = '_blank';
+    link.relList.add('noopener', 'noreferrer');
+  });
+
+  // 3. Locally cached favicons for ordinary external links
   const decorateExternalLinks = async () => {
     if (!externalIconManifestUrl) return;
 
-    const links = Array.from(document.querySelectorAll('.post-content a[href]')).filter(link => {
+    const links = externalLinks.filter(link => {
       if (link.closest('.link-preview, .github-repo-card, .static-tweet')) return false;
       if (link.querySelector('img, svg')) return false;
 
-      try {
-        const url = new URL(link.href, window.location.href);
-        return (url.protocol === 'http:' || url.protocol === 'https:') && url.origin !== window.location.origin;
-      } catch (_) {
-        return false;
-      }
+      return true;
     });
     if (links.length === 0) return;
 
@@ -138,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   decorateExternalLinks();
 
-  // 3. Table of Contents (TOC) Scroll-Spy
+  // 4. Table of Contents (TOC) Scroll-Spy
   const tocContainer = document.querySelector('.post-toc');
   const tocToggle = tocContainer?.querySelector('.toc-toggle');
   const tocLinks = document.querySelectorAll('.post-toc a[href^="#"]');

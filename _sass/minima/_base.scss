@@ -314,26 +314,33 @@ table {
   text-align: $table-text-align;
   color: var(--table-text);
   border-collapse: collapse;
-  border: 1px solid var(--grey-color-light);
-
-  tr {
-    &:nth-child(even) {
-      background-color: var(--table-bg-even);
-    }
-  }
+  border: 0;
+  border-bottom: 1px solid var(--border-color);
 
   th,
   td {
-    padding: (math.div($spacing-unit, 3)) (math.div($spacing-unit, 2));
+    padding: math.div($spacing-unit, 4) math.div($spacing-unit, 2);
+    border: 0;
   }
 
   th {
-    background-color: var(--table-th-bg);
-    border: 1px solid var(--border-color);
+    padding-top: math.div($spacing-unit, 5);
+    padding-bottom: math.div($spacing-unit, 5);
+    background-color: transparent;
+    color: var(--brand-color);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
   }
 
-  td {
-    border: 1px solid var(--grey-color-light);
+  tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  td code {
+    padding-right: 3px;
+    padding-left: 3px;
+    border: 0;
+    background-color: var(--brand-dim) !important;
   }
 }
 

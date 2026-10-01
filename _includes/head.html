@@ -28,6 +28,13 @@
     {%- include google-analytics.html -%}
   {%- endif -%}
   {%- if page.use_math -%}
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
   <script type="text/javascript" async
     src="{{ site.third_party.mathjax_url }}">
   </script>

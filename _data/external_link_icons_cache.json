@@ -4,7 +4,7 @@
   "hosts": {
     "0ops.sjtu.cn": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:42Z"
+      "checked_at": "2026-08-01T07:01:25Z"
     },
     "9anux.org": {
       "status": "ok",
@@ -13,7 +13,7 @@
     },
     "android.googlesource.com": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:45Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "androidoffsec.withgoogle.com": {
       "status": "ok",
@@ -42,7 +42,7 @@
     },
     "atum.li": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:59Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "badram.eu": {
       "status": "ok",
@@ -53,6 +53,10 @@
       "status": "ok",
       "file": "76d592f73705f86c.png",
       "checked_at": "2026-07-15T15:55:29Z"
+    },
+    "beian.miit.gov.cn": {
+      "status": "missing",
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "blog.bi0s.in": {
       "status": "ok",
@@ -76,7 +80,7 @@
     },
     "boreas618.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:31Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "browserleaks.com": {
       "status": "ok",
@@ -95,7 +99,7 @@
     },
     "calinyara.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:03Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "cameudis.github.io": {
       "status": "ok",
@@ -169,7 +173,7 @@
     },
     "devkitpro.org": {
       "status": "missing",
-      "checked_at": "2026-07-16T07:38:16Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "docs.binary.ninja": {
       "status": "ok",
@@ -200,6 +204,10 @@
       "status": "ok",
       "file": "0b6729ab10478a68.png",
       "checked_at": "2026-07-15T15:55:38Z"
+    },
+    "drlot.us": {
+      "status": "missing",
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "dsp.domains.trincoll.edu": {
       "status": "ok",
@@ -243,7 +251,7 @@
     },
     "files.givewell.org": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:31Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "ghostwriteattack.com": {
       "status": "ok",
@@ -257,7 +265,7 @@
     },
     "git.kernel.org": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:01Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "github.com": {
       "status": "ok",
@@ -271,7 +279,7 @@
     },
     "gossip.team": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:43Z"
+      "checked_at": "2026-08-01T07:01:25Z"
     },
     "gyrojibering.github.io": {
       "status": "ok",
@@ -300,7 +308,7 @@
     },
     "hongyi.lu": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:09Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "icoa2026.au": {
       "status": "missing",
@@ -403,11 +411,11 @@
     },
     "nyxwh1sper.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:23Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "ollama.com": {
       "status": "missing",
-      "checked_at": "2026-07-16T07:38:16Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "optee.readthedocs.io": {
       "status": "ok",
@@ -416,15 +424,15 @@
     },
     "patchwork.ozlabs.org": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:26Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "picture.iczhiku.com": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:15Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "play.google.com": {
       "status": "missing",
-      "checked_at": "2026-07-16T07:38:16Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "posts.specterops.io": {
       "status": "ok",
@@ -468,7 +476,7 @@
     },
     "rr-project.org": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:21Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "s3.shizhz.me": {
       "status": "ok",
@@ -482,7 +490,7 @@
     },
     "securerom.fun": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:20Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "security.apple.com": {
       "status": "ok",
@@ -496,7 +504,7 @@
     },
     "space.bilibili.com": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:43Z"
+      "checked_at": "2026-08-01T07:01:25Z"
     },
     "steveklabnik.github.io": {
       "status": "ok",
@@ -510,7 +518,7 @@
     },
     "switchbrew.org": {
       "status": "missing",
-      "checked_at": "2026-07-16T07:38:16Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "techdocs.broadcom.com": {
       "status": "ok",
@@ -529,7 +537,7 @@
     },
     "utopianfuture.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:52Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "venam.net": {
       "status": "ok",
@@ -538,7 +546,7 @@
     },
     "wanglizheng.com": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:22Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "wiretap.fail": {
       "status": "ok",
@@ -592,7 +600,7 @@
     },
     "www.lijuanru.com": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:21Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "www.nature.com": {
       "status": "ok",
@@ -611,7 +619,7 @@
     },
     "www.nullbyte.cat": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:35Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "www.nvme0n1p.dev": {
       "status": "ok",
@@ -660,7 +668,7 @@
     },
     "www.shwetashinde.org": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:05Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "www.stratascale.com": {
       "status": "ok",
@@ -714,11 +722,11 @@
     },
     "xuanxuanblingbling.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:55:26Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "xuedugu.github.io": {
       "status": "missing",
-      "checked_at": "2026-07-15T15:56:24Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "yanghaoi.github.io": {
       "status": "ok",
@@ -737,7 +745,7 @@
     },
     "zcode.z.ai": {
       "status": "missing",
-      "checked_at": "2026-07-16T07:38:16Z"
+      "checked_at": "2026-10-01T04:21:33Z"
     },
     "zenaxu.cn": {
       "status": "ok",
